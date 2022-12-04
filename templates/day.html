@@ -1,0 +1,61 @@
+
+{% load static %}
+{% include "Common/header.html" %}
+
+{{tiny_mce.media}} <!-- needed for tiny mce to activate -->
+{% include "Modals/callbackModal.html" %}
+{% include "Modals/simpleModal.html" %}
+
+<link rel="stylesheet" href="{% static 'CSS/image-upload.css' %}"/>
+<link rel="stylesheet" href="{% static 'CSS/edit-content.css' %}"/>
+
+<body>
+    {% include "Backgrounds/Mountains.html" %}
+    {% include "NavBars/day-nav.html" %}
+
+    <div class="container">
+        <br>
+        <h1 class="text-center">{{day_name}}, {{day}}{{day_suffix}} {{month}} {{year}}</h1>
+        <br>
+
+        <div class='ml-4 bg-light border border-dark rounded' style='position: relative; height: 100%'>
+            <br>
+            <div class='px-5' id='edit-area' data-spy='scroll' data-target='#scrollable-data' data-offset='0'></div>
+
+            <div class = 'row mt-3 px-5'>
+                <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-para'>New Paragraph</button>
+                <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-image'>New Image</button>
+                <button class='btn btn-success px-2 ml-2 mt-2 mb-5' id='btn-save'>Save</button>
+                <button class='btn btn-dark px-3 ml-2 mt-2 mb-5 invisible' id='spinner-save' type='button' disabled>
+                    <span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span>
+                    &nbsp in progress 
+                </button>
+            </div>
+        </div>
+       {% csrf_token %}
+    </div>
+
+    <script src="{% static 'js/tiny.mce.helper.js' %}"></script>
+    <script src="{% static 'js/common.utility.js' %}"></script>
+    <script src="{% static 'js/entry.paragraph.js' %}"></script>
+    <script src="{% static 'js/entry.image.js' %}"></script>
+    <script src="{% static 'js/entry.edit.js' %}"></script>
+    <script src="{% static 'js/entry.save.js' %}"></script>
+    <script src="{% static 'js/entry.load.js' %}"></script>
+
+    <script>
+        var CONTENT_INDEX = 0;
+        var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" %}`;
+        var IMAGE_TEMPLATE = `{% include "EntryContents/Image.html" %}`;
+        var SAVE_CONTENT = {{saved_content | safe}};
+        var DATE_SLUG = '{{date_slug}}';
+        var SAVE_URL = '{% url "main:save-entry" %}';
+        var MAX_CHANGE_ATTEMPTS = 10;
+
+        intializeLoadedContent(SAVE_CONTENT);
+
+        $('#btn-new-para').click(appendParagraphToList);
+        $('#btn-new-image').click(appendImageToList);
+        $('#btn-save').click(saveToDatabase);
+    </script>
+</body>

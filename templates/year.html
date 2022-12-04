@@ -1,0 +1,32 @@
+{% load static %}
+{% include "Common/header.html" %}
+{% include "Backgrounds/Mountains.html" %}
+{% include "NavBars/year-nav.html" %}
+{% include "Backgrounds/coffee.html" %}
+
+<body>
+  <div class="container">
+    <div class="row">
+      {% for month_name in months_in_year %}
+        <div class="card my-3 mx-4 col-md-5">
+          <div class="row g-0">
+            <div class="col-md-4 py-2 px-2">
+              <a href = "{% url 'main:month' year month_name %}">
+                <img src="{% static 'Image/Missing.svg' %}" class="img-fluid rounded-start" alt="...">
+              </a>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <a href = "{% url 'main:month' year month_name %}">
+                  <h5 class="card-title" style = "color: black">{{month_name}}</h5>
+                </a>
+                <p class="card-text">10 entries 100 images 1000 words.</p>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>

@@ -1,0 +1,4 @@
+
+Journal/settings.py
+*.pyc
+*.sqlite3

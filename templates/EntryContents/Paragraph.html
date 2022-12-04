@@ -1,0 +1,34 @@
+<!-- Editable Text Area -->
+<div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-%{contentInd}' name='paragraph%{contentInd}'>
+    <form method = 'get' action = '' class = 'card container'>
+        <textarea class='entry-text save-content' name='message' cols='40' rows='10' required='' id='paragraph%{contentInd}' aria-hidden='true' style='min-height: 300px;'></textarea>
+    </form>
+</div>
+<!-- Edit Buttons -->
+<div class='col col-md-1 py-2 entry-region-%{contentInd}'>
+    <div class='row ml-3 mt-3'>
+        <button id='delete-content%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Delete' name='.entry-region-%{contentInd}'>
+            <i id='delete-content%{contentInd}' class='fa fa-trash style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='insert-paragraph%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Insert Paragraph' name='.entry-region-%{contentInd}'>
+            <i id='insert-paragraph%{contentInd}' class='fa fa-paragraph style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='insert-image%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Insert Image' name='.entry-region-%{contentInd}'>
+            <i id='insert-image%{contentInd}' class='fa fa-picture-o style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='move-content-up%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Move Up' name='.entry-region-%{contentInd}'>
+            <i id='move-content-up%{contentInd}' class='fa fa-arrow-up style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='move-content-down%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Move Down' name='.entry-region-%{contentInd}'>
+            <i id='move-content-down%{contentInd}' class='fa fa-arrow-down style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+</div>

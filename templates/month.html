@@ -1,0 +1,55 @@
+{% load static %}
+
+{% include "Common/header.html" %}
+{% include "Backgrounds/Topography.html" %}
+
+<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
+
+<body>
+  <div class="wood container py-5">
+    {% include "NavBars/month-nav.html" %}
+    <div class="calendar shadow p-5 page">
+      {% include "Month/CalendarHeader.html" %}
+      <br>
+      {% include "Month/DayNames.html" %}
+
+      <ol class="days list-unstyled">
+        {% for day in preceding_days %}
+          <li class="outside">
+            <div class="date">&nbsp&nbsp&nbsp{{day}}</div>
+          </li>
+        {% endfor %}
+        {% for day in days_in_month %}
+          <li>
+            <span>
+              <p class="date">&nbsp&nbsp&nbsp<strong style="color: black;">{{day}}</strong></p>
+
+              {% if day in days_with_an_entry %}
+                <a href="{% url 'main:edit' year month day %}">
+                  <button type="button" class="btn btn-dark draw-button">
+                    <i class='fa fa-pencil style'></i>
+                  </button>
+                </a>
+                <button type="button" class="btn btn-success"><i class='fa fa-desktop style'></i></button>
+                <button type="button" class="btn btn-success"><i class='fa fa-area-chart style'></i></button>
+              {% else %}
+                <a href="{% url 'main:edit' year month day %}">
+                  <button type="button" class="btn btn-outline-dark draw-button">
+                    <i class='fa fa-pencil style'></i>
+                  </button>
+                </a>
+                <button type="button" class="btn btn-outline-secondary" disabled ><i class='fa fa-desktop style'></i></button>
+                <button type="button" class="btn btn-outline-secondary" disabled ><i class='fa fa-area-chart style'></i></button>
+              {% endif %}
+            </span>
+          </li>
+        {% endfor %}
+        {% for day in trailing_days %}
+          <li class="outside">
+            <div class="date">&nbsp&nbsp&nbsp{{day}}</div>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</body>

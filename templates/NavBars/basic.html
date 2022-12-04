@@ -1,0 +1,14 @@
+{% load static %}
+
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:homepage' %}">
+            <img src="{% static 'image/Icons/home.png' %}" class="d-block w-30 mx-auto" alt="...">[Home]
+    </a>
+</li>
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:latest' %}">
+            <img src="{% static 'image/Icons/latest.png' %}" class="d-block w-30 mx-auto" alt="...">[Latest]
+    </a>
+</li>

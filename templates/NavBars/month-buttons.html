@@ -1,0 +1,32 @@
+{% load static %}
+
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:year' year %}">
+        <img src="{% static 'image/Icons/year.png' %}" class="d-block w-30 mx-auto" alt="...">[{{year}}]
+    </a>
+</li>
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:month' prev_month_year prev_month %}">
+        <button type="button" class="btn btn-dark mt-1">
+            <i class='fa fa-arrow-left style'></i>
+            &nbsp[{{prev_month}}]
+        </button>
+    </a>
+</li>
+<li class = "nav-small-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <button type="button" class="btn btn-dark" disabled>
+        &nbsp[{{month}}]&nbsp
+    </button>
+</li>
+<li class = "nav-small-space"><wbr></li>
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:month' next_month_year next_month %}">
+        <button type="button" class="btn btn-dark mt-1">
+            [{{next_month}}]
+            &nbsp<i class='fa fa-arrow-right style'></i>
+        </button>
+    </a>
+</li>

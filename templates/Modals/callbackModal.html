@@ -1,0 +1,41 @@
+<div class="modal fade" id="callback-modal" tabindex="-1" role="dialog" aria-labelledby="closeModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="callback-modal-title">Title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="callback-modal-body" class="modal-body">
+            Message
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="callback-modal-action" data-dismiss="modal">Action</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let showCallbackModal = function(modalTitle, modalMessage, actionTitle, callback) {
+        var modal = $('#callback-modal')[0];
+        var clonedModal = modal.cloneNode(true);
+        modal.parentNode.replaceChild(clonedModal, modal);
+
+        $('#callback-modal-title')[0].innerText = modalTitle;
+        $('#callback-modal-body')[0].innerText = modalMessage;
+        $('#callback-modal-action')[0].innerText = actionTitle;
+        $('#callback-modal-action').click(callback);
+        $('#callback-modal').modal('show');
+    }
+
+    document.onkeydown = function(e){
+          e = e || window.event;
+          var key = e.which || e.keyCode;
+          if (key === 13) {
+               $('#callback-modal-action')[0].click();
+          }
+     }
+</script>

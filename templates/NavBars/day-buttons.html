@@ -1,0 +1,38 @@
+{% load static %}
+
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:year' year %}">
+        <img src="{% static 'image/Icons/year.png' %}" class="d-block w-30 mx-auto" alt="...">[{{year}}]
+    </a>
+</li>
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:month' year month %}">
+        <img src="{% static 'image/Icons/month.png' %}" class="d-block w-30 mx-auto" alt="...">[{{month}}]
+    </a>
+</li>
+<li class = "nav-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:edit' prev_day_year prev_day_month prev_day %}">
+        <button type="button" class="btn btn-dark mt-1">
+            <i class='fa fa-arrow-left style'></i>
+            &nbsp[{{prev_day}} {{prev_day_month}}]
+        </button>
+    </a>
+</li>
+<li class = "nav-small-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <button type="button" class="btn btn-dark" disabled>
+        &nbsp[{{day}} {{month}}]&nbsp
+    </button>
+</li>
+<li class = "nav-small-space"><wbr></li> 
+<li class="breadcrumb-item active mt-1" aria-current="page">
+    <a href = "{% url 'main:edit' next_day_year next_day_month next_day %}">
+        <button type="button" class="btn btn-dark mt-1">
+            [{{next_day}} {{next_day_month}}]
+            &nbsp<i class='fa fa-arrow-right style'></i>
+        </button>
+    </a>
+</li>

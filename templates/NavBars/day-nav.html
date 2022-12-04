@@ -1,0 +1,12 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/nav-bar.css' %}"/>
+
+<nav aria-label="breadcrumb">
+    <div class = "row">
+        <ol class="col-md-1"></ol>
+        <ol class="breadcrumb col-md-10">
+            {% include "NavBars/basic.html" %}
+            {% include "NavBars/day-buttons.html" %}
+        </ol>
+    </div>
+</nav>
