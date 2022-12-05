@@ -1,6 +1,7 @@
 
 from django import forms
 from django.forms import ModelForm
+from django.db import models as django_models
 import re
 import os
 from pathlib import Path
@@ -9,18 +10,6 @@ from datetime import datetime
 import main.models as models
 
 from tinymce.widgets import TinyMCE
-
-
-class TinyMCEComponent(ModelForm):
-
-    content = forms.CharField(widget=TinyMCE(
-        attrs={'cols': 80, 'rows': 30, 'required': False}
-    ))
-    name = forms.SlugField(max_length=10)
-
-    class Meta:
-        model = models.Entry
-        fields = '__all__'
 
 
 class EntryForm(ModelForm):
@@ -74,7 +63,12 @@ class ImageForm(ModelForm):
         return file_path
 
 
-class ParagraphForm(ModelForm):
+class TinyMCEComponent(ModelForm):
+
+    text = forms.CharField(widget=TinyMCE(
+        attrs={'cols': 80, 'rows': 30, 'required': False}
+    ))
+    entry = django_models.ForeignKey(models.Entry, on_delete=django_models.CASCADE)
 
     class Meta:
         model = models.EntryParagraph
@@ -83,7 +77,7 @@ class ParagraphForm(ModelForm):
 
 CONTENT_FORMS = {
     'image': ImageForm,
-    'paragraph': ParagraphForm,
+    'paragraph': TinyMCEComponent,
 }
 
 
