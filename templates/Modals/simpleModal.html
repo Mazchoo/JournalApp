@@ -20,7 +20,7 @@
 <script>
     let showMessageSimpleModal = function(modalTitle, modalMessage) {
         $('#simple-modal-title')[0].innerText = modalTitle;
-        $('#simple-modal-body')[0].innerText = modalMessage;
+        $('#simple-modal-body')[0].innerHTML = modalMessage;
         $('#simple-modal').modal('show');
     }
 </script>

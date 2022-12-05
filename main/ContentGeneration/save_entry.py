@@ -2,6 +2,7 @@
 from datetime import datetime
 import re
 from django.http import HttpResponse
+from django.forms.utils import ErrorDict
 
 import main.models as models
 import main.forms as forms
@@ -51,44 +52,47 @@ def generateNewContent(model_form, entry_type):
             content_key = content_form.instance.pk
         else:
             model_form.instance.delete()
-            return HttpResponse(f'Invalid content {content_form.errors}', content_type='text/plain'), None
+            return content_form.errors, None
     else:
-        return HttpResponse(f'Invalid content {model_form.errors}', content_type='text/plain'), None
+        return model_form.errors, None
 
     return None, content_key
 
 def getSavedContentIds(content_dict: dict):
     content_keys = []
+    errors = ErrorDict()
+
     for key, value in content_dict.items():
         content_type_match = re.search(r"(\w+)\d+", key)
         if not content_type_match:
-            return HttpResponse(f'Invalid content syntax {key}', content_type='text/plain'), None
+            errors[f"{key}"] = f'Invalid content syntax'
+            continue
 
         entry_type = content_type_match.group(1)
         if entry_type not in forms.CONTENT_FORMS:
-            return HttpResponse(f'Invalid content type {entry_type}', content_type='text/plain'), None
+            errors[f"{key}"] = f'Invalid content type'
+            continue
 
         content_fields = dict(value)
         model_form = forms.CONTENT_FORMS[entry_type](content_fields)
 
         error, content_key = generateNewContent(model_form, entry_type)
-        if error is not None:
-            return error, None
+        if error:
+            for field_name, message in error.items():
+                errors[f"{key}.{field_name}"] = message
+            continue
+
         content_keys.append(content_key)
 
-    return None, content_keys
+    return errors, content_keys
 
 
 def deleteOldContent(entry: models.Entry):
     old_content_ids = entry.content.get_queryset()
-    deleted_content = [models.Content.objects.filter(id__in=old_content_ids)]
-    deleted_content[0].delete()
+    models.Content.objects.filter(id__in=old_content_ids).delete()
 
     for Model in models.CONTENT_MODELS.values():
-        deleted_content.append(Model.objects.filter(entry=entry.name))
-        deleted_content[-1].delete()
-    
-    return deleted_content
+        Model.objects.filter(entry=entry.name).delete()
 
 
 def updateOrGenerateEntry(post_data):
@@ -106,15 +110,14 @@ def updateOrGenerateEntry(post_data):
     if 'content' not in post_data:
         return HttpResponse('No content in entry', content_type='text/plain')
 
-    deleted_content = deleteOldContent(entry)
-
-    error, content_ids = getSavedContentIds(post_data['content'])
-    if error is not None:
-        #[content.save(commit=True) for content in deleted_content]
-        return error
+    deleteOldContent(entry)
+    errors, content_ids = getSavedContentIds(post_data['content'])
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)
     entry.save()
     
+    if errors:
+        return HttpResponse(f'Invalid content {errors}', content_type='text/plain')
+
     return HttpResponse('Entry Saved Successfully', content_type='text/plain')

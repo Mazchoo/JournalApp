@@ -36,20 +36,28 @@ class EntryImage(Model):
         return self.base64
 
     def view(self):
-        with open(self.file_path, "rb") as img_file:
-            b64_string = base64.b64encode(img_file.read()).decode('utf-8')
+        # ToDo - Refactor this and put the files into an entry folder
         file_path = Path(self.file_path)
         file_name = file_path.stem + file_path.suffix
+        
+        if file_path.exists():
+            with open(self.file_path, "rb") as img_file:
+                b64_string = base64.b64encode(img_file.read()).decode('utf-8')
 
-        if file_path.suffix in [".jpg", ".jpeg"]:
-            ecoding_type = "jpeg"
-        elif file_path.suffix == ".png":
-            ecoding_type = "png"
+            if file_path.suffix in [".jpg", ".jpeg"]:
+                ecoding_type = "jpeg"
+            elif file_path.suffix == ".png":
+                ecoding_type = "png"
+            else:
+                raise ValueError("Unknown image extension")
+        
+            b64_string = f"data:image/{ecoding_type};base64,{b64_string}"
         else:
-            raise ValueError("Unknown image extension")
+            print(f'Error! Image {file_path} does not exist!')
+            b64_string = ""
 
         return  {
-            "base64":    f"data:image/{ecoding_type};base64,{b64_string}",
+            "base64":    b64_string,
             "file_name": file_name,
             "original":  int(self.original)
         }

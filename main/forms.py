@@ -82,9 +82,8 @@ class ContentForm(ModelForm):
         model = models.Content
         fields = '__all__'
 
-    def clean_data(self):
+    def clean(self):
+        clean_data = super().clean()
         content_type = self.cleaned_data['content_type']
         if content_type not in models.CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
-
-        return content_type

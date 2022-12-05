@@ -35,7 +35,6 @@ let generateSaveEntry = function(saveContent) {
 let saveEntryToDatabase = function(saveData) {
     if (saveData === null) {return;}
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    // ToDo - Add saving spinner here
 
     $.ajax({
          type: 'POST',
