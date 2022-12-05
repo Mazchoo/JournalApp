@@ -13,14 +13,14 @@ def generateNewEntry(name: str):
         'name': name,
         'first_created': datetime.now(),
         'last_edited': datetime.now(),
-        'date': datetime.strptime(name, '%Y-%m-%d'),
+        'date': datetime.now(),
     })
 
     if entry_form.is_valid():
         entry_form.save(commit=True)
         entry = entry_form.instance
     else:
-        error = HttpResponse(entry_form.errors, content_type='text/plain')
+        error = HttpResponse(f'Invalid entry {entry_form.errors}', content_type='text/plain')
         return error, None
 
     return None, entry
@@ -65,12 +65,12 @@ def getSavedContentIds(content_dict: dict):
     for key, value in content_dict.items():
         content_type_match = re.search(r"(\w+)\d+", key)
         if not content_type_match:
-            errors[f"{key}"] = f'Invalid content syntax'
+            errors[f"{key}"] = f' => Invalid content syntax'
             continue
 
         entry_type = content_type_match.group(1)
         if entry_type not in forms.CONTENT_FORMS:
-            errors[f"{key}"] = f'Invalid content type'
+            errors[f"{key}"] = f' => Invalid content type'
             continue
 
         content_fields = dict(value)
@@ -99,25 +99,26 @@ def updateOrGenerateEntry(post_data):
     '''
         Delete all previous objects associated with entry and save the object again.
         Each entry has content which are content objects with types and a foreign key.
+        Content that cannot be saved will return an error message.
     '''
     if 'name' not in post_data:
         return HttpResponse('Entry name not specified', content_type='text/plain')
     
-    error, entry = getPostEntry(post_data['name'])
-    if error is not None:
-        return error
+    error_response, entry = getPostEntry(post_data['name'])
+    if error_response is not None:
+        return error_response
 
     if 'content' not in post_data:
         return HttpResponse('No content in entry', content_type='text/plain')
 
     deleteOldContent(entry)
-    errors, content_ids = getSavedContentIds(post_data['content'])
+    content_errors, content_ids = getSavedContentIds(post_data['content'])
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)
     entry.save()
     
-    if errors:
-        return HttpResponse(f'Invalid content {errors}', content_type='text/plain')
+    if content_errors:
+        return HttpResponse(f'Invalid content {content_errors}', content_type='text/plain')
 
     return HttpResponse('Entry Saved Successfully', content_type='text/plain')

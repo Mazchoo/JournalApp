@@ -3,6 +3,7 @@ from django import forms
 from django.forms import ModelForm
 import re
 import os
+from pathlib import Path
 from datetime import datetime
 
 import main.models as models
@@ -28,7 +29,7 @@ class EntryForm(ModelForm):
         model = models.Entry
         fields = ['name', 'first_created', 'last_edited', 'date']
 
-    def clean(self):
+    def clean_date(self):
         clean_data = super().clean()
         name = clean_data['name']
         date_match = re.search(r"(\d{4})\-0?(\d+)\-0?(\d+)", name)
@@ -44,8 +45,7 @@ class EntryForm(ModelForm):
         except:
             raise forms.ValidationError(f"Name must a real date {year}-{month}-{day}")
 
-        if clean_data['date'] != entry_date:
-            raise forms.ValidationError(f"Date does not match entry date {entry_date} - {clean_data['date']}")
+        return entry_date
 
 
 class ImageForm(ModelForm):
@@ -57,8 +57,19 @@ class ImageForm(ModelForm):
     def clean_file_path(self):
         file_path = self.cleaned_data['file_path']
 
-        if file_path != '':
-            file_path = f"{os.getcwd()}/Images/{file_path}"
+        if len(file_path) == 0:
+            raise forms.ValidationError("Path is empty")
+
+        if "." not in file_path:
+            raise forms.ValidationError(f"Path '{file_path}' has no extention")
+
+        file_path = f"{os.getcwd()}\\Images\\{file_path}"
+        file_obj = Path(file_path)
+        if not file_obj.exists():
+            raise forms.ValidationError(f"Cannot find '{file_path}' in <b>Images</b> folder")
+
+        if file_obj.suffix.lower() not in ['.png', '.jpg', '.jpeg']:
+            raise forms.ValidationError(f"Extension '{file_obj.suffix}' is not a recognised image extension")
 
         return file_path
 
@@ -84,6 +95,6 @@ class ContentForm(ModelForm):
 
     def clean(self):
         clean_data = super().clean()
-        content_type = self.cleaned_data['content_type']
+        content_type = clean_data['content_type']
         if content_type not in models.CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
