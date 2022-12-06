@@ -1,5 +1,6 @@
 
 let initializeTinyMCE = function(component_name) {
+    // ToDo - Add ability to change height
     tinymce.init({
         selector: component_name,
         deprecation_warnings: false,

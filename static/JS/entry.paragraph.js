@@ -36,12 +36,10 @@ let createNewParagraph = function() {
 
 let editParagraphContent = function(updateInd, paragraphContent) {
     if (updateInd === undefined || paragraphContent === undefined) { return false; }
-    let contentDiv = $('#paragraph' + String(updateInd) + '_ifr')[0];
-    if (contentDiv === undefined) { return false; }
+    let paragraphDiv = tinyMCE.get('paragraph' + updateInd);
+    if (paragraphDiv === null) { return false; }
 
-    // ToDo - Use tinyMCE.get('paragraph' + String(updateInd)).setContent() and getContent()
-
-    contentDiv.contentDocument.body.innerHTML = paragraphContent["text"];
+    paragraphDiv.setContent(paragraphContent["text"]);
     return true;
 }
 

@@ -8,7 +8,7 @@ let generateSaveEntry = function(saveContent) {
           let contentId = content.id;
 
           if ($(content).hasClass("entry-text")) {
-               let textContent = $('#' + contentId + '_ifr')[0].contentDocument.body.innerHTML;
+               let textContent = tinyMCE.get(contentId).getContent();
                saveData[contentId] = {
                     "text": textContent,
                     "entry": DATE_SLUG
