@@ -39,7 +39,6 @@ def getPostEntry(name: str):
 
 
 def generateNewContent(model_form, entry_type):
-
     if model_form.is_valid():
         model_form.save(commit=True)
         content_form = forms.ContentForm({
@@ -58,33 +57,29 @@ def generateNewContent(model_form, entry_type):
 
     return None, content_key
 
-def getSavedContentIds(content_dict: dict):
-    content_keys = []
-    errors = ErrorDict()
 
-    for key, value in content_dict.items():
-        content_type_match = re.search(r"(\w+)\d+", key)
-        if not content_type_match:
-            errors[f"{key}"] = f' => Invalid content syntax'
-            continue
+def processSubmittedContent(key, value, errors, content_keys):
+    content_type_match = re.search(r"(\w+)\d+", key)
+    if not content_type_match:
+        errors[f"{key}"] = ' => Invalid content syntax'
+        return False
 
-        entry_type = content_type_match.group(1)
-        if entry_type not in forms.CONTENT_FORMS:
-            errors[f"{key}"] = f' => Invalid content type'
-            continue
+    entry_type = content_type_match.group(1)
+    if entry_type not in forms.CONTENT_FORMS:
+        errors[f"{key}"] = ' => Invalid content type'
+        return False
 
-        content_fields = dict(value)
-        model_form = forms.CONTENT_FORMS[entry_type](content_fields)
+    content_fields = dict(value)
+    model_form = forms.CONTENT_FORMS[entry_type](content_fields)
 
-        error, content_key = generateNewContent(model_form, entry_type)
-        if error:
-            for field_name, message in error.items():
-                errors[f"{key}.{field_name}"] = message
-            continue
+    error, content_key = generateNewContent(model_form, entry_type)
+    if error:
+        for field_name, message in error.items():
+            errors[f"{key}.{field_name}"] = message
+        return False
 
-        content_keys.append(content_key)
-
-    return errors, content_keys
+    content_keys.append(content_key)
+    return True
 
 
 def deleteOldContent(entry: models.Entry):
@@ -93,6 +88,19 @@ def deleteOldContent(entry: models.Entry):
 
     for Model in models.CONTENT_MODELS.values():
         Model.objects.filter(entry=entry.name).delete()
+
+
+def getSavedContentIds(content_dict: dict):
+    content_keys = []
+    errors = ErrorDict()
+
+    for key, value in content_dict.items():
+        try:
+            processSubmittedContent(key, value, errors, content_keys)
+        except:
+            errors[f"{key}"] = " => Internal server error"
+
+    return errors, content_keys
 
 
 def updateOrGenerateEntry(post_data):
