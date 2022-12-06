@@ -10,7 +10,7 @@ let deleteParagraph = function(e) {
          deleteParentDiv(paragraphDivs[0]);
     }
 
-   let paragraphText = paragraphDivs.find(".tox-edit-area__iframe")[0];
+    let paragraphText = paragraphDivs.find(".tox-edit-area__iframe")[0];
     if (paragraphText !== undefined) {
          paragraphContent = paragraphText.contentDocument.body;
          if (paragraphContent.innerText.trim().length === 0) {

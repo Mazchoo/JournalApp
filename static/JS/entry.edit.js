@@ -1,7 +1,7 @@
 
 
-let initializeNewParagraph = function(lastestId) {
-    initializeTinyMCE('#paragraph' + lastestId);
+let initializeNewParagraph = function(lastestId, height) {
+    createTinyMCE('#paragraph' + lastestId, height);
 
     $('#delete-content' + lastestId).click(deleteParagraph);
     $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
@@ -17,12 +17,12 @@ let insertNewParagraphToPosition = function(e) {
 }
 
 
-let appendParagraphToList = function() {
+let appendParagraphToList = function(height=220) {
     let div = createNewParagraph();
     if (div === undefined) {return;}
 
     $('#edit-area')[0].appendChild(div);
-    initializeNewParagraph(String(CONTENT_INDEX));
+    initializeNewParagraph(String(CONTENT_INDEX), height);
 
     return div;
 }

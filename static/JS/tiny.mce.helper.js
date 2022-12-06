@@ -1,12 +1,17 @@
 
-let initializeTinyMCE = function(component_name) {
+let createTinyMCE = function(component_name, height) {
     // ToDo - Add ability to change height
     tinymce.init({
         selector: component_name,
         deprecation_warnings: false,
         browser_spellcheck: true,
-        height: 220,
+        height: height,
     });
+}
+
+
+let getMCEComponentHeight = function(name) {
+    return tinymce.get(name).getContainer().clientHeight + 2;
 }
 
 
@@ -15,6 +20,7 @@ let resetMCE = function(div) {
     if (!$(div).hasClass("paragraph-entry")) { return; }
 
     let divName = div.children[0].getAttribute('name');
+    currentHeight = getMCEComponentHeight(divName);
     tinymce.get(divName).remove();
-    initializeTinyMCE('#' + divName);
+    createTinyMCE('#' + divName, currentHeight);
 }

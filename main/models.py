@@ -39,7 +39,7 @@ class EntryImage(Model):
         # ToDo - Refactor this and put the files into an entry folder
         file_path = Path(self.file_path)
         file_name = file_path.stem + file_path.suffix
-        
+
         if file_path.exists():
             with open(self.file_path, "rb") as img_file:
                 b64_string = base64.b64encode(img_file.read()).decode('utf-8')
@@ -50,7 +50,7 @@ class EntryImage(Model):
                 ecoding_type = "png"
             else:
                 raise ValueError("Unknown image extension")
-        
+
             b64_string = f"data:image/{ecoding_type};base64,{b64_string}"
         else:
             print(f'Error! Image {file_path} does not exist!')
@@ -64,18 +64,20 @@ class EntryImage(Model):
 
 
 class EntryParagraph(Model):
-    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
-    text  = models.TextField()
+    entry  = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    text   = models.TextField()
+    height = models.IntegerField()
 
     def __repr__(self):
         return f"paragraph{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
         return self.text
-    
+
     def view(self):
         return  {
             "text": self.text,
+            "height": self.height
         }
 
 

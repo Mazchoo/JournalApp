@@ -9,8 +9,10 @@ let generateSaveEntry = function(saveContent) {
 
           if ($(content).hasClass("entry-text")) {
                let textContent = tinyMCE.get(contentId).getContent();
+               let height = getMCEComponentHeight(contentId);
                saveData[contentId] = {
                     "text": textContent,
+                    "height": height,
                     "entry": DATE_SLUG
                };
           } else if ($(content).hasClass("img-fluid")) {
@@ -18,9 +20,9 @@ let generateSaveEntry = function(saveContent) {
                let original = $('#original-check' + ind).is(":checked");
                let fileName = $("#upload-label" + ind)[0].textContent;
                saveData[contentId] = {
-                    "entry":     DATE_SLUG,
                     "file_path": fileName,
-                    "original":  original
+                    "original":  original,
+                    "entry":     DATE_SLUG
                }
           } else {
                console.log("Unrecognised save content");
