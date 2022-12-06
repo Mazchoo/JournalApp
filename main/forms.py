@@ -3,11 +3,12 @@ from django import forms
 from django.forms import ModelForm
 from django.db import models as django_models
 import re
-import os
 from pathlib import Path
 from datetime import datetime
 
 import main.models as models
+from main.ContentGeneration.image_utils import getImageSavePath
+from main.ContentGeneration.image_constants import ImageConstants
 
 from tinymce.widgets import TinyMCE
 
@@ -52,12 +53,12 @@ class ImageForm(ModelForm):
         if "." not in file_path:
             raise forms.ValidationError(f"Path '{file_path}' has no extention")
 
-        file_path = f"{os.getcwd()}\\Images\\{file_path}"
+        file_path = getImageSavePath(file_path)
         file_obj = Path(file_path)
         if not file_obj.exists():
             raise forms.ValidationError(f"Cannot find '{file_path}' in <b>Images</b> folder")
 
-        if file_obj.suffix.lower() not in ['.png', '.jpg', '.jpeg']:
+        if file_obj.suffix.lower() not in ImageConstants().supported_extensions:
             raise forms.ValidationError(f"Extension '{file_obj.suffix}' is not a recognised image extension")
 
         return file_path
