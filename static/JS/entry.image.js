@@ -18,7 +18,9 @@ let deleteImage = function(e) {
 
 let readImageURL= function(self) {
     let input = self.target;
-    if (!(input.id && input.files && input.files[0])) { return; }
+    if (!(input.id && input.files && input.files[0])) {
+        return;
+    }
 
     var reader = new FileReader();
 
@@ -33,18 +35,19 @@ let readImageURL= function(self) {
 
 let showImageFileName = function(self) {
     let input = self.target;
-
-    if (!(input.id && input.files && input.files[0])) { return; }
+    if (!(input.id && input.files && input.files[0])) { 
+        return;
+    }
 
     let contentId = input.id.replace("upload", "");
     let infoArea = $("#upload-label" + contentId)[0]
-    debugger;
     let fileName = input.files[0].name;
     infoArea.textContent = fileName;
 }
 
 
 let showImageUpload = function(self) {
+    // ToDo - Allow saving of multiple input files
     readImageURL(self);
     showImageFileName(self);
 }
