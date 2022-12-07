@@ -2,11 +2,26 @@
 import os
 import base64
 from pathlib import Path
+import shutil
+
 from main.ContentGeneration.image_constants import ImageConstants
 
-def getImageSavePath(file_name: str) -> str:
-    # ToDo - Move images into an entry folder (if not already there)
-    return f"{os.getcwd()}\\Images\\{file_name}"
+
+def getImageSavePath(file_name: str, entry_name: str) -> str:
+    target_folder = f"{os.getcwd()}\\Images\\{entry_name}"
+    target_file_path = f"{target_folder}\\{file_name}"
+
+    if not Path(target_file_path).exists():
+        source_file_path = f"{os.getcwd()}\\Images\\{file_name}"
+
+        if Path(source_file_path).exists():
+            if not Path(target_folder).exists():
+                os.mkdir(target_folder)
+            shutil.move(source_file_path, target_file_path)
+        else:
+            target_file_path = source_file_path
+
+    return target_file_path
 
 
 def getImageFileName(file_path: str) -> str:

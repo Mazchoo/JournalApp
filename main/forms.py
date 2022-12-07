@@ -45,7 +45,9 @@ class ImageForm(ModelForm):
         fields = '__all__'
 
     def clean_file_path(self):
-        file_path = self.cleaned_data['file_path']
+        clean_data = super().clean()
+        file_path = clean_data['file_path']
+        entry = clean_data['entry']
 
         if len(file_path) == 0:
             raise forms.ValidationError("Path is empty")
@@ -53,7 +55,7 @@ class ImageForm(ModelForm):
         if "." not in file_path:
             raise forms.ValidationError(f"Path '{file_path}' has no extention")
 
-        file_path = getImageSavePath(file_path)
+        file_path = getImageSavePath(file_path, entry.name)
         file_obj = Path(file_path)
         if not file_obj.exists():
             raise forms.ValidationError(f"Cannot find '{file_path}' in <b>Images</b> folder")
