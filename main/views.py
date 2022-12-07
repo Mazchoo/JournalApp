@@ -49,6 +49,5 @@ def dateNotFoundPage(request):
 
 @ajaxRequest
 def saveEntry(post_data: dict):
-    # ToDo - Save whatever is generated from the current page even if there are some errors
     return updateOrGenerateEntry(post_data)
     
