@@ -3,6 +3,7 @@ import os
 import base64
 from pathlib import Path
 import shutil
+from functools import lru_cache
 
 from main.ContentGeneration.image_constants import ImageConstants
 
@@ -29,10 +30,14 @@ def getImageFileName(file_path: str) -> str:
     return file_path.stem + file_path.suffix
 
 
+@lru_cache(maxsize = 100)
 def parseBase64ImageData(file_path: str) -> str:
     file_path = Path(file_path)
 
     if file_path.exists() and file_path.suffix in ImageConstants().supported_extensions:
+        # ToDo - Make a related app that creates a half, quarter and icon version of each image
+        # The entry should load half if it is available
+        # If more than 10 it should load at a quarter
         with open(file_path, "rb") as img_file:
             b64_string = base64.b64encode(img_file.read()).decode('utf-8')
 

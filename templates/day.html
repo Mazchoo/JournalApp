@@ -49,7 +49,7 @@
         var SAVE_CONTENT = {{saved_content | safe}};
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
-        var MAX_CHANGE_ATTEMPTS = 10;
+        var MAX_CHANGE_ATTEMPTS = 100;
 
         intializeLoadedContent(SAVE_CONTENT);
 

@@ -63,8 +63,8 @@ let showImageFileName = function(inputFiles, fileInd, contentId) {
 
 
 let uploadAllImageFiles = function(contentInd, inputFiles) {
-    for (let i = 0; i < inputFiles.length; i++) {
-        if (i > 0) {
+    for (let i = inputFiles.length - 1; i >= 0; i--) {
+        if (i < inputFiles.length - 1) {
             $("#insert-image" + contentInd).click();
             contentInd = CONTENT_INDEX;
         }
@@ -86,7 +86,6 @@ let showImageUpload = function(self) {
 
 
 let editImageContent = function(updateInd, imageContent) {
-    debugger;
     let imageArea = $("#image" + updateInd);
     let infoArea = $("#upload-label" + updateInd);
     let originalCheck = $("#original-check" + updateInd);

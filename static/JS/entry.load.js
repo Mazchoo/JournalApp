@@ -31,10 +31,10 @@ let createBlankStory = function() {
 
 let intializeLoadedContent = function(loadedContent) {
     if (loadedContent === null) {
-         createBlankStory();
+        createBlankStory();
     } else {
-         for([key, textContent] of Object.entries(loadedContent)) {
-              parseLoadedStoryContent(key, textContent);
-         }
+        for([key, textContent] of Object.entries(loadedContent)) {
+            parseLoadedStoryContent(key, textContent);
+        }
     }
 }

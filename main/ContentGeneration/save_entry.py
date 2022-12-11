@@ -59,7 +59,7 @@ def generateNewContent(model_form, entry_type):
 
 
 def processSubmittedContent(key, value, errors, content_keys):
-    content_type_match = re.search(r"(\w+)\d+", key)
+    content_type_match = re.search(r"([A-Za-z]+)\d+", key)
     if not content_type_match:
         errors[f"{key}"] = ' => Invalid content syntax'
         return False

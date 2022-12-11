@@ -29,7 +29,7 @@ let deleteParagraph = function(e) {
 
 
 let createNewParagraph = function() {
-    CONTENT_INDEX += 1; // ToDo Consider making this stateless and getting max index
+    CONTENT_INDEX += 1;
     return componentFromTemplate(generateParagraphTemplate(CONTENT_INDEX), 'div', 'row mt-3 paragraph-entry');
 }
 
@@ -49,7 +49,7 @@ let editParagraphWhenInitialised = function(updateInd, paragraphContent, counter
 
     if (!editParagraphContent(updateInd, paragraphContent)) {
         counter--;
-        setTimeout(editParagraphWhenInitialised, 1000, updateInd, paragraphContent, counter);
+        setTimeout(editParagraphWhenInitialised, 1000 * (100 / counter), updateInd, paragraphContent, counter);
     }
 }
 
