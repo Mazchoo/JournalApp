@@ -16,44 +16,77 @@ let deleteImage = function(e) {
 }
 
 
-let readImageURL= function(self) {
-    let input = self.target;
-    if (!(input.id && input.files && input.files[0])) {
-        return;
-    }
+let initializeNewImage = function(lastestId) {
+    $('#upload' + lastestId).change(showImageUpload);
+    
+    $('#delete-content' + lastestId).click(deleteImage);
+    $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
+    $('#insert-image' + lastestId).click(insertNewImageToPosition);
+    $('#move-content-up' + lastestId).click(moveObjectUp);
+    $('#move-content-down' + lastestId).click(moveObjectDown);
+}
 
+
+let insertNewImageToPosition = function(e) {
+    let contendInd = String(CONTENT_INDEX + 1);
+    return insertNewObjectIntoEditArea(e, createNewImage, initializeNewImage, contendInd);
+}
+
+
+let appendImageToList = function() {
+    let div = createNewImage();
+    if (div === undefined) {return;}
+
+    $('#edit-area')[0].appendChild(div);
+    initializeNewImage(String(CONTENT_INDEX));
+
+    return div;
+}
+
+
+let readImageURL= function(inputFiles, fileInd, contentId) {
     var reader = new FileReader();
 
-    let contentId = input.id.replace("upload", "");
     reader.onload = function (e) {
         $('#image' + contentId)
             .attr('src', e.target.result);
     };
-    reader.readAsDataURL(input.files[0]);
+    reader.readAsDataURL(inputFiles[fileInd]);
 }
 
 
-let showImageFileName = function(self) {
-    let input = self.target;
-    if (!(input.id && input.files && input.files[0])) { 
-        return;
-    }
-
-    let contentId = input.id.replace("upload", "");
+let showImageFileName = function(inputFiles, fileInd, contentId) {
     let infoArea = $("#upload-label" + contentId)[0]
-    let fileName = input.files[0].name;
+    let fileName = inputFiles[fileInd].name;
     infoArea.textContent = fileName;
 }
 
 
+let uploadAllImageFiles = function(contentInd, inputFiles) {
+    for (let i = 0; i < inputFiles.length; i++) {
+        if (i > 0) {
+            $("#insert-image" + contentInd).click();
+            contentInd = CONTENT_INDEX;
+        }
+        readImageURL(inputFiles, i, contentInd);
+        showImageFileName(inputFiles, i, contentInd);
+    }
+}
+
+
 let showImageUpload = function(self) {
-    // ToDo - Allow saving of multiple input files
-    readImageURL(self);
-    showImageFileName(self);
+    let input = self.target;
+    if (!(input.id && input.files)) { 
+        return;
+    }
+
+    let contentInd = input.id.replace("upload", "");
+    uploadAllImageFiles(contentInd, input.files);
 }
 
 
 let editImageContent = function(updateInd, imageContent) {
+    debugger;
     let imageArea = $("#image" + updateInd);
     let infoArea = $("#upload-label" + updateInd);
     let originalCheck = $("#original-check" + updateInd);
@@ -62,6 +95,7 @@ let editImageContent = function(updateInd, imageContent) {
     imageArea.attr("src", imageContent["base64"]);
     originalCheck.prop("checked", imageContent["original"] === 1);
     infoArea.text(imageContent["file_name"]);
+    return true;
 }
 
 
@@ -70,6 +104,6 @@ let editImageWhenInitialised = function(updateInd, imageContent, counter) {
 
     if (!editImageContent(updateInd, imageContent)) {
         counter--;
-        setTimeout(editImageWhenInitialised, 1000, updateInd, textContent, counter);
+        setTimeout(editImageWhenInitialised, 1000, updateInd, imageContent, counter);
     }
 }

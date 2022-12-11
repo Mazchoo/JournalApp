@@ -10,7 +10,7 @@ let replaceExpression = function(str, expression, replacement) {
 
 
 let getIndexInArr = function(arr, obj) {
-    for(i=0; i<arr.length; i++) {
+    for(i = 0; i < arr.length; i++) {
         if (arr[i] === obj) {
             return i;
         }

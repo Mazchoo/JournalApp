@@ -1,6 +1,6 @@
 
 let loadParagraphContent = function(paragraphContent) {
-    appendParagraphToList(paragraphContent["height"]);
+    appendParagraphToList(null, paragraphContent["height"]);
     editParagraphWhenInitialised(CONTENT_INDEX, paragraphContent, MAX_CHANGE_ATTEMPTS);
 }
 

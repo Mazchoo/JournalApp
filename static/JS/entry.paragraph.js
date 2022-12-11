@@ -48,7 +48,35 @@ let editParagraphWhenInitialised = function(updateInd, paragraphContent, counter
     if (counter <= 0 || updateInd === undefined || paragraphContent === undefined) { return false; }
 
     if (!editParagraphContent(updateInd, paragraphContent)) {
-         counter--;
-         setTimeout(editParagraphWhenInitialised, 1000, updateInd, paragraphContent, counter);
+        counter--;
+        setTimeout(editParagraphWhenInitialised, 1000, updateInd, paragraphContent, counter);
     }
+}
+
+
+let initializeNewParagraph = function(lastestId, height) {
+    createTinyMCE('#paragraph' + lastestId, height);
+
+    $('#delete-content' + lastestId).click(deleteParagraph);
+    $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
+    $('#insert-image' + lastestId).click(insertNewImageToPosition);
+    $('#move-content-up' + lastestId).click(moveObjectUp);
+    $('#move-content-down' + lastestId).click(moveObjectDown);
+}
+
+
+let insertNewParagraphToPosition = function(e) {
+    let contendInd = String(CONTENT_INDEX + 1);
+    return insertNewObjectIntoEditArea(e, createNewParagraph, initializeNewParagraph, contendInd);
+}
+
+
+let appendParagraphToList = function(_e, height=220) {
+    let div = createNewParagraph();
+    if (div === undefined) {return;}
+
+    $('#edit-area')[0].appendChild(div);
+    initializeNewParagraph(String(CONTENT_INDEX), height);
+
+    return div;
 }
