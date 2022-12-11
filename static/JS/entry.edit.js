@@ -17,7 +17,7 @@ let insertNewParagraphToPosition = function(e) {
 }
 
 
-let appendParagraphToList = function(height=220) {
+let appendParagraphToList = function(_e, height=220) {
     let div = createNewParagraph();
     if (div === undefined) {return;}
 
