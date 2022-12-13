@@ -3,9 +3,12 @@ import os
 import base64
 from pathlib import Path
 import shutil
+from io import BytesIO
+from PIL import Image, ExifTags
 from functools import lru_cache
 
 from main.ContentGeneration.image_constants import ImageConstants
+IMAGE_CONSTANTS = ImageConstants()
 
 
 def getImageSavePath(file_name: str, entry_name: str) -> str:
@@ -34,17 +37,44 @@ def getImageFileName(file_path: str) -> str:
 def parseBase64ImageData(file_path: str) -> str:
     file_path = Path(file_path)
 
-    if file_path.exists() and file_path.suffix in ImageConstants().supported_extensions:
-        # ToDo - Make a related app that creates a half, quarter and icon version of each image
-        # The entry should load half if it is available
-        # If more than 10 it should load at a quarter
-        with open(file_path, "rb") as img_file:
-            b64_string = base64.b64encode(img_file.read()).decode('utf-8')
+    if file_path.exists() and file_path.suffix in IMAGE_CONSTANTS.supported_extensions:
+        # ToDo - Clean up this mess
+
+        image = Image.open(file_path)
+        exif = image._getexif()
+        width, height = image.size
+        max_dimension = max(width, height)
+        factor = 1
+        while max_dimension >= IMAGE_CONSTANTS.default_display_longest_side:
+            factor *= 2
+            max_dimension //= 2
 
         if file_path.suffix in [".jpg", ".jpeg"]:
             ecoding_type = "jpeg"
         elif file_path.suffix == ".png":
             ecoding_type = "png"
+
+        if factor > 1:
+            image = image.resize((width // factor, height // factor), resample=Image.LANCZOS)
+            
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation':
+                    break
+
+            if exif[orientation] == 3:
+                image=image.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                image=image.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                image=image.rotate(90, expand=True)
+
+            buffered = BytesIO()
+            image.save(buffered, format="JPEG")
+            b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            ecoding_type = "jpeg"
+        else:
+            with open(file_path, "rb") as img_file:
+                b64_string = base64.b64encode(img_file.read()).decode('utf-8')
 
         b64_string = f"data:image/{ecoding_type};base64,{b64_string}"
     else:
