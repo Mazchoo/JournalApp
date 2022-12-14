@@ -1,10 +1,14 @@
 
-from dataclasses import dataclass
+from PIL import ExifTags
 
-@dataclass
+def getOrientationFlag():
+    for key, value in ExifTags.TAGS.items():
+        if value == 'Orientation':
+           return key
+
+# ToDo - Display icons for each image on month and year pages
 class ImageConstants:
     supported_extensions: tuple = ('.png', '.jpg', '.jpeg')
     default_display_longest_side: int = 1024
-    low_res_longest_side: int = 512
-    low_res_nr_threshold: int = 16
-    icon_size: tuple = (96, 96)
+    icon_size: int = 96
+    pil_orientation_flag: int = getOrientationFlag()

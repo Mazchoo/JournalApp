@@ -4,11 +4,10 @@ import base64
 from pathlib import Path
 import shutil
 from io import BytesIO
-from PIL import Image, ExifTags
+from PIL import Image
 from functools import lru_cache
 
 from main.ContentGeneration.image_constants import ImageConstants
-IMAGE_CONSTANTS = ImageConstants()
 
 
 def getImageSavePath(file_name: str, entry_name: str) -> str:
@@ -33,52 +32,75 @@ def getImageFileName(file_path: str) -> str:
     return file_path.stem + file_path.suffix
 
 
-@lru_cache(maxsize = 100)
+def getResizingFactor(file_path):
+    image = Image.open(file_path)
+    width, height = image.size
+    max_dimension = max(width, height)
+
+    factor = 1
+    while max_dimension >= ImageConstants.default_display_longest_side:
+        factor *= 2
+        max_dimension //= 2
+    
+    return factor
+
+
+def orientatePILImage(image_resized, exif):
+    orientation_key = ImageConstants.pil_orientation_flag
+    
+    if exif[orientation_key] == 3:
+        image_resized=image_resized.rotate(180, expand=True)
+    elif exif[orientation_key] == 6:
+        image_resized=image_resized.rotate(270, expand=True)
+    elif exif[orientation_key] == 8:
+        image_resized=image_resized.rotate(90, expand=True)
+    
+    return image_resized
+
+
+def getResizeBase64(file_path, factor):
+    image = Image.open(file_path)
+    width, height = image.size
+    
+    image_resized = image.resize((width // factor, height // factor), resample=Image.LANCZOS)
+
+    exif = image._getexif()
+    image_resized = orientatePILImage(image_resized, exif)
+
+    buffered = BytesIO()
+    image_resized.save(buffered, format="JPEG")
+    b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    
+    return b64_string, "jpeg"
+
+
+def loadImageDirectly(file_path):
+    if file_path.suffix in [".jpg", ".jpeg"]:
+        ecoding_type = "jpeg"
+    elif file_path.suffix == ".png":
+        ecoding_type = "png"
+
+    with open(file_path, "rb") as img_file:
+        b64_string = base64.b64encode(img_file.read()).decode('utf-8')
+    
+    return b64_string, ecoding_type
+
+
+@lru_cache(maxsize=1024)
 def parseBase64ImageData(file_path: str) -> str:
     file_path = Path(file_path)
 
-    if file_path.exists() and file_path.suffix in IMAGE_CONSTANTS.supported_extensions:
-        # ToDo - Clean up this mess
+    if file_path.exists() and file_path.suffix in ImageConstants.supported_extensions:
 
-        image = Image.open(file_path)
-        exif = image._getexif()
-        width, height = image.size
-        max_dimension = max(width, height)
-        factor = 1
-        while max_dimension >= IMAGE_CONSTANTS.default_display_longest_side:
-            factor *= 2
-            max_dimension //= 2
-
-        if file_path.suffix in [".jpg", ".jpeg"]:
-            ecoding_type = "jpeg"
-        elif file_path.suffix == ".png":
-            ecoding_type = "png"
-
+        factor = getResizingFactor(file_path)
         if factor > 1:
-            image = image.resize((width // factor, height // factor), resample=Image.LANCZOS)
-            
-            for orientation in ExifTags.TAGS.keys():
-                if ExifTags.TAGS[orientation] == 'Orientation':
-                    break
-
-            if exif[orientation] == 3:
-                image=image.rotate(180, expand=True)
-            elif exif[orientation] == 6:
-                image=image.rotate(270, expand=True)
-            elif exif[orientation] == 8:
-                image=image.rotate(90, expand=True)
-
-            buffered = BytesIO()
-            image.save(buffered, format="JPEG")
-            b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            ecoding_type = "jpeg"
+            b64_string, ecoding_type = getResizeBase64(file_path, factor)
         else:
-            with open(file_path, "rb") as img_file:
-                b64_string = base64.b64encode(img_file.read()).decode('utf-8')
+            b64_string, ecoding_type = loadImageDirectly(file_path)
 
         b64_string = f"data:image/{ecoding_type};base64,{b64_string}"
     else:
         print(f'Error! Image {file_path} does not exist!')
         b64_string = ""
-        
+    
     return b64_string
