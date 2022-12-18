@@ -28,7 +28,9 @@
                     {{ nr_entries_per_month | get_item:month_name}}
                     entr{{ nr_entries_per_month | get_item:month_name | pluralize:"y,ies"}}
                   </p>
-                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                <p class="card-text"><small class="text-muted">
+                  Last updated : {{ month_last_edited | get_item:month_name }}
+                </small></p>
               </div>
             </div>
           </div>
