@@ -6,7 +6,7 @@ def getOrientationFlag():
         if value == 'Orientation':
            return key
 
-# ToDo - Display icons for each image on month and year pages
+
 class ImageConstants:
     supported_extensions: tuple = ('.png', '.jpg', '.jpeg')
     default_display_longest_side: int = 1024
