@@ -5,6 +5,8 @@ from django.shortcuts import render
 from main.Helpers.date_helpers import (addDayInformation, addMonthInformation,
                                        addYearInformation, putVargsIntoContext)
 from main.Helpers.ajax_request import ajaxRequest
+from main.Helpers.get_icon_files import getIconForEachYear
+
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 
@@ -16,6 +18,7 @@ def homePage(request):
 @putVargsIntoContext
 def yearPage(request, context):
     addYearInformation(context)
+    getIconForEachYear(context)
     return render(request=request, template_name='year.html', context=context)
 
 

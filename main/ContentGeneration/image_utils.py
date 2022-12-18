@@ -8,41 +8,20 @@ from PIL import Image
 from functools import lru_cache
 
 from main.ContentGeneration.image_constants import ImageConstants
+from main.ContentGeneration.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
+                                                      cropImageToSquare)
 
-
-def orientatePILImage(image_resized, exif):
-    if exif is None:
-        return image_resized
-    orientation_key = ImageConstants.pil_orientation_flag
-    
-    if exif[orientation_key] == 3:
-        image_resized = image_resized.rotate(180, expand=True)
-    elif exif[orientation_key] == 6:
-        image_resized = image_resized.rotate(270, expand=True)
-    elif exif[orientation_key] == 8:
-        image_resized = image_resized.rotate(90, expand=True)
-    
-    return image_resized
-
-
-def cropImageToSquare(image: Image):
-    width, height = image.size
-    crop_amount = (max(width, height) - min(width, height)) // 2
-
-    if width > height:
-        image_resized = image.crop((crop_amount, 0, width - crop_amount, height))
-    else:
-        image_resized = image.crop((0, crop_amount, width, height - crop_amount))
-    
-    return image_resized
+def getIconFilePath(file_path: Path):
+    icon_file_name = f"{file_path.stem}_icon{file_path.suffix}"
+    target_icon_path = file_path.parent / icon_file_name
+    return target_icon_path
 
 
 def createImageIcon(target_path_obj: Path):
     if not target_path_obj.exists():
         return False
     
-    icon_file_name = f"{target_path_obj.stem}_icon{target_path_obj.suffix}"
-    target_icon_path = target_path_obj.parent / icon_file_name
+    target_icon_path = getIconFilePath(target_path_obj)
     if target_icon_path.exists():
         return False
     
@@ -88,19 +67,6 @@ def getImageFileName(file_path: str) -> str:
     return file_path.stem + file_path.suffix
 
 
-def getResizingFactor(file_path):
-    image = Image.open(file_path)
-    width, height = image.size
-    max_dimension = max(width, height)
-
-    factor = 1
-    while max_dimension >= ImageConstants.default_display_longest_side:
-        factor *= 2
-        max_dimension //= 2
-    
-    return factor
-
-
 def getResizeBase64(file_path, factor):
     image = Image.open(file_path)
     width, height = image.size
@@ -128,19 +94,23 @@ def loadImageDirectly(file_path):
     return b64_string, ecoding_type
 
 
+def addEncodingTypeToBase64(b64_string, ecoding_type):
+    return f"data:image/{ecoding_type};base64,{b64_string}"
+
+
 @lru_cache(maxsize=1024)
 def parseBase64ImageData(file_path: str) -> str:
     file_path = Path(file_path)
 
     if file_path.exists() and file_path.suffix in ImageConstants.supported_extensions:
 
-        factor = getResizingFactor(file_path)
+        factor = getResizingFactorToDownSized(file_path)
         if factor > 1:
             b64_string, ecoding_type = getResizeBase64(file_path, factor)
         else:
             b64_string, ecoding_type = loadImageDirectly(file_path)
 
-        b64_string = f"data:image/{ecoding_type};base64,{b64_string}"
+        b64_string = addEncodingTypeToBase64(b64_string, ecoding_type)
     else:
         print(f'Error! Image {file_path} does not exist!')
         b64_string = ""
