@@ -15,7 +15,7 @@
                 {% if month_name in icon_paths %}
                   <img src="{{icon_paths | get_item:month_name | safe}}" class="img-fluid rounded-start container py-3" alt="...">
                 {% else %}
-                  <img src="{% static 'Image/Missing.svg' %}" class="img-fluid rounded-start" alt="...">
+                  <img src="{% static 'Image/Missing.svg' %}" class="img-fluid rounded-start container py-3" alt="...">
                 {% endif %}
               </a>
             </div>
