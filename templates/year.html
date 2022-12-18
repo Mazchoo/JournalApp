@@ -24,7 +24,10 @@
                 <a href = "{% url 'main:month' year month_name %}">
                   <h5 class="card-title" style = "color: black">{{month_name}}</h5>
                 </a>
-                <p class="card-text">10 entries 100 images 1000 words.</p>
+                  <p class="card-text">
+                    {{ nr_entries_per_month | get_item:month_name}}
+                    entr{{ nr_entries_per_month | get_item:month_name | pluralize:"y,ies"}}
+                  </p>
                 <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
               </div>
             </div>

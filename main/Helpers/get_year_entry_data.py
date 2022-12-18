@@ -27,3 +27,17 @@ def getIconForEachYear(context: dict):
             output_dict[month_name] = addEncodingTypeToBase64(b64_string, ecoding_type)
             
     context['icon_paths'] = output_dict
+
+
+def getNrEntiresForEachYear(context: dict):
+    year = context["year"]
+    output_dict = {}
+
+    for i in range(1, 12):
+        month = ("0" + str(i))[-2:]
+        month_name = context["months_in_year"][i - 1]
+        entries = models.Entry.objects.all().filter(name__istartswith=f"{year}-{month}")
+        
+        output_dict[month_name] = len(entries)
+    
+    context['nr_entries_per_month'] = output_dict
