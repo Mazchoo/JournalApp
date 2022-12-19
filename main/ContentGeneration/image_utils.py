@@ -75,6 +75,7 @@ def getResizeBase64(file_path, factor):
 
     image_resized = orientatePILImage(image_resized, image._getexif())
 
+    # ToDo - The buffered data has to support the encoding type
     buffered = BytesIO()
     image_resized.save(buffered, format="JPEG")
     b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')

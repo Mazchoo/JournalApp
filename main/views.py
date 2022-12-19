@@ -12,6 +12,7 @@ from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAn
 
 
 def homePage(request):
+    # ToDo - Show images on homepage
     return render(request=request, template_name='home.html')
 
 
