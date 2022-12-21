@@ -1,20 +1,26 @@
 
-from PIL import Image
+from PIL import Image, ExifTags
 
 from main.ContentGeneration.image_constants import ImageConstants
+
+def getOrientationFlag():
+    for key, value in ExifTags.TAGS.items():
+        if value == 'Orientation':
+           return key
 
 
 def orientatePILImage(image_resized, exif):
     if exif is None:
         return image_resized
-    orientation_key = ImageConstants.pil_orientation_flag
+    orientation_key = getOrientationFlag()
     
-    if exif[orientation_key] == 3:
-        image_resized = image_resized.rotate(180, expand=True)
-    elif exif[orientation_key] == 6:
-        image_resized = image_resized.rotate(270, expand=True)
-    elif exif[orientation_key] == 8:
-        image_resized = image_resized.rotate(90, expand=True)
+    if orientation_key in exif:
+        if exif[orientation_key] == 3:
+            image_resized = image_resized.rotate(180, expand=True)
+        elif exif[orientation_key] == 6:
+            image_resized = image_resized.rotate(270, expand=True)
+        elif exif[orientation_key] == 8:
+            image_resized = image_resized.rotate(90, expand=True)
     
     return image_resized
 

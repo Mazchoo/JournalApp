@@ -124,3 +124,9 @@ def parseBase64ImageData(file_path: str) -> str:
         b64_string = ""
     
     return b64_string
+
+
+def getBase64FromPath(file_path: Path):
+    b64_string = loadImageDirectly(file_path)
+    ecoding_type = getEncodingType(file_path)
+    return addEncodingTypeToBase64(b64_string, ecoding_type)

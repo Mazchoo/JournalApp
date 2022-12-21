@@ -2,17 +2,20 @@
 import main.forms as forms
 
 from django.shortcuts import render
-from main.Helpers.date_helpers import (addDayInformation, addMonthInformation,
+from main.Helpers.date_helpers import (addGeneralInformation, addDayInformation, addMonthInformation,
                                        addYearInformation, putVargsIntoContext)
 from main.Helpers.ajax_request import ajaxRequest
-from main.Helpers.get_year_entry_data import getYearEntryInformation
+from main.Helpers.get_year_entry_data import getYearEntryInformation, getAllYearSummaryInformation
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 
 
-def homePage(request):
-    # ToDo - Show images on homepage
+@putVargsIntoContext
+def homePage(request, context):
+    addGeneralInformation(context)
+    getAllYearSummaryInformation(context)
+    # ToDo display icons for each year
     return render(request=request, template_name='home.html')
 
 

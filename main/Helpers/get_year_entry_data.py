@@ -1,10 +1,11 @@
 
+from django.db.models.functions import ExtractYear
+
 import random
 from pathlib import Path
 
 import main.models as models
-from main.ContentGeneration.image_utils import (getEncodingType, loadImageDirectly, 
-                                                addEncodingTypeToBase64, getIconFilePath)
+from main.ContentGeneration.image_utils import (getBase64FromPath, getIconFilePath)
 
 
 def getMonthStrings(i: int, context: dict):
@@ -22,8 +23,14 @@ def getAllImagesInMonth(year: str, month: str):
         entry__name__istartswith=f"{year}-{month}-"
     )
 
-def getIconForEachYear(context: dict):
-    year = context["year"]
+
+def getAllImagesInYear(year: str):
+    return models.EntryImage.objects.all().filter(
+        entry__name__istartswith=f"{year}-"
+    )
+
+
+def getIconForEachMonth(context: dict, year: int):
     output_dict = {}
     
     for i in range(1, 13):
@@ -35,15 +42,12 @@ def getIconForEachYear(context: dict):
 
         if valid_icons:
             selected_icon_path = valid_icons[random.randint(0, len(valid_icons) - 1)]
-            ecoding_type = getEncodingType(selected_icon_path)
-            b64_string = loadImageDirectly(selected_icon_path)
-            output_dict[month_name] = addEncodingTypeToBase64(b64_string, ecoding_type)
+            output_dict[month_name] = getBase64FromPath(selected_icon_path)
             
-    context['icon_paths'] = output_dict
+    return output_dict
 
 
-def getNrEntiresForEachYear(context: dict):
-    year = context["year"]
+def getNrEntiresForEachYear(context: dict, year: int):
     output_dict = {}
 
     for i in range(1, 13):
@@ -52,11 +56,10 @@ def getNrEntiresForEachYear(context: dict):
         
         output_dict[month_name] = len(entries)
     
-    context['nr_entries_per_month'] = output_dict
+    return output_dict
 
 
-def getLastTimeEntriesWereUpdated(context):
-    year = context["year"]
+def getLastTimeEntriesWereUpdated(context: dict, year: int):
     output_dict = {}
 
     for i in range(1, 13):
@@ -66,10 +69,36 @@ def getLastTimeEntriesWereUpdated(context):
         last_update = max([entry.last_edited for entry in entries]) if entries else "never"
         output_dict[month_name] = last_update
     
-    context['month_last_edited'] = output_dict
+    return output_dict
 
+
+def getAllEntryYears():
+    distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
+    return [entry['year'] for entry in distinct_years]
+
+
+def getRandomImagesFromYear(context: dict, year: int):
+    output_list = []
+
+    year_images = getAllImagesInYear(year)
+    images_icon_files = [getIconFilePath(Path(img.file_path)) for img in year_images]
+    valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
+
+    if valid_icons:
+        selected_icon_paths = random.choices(valid_icons, k=12)
+        output_list = [getBase64FromPath(path) for path in selected_icon_paths]
+            
+    return output_list
 
 def getYearEntryInformation(context: dict):
-    getIconForEachYear(context)
-    getNrEntiresForEachYear(context)
-    getLastTimeEntriesWereUpdated(context)
+    year = context["year"]
+    context['icon_paths'] = getIconForEachMonth(context, year)
+    context['nr_entries_per_month'] = getNrEntiresForEachYear(context, year)
+    context['month_last_edited'] = getLastTimeEntriesWereUpdated(context, year)
+
+
+def getAllYearSummaryInformation(context: dict):
+    context['all_years']  = getAllEntryYears()
+    context['icon_paths'] = {}
+    for year in context['all_years']:
+        context['icon_paths'][year] = getRandomImagesFromYear(context, year)
