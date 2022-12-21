@@ -3,8 +3,8 @@ import random
 from pathlib import Path
 
 import main.models as models
-from main.ContentGeneration.image_utils import (getIconFilePath, loadImageDirectly, 
-                                                addEncodingTypeToBase64)
+from main.ContentGeneration.image_utils import (getEncodingType, loadImageDirectly, 
+                                                addEncodingTypeToBase64, getIconFilePath)
 
 
 def getMonthStrings(i: int, context: dict):
@@ -26,7 +26,7 @@ def getIconForEachYear(context: dict):
     year = context["year"]
     output_dict = {}
     
-    for i in range(1, 12):
+    for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
 
         month_images = getAllImagesInMonth(year, month)
@@ -35,7 +35,8 @@ def getIconForEachYear(context: dict):
 
         if valid_icons:
             selected_icon_path = valid_icons[random.randint(0, len(valid_icons) - 1)]
-            b64_string, ecoding_type = loadImageDirectly(selected_icon_path)
+            ecoding_type = getEncodingType(selected_icon_path)
+            b64_string = loadImageDirectly(selected_icon_path)
             output_dict[month_name] = addEncodingTypeToBase64(b64_string, ecoding_type)
             
     context['icon_paths'] = output_dict
@@ -45,7 +46,7 @@ def getNrEntiresForEachYear(context: dict):
     year = context["year"]
     output_dict = {}
 
-    for i in range(1, 12):
+    for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
         entries = getAllEntriesInMonth(year, month)
         
@@ -58,7 +59,7 @@ def getLastTimeEntriesWereUpdated(context):
     year = context["year"]
     output_dict = {}
 
-    for i in range(1, 12):
+    for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
         entries = getAllEntriesInMonth(year, month)
         

@@ -67,7 +67,17 @@ def getImageFileName(file_path: str) -> str:
     return file_path.stem + file_path.suffix
 
 
-def getResizeBase64(file_path, factor):
+def getEncodingType(file_path: Path):
+    if file_path.suffix in [".jpg", ".jpeg"]:
+        ecoding_type = "jpeg"
+    elif file_path.suffix == ".png":
+        ecoding_type = "png"
+    else:
+        ecoding_type = ImageConstants.unknown_enoding_type
+    
+    return ecoding_type
+
+def getResizeBase64(file_path, factor, ecoding_type):
     image = Image.open(file_path)
     width, height = image.size
     
@@ -75,27 +85,23 @@ def getResizeBase64(file_path, factor):
 
     image_resized = orientatePILImage(image_resized, image._getexif())
 
-    # ToDo - The buffered data has to support the encoding type
     buffered = BytesIO()
-    image_resized.save(buffered, format="JPEG")
+    image_resized.save(buffered, format=ecoding_type)
     b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
     
-    return b64_string, "jpeg"
+    return b64_string
 
 
 def loadImageDirectly(file_path):
-    if file_path.suffix in [".jpg", ".jpeg"]:
-        ecoding_type = "jpeg"
-    elif file_path.suffix == ".png":
-        ecoding_type = "png"
-
     with open(file_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode('utf-8')
     
-    return b64_string, ecoding_type
+    return b64_string
 
 
 def addEncodingTypeToBase64(b64_string, ecoding_type):
+    if ecoding_type == ImageConstants.unknown_enoding_type:
+        return ""
     return f"data:image/{ecoding_type};base64,{b64_string}"
 
 
@@ -106,10 +112,11 @@ def parseBase64ImageData(file_path: str) -> str:
     if file_path.exists() and file_path.suffix in ImageConstants.supported_extensions:
 
         factor = getResizingFactorToDownSized(file_path)
+        ecoding_type = getEncodingType(file_path)
         if factor > 1:
-            b64_string, ecoding_type = getResizeBase64(file_path, factor)
+            b64_string = getResizeBase64(file_path, factor, ecoding_type)
         else:
-            b64_string, ecoding_type = loadImageDirectly(file_path)
+            b64_string = loadImageDirectly(file_path)
 
         b64_string = addEncodingTypeToBase64(b64_string, ecoding_type)
     else:
