@@ -5,7 +5,8 @@ from django.shortcuts import render
 from main.Helpers.date_helpers import (addGeneralInformation, addDayInformation, addMonthInformation,
                                        addYearInformation, putVargsIntoContext)
 from main.Helpers.ajax_request import ajaxRequest
-from main.Helpers.get_year_entry_data import getYearEntryInformation, getAllYearSummaryInformation
+from main.Helpers.get_year_entry_data import getYearEntryInformation
+from main.Helpers.get_all_years_summary import getAllYearSummaryInformation
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
