@@ -36,4 +36,4 @@ def getAllYearSummaryInformation(context: dict):
     context['all_years']  = getAllEntryYears()
     context['icon_paths'] = {}
     for year in context['all_years']:
-        context['icon_paths'][year] = getRandomImagesFromYear(context, year)
+        context['icon_paths'][year] = getRandomImagesFromYear(year)

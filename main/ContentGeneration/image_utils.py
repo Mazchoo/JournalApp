@@ -3,7 +3,6 @@ import os
 import base64
 from pathlib import Path
 import shutil
-from io import BytesIO
 from PIL import Image
 from functools import lru_cache
 
@@ -77,19 +76,25 @@ def getEncodingType(file_path: Path):
     
     return ecoding_type
 
-def getResizeBase64(file_path, factor, ecoding_type):
+
+def getResizeName(file_path: Path):
+    return file_path.parent / f"{file_path.stem}_resized{file_path.suffix}"
+
+
+def getResizeBase64(file_path: Path, factor: float, ecoding_type: str):
+    resized_path = getResizeName(file_path)
+    if resized_path.exists():
+        return loadImageDirectly(resized_path)
+
     image = Image.open(file_path)
     width, height = image.size
     
     image_resized = image.resize((width // factor, height // factor), resample=Image.LANCZOS)
-
     image_resized = orientatePILImage(image_resized, image._getexif())
 
-    buffered = BytesIO()
-    image_resized.save(buffered, format=ecoding_type)
-    b64_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    image_resized.save(resized_path, format=ecoding_type)
     
-    return b64_string
+    return loadImageDirectly(resized_path)
 
 
 def loadImageDirectly(file_path):
