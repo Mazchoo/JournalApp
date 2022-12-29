@@ -17,7 +17,7 @@ def homePage(request, context):
     addGeneralInformation(context)
     getAllYearSummaryInformation(context)
     # ToDo display icons for each year
-    return render(request=request, template_name='home.html')
+    return render(request=request, template_name='home.html', context=context)
 
 
 @putVargsIntoContext

@@ -2,7 +2,7 @@
 {% load static %}
 {% include "Common/header.html" %}
 {% include "NavBars/home-nav.html" %}
-{% include "Backgrounds/Mountains.html" %}
+{% include "Backgrounds/Summer.html" %}
 <link rel="stylesheet" href="{% static 'css/carosel.css' %}"/>
 
 
@@ -11,39 +11,37 @@
         <br><br>
         <div class="row">
             <div id="carousel" class="carousel slide" data-ride="carousel">
-            <ol class="carousel-indicators">
-                <li data-target="#carousel" data-slide-to="0" class="active"></li>
-                <li data-target="#carousel" data-slide-to="1"></li>
-            </ol>
             <div class="carousel-inner">
 
-                <div class="carousel-item active">            <h1> 2020 </h1>
-                <div class="d-none d-lg-block">
-                    <div class="slide-box">
-                    <img src="https://picsum.photos/285/200/?image=0&random" alt="First slide">
-                    <img src="https://picsum.photos/285/200/?image=1&random" alt="First slide">
-                    <img src="https://picsum.photos/285/200/?image=2&random" alt="First slide">
-                    <img src="https://picsum.photos/285/200/?image=3&random" alt="First slide">
+                {% for year, icons in icon_paths.items %}
+                    {% if forloop.counter0 == 0 %}
+                        <div class="carousel-item active">
+                    {% else %}
+                        <div class="carousel-item">
+                    {% endif %}
+                            <span class="text-center carousel-caption">
+                                <a href="{% url 'main:year' year %}">
+                                    <h1>{{ year }}</h1>
+                                </a>
+                            </span>
+                            <div class="d-none d-lg-block">
+                                <div class="slide-box row">
+                                    {% for icon in icons %}
+                                        <div class="col-md-2">
+                                            <img src="{{icon}}" class="img-fluid rounded-start py-1">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                     </div>
-                </div>
-                </div>
+                {% endfor %}
 
-                <div class="carousel-item">             <h1> 2021 </h1>
-                <div class="d-none d-lg-block">
-                    <div class="slide-box">
-                    <img src="https://picsum.photos/285/200/?image=4&random" alt="Second slide">
-                    <img src="https://picsum.photos/285/200/?image=5&random" alt="Second slide">
-                    <img src="https://picsum.photos/285/200/?image=6&random" alt="Second slide">
-                    <img src="https://picsum.photos/285/200/?image=7&random" alt="Second slide">
-                    </div>
-                </div>
-                </div>
             </div>
-            <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+            <a class="carousel-control-prev btn-dark carousel-btn" href="#carousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
             </a>
-            <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+            <a class="carousel-control-next btn-dark carousel-btn" href="#carousel" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>

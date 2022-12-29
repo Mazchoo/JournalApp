@@ -7,6 +7,8 @@ from django.db.models.functions import ExtractYear
 import main.models as models
 from main.ContentGeneration.image_utils import getBase64FromPath, getIconFilePath
 
+NR_IMAGES_TO_DISPLAY = 18
+
 def getAllImagesInYear(year: str):
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-"
@@ -15,19 +17,24 @@ def getAllImagesInYear(year: str):
 
 def getAllEntryYears():
     distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
-    return [entry['year'] for entry in distinct_years]
+    years = [entry['year'] for entry in distinct_years]
+    years.sort()
+    return years
 
 
 def getRandomImagesFromYear(year: int):
-    output_list = []
 
     year_images = getAllImagesInYear(year)
     images_icon_files = [getIconFilePath(Path(img.file_path)) for img in year_images]
     valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
 
-    if valid_icons:
-        selected_icon_paths = random.choices(valid_icons, k=12)
-        output_list = [getBase64FromPath(path) for path in selected_icon_paths]
+    selected_icon_paths = []
+    if len(valid_icons) >= NR_IMAGES_TO_DISPLAY:
+        selected_icon_paths = random.sample(valid_icons, k=NR_IMAGES_TO_DISPLAY)
+    elif valid_icons:
+        selected_icon_paths = random.choices(valid_icons, k=NR_IMAGES_TO_DISPLAY)
+        
+    output_list = [getBase64FromPath(path) for path in selected_icon_paths]
             
     return output_list
 

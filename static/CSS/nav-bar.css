@@ -6,3 +6,8 @@
 .nav-small-space {
     width: 2%;
 }
+
+a {
+    color: inherit; /* blue colors for links too */
+    text-decoration: inherit; /* no underline */
+}
