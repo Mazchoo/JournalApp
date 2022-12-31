@@ -2,7 +2,7 @@
 {% load static %}
 {% include "Common/header.html" %}
 {% include "NavBars/home-nav.html" %}
-{% include "Backgrounds/Summer.html" %}
+{% include "Backgrounds/Autumn.html" %}
 <link rel="stylesheet" href="{% static 'css/carosel.css' %}"/>
 
 
@@ -20,6 +20,7 @@
                         <div class="carousel-item">
                     {% endif %}
                             <span class="text-center carousel-caption">
+                                <p></p>
                                 <a href="{% url 'main:year' year %}">
                                     <h1>{{ year }}</h1>
                                 </a>
