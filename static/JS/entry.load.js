@@ -37,4 +37,5 @@ let intializeLoadedContent = function(loadedContent) {
             parseLoadedStoryContent(key, textContent);
         }
     }
+    window.scrollTo(0, 0);
 }
