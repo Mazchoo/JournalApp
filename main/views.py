@@ -1,12 +1,13 @@
 
 import main.forms as forms
+from django.shortcuts import render, redirect
 
-from django.shortcuts import render
 from main.Helpers.date_helpers import (addGeneralInformation, addDayInformation, addMonthInformation,
                                        addYearInformation, putVargsIntoContext)
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import getYearEntryInformation
 from main.Helpers.get_all_years_summary import getAllYearSummaryInformation
+from main.Helpers.get_latest_entry import getLatestEntryTuple
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
@@ -16,8 +17,15 @@ from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAn
 def homePage(request, context):
     addGeneralInformation(context)
     getAllYearSummaryInformation(context)
-    # ToDo display icons for each year
     return render(request=request, template_name='home.html', context=context)
+
+
+@putVargsIntoContext
+def latestPage(request, context):
+    last_date_tuple = getLatestEntryTuple()
+    if last_date_tuple:
+        return redirect(f'/edit/{"/".join(last_date_tuple)}')
+    return redirect('/')
 
 
 @putVargsIntoContext
@@ -45,10 +53,6 @@ def editEntryPage(request, context):
 
 def showEntryPage(request, _day: int, _month: str, _year: int):
     return render(request=request, template_name='month.html')
-
-
-def latestPage(request):
-    return render(request=request, template_name='home.html')
 
 
 def dateNotFoundPage(request):
