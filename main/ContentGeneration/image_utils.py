@@ -67,9 +67,9 @@ def getImageFileName(file_path: str) -> str:
 
 
 def getEncodingType(file_path: Path):
-    if file_path.suffix in [".jpg", ".jpeg"]:
+    if file_path.suffix.lower() in [".jpg", ".jpeg"]:
         ecoding_type = "jpeg"
-    elif file_path.suffix == ".png":
+    elif file_path.suffix.lower() == ".png":
         ecoding_type = "png"
     else:
         ecoding_type = ImageConstants.unknown_enoding_type
@@ -114,7 +114,7 @@ def addEncodingTypeToBase64(b64_string, ecoding_type):
 def parseBase64ImageData(file_path: str) -> str:
     file_path = Path(file_path)
 
-    if file_path.exists() and file_path.suffix in ImageConstants.supported_extensions:
+    if file_path.exists() and file_path.suffix.lower() in ImageConstants.supported_extensions:
 
         factor = getResizingFactorToDownSized(file_path)
         ecoding_type = getEncodingType(file_path)
@@ -125,7 +125,7 @@ def parseBase64ImageData(file_path: str) -> str:
 
         b64_string = addEncodingTypeToBase64(b64_string, ecoding_type)
     else:
-        print(f'Error! Image {file_path} does not exist!')
+        print(f'Error! Image {file_path} is invalid!')
         b64_string = ""
     
     return b64_string
