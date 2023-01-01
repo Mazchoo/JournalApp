@@ -58,6 +58,9 @@ def showEntryPage(request, _day: int, _month: str, _year: int):
 def dateNotFoundPage(request):
     return render(request=request, template_name='DateNotFound.html')
 
+# ToDo Add a request that can delete an entry
+# ToDo Add a request to move an entry to another date
+# ToDo Prev day year seems to be wrong
 
 @ajaxRequest
 def saveEntry(post_data: dict):
