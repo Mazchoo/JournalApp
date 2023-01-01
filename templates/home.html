@@ -14,7 +14,7 @@
             <div class="carousel-inner">
 
                 {% for year, icons in icon_paths.items %}
-                    {% if forloop.counter0 == 0 %}
+                    {% if forloop.counter == icon_paths|length %}
                         <div class="carousel-item active">
                     {% else %}
                         <div class="carousel-item">
