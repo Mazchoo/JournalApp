@@ -20,8 +20,7 @@ def homePage(request, context):
     return render(request=request, template_name='home.html', context=context)
 
 
-@putVargsIntoContext
-def latestPage(request, context):
+def latestPage(_request):
     last_date_tuple = getLatestEntryTuple()
     if last_date_tuple:
         return redirect(f'/edit/{"/".join(last_date_tuple)}')
@@ -60,6 +59,7 @@ def dateNotFoundPage(request):
 
 # ToDo Add a request that can delete an entry
 # ToDo Add a request to move an entry to another date
+# ToDo Add a request to give the full sized image for zooming
 
 @ajaxRequest
 def saveEntry(post_data: dict):
