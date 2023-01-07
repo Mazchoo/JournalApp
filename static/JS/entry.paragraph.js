@@ -50,7 +50,7 @@ let editParagraphWhenInitialised = function(updateInd, paragraphContent, counter
     if (!editParagraphContent(updateInd, paragraphContent)) {
         counter--;
         // ToDo - try to fix this issue by separating this initialisation from creating the html components
-        setTimeout(editParagraphWhenInitialised, 1500 * (100 / counter), updateInd, paragraphContent, counter);
+        setTimeout(editParagraphWhenInitialised, 1000 * (100 / counter), updateInd, paragraphContent, counter);
     }
 }
 
