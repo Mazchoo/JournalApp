@@ -48,8 +48,8 @@ let readImageURL= function(inputFiles, fileInd, contentId) {
     var reader = new FileReader();
 
     reader.onload = function (e) {
-        $('#image' + contentId)
-            .attr('src', e.target.result);
+        $('#image' + contentId).attr('src', e.target.result);
+        enableSaveButton();
     };
     reader.readAsDataURL(inputFiles[fileInd]);
 }

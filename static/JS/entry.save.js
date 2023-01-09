@@ -72,3 +72,8 @@ let saveToDatabase = function() {
      let saveData = getSaveData();
      saveEntryToDatabase(saveData);
 }
+
+let enableSaveButton = function() {
+     $('#btn-save').removeClass('disabled');
+     $('#btn-save').addClass('btn-success');
+}

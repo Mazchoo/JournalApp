@@ -5,6 +5,11 @@ let createTinyMCE = function(component_name, height) {
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
+        setup:function(ed) {
+            ed.on('change', function(e) {
+                enableSaveButton();
+            })
+        }
     });
 }
 
@@ -15,7 +20,6 @@ let getMCEComponentHeight = function(name) {
 
 
 let resetMCE = function(div) {
-    // MCE bugs out after divs get moved around
     if (!$(div).hasClass("paragraph-entry")) { return; }
 
     let divName = div.children[0].getAttribute('name');

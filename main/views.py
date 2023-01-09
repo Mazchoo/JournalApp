@@ -60,9 +60,7 @@ def dateNotFoundPage(request):
 # ToDo Add a request that can delete an entry
 # ToDo Add a request to move an entry to another date
 # ToDo Add a request to give the full sized image for zooming
-# ToDo Enable save button when page has changed in website and not before
 
 @ajaxRequest
 def saveEntry(post_data: dict):
     return updateOrGenerateEntry(post_data)
-    
