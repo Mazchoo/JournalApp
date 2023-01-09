@@ -1,6 +1,6 @@
 
 let generateSaveEntry = function(saveContent) {
-     if (saveContent === null) {return;}
+     if (saveContent === null) { return; }
      let saveData = {};
 
      for (let i = 0; i < saveContent.length; i++) {
@@ -35,7 +35,7 @@ let generateSaveEntry = function(saveContent) {
 
 
 let saveEntryToDatabase = function(saveData) {
-    if (saveData === null) {return;}
+    if (saveData === null) { return; }
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     $.ajax({
@@ -54,7 +54,7 @@ let saveEntryToDatabase = function(saveData) {
           },
           complete: function(_jqXhr, _textStatus) {
                $('#spinner-save').addClass("invisible");
-               $('#btn-save').attr("disabled", false);
+               enableDeleteButton();
           }
     })
 }
@@ -67,13 +67,14 @@ let getSaveData = function() {
 
 
 let saveToDatabase = function() {
-     $('#btn-save').attr("disabled", true);
-     $('#spinner-save').removeClass("invisible");
+     if ($('#btn-save').hasClass('disabled')) { return; }
+
+     $('#btn-save').attr('disabled', true);
+     $('#spinner-save').removeClass('invisible');
      let saveData = getSaveData();
      saveEntryToDatabase(saveData);
 }
 
 let enableSaveButton = function() {
      $('#btn-save').removeClass('disabled');
-     $('#btn-save').addClass('btn-success');
 }

@@ -6,6 +6,8 @@ from django.http import Http404
 
 
 def isAjax(request):
+    if not hasattr(request, 'META'):
+        return False
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 

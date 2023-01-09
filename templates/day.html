@@ -26,6 +26,7 @@
                 <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-para'>New Paragraph</button>
                 <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-image'>New Image</button>
                 <button class='btn btn-success disabled px-2 ml-2 mt-2 mb-5' id='btn-save'>Save</button>
+                <button class='btn btn-danger disabled px-2 ml-2 mt-2 mb-5' id='btn-delete'>Delete</button>
                 <button class='btn btn-dark px-3 ml-2 mt-2 mb-5 invisible' id='spinner-save' type='button' disabled>
                     <span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span>
                     &nbsp in progress 
@@ -40,6 +41,7 @@
     <script src="{% static 'js/entry.paragraph.js' %}"></script>
     <script src="{% static 'js/entry.image.js' %}"></script>
     <script src="{% static 'js/entry.save.js' %}"></script>
+    <script src="{% static 'js/entry.delete.js' %}"></script>
     <script src="{% static 'js/entry.load.js' %}"></script>
 
     <script>
@@ -49,6 +51,7 @@
         var SAVE_CONTENT = {{saved_content | safe}};
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
+        var DELETE_URL = '{% url "main:delete-entry" %}';
         var MAX_CHANGE_ATTEMPTS = 100;
 
         intializeLoadedContent(SAVE_CONTENT);
@@ -56,5 +59,6 @@
         $('#btn-new-para').click(appendParagraphToList);
         $('#btn-new-image').click(appendImageToList);
         $('#btn-save').click(saveToDatabase);
+        $('#btn-delete').click(deleteContent);
     </script>
 </body>

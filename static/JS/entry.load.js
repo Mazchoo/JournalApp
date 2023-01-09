@@ -35,6 +35,7 @@ let intializeLoadedContent = function(loadedContent) {
     } else {
         for([key, textContent] of Object.entries(loadedContent)) {
             parseLoadedStoryContent(key, textContent);
+            enableDeleteButton();
         }
     }
     window.scrollTo(0, 0);

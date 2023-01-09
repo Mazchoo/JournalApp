@@ -12,4 +12,5 @@ urlpatterns = [
     path('latest', views.latestPage, name='latest'),
     path('date-not-found', views.homePage, name='date-not-found'),
     path('ajax/save-entry/', views.saveEntry, name='save-entry'),
+    path('ajax/delete-entry/', views.deleteEntry, name='delete-entry'),
 ]

@@ -7,6 +7,8 @@ from django.forms.utils import ErrorDict
 import main.models as models
 import main.forms as forms
 
+from main.ContentGeneration.delete_entry import deleteEntryContent
+
 
 def generateNewEntry(name: str):
     entry_form = forms.EntryForm({
@@ -82,14 +84,6 @@ def processSubmittedContent(key, value, errors, content_keys):
     return True
 
 
-def deleteOldContent(entry: models.Entry):
-    old_content_ids = entry.content.get_queryset()
-    models.Content.objects.filter(id__in=old_content_ids).delete()
-
-    for Model in models.CONTENT_MODELS.values():
-        Model.objects.filter(entry=entry.name).delete()
-
-
 def getSavedContentIds(content_dict: dict):
     content_keys = []
     errors = ErrorDict()
@@ -119,7 +113,7 @@ def updateOrGenerateEntry(post_data):
     if 'content' not in post_data:
         return HttpResponse('No content in entry', content_type='text/plain')
 
-    deleteOldContent(entry)
+    deleteEntryContent(entry)
     content_errors, content_ids = getSavedContentIds(post_data['content'])
 
     entry.last_edited = datetime.now()
