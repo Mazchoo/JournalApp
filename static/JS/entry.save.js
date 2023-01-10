@@ -54,7 +54,6 @@ let saveEntryToDatabase = function(saveData) {
           },
           complete: function(_jqXhr, _textStatus) {
                $('#spinner-save').addClass("invisible");
-               enableDeleteButton();
           }
     })
 }
@@ -67,9 +66,11 @@ let getSaveData = function() {
 
 
 let saveToDatabase = function() {
-     if ($('#btn-save').hasClass('disabled')) { return; }
+     if ($('#btn-save').hasClass('disabled') || !$('#spinner-save').hasClass('invisible')) {
+           return;
+     }
 
-     $('#btn-save').attr('disabled', true);
+     disableSaveButton();
      $('#spinner-save').removeClass('invisible');
      let saveData = getSaveData();
      saveEntryToDatabase(saveData);
@@ -77,4 +78,12 @@ let saveToDatabase = function() {
 
 let enableSaveButton = function() {
      $('#btn-save').removeClass('disabled');
+     $('#btn-save').removeClass('btn-outline-success');
+     $('#btn-save').addClass('btn-success');
+}
+
+let disableSaveButton = function() {
+     $('#btn-save').removeClass('btn-success');
+     $('#btn-save').addClass('disabled');
+     $('#btn-save').addClass('btn-outline-success');
 }

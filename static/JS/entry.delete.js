@@ -2,6 +2,15 @@
 
 let enableDeleteButton = function() {
     $('#btn-delete').removeClass('disabled');
+    $('#btn-delete').removeClass('btn-outline-danger');
+    $('#btn-delete').addClass('btn-danger');
+}
+
+
+let disableDeleteButton = function() {
+     $('#btn-delete').removeClass('btn-danger');
+     $('#btn-delete').addClass('disabled');
+     $('#btn-delete').addClass('btn-outline-danger');
 }
 
 
@@ -23,7 +32,7 @@ let deleteFromDatabase = function() {
           },
           complete: function(_jqXhr, _textStatus) {
                $('#spinner-save').addClass('invisible');
-               $('#btn-delete').addClass('disable');
+               disableDeleteButton();
           }
     })
 }

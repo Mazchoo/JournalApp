@@ -15,16 +15,15 @@ def deleteEntryContent(entry: models.Entry):
 def deleteEntryAndContent(post_data):
     if "name" not in post_data:
         return HttpResponse(f'No name in post data', content_type='text/plain')
-    
+
     name = post_data["name"]
     entry = models.Entry.objects.all().filter(name=name)
-    
+
     if not entry.exists():
         return HttpResponse(f'Invalid entry {name}', content_type='text/plain')
-    
+
     entry = entry[0]
     deleteEntryContent(entry)
     entry.delete()
 
     return HttpResponse("It's gone! Reload the page to delete your local copy.", content_type='text/plain')
-    
