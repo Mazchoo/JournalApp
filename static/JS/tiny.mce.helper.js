@@ -13,7 +13,6 @@ let createTinyMCE = function(component_name, height, initCallback=emptyFunction)
             }),
             editor.on('init', function(e) {
                 initCallback();
-                console.log("initCallbackRun");
             })
         },
     });

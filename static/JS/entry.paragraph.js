@@ -50,7 +50,7 @@ let createInitFunction = function(updateInd, paragraphText) {
 }
 
 
-let initializeNewParagraph = function(lastestId, height, paragraphText) {
+let initializeNewParagraph = function(lastestId, height=220, paragraphText="") {
     let initFunction = createInitFunction(lastestId, paragraphText);
     createTinyMCE('#paragraph' + lastestId, height, initFunction);
 
