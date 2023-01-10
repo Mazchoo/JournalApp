@@ -34,29 +34,25 @@ let createNewParagraph = function() {
 }
 
 
-let editParagraphContent = function(updateInd, paragraphContent) {
-    if (updateInd === undefined || paragraphContent === undefined) { return false; }
+let editParagraphContent = function(updateInd, paragraphText) {
+    if (updateInd === undefined || paragraphText === undefined) { return false; }
     let paragraphDiv = tinyMCE.get('paragraph' + updateInd);
     if (paragraphDiv === null) { return false; }
 
-    paragraphDiv.setContent(paragraphContent["text"]);
+    paragraphDiv.setContent(paragraphText);
     return true;
 }
 
 
-let editParagraphWhenInitialised = function(updateInd, paragraphContent, counter) {
-    if (counter <= 0 || updateInd === undefined || paragraphContent === undefined) { return false; }
-
-    if (!editParagraphContent(updateInd, paragraphContent)) {
-        counter--;
-        // ToDo - try to fix this issue by separating this initialisation from creating the html components
-        setTimeout(editParagraphWhenInitialised, 1000 * (100 / counter), updateInd, paragraphContent, counter);
-    }
+let createInitFunction = function(updateInd, paragraphText) {
+    if (paragraphText.length == 0) { return emptyFunction; }
+    return function() { editParagraphContent(updateInd, paragraphText); };
 }
 
 
-let initializeNewParagraph = function(lastestId, height) {
-    createTinyMCE('#paragraph' + lastestId, height);
+let initializeNewParagraph = function(lastestId, height, paragraphText) {
+    let initFunction = createInitFunction(lastestId, paragraphText);
+    createTinyMCE('#paragraph' + lastestId, height, initFunction);
 
     $('#delete-content' + lastestId).click(deleteParagraph);
     $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
@@ -72,12 +68,12 @@ let insertNewParagraphToPosition = function(e) {
 }
 
 
-let appendParagraphToList = function(_e, height=220) {
+let appendParagraphToList = function(_e, height=220, paragraphText="") {
     let div = createNewParagraph();
     if (div === undefined) {return;}
 
     $('#edit-area')[0].appendChild(div);
-    initializeNewParagraph(String(CONTENT_INDEX), height);
+    initializeNewParagraph(String(CONTENT_INDEX), height, paragraphText);
 
     return div;
 }

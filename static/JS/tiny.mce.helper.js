@@ -1,15 +1,21 @@
 
-let createTinyMCE = function(component_name, height) {
+
+
+let createTinyMCE = function(component_name, height, initCallback=emptyFunction) {
     tinymce.init({
         selector: component_name,
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
-        setup:function(ed) {
-            ed.on('change', function(e) {
+        setup:function(editor) {
+            editor.on('change', function(e) {
                 enableSaveButton();
+            }),
+            editor.on('init', function(e) {
+                initCallback();
+                console.log("initCallbackRun");
             })
-        }
+        },
     });
 }
 

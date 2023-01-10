@@ -60,6 +60,7 @@ def dateNotFoundPage(request):
 
 # ToDo Add a request to move an entry to another date
 # ToDo Add a request to give the full sized image for zooming
+# ToDo Add import statements for javascript modules
 
 @ajaxRequest
 def deleteEntry(post_data: dict):

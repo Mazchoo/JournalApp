@@ -115,3 +115,8 @@ let moveObjectDown = function(e) {
     resetMCE(parentDiv);
     resetMCE(editAreaList.children[objInd]);
 }
+
+
+let emptyFunction = function() {
+    return;
+}
