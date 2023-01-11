@@ -54,11 +54,13 @@ def createEntryFilePathIfExists(target_file_path: str, target_folder: str, file_
     return output_path
 
 
-def getImageSavePath(file_name: str, entry_name: str) -> str:
+def getImagePath(file_name: str, entry_name: str) -> str:
     target_folder = f"{os.getcwd()}\\Images\\{entry_name}"
-    target_file_path = f"{target_folder}\\{file_name}"
+    return target_folder, f"{target_folder}\\{file_name}"
 
-    return createEntryFilePathIfExists(target_file_path, target_folder, file_name)
+
+def moveImageToSavePath(file_name: str, entry_name: str) -> str:
+    return createEntryFilePathIfExists(*getImagePath(file_name, entry_name), file_name)
 
 
 def getImageFileName(file_path: str) -> str:

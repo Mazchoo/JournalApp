@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 
 import main.models as models
-from main.ContentGeneration.image_utils import getImageSavePath
+from main.ContentGeneration.image_utils import moveImageToSavePath
 from main.ContentGeneration.image_constants import ImageConstants
 
 from tinymce.widgets import TinyMCE
@@ -55,7 +55,7 @@ class ImageForm(ModelForm):
         if "." not in file_path:
             raise forms.ValidationError(f"Path '{file_path}' has no extention")
 
-        file_path = getImageSavePath(file_path, entry.name)
+        file_path = moveImageToSavePath(file_path, entry.name)
         file_obj = Path(file_path)
         if not file_obj.exists():
             raise forms.ValidationError(f"Cannot find '{file_path}' in <b>Images</b> folder")
