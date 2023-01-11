@@ -106,3 +106,34 @@ let editImageWhenInitialised = function(updateInd, imageContent, counter) {
         setTimeout(editImageWhenInitialised, 1000, updateInd, imageContent, counter);
     }
 }
+
+
+let zoomToImage = function() {
+    let imageId = $(this).find('img').attr('id');
+    let contentId = getContentId(imageId);
+
+    if (contentId === undefined) return;
+    let imageName = $('#upload-label' + contentId).html();
+    let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    let imageSource = $(this).find('img').attr('src');
+    $.ajax({
+        type: 'POST',
+        url: IMAGE_URL,
+        data: {
+            "file": imageName,
+            "csrfmiddlewaretoken": csrftoken,
+            "name": DATE_SLUG
+        },
+        success: function(response) {
+            imageSource = response["base64"];
+        },
+        error: function(_jqXhr, _textStatus, errorThrown){
+            showMessageSimpleModal('Save Status', errorThrown);
+        },
+        complete: function(_jqXhr, _textStatus) {
+            $('#image-preview').attr('src', imageSource);
+            $('#image-modal').modal('show');
+       }
+   })
+}

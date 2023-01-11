@@ -13,6 +13,8 @@ from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 from main.ContentGeneration.delete_entry import deleteEntryAndContent
 
+from main.ContentGeneration.image_utils import getImagePath, loadImageDirectly, addEncodingTypeToBase64
+
 
 @putVargsIntoContext
 def homePage(request, context):
@@ -58,8 +60,10 @@ def showEntryPage(request, _day: int, _month: str, _year: int):
 def dateNotFoundPage(request):
     return render(request=request, template_name='DateNotFound.html')
 
+
 # ToDo Add a request to move an entry to another date
-# ToDo Add a request to give the full sized image for zooming
+# ToDo Make global parameters a static class
+# ToDo Add a .bat file to run and open webpage
 
 @ajaxRequest
 def deleteEntry(post_data: dict):
@@ -69,3 +73,18 @@ def deleteEntry(post_data: dict):
 @ajaxRequest
 def saveEntry(post_data: dict):
     return updateOrGenerateEntry(post_data)
+
+from django.http import HttpResponse, JsonResponse
+from pathlib import Path
+
+@ajaxRequest
+def getImage(post_data: dict):
+    _, target_path = getImagePath(post_data["file"], post_data["name"])
+
+    if not Path(target_path).exists():
+        return HttpResponse("Image Not Found", status=404)
+    
+    b64_string = loadImageDirectly(target_path)
+    image_str = addEncodingTypeToBase64(b64_string, "jpeg")
+    
+    return JsonResponse({"base64": image_str}, safe=True)

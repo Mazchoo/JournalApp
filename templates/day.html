@@ -5,6 +5,7 @@
 {{tiny_mce.media}} <!-- needed for tiny mce to activate -->
 {% include "Modals/callbackModal.html" %}
 {% include "Modals/simpleModal.html" %}
+{% include "Modals/imageModal.html" %}
 
 <link rel="stylesheet" href="{% static 'CSS/image-upload.css' %}"/>
 <link rel="stylesheet" href="{% static 'CSS/edit-content.css' %}"/>
@@ -40,8 +41,8 @@
     <script src="{% static 'js/tiny.mce.helper.js' %}"></script>
     <script src="{% static 'js/entry.paragraph.js' %}"></script>
     <script src="{% static 'js/entry.image.js' %}"></script>
-    <script src="{% static 'js/entry.save.js' %}"></script>
     <script src="{% static 'js/entry.delete.js' %}"></script>
+    <script src="{% static 'js/entry.save.js' %}"></script>
     <script src="{% static 'js/entry.load.js' %}"></script>
 
     <script>
@@ -52,6 +53,7 @@
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
         var DELETE_URL = '{% url "main:delete-entry" %}';
+        var IMAGE_URL = '{% url "main:get-image" %}';
         var MAX_CHANGE_ATTEMPTS = 100;
 
         intializeLoadedContent(SAVE_CONTENT);
@@ -60,5 +62,7 @@
         $('#btn-new-image').click(appendImageToList);
         $('#btn-save').click(saveToDatabase);
         $('#btn-delete').click(deleteContent);
+
+        $('.image-area').click(zoomToImage);
     </script>
 </body>

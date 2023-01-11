@@ -79,8 +79,16 @@ let insertNewObjectIntoEditArea = function(e, newFunc, initFunc, contentInd) {
 
 
 let getContentType = function(key) {
-    let contentType = key.match(/([a-zA-Z]+)/g);
-    return contentType[0];
+    let contentMatch = key.match(/([a-zA-Z]+)/g);
+    if (contentMatch === undefined) return "";
+    return contentMatch[0];
+}
+
+
+let getContentId = function(key) {
+    let contentMatch = key.match(/([0-9]+)/g);
+    if (contentMatch === undefined) return -1;
+    return contentMatch[0];
 }
 
 
