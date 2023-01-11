@@ -48,6 +48,7 @@ let saveEntryToDatabase = function(saveData) {
           },
           success: function(response) {
                showMessageSimpleModal('Save Status', response);
+               enableDeleteButton();
           },
           error: function(_jqXhr, _textStatus, errorThrown){
                showMessageSimpleModal('Unknown Error', errorThrown);
