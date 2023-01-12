@@ -2,6 +2,7 @@
 import os
 import base64
 from pathlib import Path
+from typing import Union
 import shutil
 from PIL import Image
 from functools import lru_cache
@@ -56,7 +57,7 @@ def createEntryFilePathIfExists(target_file_path: str, target_folder: str, file_
 
 def getImagePath(file_name: str, entry_name: str) -> str:
     target_folder = f"{os.getcwd()}\\Images\\{entry_name}"
-    return target_folder, f"{target_folder}\\{file_name}"
+    return f"{target_folder}\\{file_name}", target_folder
 
 
 def moveImageToSavePath(file_name: str, entry_name: str) -> str:
@@ -68,10 +69,11 @@ def getImageFileName(file_path: str) -> str:
     return file_path.stem + file_path.suffix
 
 
-def getEncodingType(file_path: Path):
-    if file_path.suffix.lower() in [".jpg", ".jpeg"]:
+def getEncodingType(file_path: Union[Path, str]):
+    path = Path(file_path)
+    if path.suffix.lower() in [".jpg", ".jpeg"]:
         ecoding_type = "jpeg"
-    elif file_path.suffix.lower() == ".png":
+    elif path.suffix.lower() == ".png":
         ecoding_type = "png"
     else:
         ecoding_type = ImageConstants.unknown_enoding_type

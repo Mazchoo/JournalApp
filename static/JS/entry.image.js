@@ -35,7 +35,7 @@ let insertNewImageToPosition = function(e) {
 
 let appendImageToList = function() {
     let div = createNewImage();
-    if (div === undefined) {return;}
+    if (div === undefined) return;
 
     $('#edit-area')[0].appendChild(div);
     initializeNewImage(String(CONTENT_INDEX));
@@ -76,9 +76,7 @@ let uploadAllImageFiles = function(contentInd, inputFiles) {
 
 let showImageUpload = function(self) {
     let input = self.target;
-    if (!(input.id && input.files)) { 
-        return;
-    }
+    if (!(input.id && input.files)) return;
 
     let contentInd = input.id.replace("upload", "");
     uploadAllImageFiles(contentInd, input.files);
@@ -99,7 +97,7 @@ let editImageContent = function(updateInd, imageContent) {
 
 
 let editImageWhenInitialised = function(updateInd, imageContent, counter) {
-    if (counter <= 0 || updateInd == undefined || imageContent == undefined){ return false; }
+    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
 
     if (!editImageContent(updateInd, imageContent)) {
         counter--;
@@ -129,7 +127,7 @@ let zoomToImage = function() {
             imageSource = response["base64"];
         },
         error: function(_jqXhr, _textStatus, errorThrown){
-            showMessageSimpleModal('Save Status', errorThrown);
+            console.log("Image show error :" + errorThrown);
         },
         complete: function(_jqXhr, _textStatus) {
             $('#image-preview').attr('src', imageSource);

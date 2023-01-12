@@ -84,7 +84,7 @@ def processSubmittedContent(key, value, errors, content_keys):
     return True
 
 
-def getSavedContentIds(content_dict: dict):
+def saveContentToDatabase(content_dict: dict) -> list:
     content_keys = []
     errors = ErrorDict()
 
@@ -114,7 +114,7 @@ def updateOrGenerateEntry(post_data):
         return HttpResponse('No content in entry', content_type='text/plain')
 
     deleteEntryContent(entry)
-    content_errors, content_ids = getSavedContentIds(post_data['content'])
+    content_errors, content_ids = saveContentToDatabase(post_data['content'])
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)
