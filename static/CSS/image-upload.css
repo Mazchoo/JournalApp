@@ -32,7 +32,7 @@
     position: relative;
 }
 
-.image-area:hover {
+.content-image:hover {
     cursor: zoom-in;
 }
 
