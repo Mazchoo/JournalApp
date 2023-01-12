@@ -32,6 +32,10 @@
     position: relative;
 }
 
+.image-area:hover {
+    cursor: zoom-in;
+}
+
 .image-container {
     min-height: 230px;
 }

@@ -64,7 +64,6 @@ def dateNotFoundPage(request):
 # ToDo Make global parameters a static class
 # ToDo Add a .bat file to run and open webpage
 # ToDo Deleting should clean up image folder
-# ToDo - make hover icon for the images
 
 @ajaxRequest
 def deleteEntry(post_data: dict):
