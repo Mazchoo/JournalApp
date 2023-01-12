@@ -1,11 +1,9 @@
 
 
 from django.http import HttpResponse, JsonResponse
-from pathlib import Path
 
-from main.ContentGeneration.image_utils import (getImagePath, loadImageDirectly, 
-                                                addEncodingTypeToBase64, getEncodingType)
-from main.ContentGeneration.image_constants import ImageConstants
+from main.Helpers.image_utils import loadImageDirectly, addEncodingTypeToBase64, getEncodingType
+from main.Helpers.image_constants import ImageConstants
 from main.forms import FullImagePath
 
 

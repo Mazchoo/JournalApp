@@ -8,7 +8,7 @@ from main.Helpers.date_contants import DateConstants
 
 def putVargsIntoContext(func):
     ''' Put date information from slug into context '''
-    month_names = DateConstants().month_names
+    month_names = DateConstants.month_names
 
     def wrapFunc(request, **kwargs):
         context = kwargs.copy()
@@ -20,10 +20,9 @@ def putVargsIntoContext(func):
 
 
 def addGeneralInformation(context):
-    date_constants = DateConstants()
-    context['full_day_names'] = date_constants.day_names
-    context['short_day_names'] = date_constants.day_names_short
-    context['months_in_year'] = date_constants.month_names
+    context['full_day_names'] = DateConstants.day_names
+    context['short_day_names'] = DateConstants.day_names_short
+    context['months_in_year'] = DateConstants.month_names
 
 
 def addYearInformation(context):
@@ -45,9 +44,8 @@ def addMonthInformation(context):
         print('addMonthInformation: Request does not have month or year.', context)
         return
 
-    date_constants = DateConstants()
-    month_names = date_constants.month_names
-    day_names = date_constants.day_names
+    month_names = DateConstants.month_names
+    day_names = DateConstants.day_names
 
     year = addYearInformation(context)
     month_ind = month_names.index(context['month']) + 1

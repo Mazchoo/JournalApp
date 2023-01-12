@@ -7,8 +7,8 @@ import shutil
 from PIL import Image
 from functools import lru_cache
 
-from main.ContentGeneration.image_constants import ImageConstants
-from main.ContentGeneration.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
+from main.Helpers.image_constants import ImageConstants
+from main.Helpers.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
                                                       cropImageToSquare)
 
 def getIconFilePath(file_path: Path):

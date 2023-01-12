@@ -1,7 +1,7 @@
 from django.db.models import Model
 from django.db import models
 
-from main.ContentGeneration.image_utils import parseBase64ImageData, getImageFileName
+from main.Helpers.image_utils import parseBase64ImageData, getImageFileName
 
 class Content(Model):
     content_type = models.CharField(max_length=10)

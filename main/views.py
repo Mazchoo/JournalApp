@@ -61,7 +61,6 @@ def dateNotFoundPage(request):
 
 
 # ToDo Add a request to move an entry to another date
-# ToDo Make global parameters a static class
 # ToDo Add a .bat file to run and open webpage
 # ToDo Deleting should clean up image folder
 

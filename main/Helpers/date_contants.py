@@ -1,7 +1,4 @@
 
-from dataclasses import dataclass
-
-@dataclass
 class DateConstants:
     day_names: tuple = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
     day_names_short: tuple = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')

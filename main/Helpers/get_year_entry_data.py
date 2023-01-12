@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 
 import main.models as models
-from main.ContentGeneration.image_utils import getBase64FromPath, getIconFilePath
+from main.Helpers.image_utils import getBase64FromPath, getIconFilePath
 
 
 def getMonthStrings(i: int, context: dict):

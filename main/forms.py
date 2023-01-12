@@ -7,8 +7,8 @@ from pathlib import Path
 from datetime import datetime
 
 import main.models as models
-from main.ContentGeneration.image_utils import moveImageToSavePath, getImagePath
-from main.ContentGeneration.image_constants import ImageConstants
+from main.Helpers.image_utils import moveImageToSavePath, getImagePath
+from main.Helpers.image_constants import ImageConstants
 
 from tinymce.widgets import TinyMCE
 

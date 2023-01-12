@@ -5,7 +5,7 @@ from pathlib import Path
 from django.db.models.functions import ExtractYear
 
 import main.models as models
-from main.ContentGeneration.image_utils import getBase64FromPath, getIconFilePath
+from main.Helpers.image_utils import getBase64FromPath, getIconFilePath
 
 NR_IMAGES_TO_DISPLAY = 18
 
