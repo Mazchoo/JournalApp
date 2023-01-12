@@ -12,6 +12,7 @@ from main.Helpers.get_latest_entry import getLatestEntryTuple
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 from main.ContentGeneration.delete_entry import deleteEntryAndContent
+from main.ContentGeneration.get_full_image import getFullImageReponse
 
 
 @putVargsIntoContext
@@ -63,6 +64,7 @@ def dateNotFoundPage(request):
 # ToDo Make global parameters a static class
 # ToDo Add a .bat file to run and open webpage
 # ToDo Deleting should clean up image folder
+# ToDo - make hover icon for the images
 
 @ajaxRequest
 def deleteEntry(post_data: dict):
@@ -73,28 +75,7 @@ def deleteEntry(post_data: dict):
 def saveEntry(post_data: dict):
     return updateOrGenerateEntry(post_data)
 
-# ToDo - refactor this and make hover icon for the images
-
-from django.http import HttpResponse, JsonResponse
-from pathlib import Path
-
-from main.ContentGeneration.image_utils import (getImagePath, loadImageDirectly, 
-                                                addEncodingTypeToBase64, getEncodingType)
-from main.ContentGeneration.image_constants import ImageConstants
 
 @ajaxRequest
 def getImage(post_data: dict):
-    target_path, _ = getImagePath(post_data["file"], post_data["name"])
-
-    if not Path(target_path).exists():
-        return HttpResponse("Image Not Found", status=404)
-    
-    b64_string = loadImageDirectly(target_path)
-    encoding_type = getEncodingType(target_path)
-    
-    if encoding_type == ImageConstants.unknown_enoding_type:
-        return HttpResponse("Unknown Encoding Type", status=404)
-    
-    image_str = addEncodingTypeToBase64(b64_string, encoding_type)
-    
-    return JsonResponse({"base64": image_str}, safe=True)
+    return getFullImageReponse(post_data)

@@ -1,13 +1,13 @@
 
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from django.db import models as django_models
 import re
 from pathlib import Path
 from datetime import datetime
 
 import main.models as models
-from main.ContentGeneration.image_utils import moveImageToSavePath
+from main.ContentGeneration.image_utils import moveImageToSavePath, getImagePath
 from main.ContentGeneration.image_constants import ImageConstants
 
 from tinymce.widgets import TinyMCE
@@ -78,12 +78,6 @@ class TinyMCEComponent(ModelForm):
         fields = '__all__'
 
 
-CONTENT_FORMS = {
-    'image': ImageForm,
-    'paragraph': TinyMCEComponent,
-}
-
-
 class ContentForm(ModelForm):
 
     class Meta:
@@ -95,3 +89,23 @@ class ContentForm(ModelForm):
         content_type = clean_data['content_type']
         if content_type not in models.CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
+
+
+CONTENT_FORMS = {
+    'image': ImageForm,
+    'paragraph': TinyMCEComponent,
+}
+
+
+class FullImagePath(Form):
+    name = forms.SlugField(max_length=10)
+    file = forms.CharField(max_length=256)
+
+    def clean_file(self):
+        clean_data = super().clean()
+        target_path, _ = getImagePath(clean_data["file"], clean_data["name"])
+
+        if not Path(target_path).exists():
+            raise forms.ValidationError(f"File {target_path} does not exist")
+
+        return target_path
