@@ -17,7 +17,6 @@ class Entry(Model):
     first_created  = models.DateTimeField()
     last_edited    = models.DateTimeField()
     content        = models.ManyToManyField(Content)
-    thumbnail_path = models.CharField(max_length=256)
 
     def __str__(self):
         return f"Entry {self.name} - last modified - {self.last_edited}"
