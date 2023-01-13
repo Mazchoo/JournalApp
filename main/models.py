@@ -66,3 +66,4 @@ CONTENT_MODELS = {
     'image': EntryImage,
     'paragraph': EntryParagraph,
 }
+

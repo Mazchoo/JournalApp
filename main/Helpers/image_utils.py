@@ -11,6 +11,7 @@ from main.Helpers.image_constants import ImageConstants
 from main.Helpers.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
                                                       cropImageToSquare)
 
+
 def getIconFilePath(file_path: Path):
     icon_file_name = f"{file_path.stem}_icon{file_path.suffix}"
     target_icon_path = file_path.parent / icon_file_name
@@ -56,7 +57,8 @@ def createEntryFilePathIfExists(target_file_path: str, target_folder: str, file_
 
 
 def getImagePath(file_name: str, entry_name: str) -> str:
-    target_folder = f"{os.getcwd()}\\Images\\{entry_name}"
+    year, month, day = entry_name.split("-")
+    target_folder = f"{os.getcwd()}\\Images\\{year}\\{month}\\{day}"
     return f"{target_folder}\\{file_name}", target_folder
 
 

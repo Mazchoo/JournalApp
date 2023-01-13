@@ -3,6 +3,7 @@ from PIL import Image, ExifTags
 
 from main.Helpers.image_constants import ImageConstants
 
+
 def getOrientationFlag():
     for key, value in ExifTags.TAGS.items():
         if value == 'Orientation':
