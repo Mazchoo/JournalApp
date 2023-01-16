@@ -4,6 +4,7 @@ from os import listdir, rmdir, mkdir, getcwd
 
 from main.Helpers.image_constants import ImageConstants
 
+
 def removeEmptyParentFolders(folder: Path):
     if not folder.is_dir():
         return

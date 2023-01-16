@@ -61,4 +61,5 @@ def deleteEntryAndContent(post_data):
     moveImagesOutOfADeleteFolder(entry)
     entry.delete()
 
-    return HttpResponse("It's gone! Reload the page to delete your local copy.", content_type='text/plain')
+    success_message = "It's gone! Reload the page to delete your local copy."
+    return HttpResponse(success_message, content_type='text/plain')

@@ -25,7 +25,7 @@ let deleteFromDatabase = function() {
                "name": DATE_SLUG
           },
           success: function(response) {
-               showMessageSimpleModal('Save Status', response);
+               showMessageSimpleModal('Delete Status', response);
           },
           error: function(_jqXhr, _textStatus, errorThrown){
                showMessageSimpleModal('Unknown Error', errorThrown);
