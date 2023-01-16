@@ -62,7 +62,6 @@ def dateNotFoundPage(request):
 # ToDo use flake8 on all files
 # ToDo Add a request to move an entry to another date
 # ToDo Add a .bat file to run and open webpage
-# ToDo Deleting should clean up image folder
 
 @ajaxRequest
 def deleteEntry(post_data: dict):

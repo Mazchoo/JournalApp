@@ -3,7 +3,7 @@ import os
 import base64
 from pathlib import Path
 from typing import Union
-import shutil
+from shutil import move
 from PIL import Image
 from functools import lru_cache
 
@@ -37,6 +37,20 @@ def createImageIcon(target_path_obj: Path):
     return True
 
 
+def outsideWorkingDirectory(folder: Path) -> bool:
+    return str(folder).find(os.getcwd()) != 0
+
+
+def makeParentFolders(target_folder: Path):
+    if target_folder.exists() or outsideWorkingDirectory(target_folder):
+        return
+    
+    if not target_folder.parent.exists():
+        makeParentFolders(target_folder.parent)
+    
+    os.mkdir(str(target_folder))
+
+
 def createEntryFilePathIfExists(target_file_path: str, target_folder: str, file_name: str):
     target_path_obj = Path(target_file_path)
     if target_path_obj.exists():
@@ -47,18 +61,21 @@ def createEntryFilePathIfExists(target_file_path: str, target_folder: str, file_
     output_path = source_file_path
 
     if Path(source_file_path).exists():
-        if not Path(target_folder).exists():
-            os.mkdir(target_folder)
-        shutil.move(source_file_path, target_file_path)
+        makeParentFolders(Path(target_folder))
+        move(source_file_path, target_file_path)
         output_path = target_file_path
         createImageIcon(target_path_obj)
 
     return output_path
 
 
-def getImagePath(file_name: str, entry_name: str) -> str:
+def getImageFolder(entry_name: str) -> str:
     year, month, day = entry_name.split("-")
-    target_folder = f"{os.getcwd()}\\Images\\{year}\\{month}\\{day}"
+    return f"{os.getcwd()}\\Images\\{year}\\{month}\\{day}"
+
+
+def getImagePath(file_name: str, entry_name: str) -> str:
+    target_folder = getImageFolder(entry_name)
     return f"{target_folder}\\{file_name}", target_folder
 
 
