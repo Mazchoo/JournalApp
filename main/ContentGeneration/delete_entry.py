@@ -1,12 +1,13 @@
 
 from django.http import HttpResponse
 from pathlib import Path
-from os import listdir, getcwd, rmdir
+from os import listdir, getcwd
 from shutil import move
 from typing import List
 
 import main.models as models
 from main.Helpers.image_utils import getImageFolder
+from main.Helpers.file_utils import removeEmptyParentFolders, pathHasImageTag
 
 
 def deleteEntryContent(entry: models.Entry):
@@ -16,13 +17,6 @@ def deleteEntryContent(entry: models.Entry):
     for Model in models.CONTENT_MODELS.values():
         Model.objects.filter(entry=entry.name).delete()
 
-reserved_image_tags = ["_icon", "_resized"]
-
-def pathHasImageTag(path: Path):
-    for tag in reserved_image_tags:
-        if path.stem.rfind(tag) == len(path.stem) - len(tag):
-            return True
-    return False
 
 def moveFilesOutOfFolder(files: List[Path]):
     destination_folder = Path(f"{getcwd()}/Images")
@@ -36,19 +30,8 @@ def moveFilesOutOfFolder(files: List[Path]):
         if is_tagged:
             file.unlink()
         else:
-            destination_path = destination_folder/f"{file.stem}{file.suffix}"
+            destination_path = destination_folder/file.name
             move(str(file), str(destination_path))
-
-
-def removeEmptyParentFolders(folder: Path):
-    if not folder.is_dir():
-        return
-    
-    rmdir(str(folder))
-    
-    parent_folder = folder.parent
-    if listdir(str(parent_folder)) == []:
-        removeEmptyParentFolders(parent_folder)
 
 
 def moveImagesOutOfADeleteFolder(entry: models.Entry):
