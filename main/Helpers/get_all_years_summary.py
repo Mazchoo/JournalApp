@@ -1,5 +1,6 @@
 
 import random
+from os import getcwd
 from pathlib import Path
 
 from django.db.models.functions import ExtractYear
@@ -33,6 +34,9 @@ def getRandomImagesFromYear(year: int):
         selected_icon_paths = random.sample(valid_icons, k=NR_IMAGES_TO_DISPLAY)
     elif valid_icons:
         selected_icon_paths = random.choices(valid_icons, k=NR_IMAGES_TO_DISPLAY)
+    else:
+        selected_icon_paths = [f"{getcwd()}/Journal/static/Image/missing_icon.JPG"]
+        selected_icon_paths *= NR_IMAGES_TO_DISPLAY
         
     output_list = [getBase64FromPath(path) for path in selected_icon_paths]
             
