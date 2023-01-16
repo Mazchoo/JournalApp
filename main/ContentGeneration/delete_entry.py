@@ -6,8 +6,8 @@ from shutil import move
 from typing import List
 
 import main.models as models
-from main.Helpers.image_utils import getImageFolder
-from main.Helpers.file_utils import removeEmptyParentFolders, pathHasImageTag
+from main.Helpers.file_utils import (getStoredImageFolder, removeEmptyParentFolders,
+                                     pathHasImageTag)
 
 
 def deleteEntryContent(entry: models.Entry):
@@ -35,7 +35,7 @@ def moveFilesOutOfFolder(files: List[Path]):
 
 
 def moveImagesOutOfADeleteFolder(entry: models.Entry):
-    image_folder = Path(getImageFolder(entry.name))
+    image_folder = Path(getStoredImageFolder(entry.name))
     if not image_folder.exists():
         return
 

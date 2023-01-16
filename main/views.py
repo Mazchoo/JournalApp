@@ -59,9 +59,6 @@ def showEntryPage(request, _day: int, _month: str, _year: int):
 def dateNotFoundPage(request):
     return render(request=request, template_name='DateNotFound.html')
 
-# ToDo use flake8 on all files
-# ToDo Add a request to move an entry to another date
-# ToDo Add a .bat file to run and open webpage
 
 @ajaxRequest
 def deleteEntry(post_data: dict):
@@ -76,3 +73,7 @@ def saveEntry(post_data: dict):
 @ajaxRequest
 def getImage(post_data: dict):
     return getFullImageReponse(post_data)
+
+# ToDo use flake8 on all files
+# ToDo Add a .bat file to run and open webpage
+# ToDo Add a request to move an entry to another date

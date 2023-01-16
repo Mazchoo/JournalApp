@@ -7,8 +7,10 @@ from pathlib import Path
 from datetime import datetime
 
 import main.models as models
-from main.Helpers.image_utils import moveImageToSavePath, getImagePath
+from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
+from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
+                                     getImageBaseFolderPath)
 
 from tinymce.widgets import TinyMCE
 
@@ -46,24 +48,32 @@ class ImageForm(ModelForm):
 
     def clean_file_path(self):
         clean_data = super().clean()
-        file_path = clean_data['file_path']
+        file_name = clean_data['file_path']
         entry = clean_data['entry']
 
-        if len(file_path) == 0:
+        if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
 
-        if "." not in file_path:
-            raise forms.ValidationError(f"Path '{file_path}' has no extention")
+        if "." not in file_name:
+            raise forms.ValidationError(f"Path '{file_name}' has no extention")
 
-        file_path = moveImageToSavePath(file_path, entry.name)
-        file_obj = Path(file_path)
-        if not file_obj.exists():
-            raise forms.ValidationError(f"Cannot find '{file_path}' in <b>Images</b> folder")
+        target_path = getStoredImagePath(file_name, entry.name)
+        source_path = getImageBaseFolderPath(file_name)
+        target_file_obj = Path(target_path)
+        source_file_obj = Path(source_path)
 
-        if file_obj.suffix.lower() not in ImageConstants().supported_extensions:
-            raise forms.ValidationError(f"Extension '{file_obj.suffix}' is not a recognised image extension")
+        if not target_file_obj.exists() and not source_file_obj.exists():
+            raise forms.ValidationError(f"Cannot find '{file_name}' in /Images folder.")
 
-        return file_path
+        if target_file_obj.suffix.lower() not in ImageConstants.supported_extensions:
+            raise forms.ValidationError(f"Extension '{target_file_obj.suffix}' is not a recognised image extension")
+
+        if pathHasImageTag(target_file_obj):
+            raise forms.ValidationError(f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}")
+
+        moveImageToSavePath(target_path, file_name)
+
+        return target_path
 
 
 class TinyMCEComponent(ModelForm):
@@ -103,7 +113,7 @@ class FullImagePath(Form):
 
     def clean_file(self):
         clean_data = super().clean()
-        target_path, _ = getImagePath(clean_data["file"], clean_data["name"])
+        target_path = getStoredImagePath(clean_data["file"], clean_data["name"])
 
         if not Path(target_path).exists():
             raise forms.ValidationError(f"File {target_path} does not exist")

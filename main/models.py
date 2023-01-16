@@ -1,7 +1,9 @@
+
 from django.db.models import Model
 from django.db import models
+from pathlib import Path
 
-from main.Helpers.image_utils import parseBase64ImageData, getImageFileName
+from main.Helpers.image_utils import parseBase64ImageData
 
 class Content(Model):
     content_type = models.CharField(max_length=10)
@@ -34,7 +36,7 @@ class EntryImage(Model):
         return self.base64
 
     def view(self):
-        file_name = getImageFileName(self.file_path)
+        file_name = Path(self.file_path).name
         b64_string = parseBase64ImageData(self.file_path)
 
         return  {
