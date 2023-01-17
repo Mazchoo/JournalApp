@@ -5,14 +5,14 @@ from django.db import models as django_models
 import re
 from pathlib import Path
 from datetime import datetime
+from tinymce.widgets import TinyMCE
 
 import main.models as models
 from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
                                      getImageBaseFolderPath)
-
-from tinymce.widgets import TinyMCE
+from main.ContentGeneration.content_models import CONTENT_MODELS
 
 
 class EntryForm(ModelForm):
@@ -97,14 +97,8 @@ class ContentForm(ModelForm):
     def clean(self):
         clean_data = super().clean()
         content_type = clean_data['content_type']
-        if content_type not in models.CONTENT_MODELS:
+        if content_type not in CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
-
-
-CONTENT_FORMS = {
-    'image': ImageForm,
-    'paragraph': TinyMCEComponent,
-}
 
 
 class FullImagePath(Form):

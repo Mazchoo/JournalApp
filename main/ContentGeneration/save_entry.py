@@ -8,6 +8,7 @@ import main.models as models
 import main.forms as forms
 
 from main.ContentGeneration.delete_entry import deleteEntryContent
+from main.ContentGeneration.content_forms import CONTENT_FORMS
 
 
 def generateNewEntry(name: str):
@@ -67,12 +68,12 @@ def processSubmittedContent(key, value, errors, content_keys):
         return False
 
     entry_type = content_type_match.group(1)
-    if entry_type not in forms.CONTENT_FORMS:
+    if entry_type not in CONTENT_FORMS:
         errors[f"{key}"] = ' => Invalid content type'
         return False
 
     content_fields = dict(value)
-    model_form = forms.CONTENT_FORMS[entry_type](content_fields)
+    model_form = CONTENT_FORMS[entry_type](content_fields)
 
     error, content_key = generateNewContent(model_form, entry_type)
     if error:

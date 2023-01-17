@@ -1,6 +1,8 @@
 
-import main.models as models
 from datetime import datetime
+
+import main.models as models
+from main.ContentGeneration.content_models import CONTENT_MODELS
 
 
 def loadContentForEntry(entry_name: str):
@@ -12,7 +14,7 @@ def loadContentForEntry(entry_name: str):
         content_ids = entry.content.get_queryset()
 
         for content in content_ids:
-            Model = models.CONTENT_MODELS[content.content_type]
+            Model = CONTENT_MODELS[content.content_type]
             content_obj = Model.objects.get(pk=content.content_id)
             output[str(content)] = content_obj.view()
 

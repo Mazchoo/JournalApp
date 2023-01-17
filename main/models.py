@@ -62,10 +62,3 @@ class EntryParagraph(Model):
             "text": self.text,
             "height": self.height
         }
-
-
-CONTENT_MODELS = {
-    'image': EntryImage,
-    'paragraph': EntryParagraph,
-}
-

@@ -6,6 +6,7 @@ from shutil import move
 from typing import List
 
 import main.models as models
+from main.ContentGeneration.content_models import CONTENT_MODELS
 from main.Helpers.file_utils import (getStoredImageFolder, removeEmptyParentFolders,
                                      pathHasImageTag)
 
@@ -14,7 +15,7 @@ def deleteEntryContent(entry: models.Entry):
     delete_content_ids = entry.content.get_queryset()
     models.Content.objects.filter(id__in=delete_content_ids).delete()
 
-    for Model in models.CONTENT_MODELS.values():
+    for Model in CONTENT_MODELS.values():
         Model.objects.filter(entry=entry.name).delete()
 
 
