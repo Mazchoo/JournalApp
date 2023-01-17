@@ -17,11 +17,11 @@ def getAllImagesInYear(year: str):
     )
 
 
-def getAllEntryYears():
+def getAllEntryYears(context):
     distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
     years = [entry['year'] for entry in distinct_years]
     years.sort()
-    return years
+    context['all_years'] = years
 
 
 def getRandomImagesFromYear(year: int):
@@ -45,7 +45,7 @@ def getRandomImagesFromYear(year: int):
 
 
 def getAllYearSummaryInformation(context: dict):
-    context['all_years']  = getAllEntryYears()
+    getAllEntryYears(context)
     context['icon_paths'] = {}
     for year in context['all_years']:
         context['icon_paths'][year] = getRandomImagesFromYear(year)

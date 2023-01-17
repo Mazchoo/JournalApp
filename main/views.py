@@ -6,7 +6,7 @@ from main.Helpers.date_helpers import (addGeneralInformation, addDayInformation,
                                        addYearInformation, putVargsIntoContext)
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import getYearEntryInformation
-from main.Helpers.get_all_years_summary import getAllYearSummaryInformation
+from main.Helpers.get_all_years_summary import getAllYearSummaryInformation, getAllEntryYears
 from main.Helpers.get_latest_entry import getLatestEntryTuple
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
@@ -46,6 +46,8 @@ def monthPage(request, context):
 @putVargsIntoContext
 def editEntryPage(request, context):
     addDayInformation(context)
+    getAllEntryYears(context)
+
     context['tiny_mce'] = forms.TinyMCEComponent()
     context['saved_content'] = loadContentForEntry(context['date_slug'])
 
@@ -74,6 +76,10 @@ def saveEntry(post_data: dict):
 def getImage(post_data: dict):
     return getFullImageReponse(post_data)
 
+
+@ajaxRequest
+def moveEntryDate(post_data: dict):
+    return getFullImageReponse(post_data)
+
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
-# ToDo Add a request to move an entry to another date

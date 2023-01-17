@@ -77,6 +77,7 @@ def addMonthInformation(context):
     context['trailing_days'] = [i + 1 for i in range(6 - last_day_ind)]
     context['days_in_month'] = list(range(1, nr_days_in_month + 1))
     context['nr_days_in_prev_month'] = nr_days_in_last_month
+    context['min_day_to_max_day'] = list(range(1, 32))
     
     return year, month_ind
 
