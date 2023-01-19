@@ -13,18 +13,30 @@
         <span class="form-group">
             <span class="form-row row px-4">
                 <select id="date-modal-day" class="form-control col-md-2 mx-2">
-                    {% for day in min_day_to_max_day %}
-                        <option>{{ day }}</option>
+                    {% for d in min_day_to_max_day %}
+                        {% if d == day %}
+                            <option selected>{{ d }}</option>
+                        {% else %}
+                            <option>{{ d }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
                 <select id="date-modal-month" class="form-control col-md-3 mx-2">
-                    {% for month in months_in_year %}
-                        <option>{{ month }}</option>
+                    {% for m in months_in_year %}
+                        {% if m == month %}
+                            <option selected>{{ m }}</option>
+                        {% else %}
+                            <option>{{ m }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
                 <select id="date-modal-year" class="form-control col-md-2 mx-2">
-                    {% for year in all_years %}
-                        <option>{{ year }}</option>
+                    {% for y in all_years %}
+                        {% if y == year %}
+                            <option selected>{{ y }}</option>
+                        {% else %}
+                            <option>{{ y }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </span>
