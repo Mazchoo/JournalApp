@@ -87,4 +87,3 @@ def moveEntryDate(post_data: dict):
 # ToDo Add a .bat file to run and open webpage
 # ToDo Make all ajax responses JsonResponses
 # ToDo Refactor each part of date helpers into a separate module
-# ToDo Add save button to the nav bar

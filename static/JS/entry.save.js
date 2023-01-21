@@ -82,10 +82,12 @@ let enableSaveButton = function() {
      $('#btn-save').removeClass('disabled');
      $('#btn-save').removeClass('btn-outline-success');
      $('#btn-save').addClass('btn-success');
+     $('#save-nav-button').removeClass('disabled');
 }
 
 let disableSaveButton = function() {
      $('#btn-save').removeClass('btn-success');
      $('#btn-save').addClass('disabled');
      $('#btn-save').addClass('btn-outline-success');
+     $('#save-nav-button').addClass('disabled');
 }
