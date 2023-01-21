@@ -10,7 +10,7 @@ from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
                                      getImageBaseFolderPath)
-from main.ContentGeneration.content_models import CONTENT_MODELS
+from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.date_helpers import getValidDateFromSlug
 
 

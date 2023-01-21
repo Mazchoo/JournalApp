@@ -25,7 +25,7 @@ let makeMoveRequest = function() {
             "move_to": destinationSlug
         },
         success: function(response) {
-            if ("errror" in response) showMessageSimpleModal('Move Status', response["error"]);
+            if ("error" in response) showMessageSimpleModal('Move Status', response["error"]);
             if ("new_date" in response) window.location.replace(response["new_date"]);
         },
         error: function(_jqXhr, _textStatus, errorThrown){

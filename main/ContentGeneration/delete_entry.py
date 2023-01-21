@@ -6,7 +6,7 @@ from shutil import move
 from typing import List
 
 import main.models as models
-from main.ContentGeneration.content_models import CONTENT_MODELS
+from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.file_utils import (getStoredImageFolder, removeEmptyParentFolders,
                                      pathHasImageTag)
 

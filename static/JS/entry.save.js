@@ -68,9 +68,7 @@ let getSaveData = function() {
 
 
 let saveToDatabase = function() {
-     if ($('#btn-save').hasClass('disabled') || !$('#spinner-save').hasClass('invisible')) {
-           return;
-     }
+     if ($('#btn-save').hasClass('disabled') || !$('#spinner-save').hasClass('invisible')) return;
 
      disableSaveButton();
      $('#spinner-save').removeClass('invisible');

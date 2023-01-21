@@ -39,7 +39,7 @@ let deleteFromDatabase = function() {
 
 
 let deleteContent = function() {
-    if ($('#btn-delete').hasClass('disabled')) { return; }
+    if ($('#btn-delete').hasClass('disabled')) return;
 
     showCallbackModal("Are you sure?", "Delete this entry from database?", "Delete", deleteFromDatabase);
 }

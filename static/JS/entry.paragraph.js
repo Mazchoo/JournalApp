@@ -35,7 +35,7 @@ let createNewParagraph = function() {
 
 
 let editParagraphContent = function(updateInd, paragraphText) {
-    if (updateInd === undefined || paragraphText === undefined) { return false; }
+    if (updateInd === undefined || paragraphText === undefined) return false;
     let paragraphDiv = tinyMCE.get('paragraph' + updateInd);
     if (paragraphDiv === null) { return false; }
 
@@ -45,7 +45,7 @@ let editParagraphContent = function(updateInd, paragraphText) {
 
 
 let createInitFunction = function(updateInd, paragraphText) {
-    if (paragraphText.length == 0) { return emptyFunction; }
+    if (paragraphText.length == 0) return emptyFunction;
     return function() { editParagraphContent(updateInd, paragraphText); };
 }
 
@@ -71,7 +71,7 @@ let insertNewParagraphToPosition = function(e) {
 
 let appendParagraphToList = function(_e, height=220, paragraphText="") {
     let div = createNewParagraph();
-    if (div === undefined) {return;}
+    if (div === undefined) return;
 
     $('#edit-area')[0].appendChild(div);
     initializeNewParagraph(String(CONTENT_INDEX), height, paragraphText);

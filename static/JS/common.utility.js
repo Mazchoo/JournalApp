@@ -11,22 +11,19 @@ let replaceExpression = function(str, expression, replacement) {
 
 let getIndexInArr = function(arr, obj) {
     for(i = 0; i < arr.length; i++) {
-        if (arr[i] === obj) {
-            return i;
-        }
+        if (arr[i] === obj) return i;
     }
-    return;
 }
 
 
 let deleteParentDiv = function(obj) {
-    if (obj === undefined || obj.parentNode === undefined || obj.parentNode.parentNode === undefined) {return;}
+    if (obj === undefined || obj.parentNode === undefined || obj.parentNode.parentNode === undefined) return;
     obj.parentNode.parentNode.removeChild(obj.parentNode);
 }
 
 
  let removeItem = function(obj) {
-    if (obj === undefined || obj.parentNode === undefined) {return;}
+    if (obj === undefined || obj.parentNode === undefined) return;
     obj.parentNode.removeChild(obj);
 }
 
@@ -67,7 +64,7 @@ let refreshScrollSpies = function() {
 
 let insertNewObjectIntoEditArea = function(e, newFunc, initFunc, contentInd) {
     let parentDiv = $(e.target.getAttribute('name'))[0];
-    if (parentDiv === undefined) {return;}
+    if (parentDiv === undefined) return;
     let div = newFunc();
     if (div === undefined) {return;}
     parentDiv = parentDiv.parentNode;
@@ -94,7 +91,7 @@ let getContentId = function(key) {
 
 let getParentDivOfObject = function(e) {
     let parentDiv = $(e.target.getAttribute('name'))[0];
-    if  (parentDiv === undefined) {return;}
+    if  (parentDiv === undefined) return;
     return parentDiv.parentNode;
 }
 

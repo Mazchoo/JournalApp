@@ -12,13 +12,12 @@ let loadImageContent = function(imageContent) {
 
 let parseLoadedStoryContent = function(key, content) {
     let contentType = getContentType(key);
+    if (contentType === undefined) return;
 
-    if (contentType !== undefined) {
-        if (contentType === 'paragraph') {
-            loadParagraphContent(content);
-        } else if (contentType === 'image') {
-            loadImageContent(content);
-        }
+    if (contentType === 'paragraph') {
+        loadParagraphContent(content);
+    } else if (contentType === 'image') {
+        loadImageContent(content);
     }
 }
 

@@ -8,7 +8,7 @@ import main.models as models
 import main.forms as forms
 
 from main.ContentGeneration.delete_entry import deleteEntryContent
-from main.ContentGeneration.content_forms import CONTENT_FORMS
+from main.ContentGeneration.content_factory_forms import CONTENT_FORMS
 
 
 def generateNewEntry(name: str):
