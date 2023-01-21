@@ -1,6 +1,6 @@
 
 import main.models as models
-from main.Helpers.date_helpers import convertDateToUrlTuple
+from main.Helpers.date_slugs import convertDateToUrlTuple
 
 
 def getLatestEntryTuple():

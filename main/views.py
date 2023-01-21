@@ -2,8 +2,8 @@
 import main.forms as forms
 from django.shortcuts import render, redirect
 
-from main.Helpers.date_helpers import (addGeneralInformation, addDayInformation, addMonthInformation,
-                                       addYearInformation, putVargsIntoContext)
+from main.Helpers.date_information import addDayInformation, addMonthInformation, addYearInformation
+from main.Helpers.date_request import putVargsIntoContext
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import getYearEntryInformation
 from main.Helpers.get_all_years_summary import getAllYearSummaryInformation, getAllEntryYears
@@ -18,7 +18,6 @@ from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
 @putVargsIntoContext
 def homePage(request, context):
-    addGeneralInformation(context)
     getAllYearSummaryInformation(context)
     return render(request=request, template_name='home.html', context=context)
 
@@ -55,8 +54,9 @@ def editEntryPage(request, context):
     return render(request=request, template_name='day.html', context=context)
 
 
+# To be continued...
 def showEntryPage(request, _day: int, _month: str, _year: int):
-    return render(request=request, template_name='month.html')
+    return render(request=request, template_name='day.html')
 
 
 def dateNotFoundPage(request):
@@ -85,5 +85,5 @@ def moveEntryDate(post_data: dict):
 
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
+# ToDo Make a page for date not found
 # ToDo Make all ajax responses JsonResponses
-# ToDo Refactor each part of date helpers into a separate module

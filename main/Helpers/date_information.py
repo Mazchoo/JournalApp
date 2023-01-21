@@ -1,35 +1,12 @@
 
-from django.shortcuts import redirect
-
 from datetime import datetime
-import re
 from main.Helpers.date_contants import DateConstants
-
-def putVargsIntoContext(func):
-    ''' Put date information from slug into context '''
-    month_names = DateConstants.month_names
-
-    def wrapFunc(request, **kwargs):
-        context = kwargs.copy()
-        if 'month' in context and context['month'] not in month_names:
-            return redirect('/date-not-found')
-
-        return func(request, context)
-    return wrapFunc
-
-
-def addGeneralInformation(context):
-    context['full_day_names'] = DateConstants.day_names
-    context['short_day_names'] = DateConstants.day_names_short
-    context['months_in_year'] = DateConstants.month_names
 
 
 def addYearInformation(context):
     if 'year' not in context:
         print('addYearInformation: request does not have year', context)
         return
-
-    addGeneralInformation(context)
 
     year = context['year']
     context['next_year'] = year + 1
@@ -86,8 +63,7 @@ def addDayInformation(context):
         print('addDayInformation: request does not have day, month or year', context)
         return
 
-    # ToDo make this a static class
-    month_names = DateConstants().month_names
+    month_names = DateConstants.month_names
 
     day = context['day']
     year, month_ind = addMonthInformation(context)
@@ -128,29 +104,3 @@ def addDayInformation(context):
     context['day_name'] = datetime(year, month_ind, day).strftime("%A")
 
     return year, month_ind, day
-
-
-def getValidDateFromSlug(slug: str):
-    
-    date_match = re.search(r"(\d{4})\-0?(\d+)\-0?(\d+)", slug)
-
-    if not date_match:
-        return None
-
-    year, month, day = date_match.group(1), date_match.group(2), date_match.group(3)
-
-    try:
-        year, month, day = eval(year), eval(month), eval(day)
-        slug_date = datetime(year, month, day)
-    except:
-        return None
-
-    return slug_date
-
-
-def convertDateToUrlTuple(date: datetime):
-    return (
-        str(date.year),
-        date.strftime("%B"), 
-        str(date.day)
-    )

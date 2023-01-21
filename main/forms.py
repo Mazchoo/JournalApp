@@ -11,7 +11,7 @@ from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
                                      getImageBaseFolderPath)
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.date_helpers import getValidDateFromSlug
+from main.Helpers.date_slugs import getValidDateFromSlug
 
 
 class EntryForm(ModelForm):

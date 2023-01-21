@@ -5,7 +5,7 @@ from pathlib import Path
 
 from main.Helpers.file_utils import getStoredImagePath
 import main.models as models
-from main.Helpers.date_helpers import getValidDateFromSlug
+from main.Helpers.date_slugs import getValidDateFromSlug
 
 
 class FullImagePath(Form):

@@ -7,7 +7,7 @@ import main.models as models
 import main.forms as forms
 
 from main.ContentGeneration.request_forms import DateMoveForm
-from main.Helpers.date_helpers import getValidDateFromSlug, convertDateToUrlTuple
+from main.Helpers.date_slugs import getValidDateFromSlug, convertDateToUrlTuple
 from main.ContentGeneration.delete_entry import moveImagesOutOfADeleteFolder
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.ContentGeneration.content_factory_update import CONTENT_UPDATE_DATE
