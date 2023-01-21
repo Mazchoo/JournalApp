@@ -1,5 +1,5 @@
 
-from django.http import HttpResponse
+from django.http import JsonResponse
 from pathlib import Path
 from os import listdir, getcwd
 from shutil import move
@@ -47,18 +47,18 @@ def moveImagesOutOfADeleteFolder(entry: models.Entry):
 
 def deleteEntryAndContent(post_data):
     if "name" not in post_data:
-        return HttpResponse(f'No name in post data', content_type='text/plain')
+        return JsonResponse({"error": "No name in post data"})
 
     name = post_data["name"]
     entry = models.Entry.objects.filter(name=name)
 
     if not entry.exists():
-        return HttpResponse(f'Invalid entry {name}', content_type='text/plain')
+        return JsonResponse({"error": f"Invalid entry {name}"})
 
     entry = entry[0]
     deleteEntryContent(entry)
     moveImagesOutOfADeleteFolder(entry)
     entry.delete()
 
-    success_message = "It's gone! Reload the page to delete your local copy."
-    return HttpResponse(success_message, content_type='text/plain')
+    success_message = "It's gone!"
+    return JsonResponse({"success": success_message})

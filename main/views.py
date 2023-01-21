@@ -86,4 +86,3 @@ def moveEntryDate(post_data: dict):
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
 # ToDo Make a page for date not found
-# ToDo Make all ajax responses JsonResponses

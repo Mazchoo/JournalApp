@@ -1,6 +1,6 @@
 
 let generateSaveEntry = function(saveContent) {
-     if (saveContent === null) { return; }
+     if (saveContent === null) return;
      let saveData = {};
 
      for (let i = 0; i < saveContent.length; i++) {
@@ -26,7 +26,7 @@ let generateSaveEntry = function(saveContent) {
                }
           } else {
                console.log("Unrecognised save content");
-               return;
+               saveData = undefined;
           }
      }
 
@@ -35,7 +35,7 @@ let generateSaveEntry = function(saveContent) {
 
 
 let saveEntryToDatabase = function(saveData) {
-    if (saveData === null) { return; }
+    if (saveData === null) return;
     let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     $.ajax({
@@ -47,7 +47,8 @@ let saveEntryToDatabase = function(saveData) {
                "name": DATE_SLUG
           },
           success: function(response) {
-               showMessageSimpleModal('Save Status', response);
+               if ("success" in response) showMessageSimpleModal('Save Success', response["success"]);
+               if ("error" in response) showMessageSimpleModal('Save Errors', response["error"]);
                enableDeleteButton();
                $('.image-area').click(zoomToImage);
           },

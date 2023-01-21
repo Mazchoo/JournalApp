@@ -126,10 +126,11 @@ let zoomToImage = function() {
             "name": DATE_SLUG
         },
         success: function(response) {
-            imageSource = response["base64"];
+            if ("base64" in response) imageSource = response["base64"];
+            if ("error" in response) console.log(`Image error : ${response["error"]}`);
         },
         error: function(_jqXhr, _textStatus, errorThrown){
-            console.log("Image show error :" + errorThrown);
+            console.log(`Unknown error : ${errorThrown}`)
         },
         complete: function(_jqXhr, _textStatus) {
             $('#image-preview').attr('src', imageSource);

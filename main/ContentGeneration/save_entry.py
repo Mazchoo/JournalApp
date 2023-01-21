@@ -1,7 +1,7 @@
 
 from datetime import datetime
 import re
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.forms.utils import ErrorDict
 
 import main.models as models
@@ -105,14 +105,14 @@ def updateOrGenerateEntry(post_data):
         Content that cannot be saved will return an error message.
     '''
     if 'name' not in post_data:
-        return HttpResponse('Entry name not specified', content_type='text/plain')
+        return JsonResponse({"error": "Entry name not specified"})
     
     error_response, entry = getPostEntry(post_data['name'])
     if error_response is not None:
         return error_response
 
     if 'content' not in post_data:
-        return HttpResponse('No content in entry', content_type='text/plain')
+        return JsonResponse({"error": "No content in entry"})
 
     deleteEntryContent(entry)
     content_errors, content_ids = saveContentToDatabase(post_data['content'])
@@ -122,6 +122,6 @@ def updateOrGenerateEntry(post_data):
     entry.save()
     
     if content_errors:
-        return HttpResponse(f'Invalid content {content_errors}', content_type='text/plain')
+        return JsonResponse({"error": f"Invalid content {content_errors}"})
 
-    return HttpResponse('Entry Saved Successfully', content_type='text/plain')
+    return JsonResponse({"success": "Entry Saved Successfully"})
