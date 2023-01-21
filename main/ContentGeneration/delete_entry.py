@@ -26,9 +26,7 @@ def moveFilesOutOfFolder(files: List[Path]):
         if not file.exists() or file.is_dir():
             continue
 
-        is_tagged = pathHasImageTag(file)
-
-        if is_tagged:
+        if pathHasImageTag(file):
             file.unlink()
         else:
             destination_path = destination_folder/file.name
@@ -52,7 +50,7 @@ def deleteEntryAndContent(post_data):
         return HttpResponse(f'No name in post data', content_type='text/plain')
 
     name = post_data["name"]
-    entry = models.Entry.objects.all().filter(name=name)
+    entry = models.Entry.objects.filter(name=name)
 
     if not entry.exists():
         return HttpResponse(f'Invalid entry {name}', content_type='text/plain')

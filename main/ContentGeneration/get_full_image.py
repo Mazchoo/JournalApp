@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 
 from main.Helpers.image_utils import loadImageDirectly, addEncodingTypeToBase64, getEncodingType
 from main.Helpers.image_constants import ImageConstants
-from main.forms import FullImagePath
+from main.ContentGeneration.request_forms import FullImagePath
 
 
 def checkTargetPathInData(post_data):

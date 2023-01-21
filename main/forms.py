@@ -1,10 +1,8 @@
 
 from django import forms
-from django.forms import ModelForm, Form
+from django.forms import ModelForm
 from django.db import models as django_models
-import re
 from pathlib import Path
-from datetime import datetime
 from tinymce.widgets import TinyMCE
 
 import main.models as models
@@ -13,6 +11,7 @@ from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
                                      getImageBaseFolderPath)
 from main.ContentGeneration.content_models import CONTENT_MODELS
+from main.Helpers.date_helpers import getValidDateFromSlug
 
 
 class EntryForm(ModelForm):
@@ -24,18 +23,11 @@ class EntryForm(ModelForm):
     def clean_date(self):
         clean_data = super().clean()
         name = clean_data['name']
-        date_match = re.search(r"(\d{4})\-0?(\d+)\-0?(\d+)", name)
 
-        if not date_match:
-            raise forms.ValidationError("Name must be a data slug yyyy-mm-dd")
+        entry_date = getValidDateFromSlug(name)
 
-        year, month, day = date_match.group(1), date_match.group(2), date_match.group(3)
-        year, month, day = eval(year), eval(month), eval(day)
-
-        try:
-            entry_date = datetime(year, month, day)
-        except:
-            raise forms.ValidationError(f"Name must a real date {year}-{month}-{day}")
+        if entry_date is None:
+            raise forms.ValidationError(f"Entry must have a real date {name}")
 
         return entry_date
 
@@ -55,11 +47,12 @@ class ImageForm(ModelForm):
             raise forms.ValidationError("Path is empty")
 
         if "." not in file_name:
-            raise forms.ValidationError(f"Path '{file_name}' has no extention")
+            raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
         target_path = getStoredImagePath(file_name, entry.name)
-        source_path = getImageBaseFolderPath(file_name)
         target_file_obj = Path(target_path)
+
+        source_path = getImageBaseFolderPath(file_name)        
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
@@ -99,17 +92,3 @@ class ContentForm(ModelForm):
         content_type = clean_data['content_type']
         if content_type not in CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
-
-
-class FullImagePath(Form):
-    name = forms.SlugField(max_length=10)
-    file = forms.CharField(max_length=256)
-
-    def clean_file(self):
-        clean_data = super().clean()
-        target_path = getStoredImagePath(clean_data["file"], clean_data["name"])
-
-        if not Path(target_path).exists():
-            raise forms.ValidationError(f"File {target_path} does not exist")
-
-        return target_path

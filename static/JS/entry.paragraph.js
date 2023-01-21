@@ -64,6 +64,7 @@ let initializeNewParagraph = function(lastestId, height=220, paragraphText="") {
 
 let insertNewParagraphToPosition = function(e) {
     let contendInd = String(CONTENT_INDEX + 1);
+    enableSaveButton();
     return insertNewObjectIntoEditArea(e, createNewParagraph, initializeNewParagraph, contendInd);
 }
 

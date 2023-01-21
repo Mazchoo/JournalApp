@@ -109,6 +109,7 @@ let moveObjectUp = function(e) {
     editAreaList.insertBefore(parentDiv, editAreaList.children[objInd-1]);
     resetMCE(parentDiv);
     resetMCE(editAreaList.children[objInd]);
+    enableSaveButton();
 }
 
 
@@ -122,6 +123,7 @@ let moveObjectDown = function(e) {
     editAreaList.insertBefore(editAreaList.children[objInd + 1], parentDiv);
     resetMCE(parentDiv);
     resetMCE(editAreaList.children[objInd]);
+    enableSaveButton();
 }
 
 

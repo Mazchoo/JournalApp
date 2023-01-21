@@ -13,6 +13,7 @@ from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 from main.ContentGeneration.delete_entry import deleteEntryAndContent
 from main.ContentGeneration.get_full_image import getFullImageReponse
+from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
 
 @putVargsIntoContext
@@ -79,8 +80,11 @@ def getImage(post_data: dict):
 
 @ajaxRequest
 def moveEntryDate(post_data: dict):
-    return updateOrGenerateEntry(post_data)
+    return moveSourceDateToDestinationDate(post_data)
 
 
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
+# ToDo Make all ajax responses JsonResponses
+# ToDo Refactor each part of date helpers into a separate module
+# ToDo Add save button to the nav bar

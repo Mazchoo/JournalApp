@@ -13,6 +13,7 @@ let createNewImage = function() {
 let deleteImage = function(e) {
     let imageDivs = $(e.target.getAttribute('name'));
     deleteParentDiv(imageDivs[0]);
+    enableSaveButton();
 }
 
 
@@ -29,6 +30,7 @@ let initializeNewImage = function(lastestId) {
 
 let insertNewImageToPosition = function(e) {
     let contendInd = String(CONTENT_INDEX + 1);
+    enableSaveButton();
     return insertNewObjectIntoEditArea(e, createNewImage, initializeNewImage, contendInd);
 }
 
