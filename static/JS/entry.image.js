@@ -25,6 +25,7 @@ let initializeNewImage = function(lastestId) {
     $('#insert-image' + lastestId).click(insertNewImageToPosition);
     $('#move-content-up' + lastestId).click(moveObjectUp);
     $('#move-content-down' + lastestId).click(moveObjectDown);
+    $("#original-check" + lastestId).click(enableSaveButton);
 }
 
 

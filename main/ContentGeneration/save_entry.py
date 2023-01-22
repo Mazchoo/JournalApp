@@ -23,7 +23,7 @@ def generateNewEntry(name: str):
         entry_form.save(commit=True)
         entry = entry_form.instance
     else:
-        error = HttpResponse(f'Invalid entry {entry_form.errors}', content_type='text/plain')
+        error = f'Invalid entry {entry_form.errors}'
         return error, None
 
     return None, entry
@@ -107,9 +107,9 @@ def updateOrGenerateEntry(post_data):
     if 'name' not in post_data:
         return JsonResponse({"error": "Entry name not specified"})
     
-    error_response, entry = getPostEntry(post_data['name'])
-    if error_response is not None:
-        return error_response
+    error, entry = getPostEntry(post_data['name'])
+    if error is not None:
+        return JsonResponse({"error": error})
 
     if 'content' not in post_data:
         return JsonResponse({"error": "No content in entry"})
