@@ -54,7 +54,7 @@ def moveImageToSavePath(target_file_path: str, file_name: str):
 
 def getEncodingType(file_path: Union[Path, str]):
     path = Path(file_path)
-    if path.suffix.lower() in [".jpg", ".jpeg"]:
+    if path.suffix.lower() in [".jpg", ".jpeg", ".jfif"]:
         ecoding_type = "jpeg"
     elif path.suffix.lower() == ".png":
         ecoding_type = "png"
