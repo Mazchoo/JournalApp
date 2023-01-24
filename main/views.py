@@ -3,7 +3,7 @@ import main.forms as forms
 from django.shortcuts import render, redirect
 
 from main.Helpers.date_information import addDayInformation, addMonthInformation, addYearInformation
-from main.Helpers.date_request import putVargsIntoContext
+from main.Helpers.date_request import putVargsIntoContext, dateExists
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import getYearEntryInformation
 from main.Helpers.get_all_years_summary import getAllYearSummaryInformation, getAllEntryYears
@@ -31,6 +31,9 @@ def latestPage(_request):
 
 @putVargsIntoContext
 def yearPage(request, context):
+    if not dateExists(context):
+        return redirect('/date-not-found')
+
     addYearInformation(context)
     getYearEntryInformation(context)
     return render(request=request, template_name='year.html', context=context)
@@ -38,6 +41,9 @@ def yearPage(request, context):
 
 @putVargsIntoContext
 def monthPage(request, context):
+    if not dateExists(context):
+        return redirect('/date-not-found')
+
     addMonthInformation(context)
     addDaysWithAnEntry(context)
     return render(request=request, template_name='month.html', context=context)
@@ -45,6 +51,9 @@ def monthPage(request, context):
 
 @putVargsIntoContext
 def editEntryPage(request, context):
+    if not dateExists(context):
+        return redirect('/date-not-found')
+
     addDayInformation(context)
     getAllEntryYears(context)
     loadContentForEntry(context)
