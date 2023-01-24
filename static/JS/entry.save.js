@@ -74,6 +74,7 @@ let saveToDatabase = function() {
      disableSaveButton();
      $('#spinner-save').removeClass('invisible');
      let saveData = getSaveData();
+     window.scrollTo(0, document.body.scrollHeight);
      saveEntryToDatabase(saveData);
 }
 
