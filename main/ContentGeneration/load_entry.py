@@ -5,11 +5,12 @@ import main.models as models
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 
 
-def loadContentForEntry(entry_name: str):
-    entry = models.Entry.objects.all().filter(name=entry_name)
+def loadContentForEntry(context: dict):
+    entry = models.Entry.objects.all().filter(name=context['date_slug'])
     output = {}
 
-    if entry.exists():
+    context['entry_exists'] = entry.exists()
+    if context['entry_exists']:
         entry = entry[0]
         content_ids = entry.content.get_queryset()
 
@@ -18,7 +19,7 @@ def loadContentForEntry(entry_name: str):
             content_obj = Model.objects.get(pk=content.content_id)
             output[str(content)] = content_obj.view()
 
-    return output
+    context['saved_content'] = output
 
 
 def addDaysWithAnEntry(context):

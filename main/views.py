@@ -47,9 +47,9 @@ def monthPage(request, context):
 def editEntryPage(request, context):
     addDayInformation(context)
     getAllEntryYears(context)
+    loadContentForEntry(context)
 
     context['tiny_mce'] = forms.TinyMCEComponent()
-    context['saved_content'] = loadContentForEntry(context['date_slug'])
 
     return render(request=request, template_name='day.html', context=context)
 
@@ -86,4 +86,3 @@ def moveEntryDate(post_data: dict):
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
 # ToDo Make a page for date not found
-# ToDo Enable delete button on empty entries

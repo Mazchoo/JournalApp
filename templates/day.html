@@ -70,5 +70,8 @@
         $('#btn-move').click(moveEntry);
 
         $('.image-area').click(zoomToImage);
+        {% if entry_exists %}
+            enableDeleteButton();
+        {% endif %}
     </script>
 </body>
