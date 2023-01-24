@@ -7,16 +7,17 @@ let generateParagraphTemplate = function(contentInd) {
 let deleteParagraph = function(e) {
     let paragraphDivs = $(e.target.getAttribute('name'));
     let deleteParagraphs = function() {
-         deleteParentDiv(paragraphDivs[0]);
+        deleteParentDiv(paragraphDivs[0]);
+        enableSaveButton();
     }
 
     let paragraphText = paragraphDivs.find(".tox-edit-area__iframe")[0];
     if (paragraphText !== undefined) {
-         paragraphContent = paragraphText.contentDocument.body;
-         if (paragraphContent.innerText.trim().length === 0) {
-              deleteParagraphs();
-              return;
-         }
+        paragraphContent = paragraphText.contentDocument.body;
+        if (paragraphContent.innerText.trim().length === 0) {
+            deleteParagraphs();
+            return;
+        }
     }
 
     showCallbackModal(
