@@ -3,7 +3,8 @@ import main.forms as forms
 from django.shortcuts import render, redirect
 
 from main.Helpers.date_information import addDayInformation, addMonthInformation, addYearInformation
-from main.Helpers.date_request import putVargsIntoContext, dateExists
+from main.Helpers.date_request import putVargsIntoContext
+from main.Helpers.date_slugs import dateExists
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import getYearEntryInformation
 from main.Helpers.get_all_years_summary import getAllYearSummaryInformation, getAllEntryYears
@@ -94,4 +95,3 @@ def moveEntryDate(post_data: dict):
 
 # ToDo use flake8 on all files
 # ToDo Add a .bat file to run and open webpage
-# ToDo Make a page for date not found
