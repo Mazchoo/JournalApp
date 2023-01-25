@@ -92,6 +92,4 @@ def getImage(post_data: dict):
 def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)
 
-
 # ToDo use flake8 on all files
-# ToDo Add a .bat file to run and open webpage
