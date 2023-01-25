@@ -91,5 +91,3 @@ def getImage(post_data: dict):
 @ajaxRequest
 def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)
-
-# ToDo use flake8 on all files

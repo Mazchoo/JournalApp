@@ -52,17 +52,19 @@ class ImageForm(ModelForm):
         target_path = getStoredImagePath(file_name, entry.name)
         target_file_obj = Path(target_path)
 
-        source_path = getImageBaseFolderPath(file_name)        
+        source_path = getImageBaseFolderPath(file_name)
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
             raise forms.ValidationError(f"Cannot find '{file_name}' in /Images folder.")
 
         if target_file_obj.suffix.lower() not in ImageConstants.supported_extensions:
-            raise forms.ValidationError(f"Extension '{target_file_obj.suffix}' is not a recognised image extension")
+            message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
+            raise forms.ValidationError(message)
 
         if pathHasImageTag(target_file_obj):
-            raise forms.ValidationError(f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}")
+            message = f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}"
+            raise forms.ValidationError(message)
 
         moveImageToSavePath(target_path, file_name)
 

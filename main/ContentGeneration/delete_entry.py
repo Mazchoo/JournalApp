@@ -40,7 +40,7 @@ def moveImagesOutOfADeleteFolder(entry: models.Entry):
 
     files = listdir(str(image_folder))
     files = [image_folder/file for file in files]
-    
+
     moveFilesOutOfFolder(files)
     removeEmptyParentFolders(image_folder)
 

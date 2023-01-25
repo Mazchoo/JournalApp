@@ -8,9 +8,9 @@ from main.Helpers.image_constants import ImageConstants
 def removeEmptyParentFolders(folder: Path):
     if not folder.is_dir():
         return
-    
+
     rmdir(str(folder))
-    
+
     parent_folder = folder.parent
     if listdir(str(parent_folder)) == []:
         removeEmptyParentFolders(parent_folder)
@@ -30,10 +30,10 @@ def outsideWorkingDirectory(folder: Path) -> bool:
 def makeParentFolders(target_folder: Path):
     if target_folder.exists() or outsideWorkingDirectory(target_folder):
         return
-    
+
     if not target_folder.parent.exists():
         makeParentFolders(target_folder.parent)
-    
+
     mkdir(str(target_folder))
 
 

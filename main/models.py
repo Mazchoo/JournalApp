@@ -5,6 +5,7 @@ from pathlib import Path
 
 from main.Helpers.image_utils import parseBase64ImageData
 
+
 class Content(Model):
     content_type = models.CharField(max_length=10)
     content_id   = models.BigIntegerField()
@@ -39,10 +40,10 @@ class EntryImage(Model):
         file_name = Path(self.file_path).name
         b64_string = parseBase64ImageData(self.file_path)
 
-        return  {
-            "base64":    b64_string,
+        return {
+            "base64": b64_string,
             "file_name": file_name,
-            "original":  int(self.original)
+            "original": int(self.original)
         }
 
 
@@ -58,7 +59,7 @@ class EntryParagraph(Model):
         return self.text
 
     def view(self):
-        return  {
+        return {
             "text": self.text,
             "height": self.height
         }

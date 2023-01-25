@@ -29,8 +29,8 @@ def addDaysWithAnEntry(context):
     first_day = datetime(context["year"], month_ind, 1)
     last_day = datetime(context["next_month_year"], next_month_ind, 1)
 
-    entries = models.Entry.objects.all(). \
-              filter(date__date__gte=first_day). \
-              filter(date__date__lt=last_day)
+    entries = models.Entry.objects.all()
+    entries = entries.filter(date__date__gte=first_day)
+    entries = entries.filter(date__date__lt=last_day)
 
     context["days_with_an_entry"] = [entry.date.day for entry in entries]

@@ -11,6 +11,7 @@ from main.Helpers.file_utils import getIconFilePath
 
 NR_IMAGES_TO_DISPLAY = 18
 
+
 def getAllImagesInYear(year: str):
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-"
@@ -38,10 +39,8 @@ def getRandomImagesFromYear(year: int):
     else:
         selected_icon_paths = [f"{getcwd()}/Journal/static/Image/missing_icon.JPG"]
         selected_icon_paths *= NR_IMAGES_TO_DISPLAY
-        
-    output_list = [getBase64FromPath(path) for path in selected_icon_paths]
-            
-    return output_list
+
+    return [getBase64FromPath(path) for path in selected_icon_paths]
 
 
 def getAllYearSummaryInformation(context: dict):

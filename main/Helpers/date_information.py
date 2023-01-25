@@ -11,7 +11,7 @@ def addYearInformation(context):
     year = context['year']
     context['next_year'] = year + 1
     context['prev_year'] = year - 1
-    
+
     return year
 
 
@@ -46,7 +46,7 @@ def addMonthInformation(context):
     last_day_name = datetime(year, month_ind, nr_days_in_month).strftime("%A")
 
     first_day_ind = day_names.index(first_day_name)
-    preceding_days = [nr_days_in_last_month - i for i in range(first_day_ind)]    
+    preceding_days = [nr_days_in_last_month - i for i in range(first_day_ind)]
     last_day_ind = day_names.index(last_day_name)
 
     context['preceding_days'] = list(reversed(preceding_days))
@@ -54,7 +54,7 @@ def addMonthInformation(context):
     context['days_in_month'] = list(range(1, nr_days_in_month + 1))
     context['nr_days_in_prev_month'] = nr_days_in_last_month
     context['min_day_to_max_day'] = list(range(1, 32))
-    
+
     return year, month_ind
 
 
@@ -80,7 +80,7 @@ def addDayInformation(context):
         suffix = "rd"
     else:
         suffix = "th"
-    
+
     context['day_suffix'] = suffix
 
     next_day       = day + 1 if day < len(context['days_in_month']) else 1

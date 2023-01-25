@@ -32,7 +32,7 @@ class DateMoveForm(Form):
 
         if not models.Entry.objects.filter(pk=move_from).exists():
             raise forms.ValidationError(f"Source date {move_from} is not saved")
-        
+
         return move_from
 
     def clean_move_to(self):
@@ -44,5 +44,5 @@ class DateMoveForm(Form):
 
         if models.Entry.objects.filter(pk=move_to).exists():
             raise forms.ValidationError(f"Destination date {move_to} already exists")
-        
+
         return move_to

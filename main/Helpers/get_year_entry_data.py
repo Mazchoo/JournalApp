@@ -25,7 +25,7 @@ def getAllImagesInMonth(year: str, month: str):
 
 def getIconForEachMonth(context: dict, year: int):
     output_dict = {}
-    
+
     for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
 
@@ -36,7 +36,7 @@ def getIconForEachMonth(context: dict, year: int):
         if valid_icons:
             selected_icon_path = valid_icons[random.randint(0, len(valid_icons) - 1)]
             output_dict[month_name] = getBase64FromPath(selected_icon_path)
-            
+
     return output_dict
 
 
@@ -46,9 +46,9 @@ def getNrEntiresForEachYear(context: dict, year: int):
     for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
         entries = getAllEntriesInMonth(year, month)
-        
+
         output_dict[month_name] = len(entries)
-    
+
     return output_dict
 
 
@@ -58,10 +58,10 @@ def getLastTimeEntriesWereUpdated(context: dict, year: int):
     for i in range(1, 13):
         month, month_name = getMonthStrings(i, context)
         entries = getAllEntriesInMonth(year, month)
-        
+
         last_update = max([entry.last_edited for entry in entries]) if entries else "never"
         output_dict[month_name] = last_update
-    
+
     return output_dict
 
 

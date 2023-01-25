@@ -31,20 +31,20 @@ def createNewEntry(source_entry, destination_slug):
     entry_dict['name'] = destination_slug
     entry_dict['date'] = getValidDateFromSlug(destination_slug)
     entry_dict['content'] = []
-    
+
     new_entry_form = forms.EntryForm(entry_dict)
     if new_entry_form.is_valid():
         new_entry_form.save(commit=True)
         new_entry = models.Entry.objects.get(name=destination_slug)
     else:
         errors["entry"] = new_entry_form.errors
-    
+
     return new_entry, errors
 
 
 def generateNewContentObjectFromSource(content, new_slug, errors):
     content_type = content.content_type
-    
+
     Model = CONTENT_MODELS[content_type]
     obj = Model.objects.get(id=content.content_id)
     new_obj_form = CONTENT_UPDATE_DATE[content_type](obj, new_slug)
@@ -56,7 +56,7 @@ def generateNewContentObjectFromSource(content, new_slug, errors):
         obj.delete()
     else:
         errors[f'{content_type}-{obj.id}'] = new_obj_form.errors
-        
+
     return new_instance_id
 
 
@@ -73,7 +73,7 @@ def generateNewContentRecordFromSource(content, new_instance_id, errors):
         content.delete()
     else:
         errors[f'content-{content.id}'] = new_content_form.errors
-        
+
     return new_content_record_id
 
 
@@ -109,14 +109,14 @@ def moveSourceDateToDestinationDate(post_data):
 
     if error is not None:
         return JsonResponse({"error": f'Invalid dates {error}'})
-    
+
     new_entry, error = updateEntryDate(cleaned_data['move_from'], cleaned_data['move_to'])
 
     if error:
         return JsonResponse({"error": f'Update errors {error}'})
-    
+
     date_tuple = convertDateToUrlTuple(new_entry.date)
-    
+
     if date_tuple:
         return JsonResponse({"new_date": f'/edit/{"/".join(date_tuple)}'})
     else:

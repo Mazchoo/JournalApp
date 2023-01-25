@@ -3,8 +3,8 @@ from datetime import datetime
 from main.Helpers.date_contants import DateConstants
 import re
 
+
 def getValidDateFromSlug(slug: str):
-    
     date_match = re.search(r"(\d{4})\-0?(\d+)\-0?(\d+)", slug)
 
     if not date_match:
@@ -15,7 +15,7 @@ def getValidDateFromSlug(slug: str):
     try:
         year, month, day = eval(year), eval(month), eval(day)
         slug_date = datetime(year, month, day)
-    except:
+    except (ValueError, SyntaxError):
         return None
 
     return slug_date
@@ -24,7 +24,7 @@ def getValidDateFromSlug(slug: str):
 def convertDateToUrlTuple(date: datetime):
     return (
         str(date.year),
-        date.strftime("%B"), 
+        date.strftime("%B"),
         str(date.day)
     )
 
@@ -37,10 +37,10 @@ def dateExists(context):
     month_ind = month_names.index(month) + 1
 
     year = context['year']
-    
+
     try:
         datetime(year, month_ind, day)
-    except:
+    except ValueError:
         return False
     else:
         return True

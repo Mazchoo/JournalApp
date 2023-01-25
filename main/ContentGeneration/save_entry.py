@@ -92,7 +92,7 @@ def saveContentToDatabase(content_dict: dict) -> list:
     for key, value in content_dict.items():
         try:
             processSubmittedContent(key, value, errors, content_keys)
-        except:
+        except Exception:
             errors[f"{key}"] = " => Internal server error"
 
     return errors, content_keys
@@ -106,7 +106,7 @@ def updateOrGenerateEntry(post_data):
     '''
     if 'name' not in post_data:
         return JsonResponse({"error": "Entry name not specified"})
-    
+
     error, entry = getPostEntry(post_data['name'])
     if error is not None:
         return JsonResponse({"error": error})
@@ -120,7 +120,7 @@ def updateOrGenerateEntry(post_data):
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)
     entry.save()
-    
+
     if content_errors:
         return JsonResponse({"error": f"Invalid content {content_errors}"})
 
