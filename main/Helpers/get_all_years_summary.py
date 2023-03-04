@@ -2,6 +2,7 @@
 import random
 from os import getcwd
 from pathlib import Path
+from typing import List
 
 from django.db.models.functions import ExtractYear
 
@@ -12,20 +13,20 @@ from main.Helpers.file_utils import getIconFilePath
 NR_IMAGES_TO_DISPLAY = 18
 
 
-def getAllImagesInYear(year: str):
+def getAllImagesInYear(year: int):
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-"
     )
 
 
-def getAllEntryYears(context):
+def getAllEntryYears(context: dict) -> None:
     distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
     years = [entry['year'] for entry in distinct_years]
     years.sort()
     context['all_years'] = years
 
 
-def getRandomImagesFromYear(year: int):
+def getRandomImagesFromYear(year: int) -> List[str]:
 
     year_images = getAllImagesInYear(year)
     images_icon_files = [getIconFilePath(Path(img.file_path)) for img in year_images]
@@ -37,13 +38,13 @@ def getRandomImagesFromYear(year: int):
     elif valid_icons:
         selected_icon_paths = random.choices(valid_icons, k=NR_IMAGES_TO_DISPLAY)
     else:
-        selected_icon_paths = [f"{getcwd()}/Journal/static/Image/missing_icon.JPG"]
+        selected_icon_paths = [f"{getcwd()}/Journal/static/Image/missing_icon.JPG"]  # type: ignore
         selected_icon_paths *= NR_IMAGES_TO_DISPLAY
 
     return [getBase64FromPath(path) for path in selected_icon_paths]
 
 
-def getAllYearSummaryInformation(context: dict):
+def getAllYearSummaryInformation(context: dict) -> None:
     getAllEntryYears(context)
     context['icon_paths'] = {}
     for year in context['all_years']:

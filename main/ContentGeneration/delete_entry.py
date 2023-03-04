@@ -29,7 +29,7 @@ def moveFilesOutOfFolder(files: List[Path]):
         if pathHasImageTag(file):
             file.unlink()
         else:
-            destination_path = destination_folder/file.name
+            destination_path = destination_folder / file.name
             move(str(file), str(destination_path))
 
 
@@ -39,9 +39,9 @@ def moveImagesOutOfADeleteFolder(entry: models.Entry):
         return
 
     files = listdir(str(image_folder))
-    files = [image_folder/file for file in files]
+    paths_to_move_files = [image_folder / file for file in files]
 
-    moveFilesOutOfFolder(files)
+    moveFilesOutOfFolder(paths_to_move_files)
     removeEmptyParentFolders(image_folder)
 
 

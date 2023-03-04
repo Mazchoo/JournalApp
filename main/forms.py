@@ -3,7 +3,7 @@ from django import forms
 from django.forms import ModelForm
 from django.db import models as django_models
 from pathlib import Path
-from tinymce.widgets import TinyMCE
+from tinymce.widgets import TinyMCE  # type: ignore
 
 import main.models as models
 from main.Helpers.image_utils import moveImageToSavePath

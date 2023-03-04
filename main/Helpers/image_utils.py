@@ -26,7 +26,7 @@ def createImageIcon(target_path_obj: Path):
     icon_size = ImageConstants.icon_size
     image_resized = cropImageToSquare(image)
     image_resized = image_resized.resize((icon_size, icon_size), resample=Image.LANCZOS)
-    image_resized = orientatePILImage(image_resized, image._getexif())
+    image_resized = orientatePILImage(image_resized, image.getexif())
 
     image_resized.save(target_icon_path)
     return True
@@ -51,7 +51,7 @@ def moveImageToSavePath(target_file_path: str, file_name: str):
     return output_path
 
 
-def getEncodingType(file_path: Union[Path, str]):
+def getEncodingType(file_path: Union[Path, str]) -> str:
     path = Path(file_path)
     if path.suffix.lower() in [".jpg", ".jpeg", ".jfif"]:
         ecoding_type = "jpeg"
@@ -63,7 +63,7 @@ def getEncodingType(file_path: Union[Path, str]):
     return ecoding_type
 
 
-def getResizeBase64(file_path: Path, factor: float, ecoding_type: str):
+def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
     resized_path = getResizeName(file_path)
     if resized_path.exists():
         return loadImageDirectly(resized_path)
@@ -71,29 +71,29 @@ def getResizeBase64(file_path: Path, factor: float, ecoding_type: str):
     image = Image.open(file_path)
     width, height = image.size
 
-    image_resized = image.resize((width // factor, height // factor), resample=Image.LANCZOS)
-    image_resized = orientatePILImage(image_resized, image._getexif())
+    image_resized = image.resize((width // factor, height // factor), resample=Image.LANCZOS)  # type: ignore
+    image_resized = orientatePILImage(image_resized, image.getexif())
 
     image_resized.save(resized_path, format=ecoding_type)
 
     return loadImageDirectly(resized_path)
 
 
-def loadImageDirectly(file_path):
+def loadImageDirectly(file_path: Union[Path, str]) -> str:
     with open(file_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode('utf-8')
 
     return b64_string
 
 
-def addEncodingTypeToBase64(b64_string, ecoding_type):
+def addEncodingTypeToBase64(b64_string: str, ecoding_type: str) -> str:
     if ecoding_type == ImageConstants.unknown_enoding_type:
         return ""
     return f"data:image/{ecoding_type};base64,{b64_string}"
 
 
 @lru_cache(maxsize=1024)
-def parseBase64ImageData(file_path: str) -> str:
+def parseBase64ImageData(file_path: Union[Path, str]) -> str:
     file_path = Path(file_path)
 
     if file_path.exists() and file_path.suffix.lower() in ImageConstants.supported_extensions:
@@ -113,7 +113,7 @@ def parseBase64ImageData(file_path: str) -> str:
     return b64_string
 
 
-def getBase64FromPath(file_path: Path):
+def getBase64FromPath(file_path: Union[Path, str]) -> str:
     b64_string = loadImageDirectly(file_path)
     ecoding_type = getEncodingType(file_path)
     return addEncodingTypeToBase64(b64_string, ecoding_type)

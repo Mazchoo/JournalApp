@@ -19,7 +19,7 @@ class Entry(Model):
     date           = models.DateTimeField()
     first_created  = models.DateTimeField()
     last_edited    = models.DateTimeField()
-    content        = models.ManyToManyField(Content)
+    content        = models.ManyToManyField(Content)  # type: models.ManyToManyField
 
     def __str__(self):
         return f"Entry {self.name} - last modified - {self.last_edited}"

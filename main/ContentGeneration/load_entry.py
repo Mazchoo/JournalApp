@@ -6,16 +6,16 @@ from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 
 
 def loadContentForEntry(context: dict):
-    entry = models.Entry.objects.all().filter(name=context['date_slug'])
+    entry_query = models.Entry.objects.all().filter(name=context['date_slug'])
     output = {}
 
-    context['entry_exists'] = entry.exists()
+    context['entry_exists'] = entry_query.exists()
     if context['entry_exists']:
-        entry = entry[0]
+        entry = entry_query[0]
         content_ids = entry.content.get_queryset()
 
         for content in content_ids:
-            Model = CONTENT_MODELS[content.content_type]
+            Model = CONTENT_MODELS[content.content_type]  # ToDo - Make an abstract class for this type
             content_obj = Model.objects.get(pk=content.content_id)
             output[str(content)] = content_obj.view()
 

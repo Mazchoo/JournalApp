@@ -1,12 +1,13 @@
 
+from typing import Optional
 from datetime import datetime
 from main.Helpers.date_contants import DateConstants
 
 
-def addYearInformation(context):
+def addYearInformation(context) -> Optional[int]:
     if 'year' not in context:
         print('addYearInformation: request does not have year', context)
-        return
+        return None
 
     year = context['year']
     context['next_year'] = year + 1

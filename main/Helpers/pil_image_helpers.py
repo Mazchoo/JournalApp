@@ -26,7 +26,7 @@ def orientatePILImage(image_resized, exif):
     return image_resized
 
 
-def cropImageToSquare(image: Image):
+def cropImageToSquare(image: Image.Image):
     width, height = image.size
     crop_amount = (max(width, height) - min(width, height)) // 2
 

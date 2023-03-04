@@ -9,7 +9,7 @@ from main.Helpers.date_slugs import getValidDateFromSlug
 
 
 class FullImagePath(Form):
-    name = forms.SlugField(max_length=10)
+    name = forms.SlugField()
     file = forms.CharField(max_length=256)
 
     def clean_file(self):
@@ -23,8 +23,8 @@ class FullImagePath(Form):
 
 
 class DateMoveForm(Form):
-    move_from = forms.SlugField(max_length=10)
-    move_to = forms.SlugField(max_length=10)
+    move_from = forms.SlugField()
+    move_to = forms.SlugField()
 
     def clean_move_from(self):
         clean_data = super().clean()

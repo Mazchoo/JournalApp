@@ -13,11 +13,11 @@ def getMonthStrings(i: int, context: dict):
     return month, month_name
 
 
-def getAllEntriesInMonth(year: str, month: str):
+def getAllEntriesInMonth(year: int, month: str):
     return models.Entry.objects.all().filter(name__istartswith=f"{year}-{month}")
 
 
-def getAllImagesInMonth(year: str, month: str):
+def getAllImagesInMonth(year: int, month: str):
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-{month}-"
     )

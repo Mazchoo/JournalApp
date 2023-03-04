@@ -3,6 +3,7 @@ from datetime import datetime
 import re
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
+from typing import Tuple, List
 
 import main.models as models
 import main.forms as forms
@@ -30,11 +31,11 @@ def generateNewEntry(name: str):
 
 
 def getPostEntry(name: str):
-    entry = models.Entry.objects.all().filter(name=name)
+    entry_query = models.Entry.objects.all().filter(name=name)
     error = None
 
-    if entry.exists():
-        entry = entry[0]
+    if entry_query.exists():
+        entry = entry_query[0]
     else:
         error, entry = generateNewEntry(name)
 
@@ -61,7 +62,7 @@ def generateNewContent(model_form, entry_type):
     return None, content_key
 
 
-def processSubmittedContent(key, value, errors, content_keys):
+def processSubmittedContent(key: str, value: dict, errors: ErrorDict, content_keys: List[str]) -> bool:
     content_type_match = re.search(r"([A-Za-z]+)\d+", key)
     if not content_type_match:
         errors[f"{key}"] = ' => Invalid content syntax'
@@ -85,8 +86,8 @@ def processSubmittedContent(key, value, errors, content_keys):
     return True
 
 
-def saveContentToDatabase(content_dict: dict) -> list:
-    content_keys = []
+def saveContentToDatabase(content_dict: dict) -> Tuple[ErrorDict, list]:
+    content_keys = []  # type: list
     errors = ErrorDict()
 
     for key, value in content_dict.items():
@@ -98,7 +99,7 @@ def saveContentToDatabase(content_dict: dict) -> list:
     return errors, content_keys
 
 
-def updateOrGenerateEntry(post_data):
+def updateOrGenerateEntry(post_data: dict):
     '''
         Delete all previous objects associated with entry and save the object again.
         Each entry has content which are content objects with types and a foreign key.

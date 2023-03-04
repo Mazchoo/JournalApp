@@ -5,7 +5,7 @@ from os import listdir, rmdir, mkdir, getcwd
 from main.Helpers.image_constants import ImageConstants
 
 
-def removeEmptyParentFolders(folder: Path):
+def removeEmptyParentFolders(folder: Path) -> None:
     if not folder.is_dir():
         return
 
@@ -16,7 +16,7 @@ def removeEmptyParentFolders(folder: Path):
         removeEmptyParentFolders(parent_folder)
 
 
-def pathHasImageTag(path: Path):
+def pathHasImageTag(path: Path) -> bool:
     for tag in ImageConstants.reserved_image_tags:
         if path.stem.rfind(tag) == len(path.stem) - len(tag):
             return True
@@ -27,7 +27,7 @@ def outsideWorkingDirectory(folder: Path) -> bool:
     return str(folder).find(getcwd()) != 0
 
 
-def makeParentFolders(target_folder: Path):
+def makeParentFolders(target_folder: Path) -> None:
     if target_folder.exists() or outsideWorkingDirectory(target_folder):
         return
 
@@ -37,11 +37,11 @@ def makeParentFolders(target_folder: Path):
     mkdir(str(target_folder))
 
 
-def getImageBaseFolderPath(file_name: str):
+def getImageBaseFolderPath(file_name: str) -> str:
     return f"{getcwd()}\\Images\\{file_name}"
 
 
-def getIconFilePath(file_path: Path):
+def getIconFilePath(file_path: Path) -> Path:
     icon_file_name = f"{file_path.stem}_icon{file_path.suffix}"
     target_icon_path = file_path.parent / icon_file_name
     return target_icon_path
@@ -57,5 +57,5 @@ def getStoredImagePath(file_name: str, entry_name: str) -> str:
     return f"{target_folder}\\{file_name}"
 
 
-def getResizeName(file_path: Path):
+def getResizeName(file_path: Path) -> Path:
     return file_path.parent / f"{file_path.stem}_resized{file_path.suffix}"

@@ -28,8 +28,8 @@ def addNestedKeyToDict(nested_keys: List[str], value: Any, output_dict: OrderedD
     return output_dict
 
 
-def convertQueryDictToNestedDict(query_dict: QueryDict):
-    output_dict = OrderedDict()
+def convertQueryDictToNestedDict(query_dict: QueryDict) -> OrderedDict:
+    output_dict = OrderedDict()  # type: OrderedDict
 
     for key, value in query_dict.items():
         nested_keys = getTableOfKeys(key)
