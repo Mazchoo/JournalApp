@@ -17,7 +17,7 @@ def loadContentForEntry(context: dict):
         for content in content_ids:
             Model = CONTENT_MODELS[content.content_type]  # ToDo - Make an abstract class for this type
             content_obj = Model.objects.get(pk=content.content_id)
-            output[str(content)] = content_obj.view()
+            output[str(content)] = content_obj.view()  # type: ignore
 
     context['saved_content'] = output
 

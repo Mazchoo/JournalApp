@@ -2,3 +2,4 @@
 Journal/settings.py
 *.pyc
 *.sqlite3
+.tox/
