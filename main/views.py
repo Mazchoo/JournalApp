@@ -93,3 +93,5 @@ def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)
 
 # ToDo - Upgrade django version
+# ToDo - Fix bug moving paragraph between dates
+# ToDo - Add some tests for saving regular content
