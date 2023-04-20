@@ -17,7 +17,7 @@ def getUpdatedDateParagraph(paragraph_obj, destination_slug):
     new_paragraph_dict = model_to_dict(paragraph_obj)
     new_paragraph_dict['entry'] = destination_slug
 
-    return forms.ImageForm(new_paragraph_dict)
+    return forms.TinyMCEComponent(new_paragraph_dict)
 
 
 CONTENT_UPDATE_DATE = {
