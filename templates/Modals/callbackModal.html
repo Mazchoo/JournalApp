@@ -31,11 +31,11 @@
         $('#callback-modal').modal('show');
     }
 
-    document.onkeydown = function(e){
+    $(document).on('keypress', '#callback-modal', function(e) {
           e = e || window.event;
           var key = e.which || e.keyCode;
           if (key === 13) {
                $('#callback-modal-action')[0].click();
           }
-     }
+     })
 </script>

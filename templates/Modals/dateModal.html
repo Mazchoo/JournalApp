@@ -62,11 +62,11 @@
         $('#date-modal').modal('show');
     }
 
-    document.onkeydown = function(e){
-          e = e || window.event;
-          var key = e.which || e.keyCode;
-          if (key === 13) {
-               $('#callback-modal-action')[0].click();
-          }
-     }
+    $(document).on('keypress', '#date-modal', function(e) {
+        e = e || window.event;
+        var key = e.which || e.keyCode;
+        if (key === 13) {
+            $('#date-modal-action')[0].click();
+        }
+    });
 </script>

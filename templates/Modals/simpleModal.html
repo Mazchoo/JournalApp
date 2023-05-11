@@ -3,8 +3,8 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="simple-modal-title">Title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            <button type="button" id="simple-modal-close" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
             </button>
         </div>
         <div id="simple-modal-body" class="modal-body">
@@ -23,4 +23,12 @@
         $('#simple-modal-body')[0].innerHTML = modalMessage;
         $('#simple-modal').modal('show');
     }
+
+    $(document).on('keypress', '#simple-modal', function(e) {
+        e = e || window.event;
+        var key = e.which || e.keyCode;
+        if (key === 13) {
+            $('#simple-modal-close')[0].click();
+        }
+    })
 </script>

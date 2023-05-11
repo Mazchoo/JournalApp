@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content"> 
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
+                <button id="image-modal-close" type="button" class="close" data-dismiss="modal">
                     <span aria-hidden="true">&times;</span>
                     <span class="sr-only">Close</span>
                 </button>
@@ -13,3 +13,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).on('keypress', '#image-modal', function(e) {
+        e = e || window.event;
+        var key = e.which || e.keyCode;
+        if (key === 13) {
+            $('#image-modal-close')[0].click();
+        }
+    })
+</script>
