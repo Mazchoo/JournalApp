@@ -28,9 +28,9 @@ def addMonthInformation(context):
     month_ind = month_names.index(context['month']) + 1
 
     # One based indices
-    next_month_ind  = month_ind + 1 if month_ind < 12 else 1
+    next_month_ind = month_ind + 1 if month_ind < 12 else 1
     next_month_year = year if month_ind < 12 else year + 1
-    prev_month_ind  = month_ind - 1 if month_ind > 1 else 12
+    prev_month_ind = month_ind - 1 if month_ind > 1 else 12
     prev_month_year = year if month_ind > 1 else year - 1
 
     context['next_month'] = month_names[next_month_ind - 1]
@@ -84,19 +84,19 @@ def addDayInformation(context):
 
     context['day_suffix'] = suffix
 
-    next_day       = day + 1 if day < len(context['days_in_month']) else 1
+    next_day = day + 1 if day < len(context['days_in_month']) else 1
     next_day_month = month_ind if next_day != 1 else month_ind + 1
     next_day_month = next_day_month if next_day_month != 13 else 1
-    next_day_year  = year if next_day != 1 or next_day_month != 1 else year + 1
+    next_day_year = year if next_day != 1 or next_day_month != 1 else year + 1
 
     context['next_day'] = next_day
     context['next_day_month'] = month_names[next_day_month - 1]
     context['next_day_year'] = next_day_year
 
-    prev_day       = day - 1 if day > 1 else context['nr_days_in_prev_month']
+    prev_day = day - 1 if day > 1 else context['nr_days_in_prev_month']
     prev_day_month = month_ind if prev_day != context['nr_days_in_prev_month'] else month_ind - 1
     prev_day_month = prev_day_month if prev_day_month != 0 else 12
-    prev_day_year  = year if prev_day != 31 or prev_day_month != 12 else year - 1
+    prev_day_year = year if prev_day != 31 or prev_day_month != 12 else year - 1
 
     context['prev_day'] = prev_day
     context['prev_day_month'] = month_names[prev_day_month - 1]
