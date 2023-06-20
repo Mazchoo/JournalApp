@@ -1,5 +1,10 @@
 
+# Do not upload security details
 Journal/settings.py
+
 *.pyc
 *.sqlite3
+
 .tox/
+
+venv/*
