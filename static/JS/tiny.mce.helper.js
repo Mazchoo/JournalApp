@@ -1,5 +1,7 @@
 
-module.exports.createTinyMCE = (component_name, height, initCallback=emptyFunction) => {
+
+
+let createTinyMCE = function(component_name, height, initCallback=emptyFunction) {
     tinymce.init({
         selector: component_name,
         deprecation_warnings: false,
@@ -17,16 +19,16 @@ module.exports.createTinyMCE = (component_name, height, initCallback=emptyFuncti
 }
 
 
-module.exports.getMCEComponentHeight = (name) => {
+let getMCEComponentHeight = function(name) {
     return tinymce.get(name).getContainer().clientHeight + 2;
 }
 
 
-module.exports.resetMCE = (div) => {
+let resetMCE = function(div) {
     if (!$(div).hasClass("paragraph-entry")) { return; }
 
     let divName = div.children[0].getAttribute('name');
-    currentHeight = module.exports.getMCEComponentHeight(divName);
+    currentHeight = getMCEComponentHeight(divName);
     tinymce.get(divName).remove();
-    module.exports.createTinyMCE('#' + divName, currentHeight);
+    createTinyMCE('#' + divName, currentHeight);
 }

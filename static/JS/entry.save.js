@@ -1,7 +1,4 @@
 
-mceHelpers = require("./Journal/static/JS/tiny.mce.helper.js")
-
-
 let generateSaveEntry = function(saveContent) {
      if (saveContent === null) return;
      let saveData = {};
@@ -12,7 +9,7 @@ let generateSaveEntry = function(saveContent) {
 
           if ($(content).hasClass("entry-text")) {
                let textContent = tinyMCE.get(contentId).getContent();
-               let height = mceHelpers.getMCEComponentHeight(contentId);
+               let height = getMCEComponentHeight(contentId);
                saveData[contentId] = {
                     "text": textContent,
                     "height": height,

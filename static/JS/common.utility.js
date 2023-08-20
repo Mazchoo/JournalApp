@@ -1,6 +1,4 @@
 
-mceHelpers = require("./Journal/static/JS/tiny.mce.helper.js")
-
 let reverseString = function(str) {
     return str.split("").reverse().join("");
 }
@@ -106,8 +104,8 @@ let moveObjectUp = function(e) {
     if (objInd === undefined || objInd == 0) {return;}
 
     editAreaList.insertBefore(parentDiv, editAreaList.children[objInd-1]);
-    mceHelpers.resetMCE(parentDiv);
-    mceHelpers.resetMCE(editAreaList.children[objInd]);
+    resetMCE(parentDiv);
+    resetMCE(editAreaList.children[objInd]);
     enableSaveButton();
 }
 
@@ -120,8 +118,8 @@ let moveObjectDown = function(e) {
     if (objInd === undefined || objInd == editAreaList.children.length-1) {return;}
 
     editAreaList.insertBefore(editAreaList.children[objInd + 1], parentDiv);
-    mceHelpers.resetMCE(parentDiv);
-    mceHelpers.resetMCE(editAreaList.children[objInd]);
+    resetMCE(parentDiv);
+    resetMCE(editAreaList.children[objInd]);
     enableSaveButton();
 }
 

@@ -1,6 +1,4 @@
 
-mceHelpers = require("./Journal/static/JS/tiny.mce.helper.js")
-
 let generateParagraphTemplate = function(contentInd) {
     return replaceExpression(PARAGRAPH_TEMPLATE, /%{contentInd}/g, contentInd);
 }
@@ -55,7 +53,7 @@ let createInitFunction = function(updateInd, paragraphText) {
 
 let initializeNewParagraph = function(lastestId, height=220, paragraphText="") {
     let initFunction = createInitFunction(lastestId, paragraphText);
-    mceHelpers.createTinyMCE('#paragraph' + lastestId, height, initFunction);
+    createTinyMCE('#paragraph' + lastestId, height, initFunction);
 
     $('#delete-content' + lastestId).click(deleteParagraph);
     $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
