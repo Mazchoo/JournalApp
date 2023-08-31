@@ -16,6 +16,8 @@ from main.ContentGeneration.delete_entry import deleteEntryAndContent
 from main.ContentGeneration.get_full_image import getFullImageReponse
 from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
+# ToDo - Consider using tables to store functions in javascript
+
 
 @putVargsIntoContext
 def homePage(request, context):
