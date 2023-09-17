@@ -64,6 +64,9 @@ def getEncodingType(file_path: Union[Path, str]) -> str:
 
 
 def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
+    if not getIconFilePath(file_path).exists():
+        createImageIcon(file_path)
+
     resized_path = getResizeName(file_path)
     if resized_path.exists():
         return loadImageDirectly(resized_path)
