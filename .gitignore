@@ -8,3 +8,4 @@ Journal/settings.py
 .tox/
 
 venv/*
+*-checkpoint.ipynb
