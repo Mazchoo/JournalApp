@@ -5,9 +5,9 @@ from main.Helpers.date_slugs import convertDateToUrlTuple
 
 def getLatestEntryTuple():
     output = None
-    latest_entry = models.Entry.objects.all().latest('last_edited')
+    all_entities = models.Entry.objects.all()
 
-    if latest_entry:
-        output = convertDateToUrlTuple(latest_entry.date)
+    if all_entities:
+        output = convertDateToUrlTuple(all_entities.latest('last_edited').date)
 
     return output
