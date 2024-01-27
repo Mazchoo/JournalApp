@@ -1,6 +1,9 @@
 
-# Do not upload security details
+# ToDo - make a new security file for this
 Journal/settings.py
+
+# Entries
+Entries/*
 
 *.pyc
 *.sqlite3
