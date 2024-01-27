@@ -14,16 +14,19 @@ NR_IMAGES_TO_DISPLAY = 18
 
 
 def getAllImagesInYear(year: int):
+    ''' Load all database images from a certain year '''
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-"
     )
 
 
-def getAllEntryYears(context: dict) -> None:
+def getAllEntryYears(context: dict) -> dict:
+    ''' Add all available years to context dictionary '''
     distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
     years = [entry['year'] for entry in distinct_years]
     years.sort()
     context['all_years'] = years
+    return context
 
 
 def getRandomImagesFromYear(year: int) -> List[str]:
@@ -44,8 +47,8 @@ def getRandomImagesFromYear(year: int) -> List[str]:
     return [getBase64FromPath(path) for path in selected_icon_paths]
 
 
-def getAllYearSummaryInformation(context: dict) -> None:
-    getAllEntryYears(context)
+def getAllYearSummaryInformation(context: dict):
+    context = getAllEntryYears(context)
     context['icon_paths'] = {}
     for year in context['all_years']:
         context['icon_paths'][year] = getRandomImagesFromYear(year)
