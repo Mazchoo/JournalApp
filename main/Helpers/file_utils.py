@@ -1,4 +1,4 @@
-
+from typing import Union
 from pathlib import Path
 from os import listdir, rmdir, mkdir, getcwd
 
@@ -37,24 +37,28 @@ def makeParentFolders(target_folder: Path) -> None:
     mkdir(str(target_folder))
 
 
-def getImageBaseFolderPath(file_name: str) -> str:
-    return f"{getcwd()}\\Images\\{file_name}"
+def getImagePath(file_name: Union[str, Path]) -> str:
+    return f"{getcwd()}/Entries/{file_name}"
 
 
-def getIconFilePath(file_path: Path) -> Path:
+def getIconPath(file_path: Path) -> Path:
     icon_file_name = f"{file_path.stem}_icon{file_path.suffix}"
-    target_icon_path = file_path.parent / icon_file_name
-    return target_icon_path
+    return file_path.parent / icon_file_name
+
+
+def getIconPathFromRelativePath(realtive_file_path: Path) -> Path:
+    target_icon_path = f"{getcwd()}/Entries/{getIconPath(realtive_file_path)}"
+    return Path(target_icon_path)
 
 
 def getStoredImageFolder(entry_name: str) -> str:
     year, month, day = entry_name.split("-")
-    return f"{getcwd()}\\Images\\{year}\\{month}\\{day}"
+    return f"{getcwd()}/Entries/{year}/{month}/{day}"
 
 
 def getStoredImagePath(file_name: str, entry_name: str) -> str:
     target_folder = getStoredImageFolder(entry_name)
-    return f"{target_folder}\\{file_name}"
+    return f"{target_folder}/{file_name}"
 
 
 def getResizeName(file_path: Path) -> Path:

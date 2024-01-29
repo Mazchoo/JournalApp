@@ -9,7 +9,7 @@ from functools import lru_cache
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
                                             cropImageToSquare)
-from main.Helpers.file_utils import (getIconFilePath, getImageBaseFolderPath,
+from main.Helpers.file_utils import (getIconPath, getImagePath,
                                      makeParentFolders, getResizeName)
 
 
@@ -17,7 +17,7 @@ def createImageIcon(target_path_obj: Path):
     if not target_path_obj.exists():
         return False
 
-    target_icon_path = getIconFilePath(target_path_obj)
+    target_icon_path = getIconPath(target_path_obj)
     if target_icon_path.exists():
         return False
 
@@ -38,7 +38,7 @@ def moveImageToSavePath(target_file_path: str, file_name: str):
         createImageIcon(target_path_obj)
         return target_file_path
 
-    source_file_path = getImageBaseFolderPath(file_name)
+    source_file_path = getImagePath(file_name)
     output_path = source_file_path
 
     target_folder = target_path_obj.parent
@@ -64,7 +64,7 @@ def getEncodingType(file_path: Union[Path, str]) -> str:
 
 
 def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
-    if not getIconFilePath(file_path).exists():
+    if not getIconPath(file_path).exists():
         createImageIcon(file_path)
 
     resized_path = getResizeName(file_path)

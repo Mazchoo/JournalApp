@@ -9,7 +9,7 @@ import main.models as models
 from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
-                                     getImageBaseFolderPath)
+                                     getImagePath)
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.date_slugs import getValidDateFromSlug
 
@@ -52,7 +52,7 @@ class ImageForm(ModelForm):
         target_path = getStoredImagePath(file_name, entry.name)
         target_file_obj = Path(target_path)
 
-        source_path = getImageBaseFolderPath(file_name)
+        source_path = getImagePath(file_name)
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():

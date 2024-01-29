@@ -4,7 +4,7 @@ from pathlib import Path
 
 import main.models as models
 from main.Helpers.image_utils import getBase64FromPath
-from main.Helpers.file_utils import getIconFilePath
+from main.Helpers.file_utils import getIconPathFromRelativePath
 
 
 def getMonthStrings(i: int, context: dict):
@@ -30,7 +30,7 @@ def getIconForEachMonth(context: dict, year: int):
         month, month_name = getMonthStrings(i, context)
 
         month_images = getAllImagesInMonth(year, month)
-        images_icon_files = [getIconFilePath(Path(img.file_path)) for img in month_images]
+        images_icon_files = [getIconPathFromRelativePath(Path(img.file_path)) for img in month_images]
         valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
 
         if valid_icons:
