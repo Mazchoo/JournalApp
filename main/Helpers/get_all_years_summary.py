@@ -8,9 +8,10 @@ from typing import List
 from django.db.models.functions import ExtractYear
 
 import main.models as models
-from main.Helpers.image_utils import getBase64FromPath
-from main.Helpers.file_utils import getIconPathFromRelativePath
+from main.Helpers.image_utils import getBase64FromPath, createImageIcon
+from main.Helpers.file_utils import getIconPath, getImagePath
 
+# ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18
 
 
@@ -36,23 +37,42 @@ def getAllEntryYears(context: dict) -> dict:
     return context
 
 
+def getSelectionOfIcons(valid_images: List[Path]) -> List[Path]:
+    selected_image_paths = []
+    if len(valid_images) >= NR_IMAGES_TO_DISPLAY:
+        selected_image_paths = random.sample(valid_images, k=NR_IMAGES_TO_DISPLAY)
+    elif valid_images:
+        selected_image_paths = random.choices(valid_images, k=NR_IMAGES_TO_DISPLAY)
+    else:
+        # ToDo Make missing image a fixed path
+        # ToDo get a completely random set of icons for this case
+        selected_image_paths = [f"{getcwd()}/static/Image/missing.png"]  # type: ignore
+        selected_image_paths *= NR_IMAGES_TO_DISPLAY
+
+    return selected_image_paths
+
+
+def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
+    valid_icon_paths = []
+    icon_paths = [getIconPath(path) for path in selected_img_paths]
+    for icon_path, path in zip(icon_paths, selected_img_paths):
+        if icon_path.exists() or createImageIcon(path):
+            valid_icon_paths.append(icon_path)
+        else:
+            valid_icon_paths.append(Path(f"{getcwd()}/static/Image/missing_icon.png"))
+
+    return valid_icon_paths
+
+
 def getRandomImagesFromYear(year: int) -> List[str]:
     ''' Find images from a year if they exist. '''
     year_images = getAllImagesInYear(year)
-    images_icon_files = [getIconPathFromRelativePath(Path(img.file_path)) for img in year_images]
-    valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
+    image_files = [Path(getImagePath(Path(img.file_path))) for img in year_images]
+    valid_images = list(filter(lambda p: p.exists(), image_files))
 
-    selected_icon_paths = []
-    if len(valid_icons) >= NR_IMAGES_TO_DISPLAY:
-        selected_icon_paths = random.sample(valid_icons, k=NR_IMAGES_TO_DISPLAY)
-    elif valid_icons:
-        selected_icon_paths = random.choices(valid_icons, k=NR_IMAGES_TO_DISPLAY)
-    else:
-        # ToDo get a completely random set of icons for this case
-        selected_icon_paths = [f"{getcwd()}/static/Image/missing_icon.png"]  # type: ignore
-        selected_icon_paths *= NR_IMAGES_TO_DISPLAY
-
-    return [getBase64FromPath(path) for path in selected_icon_paths]
+    selected_img_paths = getSelectionOfIcons(valid_images)
+    valid_icon_paths = getValidIconPaths(selected_img_paths)
+    return [getBase64FromPath(p) for p in valid_icon_paths]
 
 
 def getAllYearSummaryInformation(context: dict):

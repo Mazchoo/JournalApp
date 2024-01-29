@@ -30,6 +30,7 @@ def getIconForEachMonth(context: dict, year: int):
         month, month_name = getMonthStrings(i, context)
 
         month_images = getAllImagesInMonth(year, month)
+        # ToDo - Make icon if image exists
         images_icon_files = [getIconPathFromRelativePath(Path(img.file_path)) for img in month_images]
         valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
 
