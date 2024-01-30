@@ -3,8 +3,8 @@ import random
 from pathlib import Path
 
 import main.models as models
-from main.Helpers.image_utils import getBase64FromPath
-from main.Helpers.file_utils import getIconPathFromRelativePath
+from main.Helpers.image_utils import getBase64FromPath, createImageIcon
+from main.Helpers.file_utils import getImagePath, getIconPath
 
 
 def getMonthStrings(i: int, context: dict):
@@ -30,13 +30,15 @@ def getIconForEachMonth(context: dict, year: int):
         month, month_name = getMonthStrings(i, context)
 
         month_images = getAllImagesInMonth(year, month)
-        # ToDo - Make icon if image exists
-        images_icon_files = [getIconPathFromRelativePath(Path(img.file_path)) for img in month_images]
-        valid_icons = list(filter(lambda p: p.exists(), images_icon_files))
+        image_files = [Path(getImagePath(Path(img.file_path))) for img in month_images]
+        valid_images = list(filter(lambda p: p.exists(), image_files))
 
-        if valid_icons:
-            selected_icon_path = valid_icons[random.randint(0, len(valid_icons) - 1)]
-            output_dict[month_name] = getBase64FromPath(selected_icon_path)
+        if valid_images:
+            selected_image = valid_images[random.randint(0, len(valid_images) - 1)]
+            selected_icon_path = getIconPath(selected_image)
+
+            if selected_icon_path.exists() or createImageIcon(selected_image):
+                output_dict[month_name] = getBase64FromPath(selected_icon_path)
 
     return output_dict
 
