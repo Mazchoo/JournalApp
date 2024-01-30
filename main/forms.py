@@ -9,7 +9,7 @@ import main.models as models
 from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.file_utils import (pathHasImageTag, getStoredImagePath,
-                                     getImagePath)
+                                     getImagePath, makeImagePathRelative)
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.date_slugs import getValidDateFromSlug
 
@@ -68,7 +68,7 @@ class ImageForm(ModelForm):
 
         moveImageToSavePath(target_path, file_name)
 
-        return target_path
+        return makeImagePathRelative(target_path)
 
 
 class TinyMCEComponent(ModelForm):

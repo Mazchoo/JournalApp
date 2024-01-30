@@ -61,5 +61,12 @@ def getStoredImagePath(file_name: str, entry_name: str) -> str:
     return f"{target_folder}/{file_name}"
 
 
+def makeImagePathRelative(file_name: str) -> str:
+    cwd = f"{getcwd()}/Entries/"
+    if cwd in file_name:
+        file_name = file_name[len(cwd):]
+    return file_name
+
+
 def getResizeName(file_path: Path) -> Path:
     return file_path.parent / f"{file_path.stem}_resized{file_path.suffix}"
