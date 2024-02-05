@@ -20,7 +20,7 @@ def deleteEntryContent(entry: models.Entry):
 
 
 def moveFilesOutOfFolder(files: List[Path]):
-    destination_folder = Path(f"{getcwd()}/Images")
+    destination_folder = Path(f"{getcwd()}/Entries")
 
     for file in files:
         if not file.exists() or file.is_dir():
