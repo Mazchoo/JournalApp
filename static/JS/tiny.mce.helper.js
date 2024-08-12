@@ -7,6 +7,8 @@ let createTinyMCE = function(component_name, height, initCallback=emptyFunction)
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
+        promotion: false,
+        branding: false,
         setup:function(editor) {
             editor.on('change', function(e) {
                 enableSaveButton();
