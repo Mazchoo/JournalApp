@@ -1,7 +1,7 @@
 asgiref==3.7.2
 colorama==0.4.6
 debugpy==1.8.0
-Django==5.0.7
+Django==5.0.8
 django-stubs==4.2.7
 django-stubs-ext==4.2.7
 django-tinymce==4.1.0

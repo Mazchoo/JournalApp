@@ -101,7 +101,7 @@ let moveObjectUp = function(e) {
     let editAreaList = $('#edit-area')[0];
     let objInd = getIndexInArr(editAreaList.children, parentDiv)
 
-    if (objInd === undefined || objInd == 0) {return;}
+    if (objInd === undefined || objInd == 0) return;
 
     editAreaList.insertBefore(parentDiv, editAreaList.children[objInd-1]);
     resetMCE(parentDiv);
@@ -115,7 +115,7 @@ let moveObjectDown = function(e) {
     let editAreaList = $('#edit-area')[0];
     let objInd = getIndexInArr(editAreaList.children, parentDiv)
 
-    if (objInd === undefined || objInd == editAreaList.children.length-1) {return;}
+    if (objInd === undefined || objInd == editAreaList.children.length-1) return;
 
     editAreaList.insertBefore(editAreaList.children[objInd + 1], parentDiv);
     resetMCE(parentDiv);
