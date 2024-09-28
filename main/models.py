@@ -47,6 +47,29 @@ class EntryImage(Model):
             "file_name": file_name,
             "original": int(self.original)
         }
+    
+
+class EntryVideo(Model):
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    file_path = models.CharField(max_length=256)
+    original = models.BooleanField()
+
+    def __repr__(self):
+        return f"video{self.pk} - Entry {self.entry.name}"
+
+    def __str__(self):
+        return self.base64
+
+    def view(self):
+        full_path = getImagePath(self.file_path)
+        file_name = Path(self.file_path).name
+        b64_string = parseBase64ImageData(full_path)
+
+        return {
+            "base64": b64_string,
+            "file_name": file_name,
+            "original": int(self.original)
+        }
 
 
 class EntryParagraph(Model):
