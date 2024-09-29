@@ -127,3 +127,15 @@ let moveObjectDown = function(e) {
 let emptyFunction = function() {
     return;
 }
+
+
+const isVideoFile = function(fileName) {
+    const fileExtention = fileName.split(".").pop().toLowerCase();
+    return fileExtention === 'mp4';
+}
+
+
+const isImageFile = function(fileName) {
+    const fileExtention = fileName.split(".").pop().toLowerCase();
+    return ["jpg", "jpeg", "jfif", "png"].includes(fileExtention);
+}

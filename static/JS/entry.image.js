@@ -47,32 +47,52 @@ let appendImageToList = function() {
 }
 
 
-let readImageURL= function(inputFiles, fileInd, contentId) {
+let readImageURL= function(inputFile, contentId) {
     var reader = new FileReader();
 
     reader.onload = function (e) {
+        $('#video' + contentId).css({ visibility: 'hidden', height: 0 }); 
         $('#image' + contentId).attr('src', e.target.result);
         enableSaveButton();
     };
-    reader.readAsDataURL(inputFiles[fileInd]);
+    reader.readAsDataURL(inputFile);
 }
 
+let readVideoURL= function(inputFile, contentId) {
+    var reader = new FileReader();
 
-let showImageFileName = function(inputFiles, fileInd, contentId) {
+    reader.onload = function (e) {''
+        $('#video' + contentId).css({ visibility: 'visible' , height: 'auto' }); 
+        $('#video' + contentId).attr('src', e.target.result);
+        enableSaveButton();
+    };
+    reader.readAsDataURL(inputFile);
+}
+
+let showFileName = function(inputFile, contentId) {
     let infoArea = $("#upload-label" + contentId)[0]
-    let fileName = inputFiles[fileInd].name;
+    let fileName = inputFile.name;
     infoArea.textContent = fileName;
 }
 
 
-let uploadAllImageFiles = function(contentInd, inputFiles) {
+let uploadAllMediaFiles = function(contentInd, inputFiles) {
     for (let i = inputFiles.length - 1; i >= 0; i--) {
         if (i < inputFiles.length - 1) {
             $("#insert-image" + contentInd).click();
             contentInd = CONTENT_INDEX;
         }
-        readImageURL(inputFiles, i, contentInd);
-        showImageFileName(inputFiles, i, contentInd);
+
+        const inputFile = inputFiles[i];
+        if (isVideoFile(inputFile.name)) {
+            readVideoURL(inputFile, contentInd);
+        } else if (isImageFile(inputFile.name)) {
+            readImageURL(inputFile, contentInd);
+        } else {
+            console.log('Unknown media type')
+        }
+        
+        showFileName(inputFiles, i, contentInd);
     }
 }
 
@@ -82,7 +102,7 @@ let showImageUpload = function(self) {
     if (!(input.id && input.files)) return;
 
     let contentInd = input.id.replace("upload", "");
-    uploadAllImageFiles(contentInd, input.files);
+    uploadAllMediaFiles(contentInd, input.files);
 }
 
 
