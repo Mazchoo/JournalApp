@@ -92,7 +92,7 @@ let uploadAllMediaFiles = function(contentInd, inputFiles) {
             console.log('Unknown media type')
         }
         
-        showFileName(inputFiles, i, contentInd);
+        showFileName(inputFile, contentInd);
     }
 }
 

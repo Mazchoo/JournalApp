@@ -15,18 +15,24 @@ let generateSaveEntry = function(saveContent) {
                     "height": height,
                     "entry": DATE_SLUG
                };
-          } else if ($(content).hasClass("img-fluid")) {
+          } else if ($(content).hasClass("content-image") && content.src) {
                let ind = contentId.replace("image", "");
-               let original = $('#original-check' + ind).is(":checked");
+               let original = $("#original-check" + ind).is(":checked");
                let fileName = $("#upload-label" + ind)[0].textContent;
                saveData[contentId] = {
                     "file_path": fileName,
                     "original":  original,
                     "entry":     DATE_SLUG
                }
-          } else {
-               console.log("Unrecognised save content");
-               saveData = undefined;
+          } else if ($(content).hasClass("content-video") && content.src) {
+               let ind = contentId.replace("video", "");
+               let original = $("#original-check" + ind).is(":checked");
+               let fileName = $("#upload-label" + ind)[0].textContent;
+               saveData[contentId] = {
+                    "file_path": fileName,
+                    "original":  original,
+                    "entry":     DATE_SLUG
+               }
           }
      }
 
