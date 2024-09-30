@@ -16,7 +16,7 @@ from main.ContentGeneration.delete_entry import deleteEntryAndContent
 from main.ContentGeneration.get_full_image import getFullImageReponse
 from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
-# ToDo - Consider using tables to store functions in javascript
+# ToDo - Consider using type script and bundle to compile javascript functions
 
 
 @putVargsIntoContext

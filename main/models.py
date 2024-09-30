@@ -4,7 +4,7 @@ from django.db import models
 from pathlib import Path
 
 from main.Helpers.image_utils import parseBase64ImageData
-from main.Helpers.file_utils import getImagePath
+from main.Helpers.file_utils import getMediaPath
 
 
 class Content(Model):
@@ -38,7 +38,7 @@ class EntryImage(Model):
         return self.base64
 
     def view(self):
-        full_path = getImagePath(self.file_path)
+        full_path = getMediaPath(self.file_path)
         file_name = Path(self.file_path).name
         b64_string = parseBase64ImageData(full_path)
 
@@ -61,7 +61,7 @@ class EntryVideo(Model):
         return self.base64
 
     def view(self):
-        full_path = getImagePath(self.file_path)
+        full_path = getMediaPath(self.file_path)
         file_name = Path(self.file_path).name
         b64_string = parseBase64ImageData(full_path)
 

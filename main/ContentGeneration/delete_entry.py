@@ -7,7 +7,7 @@ from typing import List
 
 import main.models as models
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.file_utils import (getStoredImageFolder, removeEmptyParentFolders,
+from main.Helpers.file_utils import (getStoredMediaFolder, removeEmptyParentFolders,
                                      pathHasImageTag)
 
 
@@ -34,7 +34,7 @@ def moveFilesOutOfFolder(files: List[Path]):
 
 
 def moveImagesOutOfADeleteFolder(entry: models.Entry):
-    image_folder = Path(getStoredImageFolder(entry.name))
+    image_folder = Path(getStoredMediaFolder(entry.name))
     if not image_folder.exists():
         return
 

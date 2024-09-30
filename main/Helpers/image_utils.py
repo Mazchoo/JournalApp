@@ -9,8 +9,7 @@ from functools import lru_cache
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
                                             cropImageToSquare)
-from main.Helpers.file_utils import (getIconPath, getImagePath,
-                                     makeParentFolders, getResizeName)
+from main.Helpers.file_utils import (getIconPath, moveMediaToSavePath, getResizeName)
 
 
 def createImageIcon(target_path_obj: Path):
@@ -33,22 +32,9 @@ def createImageIcon(target_path_obj: Path):
 
 
 def moveImageToSavePath(target_file_path: str, file_name: str):
-    target_path_obj = Path(target_file_path)
-    if target_path_obj.exists():
-        createImageIcon(target_path_obj)
-        return target_file_path
-
-    source_file_path = getImagePath(file_name)
-    output_path = source_file_path
-
-    target_folder = target_path_obj.parent
-    if Path(source_file_path).exists():
-        makeParentFolders(target_folder)
-        move(source_file_path, target_file_path)
-        output_path = target_file_path
-        createImageIcon(target_path_obj)
-
-    return output_path
+    ''' ToDo - Consider creating abstract class to save icon as implementation. '''
+    createImageIcon(Path(target_file_path))
+    return moveMediaToSavePath(target_file_path, file_name)
 
 
 def getEncodingType(file_path: Union[Path, str]) -> str:

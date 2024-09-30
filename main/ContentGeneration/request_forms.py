@@ -3,7 +3,7 @@ from django import forms
 from django.forms import Form
 from pathlib import Path
 
-from main.Helpers.file_utils import getStoredImagePath
+from main.Helpers.file_utils import getStoredMediaPath
 import main.models as models
 from main.Helpers.date_slugs import getValidDateFromSlug
 
@@ -14,7 +14,7 @@ class FullImagePath(Form):
 
     def clean_file(self):
         clean_data = super().clean()
-        target_path = getStoredImagePath(clean_data["file"], clean_data["name"])
+        target_path = getStoredMediaPath(clean_data["file"], clean_data["name"])
 
         if not Path(target_path).exists():
             raise forms.ValidationError(f"File {target_path} does not exist")

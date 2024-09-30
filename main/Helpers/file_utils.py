@@ -1,6 +1,7 @@
 from typing import Union
 from pathlib import Path
 from os import listdir, rmdir, mkdir, getcwd
+from shutil import move
 
 from main.Helpers.image_constants import ImageConstants
 
@@ -37,7 +38,7 @@ def makeParentFolders(target_folder: Path) -> None:
     mkdir(str(target_folder))
 
 
-def getImagePath(file_name: Union[str, Path]) -> str:
+def getMediaPath(file_name: Union[str, Path]) -> str:
     return f"{getcwd()}/Entries/{file_name}"
 
 
@@ -51,13 +52,13 @@ def getIconPathFromRelativePath(realtive_file_path: Path) -> Path:
     return Path(target_icon_path)
 
 
-def getStoredImageFolder(entry_name: str) -> str:
+def getStoredMediaFolder(entry_name: str) -> str:
     year, month, day = entry_name.split("-")
     return f"{getcwd()}/Entries/{year}/{month}/{day}"
 
 
-def getStoredImagePath(file_name: str, entry_name: str) -> str:
-    target_folder = getStoredImageFolder(entry_name)
+def getStoredMediaPath(file_name: str, entry_name: str) -> str:
+    target_folder = getStoredMediaFolder(entry_name)
     return f"{target_folder}/{file_name}"
 
 
@@ -70,3 +71,21 @@ def makeImagePathRelative(file_name: str) -> str:
 
 def getResizeName(file_path: Path) -> Path:
     return file_path.parent / f"{file_path.stem}_resized{file_path.suffix}"
+
+
+def moveMediaToSavePath(target_file_path: str, file_name: str):
+    target_path_obj = Path(target_file_path)
+    if target_path_obj.exists():
+        return target_file_path
+
+    source_file_path = getMediaPath(file_name)
+    output_path = source_file_path
+
+    target_folder = target_path_obj.parent
+    if Path(source_file_path).exists():
+        makeParentFolders(target_folder)
+        move(source_file_path, target_file_path)
+        output_path = target_file_path
+
+    return output_path
+

@@ -9,7 +9,7 @@ from django.db.models.functions import ExtractYear
 
 import main.models as models
 from main.Helpers.image_utils import getBase64FromPath, createImageIcon
-from main.Helpers.file_utils import getIconPath, getImagePath
+from main.Helpers.file_utils import getIconPath, getMediaPath
 
 # ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18
@@ -67,7 +67,7 @@ def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
 def getRandomImagesFromYear(year: int) -> List[str]:
     ''' Find images from a year if they exist. '''
     year_images = getAllImagesInYear(year)
-    image_files = [Path(getImagePath(Path(img.file_path))) for img in year_images]
+    image_files = [Path(getMediaPath(Path(img.file_path))) for img in year_images]
     valid_images = list(filter(lambda p: p.exists(), image_files))
 
     selected_img_paths = getSelectionOfIcons(valid_images)
