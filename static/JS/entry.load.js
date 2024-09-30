@@ -18,6 +18,10 @@ let parseLoadedStoryContent = function(key, content) {
         loadParagraphContent(content);
     } else if (contentType === 'image') {
         loadImageContent(content);
+    } else if (contentType === 'video') {
+        loadImageContent(content)
+    } else {
+        console.log('Unknown content loaded', contentType)
     }
 }
 

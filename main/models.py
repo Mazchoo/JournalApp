@@ -35,7 +35,7 @@ class EntryImage(Model):
         return f"image{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
-        return self.base64
+        return self.file_path
 
     def view(self):
         full_path = getMediaPath(self.file_path)
@@ -58,7 +58,7 @@ class EntryVideo(Model):
         return f"video{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
-        return self.base64
+        return self.file_path
 
     def view(self):
         full_path = getMediaPath(self.file_path)
