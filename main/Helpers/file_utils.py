@@ -4,6 +4,7 @@ from os import listdir, rmdir, mkdir, getcwd
 from shutil import move
 
 from main.Helpers.image_constants import ImageConstants
+from main.Helpers.video_constants import VideoConstants
 
 
 def removeEmptyParentFolders(folder: Path) -> None:
@@ -43,7 +44,8 @@ def getMediaPath(file_name: Union[str, Path]) -> str:
 
 
 def getIconPath(file_path: Path) -> Path:
-    icon_file_name = f"{file_path.stem}_icon{file_path.suffix}"
+    extention = '.jpg' if file_path.suffix == '.mp4' else file_path.suffix
+    icon_file_name = f"{file_path.stem}_icon{extention}"
     return file_path.parent / icon_file_name
 
 
@@ -70,7 +72,8 @@ def makeImagePathRelative(file_name: str) -> str:
 
 
 def getResizeName(file_path: Path) -> Path:
-    return file_path.parent / f"{file_path.stem}_resized{file_path.suffix}"
+    extention = '.jpg' if file_path.suffix == '.mp4' else file_path.suffix
+    return file_path.parent / f"{file_path.stem}_resized{extention}"
 
 
 def moveMediaToSavePath(target_file_path: str, file_name: str):

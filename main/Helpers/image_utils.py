@@ -2,14 +2,13 @@
 import base64
 from pathlib import Path
 from typing import Union
-from shutil import move
 from PIL import Image
 from functools import lru_cache
 
 from main.Helpers.image_constants import ImageConstants
-from main.Helpers.pil_image_helpers import (orientatePILImage, getResizingFactorToDownSized,
-                                            cropImageToSquare)
-from main.Helpers.file_utils import (getIconPath, moveMediaToSavePath, getResizeName)
+from main.Helpers.pil_image_helpers import (getSquareResizedImage, getResizingFactorToDownSized,
+                                            orientatePILImage)
+from main.Helpers.file_utils import getIconPath, moveMediaToSavePath, getResizeName
 
 
 def createImageIcon(target_path_obj: Path):
@@ -21,13 +20,11 @@ def createImageIcon(target_path_obj: Path):
         return False
 
     image = Image.open(target_path_obj)
-
     icon_size = ImageConstants.icon_size
-    image_resized = cropImageToSquare(image)
-    image_resized = image_resized.resize((icon_size, icon_size), resample=Image.LANCZOS)
-    image_resized = orientatePILImage(image_resized, image.getexif())
 
+    image_resized = getSquareResizedImage(image, icon_size)
     image_resized.save(target_icon_path)
+
     return True
 
 

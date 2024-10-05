@@ -1,3 +1,4 @@
+from pathlib import Path
 
 from PIL import Image, ExifTags
 
@@ -10,20 +11,20 @@ def getOrientationFlag():
             return key
 
 
-def orientatePILImage(image_resized, exif):
+def orientatePILImage(image, exif):
     if exif is None:
-        return image_resized
+        return image
     orientation_key = getOrientationFlag()
 
     if orientation_key in exif:
         if exif[orientation_key] == 3:
-            image_resized = image_resized.rotate(180, expand=True)
+            image = image.rotate(180, expand=True)
         elif exif[orientation_key] == 6:
-            image_resized = image_resized.rotate(270, expand=True)
+            image = image.rotate(270, expand=True)
         elif exif[orientation_key] == 8:
-            image_resized = image_resized.rotate(90, expand=True)
+            image = image.rotate(90, expand=True)
 
-    return image_resized
+    return image
 
 
 def cropImageToSquare(image: Image.Image):
@@ -38,7 +39,7 @@ def cropImageToSquare(image: Image.Image):
     return image_resized
 
 
-def getResizingFactorToDownSized(file_path):
+def getResizingFactorToDownSized(file_path: Path):
     image = Image.open(file_path)
     width, height = image.size
     max_dimension = max(width, height)
@@ -49,3 +50,9 @@ def getResizingFactorToDownSized(file_path):
         max_dimension //= 2
 
     return factor
+
+
+def getSquareResizedImage(image: Image, target_size: int) -> Image:
+    image = cropImageToSquare(image)
+    image = image.resize((target_size, target_size), resample=Image.LANCZOS)
+    return orientatePILImage(image, image.getexif())
