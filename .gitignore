@@ -12,3 +12,4 @@ Entries/*
 
 venv/*
 *-checkpoint.ipynb
+*__pycache__*

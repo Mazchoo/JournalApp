@@ -79,8 +79,57 @@ def getResizingFactorToCollageSize(capture: cv2.VideoCapture) -> float:
     return factor
 
 
-def createCollageImage(capture: cv2.VideoCapture, rescale_factor: float) -> Image:
-    pass
+def attemptToStreamVideoFile(video_path: Path) -> Optional[cv2.VideoCapture]:
+    if not video_path.exists():
+        return None
+    if not video_path.suffix.lower() in VideoConstants.supported_extensions:
+        return None
+
+    capture = cv2.VideoCapture(video_path)
+    if not capture.isOpened():
+        capture.release()
+        return None
+
+    return capture
+
+
+def createCollageImage(capture: cv2.VideoCapture, rescale_factor: int, resized_path: Path) -> Image:
+    nr_frames = getTotalFrames(capture)
+
+    width, height = getWidthHeight(capture)
+    width //= rescale_factor
+    height //= rescale_factor
+
+    rows = VideoConstants.collage_nr_rows
+    cols = VideoConstants.collage_nr_cols
+    if width > height:
+        rows, cols = cols, rows
+
+    collage_width = cols * width
+    collage_width += (cols - 1) * VideoConstants.collage_spacing
+    collage_height = rows * height
+    collage_height += (rows - 1) * VideoConstants.collage_spacing
+    collage_image = np.zeros((collage_height, collage_width, 3), dtype=np.uint8)
+    frame_increment = nr_frames // (rows * cols)
+
+    for i in range(VideoConstants.collage_nr_rows):
+        for j in range(VideoConstants.collage_nr_cols):
+            start_y = i * (height + VideoConstants.collage_spacing)
+            start_x = j * (width + VideoConstants.collage_spacing)
+            end_y = start_y + height
+            end_x = start_x + width
+
+            frame_index = frame_increment // 2
+            frame_index += i * VideoConstants.collage_nr_rows * frame_increment
+            frame_index += j * frame_increment
+
+            frame = getFrameAtIndex(capture, frame_index)
+            frame = cv2.resize(frame, dsize=(width, height))
+            collage_image[start_y: end_y, start_x: end_x, :] = frame
+
+    image_resized = Image.fromarray(collage_image)
+    image_resized.save(resized_path, format=VideoConstants.save_image_extention)
+    return loadImageDirectly(resized_path)
 
 
 @lru_cache(maxsize=1024)
@@ -94,12 +143,13 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
     if resize_file_name.exists():
         b64_string = loadImageDirectly(file_path)
 
-    elif file_path.exists() and file_path.suffix.lower() in VideoConstants.supported_extensions \
-        and (capture := cv2.VideoCapture(file_path)).isOpened():
+    elif capture := attemptToStreamVideoFile(file_path):
 
         factor = getResizingFactorToCollageSize(capture)
-        b64_string = createCollageImage(capture, factor)
-        b64_string = addEncodingTypeToBase64(b64_string, VideoConstants.save_image_extention)
+        if collage_b64 := createCollageImage(capture, factor, resize_file_name):
+            b64_string = addEncodingTypeToBase64(collage_b64, VideoConstants.save_image_extention)
+        else:
+            b64_string = ""
 
     else:
         print(f'Error! Video {file_path} is invalid!')
@@ -112,6 +162,7 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
 if __name__ == '__main__':
     cap = cv2.VideoCapture(Path('./Entries/2024/06/08/20240608_142838.mp4'))
     assert cap.isOpened()
+    createCollageImage(cap, 2, Path('./Entries/2024/06/08/20240608_142838_resized.jpeg'))
     cap.release()
     createVideoIcon(Path('./Entries/2024/06/08/20240608_142838.mp4'))
 
