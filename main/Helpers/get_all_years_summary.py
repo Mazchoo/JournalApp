@@ -13,6 +13,7 @@ from main.Helpers.file_utils import getIconPath, getMediaPath
 
 # ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18
+MISSING_IMAGE = "/static/Image/missing_icon.png"
 
 
 def getCurrentYear():
@@ -46,7 +47,7 @@ def getSelectionOfIcons(valid_images: List[Path]) -> List[Path]:
     else:
         # ToDo Make missing image a fixed path
         # ToDo get a completely random set of icons for this case
-        selected_image_paths = [f"{getcwd()}/static/Image/missing.png"]  # type: ignore
+        selected_image_paths = [f"{getcwd()}{MISSING_IMAGE}"]  # type: ignore
         selected_image_paths *= NR_IMAGES_TO_DISPLAY
 
     return selected_image_paths
@@ -59,7 +60,7 @@ def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
         if icon_path.exists() or createImageIcon(path):
             valid_icon_paths.append(icon_path)
         else:
-            valid_icon_paths.append(Path(f"{getcwd()}/static/Image/missing_icon.png"))
+            valid_icon_paths.append(Path(f"{getcwd()}{MISSING_IMAGE}"))
 
     return valid_icon_paths
 

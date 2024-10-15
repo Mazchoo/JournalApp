@@ -7,6 +7,6 @@ class VideoConstants:
     collage_image_longest_side: int = 512
     collage_nr_rows: int = 1
     collage_nr_cols: int = 4
-    billateral_filter: bool = False
+    billateral_filter: bool = True
     collage_spacing: int = 10
     icon_size: int = 96
