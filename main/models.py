@@ -5,6 +5,7 @@ from pathlib import Path
 
 from main.Helpers.image_utils import parseBase64ImageData
 from main.Helpers.file_utils import getMediaPath
+from main.Helpers.video_utils import getCollageBase64Data
 
 
 class Content(Model):
@@ -63,7 +64,7 @@ class EntryVideo(Model):
     def view(self):
         full_path = getMediaPath(self.file_path)
         file_name = Path(self.file_path).name
-        b64_string = parseBase64ImageData(full_path)
+        b64_string = getCollageBase64Data(full_path)
 
         return {
             "base64": b64_string,

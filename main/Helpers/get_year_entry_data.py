@@ -23,6 +23,12 @@ def getAllImagesInMonth(year: int, month: str):
     )
 
 
+def getAllVideosInMonth(year: int, month: str):
+    return models.EntryVideo.objects.all().filter(
+        entry__name__istartswith=f"{year}-{month}-"
+    )
+
+
 def getIconForEachMonth(context: dict, year: int):
     output_dict = {}
 
@@ -30,7 +36,10 @@ def getIconForEachMonth(context: dict, year: int):
         month, month_name = getMonthStrings(i, context)
 
         month_images = getAllImagesInMonth(year, month)
+        month_videos = getAllVideosInMonth(year, month)
+
         image_files = [Path(getMediaPath(Path(img.file_path))) for img in month_images]
+        image_files.extend([Path(getMediaPath(Path(vid.file_path))) for vid in month_videos])
         valid_images = list(filter(lambda p: p.exists(), image_files))
 
         if valid_images:

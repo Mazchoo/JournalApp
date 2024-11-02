@@ -72,7 +72,7 @@ def makeImagePathRelative(file_name: str) -> str:
 
 
 def getResizeName(file_path: Path) -> Path:
-    extention = '.jpg' if file_path.suffix == '.mp4' else file_path.suffix
+    extention = f".{VideoConstants.save_image_extention}" if file_path.suffix == '.mp4' else file_path.suffix
     return file_path.parent / f"{file_path.stem}_resized{extention}"
 
 
