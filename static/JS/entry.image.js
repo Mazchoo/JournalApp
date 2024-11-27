@@ -129,6 +129,27 @@ let editImageWhenInitialised = function(updateInd, imageContent, counter) {
 }
 
 
+let changeImageToVideoClass = function(updateInd) {
+    let imageArea = $("#image" + updateInd);
+    if (imageArea[0] == undefined) { return; }
+
+    imageArea.removeClass("content-image");
+    imageArea.addClass("content-video");
+    imageArea.css({ visibility: 'visible', height: 'auto' }); 
+    return true;
+}
+
+
+let editVideoWhenInitialised = function(updateInd, imageContent, counter) {
+    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
+
+    if (!editImageContent(updateInd, imageContent) || !changeImageToVideoClass(updateInd)) {
+        counter--;
+        setTimeout(editVideoWhenInitialised, 1000, updateInd, imageContent, counter);
+    }
+}
+
+
 let zoomToImage = function() {
     let imageId = $(this).find('img').attr('id');
     let contentId = getContentId(imageId);

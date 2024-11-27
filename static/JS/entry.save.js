@@ -25,10 +25,11 @@ let generateSaveEntry = function(saveContent) {
                     "entry":     DATE_SLUG
                }
           } else if ($(content).hasClass("content-video") && content.src) {
-               let ind = contentId.replace("video", "");
+               // Can be a video or an image
+               let ind = contentId.replace("video", "").replace("image", "");
                let original = $("#original-check" + ind).is(":checked");
                let fileName = $("#upload-label" + ind)[0].textContent;
-               saveData[contentId] = {
+               saveData[`video${ind}`] = {
                     "file_path": fileName,
                     "original":  original,
                     "entry":     DATE_SLUG

@@ -10,6 +10,12 @@ let loadImageContent = function(imageContent) {
 }
 
 
+let loadVideoContent = function(imageContent) {
+    appendImageToList();
+    editVideoWhenInitialised(CONTENT_INDEX, imageContent, MAX_CHANGE_ATTEMPTS);
+}
+
+
 let parseLoadedStoryContent = function(key, content) {
     let contentType = getContentType(key);
     if (contentType === undefined) return;
@@ -19,7 +25,7 @@ let parseLoadedStoryContent = function(key, content) {
     } else if (contentType === 'image') {
         loadImageContent(content);
     } else if (contentType === 'video') {
-        loadImageContent(content)
+        loadVideoContent(content)
     } else {
         console.log('Unknown content loaded', contentType)
     }
