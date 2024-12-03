@@ -62,8 +62,8 @@ def getCollageDisplayDimensions(capture: VideoCapture, rescale_factor: int):
 
     rows = VideoConstants.collage_nr_rows
     cols = VideoConstants.collage_nr_cols
-    if width > height:
-        rows, cols = cols, rows
+    if height > width:
+        cols += VideoConstants.nr_extra_cols
 
     collage_width = cols * width
     collage_width += (cols - 1) * VideoConstants.collage_spacing

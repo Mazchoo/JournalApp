@@ -30,5 +30,6 @@ def getUpdatedDateParagraph(paragraph_obj, destination_slug):
 
 CONTENT_UPDATE_DATE = {
     "image": getUpdatedDateImage,
-    "paragraph": getUpdatedDateParagraph
+    "paragraph": getUpdatedDateParagraph,
+    "video": getUpdatedDateVideo
 }

@@ -12,6 +12,9 @@ from main.Helpers.file_utils import getIconPath, moveMediaToSavePath, getResizeN
 
 
 def createImageIcon(target_path_obj: Path):
+    if target_path_obj.suffix == '.mp4':
+        target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
+
     if not target_path_obj.exists():
         return False
 
