@@ -16,7 +16,9 @@ from main.ContentGeneration.delete_entry import deleteEntryAndContent
 from main.ContentGeneration.get_full_image import getFullImageReponse
 from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
+# ToDo - Add streaming request for videos
 # ToDo - Consider using type script and bundle to compile javascript functions
+# ToDo - Add some tests for saving content from scratch
 
 
 @putVargsIntoContext
@@ -93,5 +95,3 @@ def getImage(post_data: dict):
 @ajaxRequest
 def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)
-
-# ToDo - Add some tests for saving regular content
