@@ -68,7 +68,6 @@ def editEntryPage(request, context):
     return render(request=request, template_name='day.html', context=context)
 
 
-# To be continued...
 def showEntryPage(request, _day: int, _month: str, _year: int):
     return render(request=request, template_name='day.html')
 
