@@ -47,7 +47,7 @@ def getSelectionOfIcons(valid_images: List[Path]) -> List[Path]:
     else:
         # ToDo Make missing image a fixed path
         # ToDo get a completely random set of icons for this case
-        selected_image_paths = [f"{getcwd()}{MISSING_IMAGE}"]  # type: ignore
+        selected_image_paths = [Path(f"{getcwd()}{MISSING_IMAGE}")]
         selected_image_paths *= NR_IMAGES_TO_DISPLAY
 
     return selected_image_paths
