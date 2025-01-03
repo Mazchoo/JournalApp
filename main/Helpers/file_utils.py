@@ -20,7 +20,8 @@ def removeEmptyParentFolders(folder: Path) -> None:
 
 def pathHasImageTag(path: Path) -> bool:
     for tag in ImageConstants.reserved_image_tags:
-        if path.stem.rfind(tag) == len(path.stem) - len(tag):
+        ending_position = path.stem.rfind(tag)
+        if ending_position >= 0 and ending_position == len(path.stem) - len(tag):
             return True
     return False
 
