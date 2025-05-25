@@ -2,7 +2,7 @@
 
 ## Description
 
-Creates a locally hosted jounral app that can store images, text and video.
+Creates a locally hosted journal app that can store images, text and video.
 
 * Organises entries by year, month and day in respective calendars
 * Has random selections of photos shown by year and month
