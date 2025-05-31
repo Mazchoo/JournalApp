@@ -1,3 +1,5 @@
+## Locally Hosted Django Journal  [![Python tests](https://github.com/Mazchoo/JournalApp/actions/workflows/main.yml/badge.svg)](https://github.com/Mazchoo/JournalApp/actions/workflows/main.yml)
+
 ![image](https://github.com/user-attachments/assets/128a3324-0bcd-4357-849a-61475f4ace0e)
 
 ## Description
