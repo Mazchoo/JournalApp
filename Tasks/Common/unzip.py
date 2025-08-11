@@ -1,6 +1,8 @@
-import zipfile
+''' Helper module to extract all zip files in a given folder '''
 import os
 from pathlib import Path
+
+from zipfile import ZipFile
 
 ENTRY_FOLDER = './Entries'
 
@@ -18,7 +20,7 @@ def main():
                 print(f'File {path} is in subfolder')
                 continue
 
-            with zipfile.ZipFile(str(path)) as f:
+            with ZipFile(str(path)) as f:
                 f.extractall(ENTRY_FOLDER)
 
             path.unlink()
