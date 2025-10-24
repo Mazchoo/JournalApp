@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 
 from main.Helpers.image_constants import ImageConstants
-# ToDo - investigate if symbolic linking can do this instead
+# ToDo - load from images .lnk files instead of folders
 
 
 def is_icon_path(path: Path) -> bool:
@@ -34,13 +34,12 @@ def remove_all_non_icons_in_folder(folder: str):
 
     for dirpath, _, filenames in os.walk(folder):
         for file in filenames:
-            path_str = os.path.join(dirpath, file)
-            path = Path(path_str)
+            path = Path(os.path.join(dirpath, file))
 
             if is_image_path(path) and not is_icon_path(path):
-                save_image.save(path_str)
-                print(path_str)
+                save_image.save(str(path))
+                print(path)
 
 
 if __name__ == "__main__":
-    remove_all_non_icons_in_folder("./Entries/2018")
+    remove_all_non_icons_in_folder("./Entries/2024")
