@@ -1,4 +1,3 @@
-
 from django.db.models import Model
 from django.db import models
 from pathlib import Path
@@ -46,9 +45,9 @@ class EntryImage(Model):
         return {
             "base64": b64_string,
             "file_name": file_name,
-            "original": int(self.original)
+            "original": int(self.original),
         }
-    
+
 
 class EntryVideo(Model):
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
@@ -69,7 +68,7 @@ class EntryVideo(Model):
         return {
             "base64": b64_string,
             "file_name": file_name,
-            "original": int(self.original)
+            "original": int(self.original),
         }
 
 
@@ -85,7 +84,4 @@ class EntryParagraph(Model):
         return self.text
 
     def view(self):
-        return {
-            "text": self.text,
-            "height": self.height
-        }
+        return {"text": self.text, "height": self.height}

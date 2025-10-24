@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0001_initial'),
+        ("main", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='entryparagraph',
-            name='height',
+            model_name="entryparagraph",
+            name="height",
             field=models.IntegerField(default=220),
             preserve_default=False,
         ),

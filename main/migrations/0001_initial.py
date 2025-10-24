@@ -5,47 +5,82 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Content',
+            name="Content",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content_type', models.CharField(max_length=10)),
-                ('content_id', models.BigIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content_type", models.CharField(max_length=10)),
+                ("content_id", models.BigIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Entry',
+            name="Entry",
             fields=[
-                ('name', models.SlugField(max_length=10, primary_key=True, serialize=False)),
-                ('date', models.DateTimeField()),
-                ('first_created', models.DateTimeField()),
-                ('last_edited', models.DateTimeField()),
-                ('thumbnail_path', models.CharField(max_length=256)),
-                ('content', models.ManyToManyField(to='main.content')),
+                (
+                    "name",
+                    models.SlugField(max_length=10, primary_key=True, serialize=False),
+                ),
+                ("date", models.DateTimeField()),
+                ("first_created", models.DateTimeField()),
+                ("last_edited", models.DateTimeField()),
+                ("thumbnail_path", models.CharField(max_length=256)),
+                ("content", models.ManyToManyField(to="main.content")),
             ],
         ),
         migrations.CreateModel(
-            name='EntryParagraph',
+            name="EntryParagraph",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField()),
-                ('entry', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.entry')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField()),
+                (
+                    "entry",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="main.entry"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='EntryImage',
+            name="EntryImage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file_path', models.CharField(max_length=256)),
-                ('original', models.BooleanField()),
-                ('entry', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.entry')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file_path", models.CharField(max_length=256)),
+                ("original", models.BooleanField()),
+                (
+                    "entry",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="main.entry"
+                    ),
+                ),
             ],
         ),
     ]

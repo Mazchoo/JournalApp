@@ -1,4 +1,3 @@
-
 from typing import Tuple, Optional
 from pathlib import Path
 
@@ -20,7 +19,7 @@ class VideoCapture:
     def getWidthHeight(self) -> Tuple[int, int]:
         if not self:
             return (0, 0)
-        
+
         width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         return (width, height)
@@ -28,7 +27,7 @@ class VideoCapture:
     def getTotalFrames(self) -> int:
         if not self:
             return 0
-        
+
         return int(self.capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
     def getFrameAtIndex(self, frame_index: int) -> Optional[np.ndarray]:

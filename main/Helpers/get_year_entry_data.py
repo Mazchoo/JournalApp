@@ -1,4 +1,3 @@
-
 import random
 from pathlib import Path
 
@@ -39,7 +38,9 @@ def getIconForEachMonth(context: dict, year: int):
         month_videos = getAllVideosInMonth(year, month)
 
         image_files = [Path(getMediaPath(Path(img.file_path))) for img in month_images]
-        image_files.extend([Path(getMediaPath(Path(vid.file_path))) for vid in month_videos])
+        image_files.extend(
+            [Path(getMediaPath(Path(vid.file_path))) for vid in month_videos]
+        )
         valid_images = list(filter(lambda p: p.exists(), image_files))
 
         if valid_images:
@@ -71,7 +72,9 @@ def getLastTimeEntriesWereUpdated(context: dict, year: int):
         month, month_name = getMonthStrings(i, context)
         entries = getAllEntriesInMonth(year, month)
 
-        last_update = max([entry.last_edited for entry in entries]) if entries else "never"
+        last_update = (
+            max([entry.last_edited for entry in entries]) if entries else "never"
+        )
         output_dict[month_name] = last_update
 
     return output_dict
@@ -79,6 +82,6 @@ def getLastTimeEntriesWereUpdated(context: dict, year: int):
 
 def getYearEntryInformation(context: dict):
     year = context["year"]
-    context['icon_paths'] = getIconForEachMonth(context, year)
-    context['nr_entries_per_month'] = getNrEntiresForEachYear(context, year)
-    context['month_last_edited'] = getLastTimeEntriesWereUpdated(context, year)
+    context["icon_paths"] = getIconForEachMonth(context, year)
+    context["nr_entries_per_month"] = getNrEntiresForEachYear(context, year)
+    context["month_last_edited"] = getLastTimeEntriesWereUpdated(context, year)

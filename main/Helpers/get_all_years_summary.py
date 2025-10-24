@@ -1,4 +1,3 @@
-
 import random
 import datetime
 from os import getcwd
@@ -17,24 +16,27 @@ MISSING_IMAGE = "/static/Image/missing_icon.png"
 
 
 def getCurrentYear():
-    ''' Get the year of today. '''
+    """Get the year of today."""
     return datetime.date.today().year
 
 
 def getAllImagesInYear(year: int):
-    ''' Load all database images from a certain year '''
-    return models.EntryImage.objects.all().filter(
-        entry__name__istartswith=f"{year}-"
-    )
+    """Load all database images from a certain year"""
+    return models.EntryImage.objects.all().filter(entry__name__istartswith=f"{year}-")
 
 
 def getAllEntryYears(context: dict) -> dict:
-    ''' Add all available years to context dictionary '''
-    distinct_years = models.Entry.objects.all().annotate(year=ExtractYear('date')).values('year').distinct()
-    years = [entry['year'] for entry in distinct_years]
+    """Add all available years to context dictionary"""
+    distinct_years = (
+        models.Entry.objects.all()
+        .annotate(year=ExtractYear("date"))
+        .values("year")
+        .distinct()
+    )
+    years = [entry["year"] for entry in distinct_years]
     years.sort()
 
-    context['all_years'] = years if years else [getCurrentYear()]
+    context["all_years"] = years if years else [getCurrentYear()]
     return context
 
 
@@ -66,7 +68,7 @@ def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
 
 
 def getRandomImagesFromYear(year: int) -> List[str]:
-    ''' Find images from a year if they exist. '''
+    """Find images from a year if they exist."""
     year_images = getAllImagesInYear(year)
     image_files = [Path(getMediaPath(Path(img.file_path))) for img in year_images]
     valid_images = list(filter(lambda p: p.exists(), image_files))
@@ -77,8 +79,8 @@ def getRandomImagesFromYear(year: int) -> List[str]:
 
 
 def getAllYearSummaryInformation(context: dict):
-    ''' Get information about stored years. '''
+    """Get information about stored years."""
     context = getAllEntryYears(context)
-    context['icon_paths'] = {}
-    for year in context['all_years']:
-        context['icon_paths'][year] = getRandomImagesFromYear(year)
+    context["icon_paths"] = {}
+    for year in context["all_years"]:
+        context["icon_paths"][year] = getRandomImagesFromYear(year)

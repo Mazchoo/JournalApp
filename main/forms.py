@@ -1,4 +1,3 @@
-
 from django import forms
 from django.forms import ModelForm
 from django.db import models as django_models
@@ -9,21 +8,25 @@ import main.models as models
 from main.Helpers.image_utils import moveImageToSavePath
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.video_constants import VideoConstants
-from main.Helpers.file_utils import (pathHasImageTag, getStoredMediaPath,
-                                     getMediaPath, makeImagePathRelative, moveMediaToSavePath)
+from main.Helpers.file_utils import (
+    pathHasImageTag,
+    getStoredMediaPath,
+    getMediaPath,
+    makeImagePathRelative,
+    moveMediaToSavePath,
+)
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.date_slugs import getValidDateFromSlug
 
 
 class EntryForm(ModelForm):
-
     class Meta:
         model = models.Entry
-        fields = ['name', 'first_created', 'last_edited', 'date']
+        fields = ["name", "first_created", "last_edited", "date"]
 
     def clean_date(self):
         clean_data = super().clean()
-        name = clean_data['name']
+        name = clean_data["name"]
 
         entry_date = getValidDateFromSlug(name)
 
@@ -34,15 +37,14 @@ class EntryForm(ModelForm):
 
 
 class ImageForm(ModelForm):
-
     class Meta:
         model = models.EntryImage
-        fields = '__all__'
+        fields = "__all__"
 
     def clean_file_path(self):
         clean_data = super().clean()
-        file_name = clean_data['file_path']
-        entry = clean_data['entry']
+        file_name = clean_data["file_path"]
+        entry = clean_data["entry"]
 
         if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
@@ -57,7 +59,9 @@ class ImageForm(ModelForm):
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
-            raise forms.ValidationError(f"Cannot find '{file_name}' in ./Entries folder.")
+            raise forms.ValidationError(
+                f"Cannot find '{file_name}' in ./Entries folder."
+            )
 
         if target_file_obj.suffix.lower() not in ImageConstants.supported_extensions:
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
@@ -73,15 +77,14 @@ class ImageForm(ModelForm):
 
 
 class VideoForm(ModelForm):
-
     class Meta:
         model = models.EntryVideo
-        fields = '__all__'
+        fields = "__all__"
 
     def clean_file_path(self):
         clean_data = super().clean()
-        file_name = clean_data['file_path']
-        entry = clean_data['entry']
+        file_name = clean_data["file_path"]
+        entry = clean_data["entry"]
 
         if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
@@ -108,25 +111,23 @@ class VideoForm(ModelForm):
 
 
 class TinyMCEComponent(ModelForm):
-
-    text = forms.CharField(widget=TinyMCE(
-        attrs={'cols': 80, 'rows': 30, 'required': False}
-    ))
+    text = forms.CharField(
+        widget=TinyMCE(attrs={"cols": 80, "rows": 30, "required": False})
+    )
     entry = django_models.ForeignKey(models.Entry, on_delete=django_models.CASCADE)
 
     class Meta:
         model = models.EntryParagraph
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ContentForm(ModelForm):
-
     class Meta:
         model = models.Content
-        fields = '__all__'
+        fields = "__all__"
 
     def clean(self):
         clean_data = super().clean()
-        content_type = clean_data['content_type']
+        content_type = clean_data["content_type"]
         if content_type not in CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")

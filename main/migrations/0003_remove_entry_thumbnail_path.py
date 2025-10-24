@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0002_entryparagraph_height'),
+        ("main", "0002_entryparagraph_height"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='entry',
-            name='thumbnail_path',
+            model_name="entry",
+            name="thumbnail_path",
         ),
     ]

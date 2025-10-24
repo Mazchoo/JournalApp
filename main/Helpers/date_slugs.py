@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from main.Helpers.date_contants import DateConstants
 import re
@@ -22,21 +21,17 @@ def getValidDateFromSlug(slug: str):
 
 
 def convertDateToUrlTuple(date: datetime):
-    return (
-        str(date.year),
-        date.strftime("%B"),
-        str(date.day)
-    )
+    return (str(date.year), date.strftime("%B"), str(date.day))
 
 
 def dateExists(context):
-    day = context['day'] if 'day' in context else 1
+    day = context["day"] if "day" in context else 1
 
-    month = context['month'] if 'month' in context else 'January'
+    month = context["month"] if "month" in context else "January"
     month_names = DateConstants.month_names
     month_ind = month_names.index(month) + 1
 
-    year = context['year']
+    year = context["year"]
 
     try:
         datetime(year, month_ind, day)

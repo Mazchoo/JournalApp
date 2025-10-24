@@ -1,8 +1,9 @@
 from typing import Tuple
 
+
 class VideoConstants:
-    supported_extensions: Tuple[str] = ('.mp4', )
-    save_image_extention: str = 'jpeg'
+    supported_extensions: Tuple[str] = (".mp4",)
+    save_image_extention: str = "jpeg"
     reserved_video_tags: tuple = ("_icon", "_resized")
     collage_image_longest_side: int = 768
     collage_nr_rows: int = 1

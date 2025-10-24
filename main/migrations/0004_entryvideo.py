@@ -5,19 +5,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0003_remove_entry_thumbnail_path'),
+        ("main", "0003_remove_entry_thumbnail_path"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EntryVideo',
+            name="EntryVideo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file_path', models.CharField(max_length=256)),
-                ('original', models.BooleanField()),
-                ('entry', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.entry')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file_path", models.CharField(max_length=256)),
+                ("original", models.BooleanField()),
+                (
+                    "entry",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="main.entry"
+                    ),
+                ),
             ],
         ),
     ]

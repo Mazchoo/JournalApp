@@ -1,4 +1,3 @@
-
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from functools import lru_cache
@@ -10,12 +9,25 @@ from PIL import Image
 
 from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import getIconPath, getResizeName
-from main.Helpers.image_utils import loadImageDirectly, getSquareResizedImage, addEncodingTypeToBase64
+from main.Helpers.image_utils import (
+    loadImageDirectly,
+    getSquareResizedImage,
+    addEncodingTypeToBase64,
+)
 from main.Helpers.video_capture import VideoCapture
 
-CollageDrawDimensions = namedtuple('CollageDrawDimensions',
-                                   ['width', 'height', 'collage_width', 'collage_height',
-                                    'frame_increment', 'rows', 'cols'])
+CollageDrawDimensions = namedtuple(
+    "CollageDrawDimensions",
+    [
+        "width",
+        "height",
+        "collage_width",
+        "collage_height",
+        "frame_increment",
+        "rows",
+        "cols",
+    ],
+)
 
 
 def createVideoIcon(video_path: Path) -> bool:
@@ -72,12 +84,18 @@ def getCollageDisplayDimensions(capture: VideoCapture, rescale_factor: int):
 
     nr_frames = capture.getTotalFrames()
     frame_increment = nr_frames // (rows * cols)
-    return CollageDrawDimensions(width, height, collage_width, collage_height,
-                                 frame_increment, rows, cols)
+    return CollageDrawDimensions(
+        width, height, collage_width, collage_height, frame_increment, rows, cols
+    )
 
 
-def drawFrameToCollage(capture: VideoCapture, collage_dims: CollageDrawDimensions,
-                       i: int, j: int, collage_image: np.ndarray):
+def drawFrameToCollage(
+    capture: VideoCapture,
+    collage_dims: CollageDrawDimensions,
+    i: int,
+    j: int,
+    collage_image: np.ndarray,
+):
     start_y = i * (collage_dims.height + VideoConstants.collage_spacing)
     start_x = j * (collage_dims.width + VideoConstants.collage_spacing)
     end_y = start_y + collage_dims.height
@@ -92,15 +110,16 @@ def drawFrameToCollage(capture: VideoCapture, collage_dims: CollageDrawDimension
     if VideoConstants.billateral_filter:
         frame = cv2.bilateralFilter(frame, 15, 75, 75)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    collage_image[start_y: end_y, start_x: end_x, :] = frame
+    collage_image[start_y:end_y, start_x:end_x, :] = frame
 
 
-def createCollageImage(capture: VideoCapture, rescale_factor: int, resized_path: Path) -> Image:
-
+def createCollageImage(
+    capture: VideoCapture, rescale_factor: int, resized_path: Path
+) -> Image:
     collage_dims = getCollageDisplayDimensions(capture, rescale_factor)
-    collage_image = np.zeros((collage_dims.collage_height,
-                              collage_dims.collage_width,
-                              3), dtype=np.uint8)
+    collage_image = np.zeros(
+        (collage_dims.collage_height, collage_dims.collage_width, 3), dtype=np.uint8
+    )
 
     for i in range(collage_dims.rows):
         for j in range(collage_dims.cols):
@@ -113,7 +132,7 @@ def createCollageImage(capture: VideoCapture, rescale_factor: int, resized_path:
 
 @lru_cache(maxsize=1024)
 def getCollageBase64Data(file_path: Union[Path, str]) -> str:
-    ''' Will create collage once and not update it when the video parameters change '''
+    """Will create collage once and not update it when the video parameters change"""
     file_path = Path(file_path)
     createVideoIcon(file_path)
     resize_file_name = getResizeName(file_path)
@@ -126,20 +145,23 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
         if capture:
             factor = getResizingFactorToCollageSize(capture)
             if collage_b64 := createCollageImage(capture, factor, resize_file_name):
-                b64_string = addEncodingTypeToBase64(collage_b64, VideoConstants.save_image_extention)
+                b64_string = addEncodingTypeToBase64(
+                    collage_b64, VideoConstants.save_image_extention
+                )
             else:
-                print(f'Error! Video {file_path} could not creat collage!')
+                print(f"Error! Video {file_path} could not creat collage!")
                 b64_string = ""
 
         else:
-            print(f'Error! Video {file_path} cannot stream!')
+            print(f"Error! Video {file_path} cannot stream!")
             b64_string = ""
 
     return b64_string
 
 
-if __name__ == '__main__':
-    with VideoCapture(Path('./Entries/2024/06/08/20240608_142838.mp4')) as cap:
-        createCollageImage(cap, 2, Path('./Entries/2024/06/08/20240608_142838_resized.jpeg'))
-    createVideoIcon(Path('./Entries/2024/06/08/20240608_142838.mp4'))
-
+if __name__ == "__main__":
+    with VideoCapture(Path("./Entries/2024/06/08/20240608_142838.mp4")) as cap:
+        createCollageImage(
+            cap, 2, Path("./Entries/2024/06/08/20240608_142838_resized.jpeg")
+        )
+    createVideoIcon(Path("./Entries/2024/06/08/20240608_142838.mp4"))

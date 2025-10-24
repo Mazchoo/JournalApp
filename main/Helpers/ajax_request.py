@@ -1,4 +1,3 @@
-
 from collections import OrderedDict
 from typing import Any, List
 from django.http.request import QueryDict
@@ -6,13 +5,13 @@ from django.http import Http404
 
 
 def isAjax(request):
-    if not hasattr(request, 'META'):
+    if not hasattr(request, "META"):
         return False
-    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+    return request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
 
 
 def getTableOfKeys(key):
-    return [k[:-1] if k[-1] == ']' else k for k in key.split('[')]
+    return [k[:-1] if k[-1] == "]" else k for k in key.split("[")]
 
 
 def addNestedKeyToDict(nested_keys: List[str], value: Any, output_dict: OrderedDict):
@@ -39,11 +38,13 @@ def convertQueryDictToNestedDict(query_dict: QueryDict) -> OrderedDict:
 
 
 def ajaxRequest(func):
-    ''' Check that input request is an ajax request. '''
+    """Check that input request is an ajax request."""
+
     def wrapFunc(request):
         if not isAjax(request) or not request.POST:
             raise Http404
         post_data = convertQueryDictToNestedDict(request.POST)
 
         return func(post_data)
+
     return wrapFunc

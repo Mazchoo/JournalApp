@@ -45,7 +45,7 @@ def getMediaPath(file_name: Union[str, Path]) -> str:
 
 
 def getIconPath(file_path: Path) -> Path:
-    extention = '.jpg' if file_path.suffix == '.mp4' else file_path.suffix
+    extention = ".jpg" if file_path.suffix == ".mp4" else file_path.suffix
     icon_file_name = f"{file_path.stem}_icon{extention}"
     return file_path.parent / icon_file_name
 
@@ -68,12 +68,16 @@ def getStoredMediaPath(file_name: str, entry_name: str) -> str:
 def makeImagePathRelative(file_name: str) -> str:
     cwd = f"{getcwd()}/Entries/"
     if cwd in file_name:
-        file_name = file_name[len(cwd):]
+        file_name = file_name[len(cwd) :]
     return file_name
 
 
 def getResizeName(file_path: Path) -> Path:
-    extention = f".{VideoConstants.save_image_extention}" if file_path.suffix == '.mp4' else file_path.suffix
+    extention = (
+        f".{VideoConstants.save_image_extention}"
+        if file_path.suffix == ".mp4"
+        else file_path.suffix
+    )
     return file_path.parent / f"{file_path.stem}_resized{extention}"
 
 
@@ -92,4 +96,3 @@ def moveMediaToSavePath(target_file_path: str, file_name: str):
         output_path = target_file_path
 
     return output_path
-

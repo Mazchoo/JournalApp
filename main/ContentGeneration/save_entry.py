@@ -1,4 +1,3 @@
-
 from datetime import datetime
 import re
 from django.http import JsonResponse
@@ -13,18 +12,20 @@ from main.ContentGeneration.content_factory_forms import CONTENT_FORMS
 
 
 def generateNewEntry(name: str):
-    entry_form = forms.EntryForm({
-        'name': name,
-        'first_created': datetime.now(),
-        'last_edited': datetime.now(),
-        'date': datetime.now(),
-    })
+    entry_form = forms.EntryForm(
+        {
+            "name": name,
+            "first_created": datetime.now(),
+            "last_edited": datetime.now(),
+            "date": datetime.now(),
+        }
+    )
 
     if entry_form.is_valid():
         entry_form.save(commit=True)
         entry = entry_form.instance
     else:
-        error = f'Invalid entry {entry_form.errors}'
+        error = f"Invalid entry {entry_form.errors}"
         return error, None
 
     return None, entry
@@ -45,10 +46,9 @@ def getPostEntry(name: str):
 def generateNewContent(model_form, entry_type):
     if model_form.is_valid():
         model_form.save(commit=True)
-        content_form = forms.ContentForm({
-            'content_type': entry_type,
-            'content_id': model_form.instance.pk
-        })
+        content_form = forms.ContentForm(
+            {"content_type": entry_type, "content_id": model_form.instance.pk}
+        )
 
         if content_form.is_valid():
             content_form.save(commit=True)
@@ -62,15 +62,17 @@ def generateNewContent(model_form, entry_type):
     return None, content_key
 
 
-def processSubmittedContent(key: str, value: dict, errors: ErrorDict, content_keys: List[str]) -> bool:
+def processSubmittedContent(
+    key: str, value: dict, errors: ErrorDict, content_keys: List[str]
+) -> bool:
     content_type_match = re.search(r"([A-Za-z]+)\d+", key)
     if not content_type_match:
-        errors[f"{key}"] = ' => Invalid content syntax'
+        errors[f"{key}"] = " => Invalid content syntax"
         return False
 
     entry_type = content_type_match.group(1)
     if entry_type not in CONTENT_FORMS:
-        errors[f"{key}"] = ' => Invalid content type'
+        errors[f"{key}"] = " => Invalid content type"
         return False
 
     content_fields = dict(value)
@@ -100,23 +102,23 @@ def saveContentToDatabase(content_dict: dict) -> Tuple[ErrorDict, list]:
 
 
 def updateOrGenerateEntry(post_data: dict):
-    '''
-        Delete all previous objects associated with entry and save the object again.
-        Each entry has content which are content objects with types and a foreign key.
-        Content that cannot be saved will return an error message.
-    '''
-    if 'name' not in post_data:
+    """
+    Delete all previous objects associated with entry and save the object again.
+    Each entry has content which are content objects with types and a foreign key.
+    Content that cannot be saved will return an error message.
+    """
+    if "name" not in post_data:
         return JsonResponse({"error": "Entry name not specified"})
 
-    error, entry = getPostEntry(post_data['name'])
+    error, entry = getPostEntry(post_data["name"])
     if error is not None:
         return JsonResponse({"error": error})
 
-    if 'content' not in post_data:
+    if "content" not in post_data:
         return JsonResponse({"error": "No content in entry"})
 
     deleteEntryContent(entry)
-    content_errors, content_ids = saveContentToDatabase(post_data['content'])
+    content_errors, content_ids = saveContentToDatabase(post_data["content"])
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)

@@ -1,4 +1,3 @@
-
 from django.http import JsonResponse
 from pathlib import Path
 from os import listdir, getcwd
@@ -7,8 +6,11 @@ from typing import List
 
 import main.models as models
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.file_utils import (getStoredMediaFolder, removeEmptyParentFolders,
-                                     pathHasImageTag)
+from main.Helpers.file_utils import (
+    getStoredMediaFolder,
+    removeEmptyParentFolders,
+    pathHasImageTag,
+)
 
 
 def deleteEntryContent(entry: models.Entry):

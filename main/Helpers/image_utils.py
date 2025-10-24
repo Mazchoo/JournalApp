@@ -1,4 +1,3 @@
-
 import base64
 from pathlib import Path
 from typing import Union
@@ -6,13 +5,16 @@ from PIL import Image
 from functools import lru_cache
 
 from main.Helpers.image_constants import ImageConstants
-from main.Helpers.pil_image_helpers import (getSquareResizedImage, getResizingFactorToDownSized,
-                                            orientatePILImage)
+from main.Helpers.pil_image_helpers import (
+    getSquareResizedImage,
+    getResizingFactorToDownSized,
+    orientatePILImage,
+)
 from main.Helpers.file_utils import getIconPath, moveMediaToSavePath, getResizeName
 
 
 def createImageIcon(target_path_obj: Path):
-    if target_path_obj.suffix == '.mp4':
+    if target_path_obj.suffix == ".mp4":
         target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
 
     if not target_path_obj.exists():
@@ -32,7 +34,7 @@ def createImageIcon(target_path_obj: Path):
 
 
 def moveImageToSavePath(target_file_path: str, file_name: str):
-    ''' ToDo - Consider creating abstract class to save icon as implementation. '''
+    """ToDo - Consider creating abstract class to save icon as implementation."""
     createImageIcon(Path(target_file_path))
     return moveMediaToSavePath(target_file_path, file_name)
 
@@ -60,7 +62,9 @@ def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
     image = Image.open(file_path)
     width, height = image.size
 
-    image_resized = image.resize((width // factor, height // factor), resample=Image.LANCZOS)  # type: ignore
+    image_resized = image.resize(
+        (width // factor, height // factor), resample=Image.LANCZOS
+    )  # type: ignore
     image_resized = orientatePILImage(image_resized, image.getexif())
 
     image_resized.save(resized_path, format=ecoding_type)
@@ -70,7 +74,7 @@ def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
 
 def loadImageDirectly(file_path: Union[Path, str]) -> str:
     with open(file_path, "rb") as img_file:
-        b64_string = base64.b64encode(img_file.read()).decode('utf-8')
+        b64_string = base64.b64encode(img_file.read()).decode("utf-8")
 
     return b64_string
 
@@ -85,8 +89,10 @@ def addEncodingTypeToBase64(b64_string: str, ecoding_type: str) -> str:
 def parseBase64ImageData(file_path: Union[Path, str]) -> str:
     file_path = Path(file_path)
 
-    if file_path.exists() and file_path.suffix.lower() in ImageConstants.supported_extensions:
-
+    if (
+        file_path.exists()
+        and file_path.suffix.lower() in ImageConstants.supported_extensions
+    ):
         factor = getResizingFactorToDownSized(file_path)
         ecoding_type = getEncodingType(file_path)
         if factor > 1:
@@ -96,7 +102,7 @@ def parseBase64ImageData(file_path: Union[Path, str]) -> str:
 
         b64_string = addEncodingTypeToBase64(b64_string, ecoding_type)
     else:
-        print(f'Error! Image {file_path} is invalid!')
+        print(f"Error! Image {file_path} is invalid!")
         b64_string = ""
 
     return b64_string
