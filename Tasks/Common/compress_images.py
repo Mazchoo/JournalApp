@@ -42,4 +42,6 @@ def remove_all_non_icons_in_folder(folder: str):
 
 
 if __name__ == "__main__":
-    remove_all_non_icons_in_folder("./Entries/2024")
+    from Journal.settings import ENTRY_FOLDER
+
+    remove_all_non_icons_in_folder(f"{ENTRY_FOLDER}/2024")

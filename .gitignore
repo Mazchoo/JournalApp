@@ -2,9 +2,6 @@
 # ToDo - make a new security file for this
 security.json
 
-# Entries
-Entries/*
-
 *.pyc
 *.sqlite3
 

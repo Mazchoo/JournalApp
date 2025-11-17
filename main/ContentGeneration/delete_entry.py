@@ -1,9 +1,10 @@
 from django.http import JsonResponse
 from pathlib import Path
-from os import listdir, getcwd
+from os import listdir
 from shutil import move
 from typing import List
 
+from Journal.settings import ENTRY_FOLDER
 import main.models as models
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.file_utils import (
@@ -22,7 +23,7 @@ def deleteEntryContent(entry: models.Entry):
 
 
 def moveFilesOutOfFolder(files: List[Path]):
-    destination_folder = Path(f"{getcwd()}/Entries")
+    destination_folder = Path(ENTRY_FOLDER)
 
     for file in files:
         if not file.exists() or file.is_dir():

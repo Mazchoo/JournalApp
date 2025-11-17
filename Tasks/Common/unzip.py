@@ -5,7 +5,7 @@ from pathlib import Path
 
 from zipfile import ZipFile
 
-ENTRY_FOLDER = "./Entries"
+from Journal.settings import ENTRY_FOLDER
 
 
 def main():

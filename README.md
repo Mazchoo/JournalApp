@@ -9,7 +9,7 @@ Creates a locally hosted journal app that can store images, text and video.
 * Organises entries by year, month and day in respective calendars
 * Has random selections of photos shown by year and month
 
-The `./Entries` folder contains all images and videos organised by folder `yyyy/mm/dd` and is private. 
+The `ENTRY_FOLDER` folder contains all images and videos organised by folder `yyyy/mm/dd` and is private. 
 
 ## Installation
 

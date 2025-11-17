@@ -1,4 +1,4 @@
-from typing import Union, Tuple, Optional
+from typing import Union
 from pathlib import Path
 from functools import lru_cache
 from collections import namedtuple
@@ -160,8 +160,10 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
 
 
 if __name__ == "__main__":
-    with VideoCapture(Path("./Entries/2024/06/08/20240608_142838.mp4")) as cap:
+    from Journal.settings import ENTRY_FOLDER
+
+    with VideoCapture(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4")) as cap:
         createCollageImage(
-            cap, 2, Path("./Entries/2024/06/08/20240608_142838_resized.jpeg")
+            cap, 2, Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838_resized.jpeg")
         )
-    createVideoIcon(Path("./Entries/2024/06/08/20240608_142838.mp4"))
+    createVideoIcon(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4"))

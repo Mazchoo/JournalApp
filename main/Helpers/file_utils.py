@@ -1,10 +1,12 @@
 from typing import Union
 from pathlib import Path
-from os import listdir, rmdir, mkdir, getcwd
+from os import listdir, rmdir, mkdir
 from shutil import move
 
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.video_constants import VideoConstants
+
+from Journal.settings import ENTRY_FOLDER
 
 
 def removeEmptyParentFolders(folder: Path) -> None:
@@ -26,12 +28,8 @@ def pathHasImageTag(path: Path) -> bool:
     return False
 
 
-def outsideWorkingDirectory(folder: Path) -> bool:
-    return str(folder).find(getcwd()) != 0
-
-
 def makeParentFolders(target_folder: Path) -> None:
-    if target_folder.exists() or outsideWorkingDirectory(target_folder):
+    if target_folder.exists():
         return
 
     if not target_folder.parent.exists():
@@ -41,7 +39,7 @@ def makeParentFolders(target_folder: Path) -> None:
 
 
 def getMediaPath(file_name: Union[str, Path]) -> str:
-    return f"{getcwd()}/Entries/{file_name}"
+    return f"{ENTRY_FOLDER}/{file_name}"
 
 
 def getIconPath(file_path: Path) -> Path:
@@ -51,13 +49,13 @@ def getIconPath(file_path: Path) -> Path:
 
 
 def getIconPathFromRelativePath(realtive_file_path: Path) -> Path:
-    target_icon_path = f"{getcwd()}/Entries/{getIconPath(realtive_file_path)}"
+    target_icon_path = f"{ENTRY_FOLDER}/{getIconPath(realtive_file_path)}"
     return Path(target_icon_path)
 
 
 def getStoredMediaFolder(entry_name: str) -> str:
     year, month, day = entry_name.split("-")
-    return f"{getcwd()}/Entries/{year}/{month}/{day}"
+    return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
 
 
 def getStoredMediaPath(file_name: str, entry_name: str) -> str:
@@ -66,9 +64,8 @@ def getStoredMediaPath(file_name: str, entry_name: str) -> str:
 
 
 def makeImagePathRelative(file_name: str) -> str:
-    cwd = f"{getcwd()}/Entries/"
-    if cwd in file_name:
-        file_name = file_name[len(cwd) :]
+    if file_name.startswith(ENTRY_FOLDER):
+        file_name = file_name[len(ENTRY_FOLDER):]
     return file_name
 
 

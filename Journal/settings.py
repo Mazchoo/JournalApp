@@ -18,15 +18,16 @@ import json
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
-SECURITY_JSON = json.load((BASE_DIR / "security.json").open())
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECURITY_JSON = json.load((BASE_DIR / "security.json").open())
 SECRET_KEY = SECURITY_JSON["SECRET_KEY"]
 ADMIN_USERNAME = SECURITY_JSON["ADMIN_USERNAME"]
 ADMIN_PASSWORD = SECURITY_JSON["ADMIN_PASSWORD"]
+ENTRY_FOLDER = SECURITY_JSON["ENTRY_FOLDER"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
