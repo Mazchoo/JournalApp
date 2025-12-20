@@ -14,5 +14,6 @@ urlpatterns = [
     path("ajax/save-entry/", views.saveEntry, name="save-entry"),
     path("ajax/delete-entry/", views.deleteEntry, name="delete-entry"),
     path("ajax/get-image/", views.getImage, name="get-image"),
+    path("ajax/get-video/", views.getVideo, name="get-video"),
     path("ajax/move-date/", views.moveEntryDate, name="move-date"),
 ]

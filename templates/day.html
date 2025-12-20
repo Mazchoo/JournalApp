@@ -6,6 +6,7 @@
 {% include "Modals/callbackModal.html" %}
 {% include "Modals/simpleModal.html" %}
 {% include "Modals/imageModal.html" %}
+{% include "Modals/videoModal.html" %}
 {% include "Modals/dateModal.html" %}
 
 <link rel="stylesheet" href="{% static 'CSS/image-upload.css' %}"/>
@@ -57,6 +58,7 @@
         var SAVE_URL = '{% url "main:save-entry" %}';
         var DELETE_URL = '{% url "main:delete-entry" %}';
         var IMAGE_URL = '{% url "main:get-image" %}';
+        var VIDEO_URL = '{% url "main:get-video" %}';
         var MOVE_URL = '{% url "main:move-date" %}';
         var MAX_CHANGE_ATTEMPTS = 100;
 

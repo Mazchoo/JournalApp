@@ -59,9 +59,7 @@ class ImageForm(ModelForm):
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
-            raise forms.ValidationError(
-                f"Cannot find '{file_name}' in Entries folder."
-            )
+            raise forms.ValidationError(f"Cannot find '{file_name}' in Entries folder.")
 
         if target_file_obj.suffix.lower() not in ImageConstants.supported_extensions:
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"

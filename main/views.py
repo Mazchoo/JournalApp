@@ -20,6 +20,7 @@ from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 from main.ContentGeneration.delete_entry import deleteEntryAndContent
 from main.ContentGeneration.get_full_image import getFullImageReponse
+from main.ContentGeneration.get_full_video import getFullVideoResponse
 from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
 # ToDo - Add streaming request for videos
@@ -95,6 +96,11 @@ def saveEntry(post_data: dict):
 @ajaxRequest
 def getImage(post_data: dict):
     return getFullImageReponse(post_data)
+
+
+@ajaxRequest
+def getVideo(post_data: dict):
+    return getFullVideoResponse(post_data)
 
 
 @ajaxRequest

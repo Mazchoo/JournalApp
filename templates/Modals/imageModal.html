@@ -21,5 +21,13 @@
         if (key === 13) {
             $('#image-modal-close')[0].click();
         }
-    })
+    });
+
+    // Move focus before modal closes to prevent aria-hidden warning
+    $('#image-modal').on('hide.bs.modal', function () {
+        // Blur any focused element in the modal before it closes
+        if (document.activeElement && $(document.activeElement).closest('#image-modal').length) {
+            document.activeElement.blur();
+        }
+    });
 </script>

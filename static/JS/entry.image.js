@@ -151,32 +151,68 @@ let editVideoWhenInitialised = function(updateInd, imageContent, counter) {
 
 
 let zoomToImage = function() {
-    let imageId = $(this).find('img').attr('id');
-    let contentId = getContentId(imageId);
+    const imageId = $(this).find('img').attr('id');
+    const contentId = getContentId(imageId);
 
     if (contentId === undefined) return;
-    let imageName = $('#upload-label' + contentId).html();
-    let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const imageName = $('#upload-label' + contentId).html();
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    let imageSource = $(this).find('img').attr('src');
-    $.ajax({
-        type: 'POST',
-        url: IMAGE_URL,
-        data: {
-            "file": imageName,
-            "csrfmiddlewaretoken": csrftoken,
-            "name": DATE_SLUG
-        },
-        success: function(response) {
-            if ("base64" in response) imageSource = response["base64"];
-            if ("error" in response) console.log(`Image error : ${response["error"]}`);
-        },
-        error: function(_jqXhr, _textStatus, errorThrown){
-            console.log(`Unknown error : ${errorThrown}`)
-        },
-        complete: function(_jqXhr, _textStatus) {
-            $('#image-preview').attr('src', imageSource);
-            $('#image-modal').modal('show');
-       }
-   })
+    const image = $(this).find('img');
+    let imageSource = image.attr('src');
+
+    if ($(image).hasClass('content-image')) {
+        $.ajax({
+            type: 'POST',
+            url: IMAGE_URL,
+            data: {
+                "file": imageName,
+                "csrfmiddlewaretoken": csrftoken,
+                "name": DATE_SLUG
+            },
+            success: function(response) {
+                if ("base64" in response) imageSource = response["base64"];
+                if ("error" in response) console.log(`Image error : ${response["error"]}`);
+            },
+            error: function(_jqXhr, _textStatus, errorThrown){
+                console.log(`Unknown error : ${errorThrown}`)
+            },
+            complete: function(_jqXhr, _textStatus) {
+                $('#image-preview').attr('src', imageSource);
+                $('#image-modal').modal('show');
+            }
+        })
+    } else if ($(image).hasClass('content-video')) {
+        $.ajax({
+            type: 'POST',
+            url: VIDEO_URL,
+            data: {
+                "file": imageName,
+                "csrfmiddlewaretoken": csrftoken,
+                "name": DATE_SLUG
+            },
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function(response) {
+                // Create a blob URL from the streaming video response
+                const videoBlob = new Blob([response], { type: 'video/mp4' });
+                imageSource = URL.createObjectURL(videoBlob);
+            },
+            error: function(jqXhr, _textStatus, errorThrown){
+                // Check if response is JSON error
+                if (jqXhr.responseJSON && "error" in jqXhr.responseJSON) {
+                    console.log(`Video error : ${jqXhr.responseJSON["error"]}`);
+                } else {
+                    console.log(`Unknown error : ${errorThrown}`);
+                }
+            },
+            complete: function(_jqXhr, _textStatus) {
+                // Use the dedicated video modal
+                $('#video-preview').attr('src', imageSource);
+                $('#video-modal').modal('show');
+            }
+        })
+    }
+
 }

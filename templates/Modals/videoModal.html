@@ -1,0 +1,43 @@
+<div class="modal top fade" id="video-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-mdb-backdrop="true" data-mdb-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content"> 
+            <div class="modal-header">
+                <button id="video-modal-close" type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <video id="video-preview" src="" class="py-1 img-fluid" controls autoplay></video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('keypress', '#video-modal', function(e) {
+        e = e || window.event;
+        var key = e.which || e.keyCode;
+        if (key === 13) {
+            $('#video-modal-close')[0].click();
+        }
+    });
+
+    // Move focus before modal closes to prevent aria-hidden warning
+    $('#video-modal').on('hide.bs.modal', function () {
+        // Blur any focused element in the modal before it closes
+        if (document.activeElement && $(document.activeElement).closest('#video-modal').length) {
+            document.activeElement.blur();
+        }
+    });
+
+    // Stop video playback after modal is closed
+    $('#video-modal').on('hidden.bs.modal', function () {
+        const videoElement = $('#video-preview')[0];
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.currentTime = 0;
+            videoElement.src = '';
+        }
+    });
+</script>
