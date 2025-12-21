@@ -1,4 +1,5 @@
 """Handle video request to view a single video"""
+
 from pathlib import Path
 from django.http import JsonResponse, FileResponse
 import mimetypes
