@@ -18,8 +18,8 @@ from main.Helpers.get_latest_entry import get_latest_entry_tuple
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
-from main.ContentGeneration.delete_entry import deleteEntryAndContent
-from main.ContentGeneration.get_full_image import getFullImageReponse
+from main.ContentGeneration.delete_entry import delete_entry_and_content
+from main.ContentGeneration.get_full_image import get_full_image_reponse
 from main.ContentGeneration.get_full_video import getFullVideoResponse
 from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
@@ -85,7 +85,7 @@ def dateNotFoundPage(request):
 
 @ajax_request
 def deleteEntry(post_data: dict):
-    return deleteEntryAndContent(post_data)
+    return delete_entry_and_content(post_data)
 
 
 @ajax_request
@@ -95,7 +95,7 @@ def saveEntry(post_data: dict):
 
 @ajax_request
 def getImage(post_data: dict):
-    return getFullImageReponse(post_data)
+    return get_full_image_reponse(post_data)
 
 
 @ajax_request

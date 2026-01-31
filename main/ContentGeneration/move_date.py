@@ -7,7 +7,7 @@ import main.forms as forms
 
 from main.ContentGeneration.request_forms import DateMoveForm
 from main.Helpers.date_slugs import get_valid_date_from_slug, convert_date_to_url_tuple
-from main.ContentGeneration.delete_entry import moveImagesOutOfADeleteFolder
+from main.ContentGeneration.delete_entry import move_files_from_entry
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.ContentGeneration.content_factory_update import CONTENT_UPDATE_DATE
 
@@ -24,7 +24,7 @@ def checkMoveRequest(post_data):
 def createNewEntry(source_entry, destination_slug):
     errors = ErrorDict()
     new_entry = None
-    moveImagesOutOfADeleteFolder(source_entry)
+    move_files_from_entry(source_entry)
 
     entry_dict = model_to_dict(source_entry)
     entry_dict["name"] = destination_slug
@@ -87,7 +87,7 @@ def updateNewContentIds(content, destination_slug, content_ids, errors):
 
 def updateEntryDate(source_slug, destination_slug):
     entry = models.Entry.objects.get(name=source_slug)
-    moveImagesOutOfADeleteFolder(entry)
+    move_files_from_entry(entry)
 
     new_entry, errors = createNewEntry(entry, destination_slug)
     if errors:

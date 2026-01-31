@@ -7,7 +7,7 @@ from typing import Tuple, List
 import main.models as models
 import main.forms as forms
 
-from main.ContentGeneration.delete_entry import deleteEntryContent
+from main.ContentGeneration.delete_entry import delete_entry_content
 from main.ContentGeneration.content_factory_forms import CONTENT_FORMS
 
 
@@ -117,7 +117,7 @@ def updateOrGenerateEntry(post_data: dict):
     if "content" not in post_data:
         return JsonResponse({"error": "No content in entry"})
 
-    deleteEntryContent(entry)
+    delete_entry_content(entry)
     content_errors, content_ids = saveContentToDatabase(post_data["content"])
 
     entry.last_edited = datetime.now()
