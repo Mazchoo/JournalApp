@@ -37,6 +37,7 @@ def createVideoStreamResponse(target_path):
         mime_type = getVideoMimeType(str(target_path))
 
         # Use FileResponse for efficient video streaming with range request support
+        # pylint: disable=consider-using-with
         response = FileResponse(open(target_path, "rb"), content_type=mime_type)
 
         # Set headers for video streaming
