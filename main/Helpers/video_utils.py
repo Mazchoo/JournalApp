@@ -1,4 +1,5 @@
 """Helper functions to extract information and get a summary image of a video"""
+
 from typing import Union
 from pathlib import Path
 from functools import lru_cache

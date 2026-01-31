@@ -1,4 +1,5 @@
 """Helper functions to get downsized images"""
+
 import base64
 from pathlib import Path
 from typing import Union
@@ -12,7 +13,11 @@ from main.Helpers.pil_image_helpers import (
     getResizingFactorToDownSized,
     orientatePILImage,
 )
-from main.Helpers.file_utils import get_icon_file_path, moveMediaToSavePath, get_resized_filename
+from main.Helpers.file_utils import (
+    get_icon_file_path,
+    moveMediaToSavePath,
+    get_resized_filename,
+)
 
 
 def createImageIcon(target_path_obj: Path):
