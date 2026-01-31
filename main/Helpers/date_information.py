@@ -1,4 +1,5 @@
 """Helpers to add date information for navigation"""
+
 from typing import Optional, Tuple
 from datetime import datetime
 

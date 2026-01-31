@@ -3,6 +3,7 @@
 
 class DateConstants:
     """Static date information"""
+
     day_names: tuple = (
         "Monday",
         "Tuesday",

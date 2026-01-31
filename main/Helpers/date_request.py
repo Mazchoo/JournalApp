@@ -1,4 +1,5 @@
 """Helpers to add general date information into requests"""
+
 from typing import Callable
 
 from django.shortcuts import redirect

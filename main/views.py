@@ -8,7 +8,7 @@ from main.Helpers.date_information import (
 )
 from main.Helpers.date_request import put_day_and_month_names_into_context
 from main.Helpers.date_slugs import date_exists
-from main.Helpers.ajax_request import ajaxRequest
+from main.Helpers.ajax_request import ajax_request
 from main.Helpers.get_year_entry_data import get_year_entry_information
 from main.Helpers.get_all_years_summary import (
     get_all_year_summary_information,
@@ -83,26 +83,26 @@ def dateNotFoundPage(request):
     return render(request=request, template_name="DateNotFound.html")
 
 
-@ajaxRequest
+@ajax_request
 def deleteEntry(post_data: dict):
     return deleteEntryAndContent(post_data)
 
 
-@ajaxRequest
+@ajax_request
 def saveEntry(post_data: dict):
     return updateOrGenerateEntry(post_data)
 
 
-@ajaxRequest
+@ajax_request
 def getImage(post_data: dict):
     return getFullImageReponse(post_data)
 
 
-@ajaxRequest
+@ajax_request
 def getVideo(post_data: dict):
     return getFullVideoResponse(post_data)
 
 
-@ajaxRequest
+@ajax_request
 def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)

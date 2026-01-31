@@ -3,6 +3,7 @@
 
 class ImageConstants:
     """Static image configuration"""
+
     supported_extensions: tuple = (".png", ".jpg", ".jpeg", ".jfif")
     reserved_image_tags: tuple = ("_icon", "_resized")
     unknown_enoding_type: str = "unknown"
