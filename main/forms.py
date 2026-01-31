@@ -5,7 +5,7 @@ from pathlib import Path
 from tinymce.widgets import TinyMCE  # type: ignore
 
 import main.models as models
-from main.Helpers.image_utils import moveImageToSavePath
+from main.Helpers.image_utils import move_image_to_save_path
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import (
@@ -69,7 +69,7 @@ class ImageForm(ModelForm):
             message = f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}"
             raise forms.ValidationError(message)
 
-        moveImageToSavePath(target_path, file_name)
+        move_image_to_save_path(target_path, file_name)
 
         return makeImagePathRelative(target_path)
 

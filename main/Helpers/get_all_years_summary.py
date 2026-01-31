@@ -7,7 +7,7 @@ from typing import List
 from django.db.models.functions import ExtractYear
 
 import main.models as models
-from main.Helpers.image_utils import getBase64FromPath, createImageIcon
+from main.Helpers.image_utils import getBase64FromPath, create_image_icon
 from main.Helpers.file_utils import get_icon_file_path, getMediaPath
 
 # ToDo - This should be from a common settings file
@@ -59,7 +59,7 @@ def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
     valid_icon_paths = []
     icon_paths = [get_icon_file_path(path) for path in selected_img_paths]
     for icon_path, path in zip(icon_paths, selected_img_paths):
-        if icon_path.exists() or createImageIcon(path):
+        if icon_path.exists() or create_image_icon(path):
             valid_icon_paths.append(icon_path)
         else:
             valid_icon_paths.append(Path(f"{getcwd()}{MISSING_IMAGE}"))

@@ -20,7 +20,8 @@ from main.Helpers.file_utils import (
 )
 
 
-def createImageIcon(target_path_obj: Path):
+def create_image_icon(target_path_obj: Path):
+    """Create image icon for target object"""
     if target_path_obj.suffix == ".mp4":
         target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
 
@@ -40,9 +41,9 @@ def createImageIcon(target_path_obj: Path):
     return True
 
 
-def moveImageToSavePath(target_file_path: str, file_name: str):
-    """ToDo - Consider creating abstract class to save icon as implementation."""
-    createImageIcon(Path(target_file_path))
+def move_image_to_save_path(target_file_path: str, file_name: str):
+    """Move image to the date save path"""
+    create_image_icon(Path(target_file_path))
     return moveMediaToSavePath(target_file_path, file_name)
 
 
@@ -60,7 +61,7 @@ def getEncodingType(file_path: Union[Path, str]) -> str:
 
 def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
     if not get_icon_file_path(file_path).exists():
-        createImageIcon(file_path)
+        create_image_icon(file_path)
 
     resized_path = get_resized_filename(file_path)
     if resized_path.exists():
