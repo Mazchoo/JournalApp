@@ -11,8 +11,8 @@ from main.Helpers.date_slugs import dateExists
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import get_year_entry_information
 from main.Helpers.get_all_years_summary import (
-    getAllYearSummaryInformation,
-    getAllEntryYears,
+    get_all_year_summary_information,
+    get_all_entry_years,
 )
 from main.Helpers.get_latest_entry import getLatestEntryTuple
 
@@ -30,7 +30,7 @@ from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 
 @putVargsIntoContext
 def homePage(request, context):
-    getAllYearSummaryInformation(context)
+    get_all_year_summary_information(context)
     return render(request=request, template_name="home.html", context=context)
 
 
@@ -67,7 +67,7 @@ def editEntryPage(request, context):
         return redirect("/date-not-found")
 
     addDayInformation(context)
-    getAllEntryYears(context)
+    get_all_entry_years(context)
     loadContentForEntry(context)
 
     context["tiny_mce"] = forms.TinyMCEComponent()

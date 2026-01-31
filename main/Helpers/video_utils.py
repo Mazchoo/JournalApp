@@ -42,11 +42,11 @@ def create_video_icon(video_path: Path) -> bool:
         return True
 
     with VideoCapture(video_path) as capture:
-        nr_frames = capture.getTotalFrames()
+        nr_frames = capture.get_total_frames()
         if nr_frames == 0:
             return False
 
-        frame = capture.getFrameAtIndex(nr_frames // 2)
+        frame = capture.get_frame_at_idx(nr_frames // 2)
         if frame is None:
             return False
 
@@ -60,7 +60,7 @@ def create_video_icon(video_path: Path) -> bool:
 
 def get_resizing_factor_to_collage_size(capture: VideoCapture) -> float:
     """Get downsizing factor resize frame to collage size of frame"""
-    width, height = capture.getWidthHeight()
+    width, height = capture.get_width_height()
     max_dimension = max(width, height)
 
     factor = 1
@@ -73,7 +73,7 @@ def get_resizing_factor_to_collage_size(capture: VideoCapture) -> float:
 
 def get_collage_display_dimensions(capture: VideoCapture, rescale_factor: int):
     """Get dimensions of full collage image"""
-    width, height = capture.getWidthHeight()
+    width, height = capture.get_width_height()
     width //= rescale_factor
     height //= rescale_factor
 
@@ -87,7 +87,7 @@ def get_collage_display_dimensions(capture: VideoCapture, rescale_factor: int):
     collage_height = rows * height
     collage_height += (rows - 1) * VideoConstants.collage_spacing
 
-    nr_frames = capture.getTotalFrames()
+    nr_frames = capture.get_total_frames()
     frame_increment = nr_frames // (rows * cols)
     return CollageDrawDimensions(
         width, height, collage_width, collage_height, frame_increment, rows, cols
@@ -111,7 +111,7 @@ def draw_frame_to_collage(
     frame_index += i * collage_dims.rows * collage_dims.frame_increment
     frame_index += j * collage_dims.frame_increment
 
-    frame = capture.getFrameAtIndex(frame_index)
+    frame = capture.get_frame_at_idx(frame_index)
     frame = cv2.resize(frame, dsize=(collage_dims.width, collage_dims.height))
     if VideoConstants.billateral_filter:
         frame = cv2.bilateralFilter(frame, 15, 75, 75)

@@ -1,7 +1,11 @@
+"""Configuration for video summaries"""
+
 from typing import Tuple
 
 
 class VideoConstants:
+    """Static information for displaying videos"""
+
     supported_extensions: Tuple[str] = (".mp4",)
     save_image_extention: str = "jpeg"
     reserved_video_tags: tuple = ("_icon", "_resized")

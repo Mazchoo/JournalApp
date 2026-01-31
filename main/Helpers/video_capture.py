@@ -1,3 +1,5 @@
+"""Wrapper around video feed"""
+
 from typing import Tuple, Optional
 from pathlib import Path
 
@@ -8,6 +10,8 @@ from main.Helpers.video_constants import VideoConstants
 
 
 class VideoCapture:
+    """File handle to get video information"""
+
     def __init__(self, video_path: Path):
         self.capture = None
         self.rotation = 0
@@ -17,9 +21,9 @@ class VideoCapture:
             return
         self.capture = cv2.VideoCapture(str(video_path))
         if self.capture is not None and self.capture.isOpened():
-            self._readRotationMetadata()
+            self._read_rotation_metadata()
 
-    def _readRotationMetadata(self):
+    def _read_rotation_metadata(self):
         """Read rotation metadata from video file."""
         try:
             # Try to get rotation from CAP_PROP_ORIENTATION (OpenCV 4.5+)
@@ -39,11 +43,12 @@ class VideoCapture:
             # If reading rotation fails, default to 0 (no rotation)
             pass
 
-    def getRotation(self) -> int:
+    def get_rotation(self) -> int:
         """Get the rotation angle in degrees (0, 90, 180, or 270)."""
         return self.rotation
 
-    def getWidthHeight(self) -> Tuple[int, int]:
+    def get_width_height(self) -> Tuple[int, int]:
+        """Get width and height of each frame"""
         if not self:
             return (0, 0)
 
@@ -56,13 +61,14 @@ class VideoCapture:
 
         return (width, height)
 
-    def getTotalFrames(self) -> int:
+    def get_total_frames(self) -> int:
+        """Get total number of frames from video"""
         if not self:
             return 0
 
         return int(self.capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    def getFrameAtIndex(self, frame_index: int) -> Optional[np.ndarray]:
+    def get_frame_at_idx(self, frame_index: int) -> Optional[np.ndarray]:
         """Return frame at index if it exists else None"""
         if not self:
             return None
@@ -73,9 +79,9 @@ class VideoCapture:
         if not ret:
             return None
 
-        return self._applyRotation(frame)
+        return self._apply_rotation(frame)
 
-    def _applyRotation(self, frame: np.ndarray) -> np.ndarray:
+    def _apply_rotation(self, frame: np.ndarray) -> np.ndarray:
         """Apply rotation to frame based on video metadata."""
         if self.rotation == 90:
             return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
