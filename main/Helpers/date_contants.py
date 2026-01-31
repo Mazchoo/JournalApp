@@ -1,4 +1,8 @@
+"""Configuration for static day and month names"""
+
+
 class DateConstants:
+    """Static date information"""
     day_names: tuple = (
         "Monday",
         "Tuesday",

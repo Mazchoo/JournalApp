@@ -1,9 +1,12 @@
-from typing import Optional
+"""Helpers to add date information for navigation"""
+from typing import Optional, Tuple
 from datetime import datetime
+
 from main.Helpers.date_contants import DateConstants
 
 
-def addYearInformation(context) -> Optional[int]:
+def add_year_information(context: dict) -> Optional[int]:
+    """Add context information specific to a year"""
     if "year" not in context:
         print("addYearInformation: request does not have year", context)
         return None
@@ -15,15 +18,16 @@ def addYearInformation(context) -> Optional[int]:
     return year
 
 
-def addMonthInformation(context):
+def add_month_information(context: dict) -> Optional[Tuple[int, int]]:
+    """Add context information specific to a month"""
     if "month" not in context or "year" not in context:
         print("addMonthInformation: Request does not have month or year.", context)
-        return
+        return None
 
     month_names = DateConstants.month_names
     day_names = DateConstants.day_names
 
-    year = addYearInformation(context)
+    year = add_year_information(context)
     month_ind = month_names.index(context["month"]) + 1
 
     # One based indices
@@ -62,15 +66,16 @@ def addMonthInformation(context):
     return year, month_ind
 
 
-def addDayInformation(context):
+def add_day_information(context: dict) -> Optional[Tuple[int, int, int]]:
+    """Add context relating to a specific day"""
     if "day" not in context or "month" not in context or "year" not in context:
-        print("addDayInformation: request does not have day, month or year", context)
-        return
+        print("add_day_information: request does not have day, month or year", context)
+        return None
 
     month_names = DateConstants.month_names
 
     day = context["day"]
-    year, month_ind = addMonthInformation(context)
+    year, month_ind = add_month_information(context)
 
     day_str = ("0" + str(day))[-2:]
     month_str = ("0" + str(month_ind))[-2:]

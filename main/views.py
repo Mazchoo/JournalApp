@@ -2,11 +2,11 @@ import main.forms as forms
 from django.shortcuts import render, redirect
 
 from main.Helpers.date_information import (
-    addDayInformation,
-    addMonthInformation,
-    addYearInformation,
+    add_day_information,
+    add_month_information,
+    add_year_information,
 )
-from main.Helpers.date_request import putVargsIntoContext
+from main.Helpers.date_request import put_day_and_month_names_into_context
 from main.Helpers.date_slugs import date_exists
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import get_year_entry_information
@@ -28,7 +28,7 @@ from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
 # ToDo - Add some tests for saving content from scratch
 
 
-@putVargsIntoContext
+@put_day_and_month_names_into_context
 def homePage(request, context):
     get_all_year_summary_information(context)
     return render(request=request, template_name="home.html", context=context)
@@ -41,32 +41,32 @@ def latestPage(_request):
     return redirect("/")
 
 
-@putVargsIntoContext
+@put_day_and_month_names_into_context
 def yearPage(request, context):
     if not date_exists(context):
         return redirect("/date-not-found")
 
-    addYearInformation(context)
+    add_year_information(context)
     get_year_entry_information(context)
     return render(request=request, template_name="year.html", context=context)
 
 
-@putVargsIntoContext
+@put_day_and_month_names_into_context
 def monthPage(request, context):
     if not date_exists(context):
         return redirect("/date-not-found")
 
-    addMonthInformation(context)
+    add_month_information(context)
     addDaysWithAnEntry(context)
     return render(request=request, template_name="month.html", context=context)
 
 
-@putVargsIntoContext
+@put_day_and_month_names_into_context
 def editEntryPage(request, context):
     if not date_exists(context):
         return redirect("/date-not-found")
 
-    addDayInformation(context)
+    add_day_information(context)
     get_all_entry_years(context)
     loadContentForEntry(context)
 
