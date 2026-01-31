@@ -65,7 +65,7 @@ def getStoredMediaPath(file_name: str, entry_name: str) -> str:
 
 def makeImagePathRelative(file_name: str) -> str:
     if file_name.startswith(ENTRY_FOLDER):
-        file_name = file_name[len(ENTRY_FOLDER):]
+        file_name = file_name[len(ENTRY_FOLDER) :]
     return file_name
 
 
