@@ -12,9 +12,9 @@ from PIL import Image
 from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import get_icon_file_path, get_resized_filename
 from main.Helpers.image_utils import (
-    loadImageDirectly,
+    load_image_directly,
     getSquareResizedImage,
-    addEncodingTypeToBase64,
+    add_encoding_type_to_base64,
 )
 from main.Helpers.video_capture import VideoCapture
 
@@ -134,7 +134,7 @@ def create_collage_image(
 
     image_resized = Image.fromarray(collage_image)
     image_resized.save(resized_path, format=VideoConstants.save_image_extention)
-    return loadImageDirectly(resized_path)
+    return load_image_directly(resized_path)
 
 
 @lru_cache(maxsize=1024)
@@ -145,14 +145,14 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
     resize_file_name = get_resized_filename(file_path)
 
     if resize_file_name.exists():
-        b64_string = loadImageDirectly(resize_file_name)
-        return addEncodingTypeToBase64(b64_string, VideoConstants.save_image_extention)
+        b64_string = load_image_directly(resize_file_name)
+        return add_encoding_type_to_base64(b64_string, VideoConstants.save_image_extention)
 
     with VideoCapture(file_path) as capture:
         if capture:
             factor = get_resizing_factor_to_collage_size(capture)
             if collage_b64 := create_collage_image(capture, factor, resize_file_name):
-                b64_string = addEncodingTypeToBase64(
+                b64_string = add_encoding_type_to_base64(
                     collage_b64, VideoConstants.save_image_extention
                 )
             else:

@@ -2,7 +2,7 @@ import random
 from pathlib import Path
 
 import main.models as models
-from main.Helpers.image_utils import getBase64FromPath, create_image_icon
+from main.Helpers.image_utils import get_base64_from_image, create_image_icon
 from main.Helpers.file_utils import getMediaPath, get_icon_file_path
 
 
@@ -48,7 +48,7 @@ def getIconForEachMonth(context: dict, year: int):
             selected_icon_path = get_icon_file_path(selected_image)
 
             if selected_icon_path.exists() or create_image_icon(selected_image):
-                output_dict[month_name] = getBase64FromPath(selected_icon_path)
+                output_dict[month_name] = get_base64_from_image(selected_icon_path)
 
     return output_dict
 

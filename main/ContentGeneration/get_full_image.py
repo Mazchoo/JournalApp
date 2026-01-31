@@ -1,9 +1,9 @@
 from django.http import JsonResponse
 
 from main.Helpers.image_utils import (
-    loadImageDirectly,
-    addEncodingTypeToBase64,
-    getEncodingType,
+    load_image_directly,
+    add_encoding_type_to_base64,
+    get_encoding_type,
 )
 from main.Helpers.image_constants import ImageConstants
 from main.ContentGeneration.request_forms import FullImagePath
@@ -19,13 +19,13 @@ def checkTargetPathInData(post_data):
 
 
 def createFullImageBase64(target_path):
-    b64_string = loadImageDirectly(target_path)
-    encoding_type = getEncodingType(target_path)
+    b64_string = load_image_directly(target_path)
+    encoding_type = get_encoding_type(target_path)
 
     if encoding_type == ImageConstants.unknown_enoding_type:
         return None, "Unknown Encoding Type"
 
-    return addEncodingTypeToBase64(b64_string, encoding_type), None
+    return add_encoding_type_to_base64(b64_string, encoding_type), None
 
 
 def getFullImageReponse(post_data: dict):

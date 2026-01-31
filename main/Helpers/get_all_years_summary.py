@@ -7,7 +7,7 @@ from typing import List
 from django.db.models.functions import ExtractYear
 
 import main.models as models
-from main.Helpers.image_utils import getBase64FromPath, create_image_icon
+from main.Helpers.image_utils import get_base64_from_image, create_image_icon
 from main.Helpers.file_utils import get_icon_file_path, getMediaPath
 
 # ToDo - This should be from a common settings file
@@ -75,7 +75,7 @@ def getRandomImagesFromYear(year: int) -> List[str]:
 
     selected_img_paths = getSelectionOfIcons(valid_images)
     valid_icon_paths = getValidIconPaths(selected_img_paths)
-    return [getBase64FromPath(p) for p in valid_icon_paths]
+    return [get_base64_from_image(p) for p in valid_icon_paths]
 
 
 def getAllYearSummaryInformation(context: dict):

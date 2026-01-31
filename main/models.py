@@ -2,7 +2,7 @@ from django.db.models import Model
 from django.db import models
 from pathlib import Path
 
-from main.Helpers.image_utils import parseBase64ImageData
+from main.Helpers.image_utils import fetch_base64_image_data
 from main.Helpers.file_utils import getMediaPath
 from main.Helpers.video_utils import getCollageBase64Data
 
@@ -40,7 +40,7 @@ class EntryImage(Model):
     def view(self):
         full_path = getMediaPath(self.file_path)
         file_name = Path(self.file_path).name
-        b64_string = parseBase64ImageData(full_path)
+        b64_string = fetch_base64_image_data(full_path)
 
         return {
             "base64": b64_string,

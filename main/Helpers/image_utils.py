@@ -15,7 +15,7 @@ from main.Helpers.pil_image_helpers import (
 )
 from main.Helpers.file_utils import (
     get_icon_file_path,
-    moveMediaToSavePath,
+    move_media_to_save_path,
     get_resized_filename,
 )
 
@@ -44,10 +44,11 @@ def create_image_icon(target_path_obj: Path):
 def move_image_to_save_path(target_file_path: str, file_name: str):
     """Move image to the date save path"""
     create_image_icon(Path(target_file_path))
-    return moveMediaToSavePath(target_file_path, file_name)
+    return move_media_to_save_path(target_file_path, file_name)
 
 
-def getEncodingType(file_path: Union[Path, str]) -> str:
+def get_encoding_type(file_path: Union[Path, str]) -> str:
+    """Get compression type form file path"""
     path = Path(file_path)
     if path.suffix.lower() in [".jpg", ".jpeg", ".jfif"]:
         ecoding_type = "jpeg"
@@ -59,42 +60,47 @@ def getEncodingType(file_path: Union[Path, str]) -> str:
     return ecoding_type
 
 
-def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
+def get_resized_base64(file_path: Path, factor: float, ecoding_type: str) -> str:
+    """Get a downsized image in base64 form"""
     if not get_icon_file_path(file_path).exists():
         create_image_icon(file_path)
 
     resized_path = get_resized_filename(file_path)
     if resized_path.exists():
-        return loadImageDirectly(resized_path)
+        return load_image_directly(resized_path)
 
     image = Image.open(file_path)
+
     width, height = image.size
 
     image_resized = image.resize(
-        (width // factor, height // factor), resample=Image.LANCZOS
+        (width // factor, height // factor), resample=Image.Resampling.BILINEAR
     )  # type: ignore
     image_resized = orientatePILImage(image_resized, image.getexif())
 
     image_resized.save(resized_path, format=ecoding_type)
 
-    return loadImageDirectly(resized_path)
+    return load_image_directly(resized_path)
 
 
-def loadImageDirectly(file_path: Union[Path, str]) -> str:
+def load_image_directly(file_path: Union[Path, str]) -> str:
+    """Load an image as base64"""
     with open(file_path, "rb") as img_file:
         b64_string = base64.b64encode(img_file.read()).decode("utf-8")
 
     return b64_string
 
 
-def addEncodingTypeToBase64(b64_string: str, ecoding_type: str) -> str:
+def add_encoding_type_to_base64(b64_string: str, ecoding_type: str) -> str:
+    """Append decoding information to base64 string"""
     if ecoding_type == ImageConstants.unknown_enoding_type:
         return ""
     return f"data:image/{ecoding_type};base64,{b64_string}"
 
 
 @lru_cache(maxsize=1024)
-def parseBase64ImageData(file_path: Union[Path, str]) -> str:
+def fetch_base64_image_data(file_path: Union[Path, str]) -> str:
+    """Load image or create base64 image from downsized original (if original size above threshold)"""
     file_path = Path(file_path)
 
     if (
@@ -102,13 +108,13 @@ def parseBase64ImageData(file_path: Union[Path, str]) -> str:
         and file_path.suffix.lower() in ImageConstants.supported_extensions
     ):
         factor = getResizingFactorToDownSized(file_path)
-        ecoding_type = getEncodingType(file_path)
+        ecoding_type = get_encoding_type(file_path)
         if factor > 1:
-            b64_string = getResizeBase64(file_path, factor, ecoding_type)
+            b64_string = get_resized_base64(file_path, factor, ecoding_type)
         else:
-            b64_string = loadImageDirectly(file_path)
+            b64_string = load_image_directly(file_path)
 
-        b64_string = addEncodingTypeToBase64(b64_string, ecoding_type)
+        b64_string = add_encoding_type_to_base64(b64_string, ecoding_type)
     else:
         print(f"Error! Image {file_path} is invalid!")
         b64_string = ""
@@ -116,7 +122,8 @@ def parseBase64ImageData(file_path: Union[Path, str]) -> str:
     return b64_string
 
 
-def getBase64FromPath(file_path: Union[Path, str]) -> str:
-    b64_string = loadImageDirectly(file_path)
-    ecoding_type = getEncodingType(file_path)
-    return addEncodingTypeToBase64(b64_string, ecoding_type)
+def get_base64_from_image(file_path: Union[Path, str]) -> str:
+    """Load image path and return it as base64"""
+    b64_string = load_image_directly(file_path)
+    ecoding_type = get_encoding_type(file_path)
+    return add_encoding_type_to_base64(b64_string, ecoding_type)
