@@ -13,17 +13,19 @@ from django.core.management.utils import get_random_secret_key
 USERNAME_REGEX = "^[A-Za-z_][A-Za-z0-9_]*"
 
 
-def generateSecurityDict(username: str, password: str):
+def generate_security_dict(username: str, password: str):
+    """Create security credentials for user and saves them to git-ignored file"""
     security_dict = {
         "ADMIN_USERNAME": username,
         "ADMIN_PASSWORD": password,
         "SECRET_KEY": f"django-insecure-{get_random_secret_key()}",
     }
-    with open(f"{os.getcwd()}/security.json", "w") as f:
+    with open(f"{os.getcwd()}/security.json", "w", encoding="utf-8") as f:
         json.dump(security_dict, f)
 
 
-def addSecurityKey():
+def add_security_key():
+    """Prompt user for a password if no admin password exists yet"""
     print("No security details detected")
     username = ""
     while not re.search(USERNAME_REGEX, username):
@@ -33,14 +35,14 @@ def addSecurityKey():
     while len(password) < 8:
         password = input("Create a password with 8 characters or more :")
 
-    generateSecurityDict(username, password)
+    generate_security_dict(username, password)
 
 
 def main(command: List[str]):
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Journal.settings")
     try:
-        from django.core.management import execute_from_command_line
+        from django.core.management import execute_from_command_line  # pylint: disable=import-error
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "
@@ -53,7 +55,7 @@ def main(command: List[str]):
 if __name__ == "__main__":
     """ Ensure security details exist. """
     if not Path(f"{os.getcwd()}/security.json").exists():
-        addSecurityKey()
+        add_security_key()
 
     """ Ensure database exists. """
     if not Path(f"{os.getcwd()}/db.sqlite3").exists():
