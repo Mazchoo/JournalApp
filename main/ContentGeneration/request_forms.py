@@ -3,8 +3,8 @@ from pathlib import Path
 
 from django.forms import Form, SlugField, CharField, ValidationError
 
-from main.Helpers.file_utils import getStoredMediaPath
-import main.models as models
+from main.Helpers.file_utils import get_stored_media_path
+from main.models import Entry
 from main.Helpers.date_slugs import get_valid_date_from_slug
 # ToDo - forms probably belong in one place
 
@@ -15,8 +15,9 @@ class FullImagePath(Form):
     file = CharField(max_length=256)
 
     def clean_file(self) -> CharField:
+        """Get validated file path"""
         clean_data = super().clean()
-        target_path = getStoredMediaPath(clean_data["file"], clean_data["name"])
+        target_path = get_stored_media_path(clean_data["file"], clean_data["name"])
 
         if not Path(target_path).exists():
             raise ValidationError(f"File {target_path} does not exist")
@@ -34,7 +35,7 @@ class DateMoveForm(Form):
         clean_data = super().clean()
         move_from = clean_data["move_from"]
 
-        if not models.Entry.objects.filter(pk=move_from).exists():
+        if not Entry.objects.filter(pk=move_from).exists():
             raise ValidationError(f"Source date {move_from} is not saved")
 
         return move_from
@@ -49,7 +50,7 @@ class DateMoveForm(Form):
                 f"Destination date must be a real date {move_to}"
             )
 
-        if models.Entry.objects.filter(pk=move_to).exists():
+        if Entry.objects.filter(pk=move_to).exists():
             raise ValidationError(f"Destination date {move_to} already exists")
 
         return move_to
