@@ -9,7 +9,8 @@ from main.Helpers.video_constants import VideoConstants
 from Journal.settings import ENTRY_FOLDER
 
 
-def removeEmptyParentFolders(folder: Path) -> None:
+def remove_empty_parent_folders(folder: Path):
+    """Remove entry folders with no contents"""
     if not folder.is_dir():
         return
 
@@ -17,10 +18,10 @@ def removeEmptyParentFolders(folder: Path) -> None:
 
     parent_folder = folder.parent
     if listdir(str(parent_folder)) == []:
-        removeEmptyParentFolders(parent_folder)
+        remove_empty_parent_folders(parent_folder)
 
 
-def pathHasImageTag(path: Path) -> bool:
+def path_has_image_extension(path: Path) -> bool:
     for tag in ImageConstants.reserved_image_tags:
         ending_position = path.stem.rfind(tag)
         if ending_position >= 0 and ending_position == len(path.stem) - len(tag):
