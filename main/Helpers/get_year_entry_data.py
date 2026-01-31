@@ -1,41 +1,50 @@
+"""Queries to get an entry from a date or date range"""
 import random
 from pathlib import Path
+from typing import Tuple, List, Dict
 
 import main.models as models
+from django.db.models import DateTimeField
 from main.Helpers.image_utils import get_base64_from_image, create_image_icon
 from main.Helpers.file_utils import getMediaPath, get_icon_file_path
 
 
-def getMonthStrings(i: int, context: dict):
+def get_month_strings(i: int, context: dict) -> Tuple[str, str]:
+    """Get month information folder name and month name"""
+    # ToDo - Using "context" here is not specific, use explicit type
     month = ("0" + str(i))[-2:]
     month_name = context["months_in_year"][i - 1]
     return month, month_name
 
 
-def getAllEntriesInMonth(year: int, month: str):
+def get_all_entries_in_month(year: int, month: str) -> List[models.Entry]:
+    """Return all entries from a specified month"""
     return models.Entry.objects.all().filter(name__istartswith=f"{year}-{month}")
 
 
-def getAllImagesInMonth(year: int, month: str):
+def get_all_images_in_month(year: int, month: str) -> List[models.EntryImage]:
+    """Return all image entries from a specified month"""
     return models.EntryImage.objects.all().filter(
         entry__name__istartswith=f"{year}-{month}-"
     )
 
 
-def getAllVideosInMonth(year: int, month: str):
+def get_all_videos_in_month(year: int, month: str) -> List[models.EntryVideo]:
+    """Return all video entries from a specified month"""
     return models.EntryVideo.objects.all().filter(
         entry__name__istartswith=f"{year}-{month}-"
     )
 
 
-def getIconForEachMonth(context: dict, year: int):
+def get_icon_for_each_month(context: dict, year: int) -> Dict[str, str]:
+    """Get a base64 dictionary of icon files for each month in a year"""
     output_dict = {}
 
     for i in range(1, 13):
-        month, month_name = getMonthStrings(i, context)
+        month, month_name = get_month_strings(i, context)
 
-        month_images = getAllImagesInMonth(year, month)
-        month_videos = getAllVideosInMonth(year, month)
+        month_images = get_all_images_in_month(year, month)
+        month_videos = get_all_videos_in_month(year, month)
 
         image_files = [Path(getMediaPath(Path(img.file_path))) for img in month_images]
         image_files.extend(
@@ -53,24 +62,26 @@ def getIconForEachMonth(context: dict, year: int):
     return output_dict
 
 
-def getNrEntiresForEachYear(context: dict, year: int):
+def get_nr_entires_for_each_year(context: dict, year: int) -> Dict[str, int]:
+    """Get a dict for each month and a count for each month"""
     output_dict = {}
 
     for i in range(1, 13):
-        month, month_name = getMonthStrings(i, context)
-        entries = getAllEntriesInMonth(year, month)
+        month, month_name = get_month_strings(i, context)
+        entries = get_all_entries_in_month(year, month)
 
         output_dict[month_name] = len(entries)
 
     return output_dict
 
 
-def getLastTimeEntriesWereUpdated(context: dict, year: int):
+def get_last_time_entries_were_updated(context: dict, year: int) -> Dict[str, DateTimeField]:
+    """Return the month mapped to latest time it was edited"""
     output_dict = {}
 
     for i in range(1, 13):
-        month, month_name = getMonthStrings(i, context)
-        entries = getAllEntriesInMonth(year, month)
+        month, month_name = get_month_strings(i, context)
+        entries = get_all_entries_in_month(year, month)
 
         last_update = (
             max([entry.last_edited for entry in entries]) if entries else "never"
@@ -80,8 +91,9 @@ def getLastTimeEntriesWereUpdated(context: dict, year: int):
     return output_dict
 
 
-def getYearEntryInformation(context: dict):
+def get_year_entry_information(context: dict):
+    """Extract year information into context"""
     year = context["year"]
-    context["icon_paths"] = getIconForEachMonth(context, year)
-    context["nr_entries_per_month"] = getNrEntiresForEachYear(context, year)
-    context["month_last_edited"] = getLastTimeEntriesWereUpdated(context, year)
+    context["icon_paths"] = get_icon_for_each_month(context, year)
+    context["nr_entries_per_month"] = get_nr_entires_for_each_year(context, year)
+    context["month_last_edited"] = get_last_time_entries_were_updated(context, year)

@@ -9,7 +9,7 @@ from main.Helpers.date_information import (
 from main.Helpers.date_request import putVargsIntoContext
 from main.Helpers.date_slugs import dateExists
 from main.Helpers.ajax_request import ajaxRequest
-from main.Helpers.get_year_entry_data import getYearEntryInformation
+from main.Helpers.get_year_entry_data import get_year_entry_information
 from main.Helpers.get_all_years_summary import (
     getAllYearSummaryInformation,
     getAllEntryYears,
@@ -47,7 +47,7 @@ def yearPage(request, context):
         return redirect("/date-not-found")
 
     addYearInformation(context)
-    getYearEntryInformation(context)
+    get_year_entry_information(context)
     return render(request=request, template_name="year.html", context=context)
 
 
