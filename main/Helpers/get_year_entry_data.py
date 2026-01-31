@@ -1,12 +1,14 @@
 """Queries to get an entry from a date or date range"""
+
 import random
 from pathlib import Path
 from typing import Tuple, List, Dict
 
-import main.models as models
 from django.db.models import DateTimeField
+
+from main.models import Entry, EntryImage, EntryVideo
 from main.Helpers.image_utils import get_base64_from_image, create_image_icon
-from main.Helpers.file_utils import getMediaPath, get_icon_file_path
+from main.Helpers.file_utils import get_base_entry_path, get_icon_file_path
 
 
 def get_month_strings(i: int, context: dict) -> Tuple[str, str]:
@@ -17,23 +19,19 @@ def get_month_strings(i: int, context: dict) -> Tuple[str, str]:
     return month, month_name
 
 
-def get_all_entries_in_month(year: int, month: str) -> List[models.Entry]:
+def get_all_entries_in_month(year: int, month: str) -> List[Entry]:
     """Return all entries from a specified month"""
-    return models.Entry.objects.all().filter(name__istartswith=f"{year}-{month}")
+    return Entry.objects.all().filter(name__istartswith=f"{year}-{month}")
 
 
-def get_all_images_in_month(year: int, month: str) -> List[models.EntryImage]:
+def get_all_images_in_month(year: int, month: str) -> List[EntryImage]:
     """Return all image entries from a specified month"""
-    return models.EntryImage.objects.all().filter(
-        entry__name__istartswith=f"{year}-{month}-"
-    )
+    return EntryImage.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
 
 
-def get_all_videos_in_month(year: int, month: str) -> List[models.EntryVideo]:
+def get_all_videos_in_month(year: int, month: str) -> List[EntryVideo]:
     """Return all video entries from a specified month"""
-    return models.EntryVideo.objects.all().filter(
-        entry__name__istartswith=f"{year}-{month}-"
-    )
+    return EntryVideo.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
 
 
 def get_icon_for_each_month(context: dict, year: int) -> Dict[str, str]:
@@ -46,9 +44,11 @@ def get_icon_for_each_month(context: dict, year: int) -> Dict[str, str]:
         month_images = get_all_images_in_month(year, month)
         month_videos = get_all_videos_in_month(year, month)
 
-        image_files = [Path(getMediaPath(Path(img.file_path))) for img in month_images]
+        image_files = [
+            Path(get_base_entry_path(Path(img.file_path))) for img in month_images
+        ]
         image_files.extend(
-            [Path(getMediaPath(Path(vid.file_path))) for vid in month_videos]
+            [Path(get_base_entry_path(Path(vid.file_path))) for vid in month_videos]
         )
         valid_images = list(filter(lambda p: p.exists(), image_files))
 
@@ -75,7 +75,9 @@ def get_nr_entires_for_each_year(context: dict, year: int) -> Dict[str, int]:
     return output_dict
 
 
-def get_last_time_entries_were_updated(context: dict, year: int) -> Dict[str, DateTimeField]:
+def get_last_time_entries_were_updated(
+    context: dict, year: int
+) -> Dict[str, DateTimeField]:
     """Return the month mapped to latest time it was edited"""
     output_dict = {}
 
@@ -84,7 +86,7 @@ def get_last_time_entries_were_updated(context: dict, year: int) -> Dict[str, Da
         entries = get_all_entries_in_month(year, month)
 
         last_update = (
-            max([entry.last_edited for entry in entries]) if entries else "never"
+            max(entry.last_edited for entry in entries) if entries else "never"
         )
         output_dict[month_name] = last_update
 

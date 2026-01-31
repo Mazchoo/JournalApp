@@ -43,7 +43,7 @@ def make_parent_folders(target_folder: Path):
     mkdir(str(target_folder))
 
 
-def get_media_path(file_name: Union[str, Path]) -> str:
+def get_base_entry_path(file_name: Union[str, Path]) -> str:
     """Get path of object in entry folder"""
     return f"{ENTRY_FOLDER}/{file_name}"
 
@@ -95,7 +95,7 @@ def move_media_to_save_path(target_file_path: str, file_name: str):
     if path.exists():
         return target_file_path
 
-    source_file_path = get_media_path(file_name)
+    source_file_path = get_base_entry_path(file_name)
     output_path = source_file_path
 
     target_folder = path.parent

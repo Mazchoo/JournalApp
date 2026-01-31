@@ -146,7 +146,9 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
 
     if resize_file_name.exists():
         b64_string = load_image_directly(resize_file_name)
-        return add_encoding_type_to_base64(b64_string, VideoConstants.save_image_extention)
+        return add_encoding_type_to_base64(
+            b64_string, VideoConstants.save_image_extention
+        )
 
     with VideoCapture(file_path) as capture:
         if capture:
