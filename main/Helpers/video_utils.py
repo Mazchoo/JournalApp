@@ -1,3 +1,4 @@
+"""Helper functions to extract information and get a summary image of a video"""
 from typing import Union
 from pathlib import Path
 from functools import lru_cache
@@ -8,7 +9,7 @@ import numpy as np
 from PIL import Image
 
 from main.Helpers.video_constants import VideoConstants
-from main.Helpers.file_utils import getIconPath, getResizeName
+from main.Helpers.file_utils import get_icon_file_path, get_resized_filename
 from main.Helpers.image_utils import (
     loadImageDirectly,
     getSquareResizedImage,
@@ -30,13 +31,14 @@ CollageDrawDimensions = namedtuple(
 )
 
 
-def createVideoIcon(video_path: Path) -> bool:
+def create_video_icon(video_path: Path) -> bool:
+    """Create a small image representing video - return False if creation of icon fails"""
     if not video_path.exists():
         return False
 
-    target_icon_path = getIconPath(video_path)
-    if target_icon_path.exists():
-        return False
+    target_icon_file_path = get_icon_file_path(video_path)
+    if target_icon_file_path.exists():
+        return True
 
     with VideoCapture(video_path) as capture:
         nr_frames = capture.getTotalFrames()
@@ -50,12 +52,13 @@ def createVideoIcon(video_path: Path) -> bool:
         image = Image.fromarray(frame)
 
     image_resized = getSquareResizedImage(image, VideoConstants.icon_size)
-    image_resized.save(target_icon_path)
+    image_resized.save(target_icon_file_path)
 
     return True
 
 
-def getResizingFactorToCollageSize(capture: VideoCapture) -> float:
+def get_resizing_factor_to_collage_size(capture: VideoCapture) -> float:
+    """Get downsizing factor resize frame to collage size of frame"""
     width, height = capture.getWidthHeight()
     max_dimension = max(width, height)
 
@@ -67,7 +70,8 @@ def getResizingFactorToCollageSize(capture: VideoCapture) -> float:
     return factor
 
 
-def getCollageDisplayDimensions(capture: VideoCapture, rescale_factor: int):
+def get_collage_display_dimensions(capture: VideoCapture, rescale_factor: int):
+    """Get dimensions of full collage image"""
     width, height = capture.getWidthHeight()
     width //= rescale_factor
     height //= rescale_factor
@@ -89,13 +93,14 @@ def getCollageDisplayDimensions(capture: VideoCapture, rescale_factor: int):
     )
 
 
-def drawFrameToCollage(
+def draw_frame_to_collage(
     capture: VideoCapture,
     collage_dims: CollageDrawDimensions,
     i: int,
     j: int,
     collage_image: np.ndarray,
 ):
+    """Take frame image, resize it and insert it into collage position"""
     start_y = i * (collage_dims.height + VideoConstants.collage_spacing)
     start_x = j * (collage_dims.width + VideoConstants.collage_spacing)
     end_y = start_y + collage_dims.height
@@ -113,17 +118,18 @@ def drawFrameToCollage(
     collage_image[start_y:end_y, start_x:end_x, :] = frame
 
 
-def createCollageImage(
+def create_collage_image(
     capture: VideoCapture, rescale_factor: int, resized_path: Path
 ) -> Image:
-    collage_dims = getCollageDisplayDimensions(capture, rescale_factor)
+    """Create collage image from video"""
+    collage_dims = get_collage_display_dimensions(capture, rescale_factor)
     collage_image = np.zeros(
         (collage_dims.collage_height, collage_dims.collage_width, 3), dtype=np.uint8
     )
 
     for i in range(collage_dims.rows):
         for j in range(collage_dims.cols):
-            drawFrameToCollage(capture, collage_dims, i, j, collage_image)
+            draw_frame_to_collage(capture, collage_dims, i, j, collage_image)
 
     image_resized = Image.fromarray(collage_image)
     image_resized.save(resized_path, format=VideoConstants.save_image_extention)
@@ -134,8 +140,8 @@ def createCollageImage(
 def getCollageBase64Data(file_path: Union[Path, str]) -> str:
     """Will create collage once and not update it when the video parameters change"""
     file_path = Path(file_path)
-    createVideoIcon(file_path)
-    resize_file_name = getResizeName(file_path)
+    create_video_icon(file_path)
+    resize_file_name = get_resized_filename(file_path)
 
     if resize_file_name.exists():
         b64_string = loadImageDirectly(resize_file_name)
@@ -143,8 +149,8 @@ def getCollageBase64Data(file_path: Union[Path, str]) -> str:
 
     with VideoCapture(file_path) as capture:
         if capture:
-            factor = getResizingFactorToCollageSize(capture)
-            if collage_b64 := createCollageImage(capture, factor, resize_file_name):
+            factor = get_resizing_factor_to_collage_size(capture)
+            if collage_b64 := create_collage_image(capture, factor, resize_file_name):
                 b64_string = addEncodingTypeToBase64(
                     collage_b64, VideoConstants.save_image_extention
                 )
@@ -163,7 +169,7 @@ if __name__ == "__main__":
     from Journal.settings import ENTRY_FOLDER
 
     with VideoCapture(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4")) as cap:
-        createCollageImage(
+        create_collage_image(
             cap, 2, Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838_resized.jpeg")
         )
-    createVideoIcon(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4"))
+    create_video_icon(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4"))

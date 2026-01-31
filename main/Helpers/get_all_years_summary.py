@@ -8,7 +8,7 @@ from django.db.models.functions import ExtractYear
 
 import main.models as models
 from main.Helpers.image_utils import getBase64FromPath, createImageIcon
-from main.Helpers.file_utils import getIconPath, getMediaPath
+from main.Helpers.file_utils import get_icon_file_path, getMediaPath
 
 # ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18
@@ -57,7 +57,7 @@ def getSelectionOfIcons(valid_images: List[Path]) -> List[Path]:
 
 def getValidIconPaths(selected_img_paths: List[Path]) -> List[Path]:
     valid_icon_paths = []
-    icon_paths = [getIconPath(path) for path in selected_img_paths]
+    icon_paths = [get_icon_file_path(path) for path in selected_img_paths]
     for icon_path, path in zip(icon_paths, selected_img_paths):
         if icon_path.exists() or createImageIcon(path):
             valid_icon_paths.append(icon_path)

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import main.models as models
 from main.Helpers.image_utils import getBase64FromPath, createImageIcon
-from main.Helpers.file_utils import getMediaPath, getIconPath
+from main.Helpers.file_utils import getMediaPath, get_icon_file_path
 
 
 def getMonthStrings(i: int, context: dict):
@@ -45,7 +45,7 @@ def getIconForEachMonth(context: dict, year: int):
 
         if valid_images:
             selected_image = valid_images[random.randint(0, len(valid_images) - 1)]
-            selected_icon_path = getIconPath(selected_image)
+            selected_icon_path = get_icon_file_path(selected_image)
 
             if selected_icon_path.exists() or createImageIcon(selected_image):
                 output_dict[month_name] = getBase64FromPath(selected_icon_path)

@@ -56,8 +56,8 @@ def get_icon_filename(image_file_path: Path) -> Path:
 
 def get_icon_file_path(realtive_file_path: Path) -> Path:
     """Get icon file path from image file path"""
-    target_icon_path = f"{ENTRY_FOLDER}/{get_icon_filename(realtive_file_path)}"
-    return Path(target_icon_path)
+    target_icon_file_path = f"{ENTRY_FOLDER}/{get_icon_filename(realtive_file_path)}"
+    return Path(target_icon_file_path)
 
 
 def get_stored_media_folder(date_pattern: str) -> str:

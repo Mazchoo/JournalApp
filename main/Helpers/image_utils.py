@@ -1,8 +1,10 @@
+"""Helper functions to get downsized images"""
 import base64
 from pathlib import Path
 from typing import Union
-from PIL import Image
 from functools import lru_cache
+
+from PIL import Image
 
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.pil_image_helpers import (
@@ -10,7 +12,7 @@ from main.Helpers.pil_image_helpers import (
     getResizingFactorToDownSized,
     orientatePILImage,
 )
-from main.Helpers.file_utils import getIconPath, moveMediaToSavePath, getResizeName
+from main.Helpers.file_utils import get_icon_file_path, moveMediaToSavePath, get_resized_filename
 
 
 def createImageIcon(target_path_obj: Path):
@@ -20,15 +22,15 @@ def createImageIcon(target_path_obj: Path):
     if not target_path_obj.exists():
         return False
 
-    target_icon_path = getIconPath(target_path_obj)
-    if target_icon_path.exists():
+    target_icon_file_path = get_icon_file_path(target_path_obj)
+    if target_icon_file_path.exists():
         return False
 
     image = Image.open(target_path_obj)
     icon_size = ImageConstants.icon_size
 
     image_resized = getSquareResizedImage(image, icon_size)
-    image_resized.save(target_icon_path)
+    image_resized.save(target_icon_file_path)
 
     return True
 
@@ -52,10 +54,10 @@ def getEncodingType(file_path: Union[Path, str]) -> str:
 
 
 def getResizeBase64(file_path: Path, factor: float, ecoding_type: str) -> str:
-    if not getIconPath(file_path).exists():
+    if not get_icon_file_path(file_path).exists():
         createImageIcon(file_path)
 
-    resized_path = getResizeName(file_path)
+    resized_path = get_resized_filename(file_path)
     if resized_path.exists():
         return loadImageDirectly(resized_path)
 
