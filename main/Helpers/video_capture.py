@@ -35,7 +35,7 @@ class VideoCapture:
                 if rotation in [0, 90, 180, 270]:
                     self.rotation = int(rotation)
                     return
-        except Exception:
+        except AttributeError:
             # If reading rotation fails, default to 0 (no rotation)
             pass
 
@@ -79,9 +79,9 @@ class VideoCapture:
         """Apply rotation to frame based on video metadata."""
         if self.rotation == 90:
             return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-        elif self.rotation == 180:
+        if self.rotation == 180:
             return cv2.rotate(frame, cv2.ROTATE_180)
-        elif self.rotation == 270:
+        if self.rotation == 270:
             return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         return frame
 
@@ -93,6 +93,6 @@ class VideoCapture:
     def __bool__(self):
         return self.capture is not None and self.capture.isOpened()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, _type, _value, _traceback):
         if self.capture is not None:
             self.capture.release()

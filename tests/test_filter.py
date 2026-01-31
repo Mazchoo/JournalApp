@@ -3,4 +3,4 @@
 
 def test_something():
     """Dummy test"""
-    pass
+    return

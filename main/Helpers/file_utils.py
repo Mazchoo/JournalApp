@@ -1,3 +1,4 @@
+"""Helpers to move files between paths"""
 from typing import Union
 from pathlib import Path
 from os import listdir, rmdir, mkdir
@@ -22,6 +23,7 @@ def remove_empty_parent_folders(folder: Path):
 
 
 def path_has_image_extension(path: Path) -> bool:
+    """Image path is a recognised image extention"""
     for tag in ImageConstants.reserved_image_tags:
         ending_position = path.stem.rfind(tag)
         if ending_position >= 0 and ending_position == len(path.stem) - len(tag):
@@ -29,48 +31,55 @@ def path_has_image_extension(path: Path) -> bool:
     return False
 
 
-def makeParentFolders(target_folder: Path) -> None:
+def make_parent_folders(target_folder: Path):
+    """Keep making parent folders until it exists"""
     if target_folder.exists():
         return
 
     if not target_folder.parent.exists():
-        makeParentFolders(target_folder.parent)
+        make_parent_folders(target_folder.parent)
 
     mkdir(str(target_folder))
 
 
-def getMediaPath(file_name: Union[str, Path]) -> str:
+def get_media_path(file_name: Union[str, Path]) -> str:
+    """Get path of object in entry folder"""
     return f"{ENTRY_FOLDER}/{file_name}"
 
 
-def getIconPath(file_path: Path) -> Path:
-    extention = ".jpg" if file_path.suffix == ".mp4" else file_path.suffix
-    icon_file_name = f"{file_path.stem}_icon{extention}"
-    return file_path.parent / icon_file_name
+def get_icon_filename(image_file_path: Path) -> Path:
+    """Get the equivalent icon filename for an image path"""
+    extention = ".jpg" if image_file_path.suffix == ".mp4" else image_file_path.suffix
+    icon_file_name = f"{image_file_path.stem}_icon{extention}"
+    return image_file_path.parent / icon_file_name
 
 
-def getIconPathFromRelativePath(realtive_file_path: Path) -> Path:
-    target_icon_path = f"{ENTRY_FOLDER}/{getIconPath(realtive_file_path)}"
+def get_icon_file_path(realtive_file_path: Path) -> Path:
+    """Get icon file path from image file path"""
+    target_icon_path = f"{ENTRY_FOLDER}/{get_icon_filename(realtive_file_path)}"
     return Path(target_icon_path)
 
 
-def getStoredMediaFolder(entry_name: str) -> str:
-    year, month, day = entry_name.split("-")
+def get_stored_media_folder(date_pattern: str) -> str:
+    """Get folder path from date pattern"""
+    year, month, day = date_pattern.split("-")
     return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
 
 
-def getStoredMediaPath(file_name: str, entry_name: str) -> str:
-    target_folder = getStoredMediaFolder(entry_name)
-    return f"{target_folder}/{file_name}"
+def get_stored_media_path(file_name: str, date_pattern: str) -> str:
+    """Get path of file entry folder"""
+    return f"{get_stored_media_folder(date_pattern)}/{file_name}"
 
 
-def makeImagePathRelative(file_name: str) -> str:
+def make_image_path_relative(file_name: str) -> str:
+    """Remove entry folder from the beginning of file path"""
     if file_name.startswith(ENTRY_FOLDER):
         file_name = file_name[len(ENTRY_FOLDER) :]
     return file_name
 
 
-def getResizeName(file_path: Path) -> Path:
+def get_resized_filename(file_path: Path) -> Path:
+    """Get resized image path from original file path"""
     extention = (
         f".{VideoConstants.save_image_extention}"
         if file_path.suffix == ".mp4"
@@ -79,17 +88,18 @@ def getResizeName(file_path: Path) -> Path:
     return file_path.parent / f"{file_path.stem}_resized{extention}"
 
 
-def moveMediaToSavePath(target_file_path: str, file_name: str):
-    target_path_obj = Path(target_file_path)
-    if target_path_obj.exists():
+def move_media_to_save_path(target_file_path: str, file_name: str):
+    """Move media for entry folder to its sorted date folder"""
+    path = Path(target_file_path)
+    if path.exists():
         return target_file_path
 
-    source_file_path = getMediaPath(file_name)
+    source_file_path = get_media_path(file_name)
     output_path = source_file_path
 
-    target_folder = target_path_obj.parent
+    target_folder = path.parent
     if Path(source_file_path).exists():
-        makeParentFolders(target_folder)
+        make_parent_folders(target_folder)
         move(source_file_path, target_file_path)
         output_path = target_file_path
 
