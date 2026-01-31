@@ -1,49 +1,55 @@
-from django import forms
-from django.forms import Form
+"""Forms to get full images and move an entry to another date"""
 from pathlib import Path
+
+from django.forms import Form, SlugField, CharField, ValidationError
 
 from main.Helpers.file_utils import getStoredMediaPath
 import main.models as models
 from main.Helpers.date_slugs import get_valid_date_from_slug
+# ToDo - forms probably belong in one place
 
 
 class FullImagePath(Form):
-    name = forms.SlugField()
-    file = forms.CharField(max_length=256)
+    """Request a full image path"""
+    name = SlugField()
+    file = CharField(max_length=256)
 
-    def clean_file(self):
+    def clean_file(self) -> CharField:
         clean_data = super().clean()
         target_path = getStoredMediaPath(clean_data["file"], clean_data["name"])
 
         if not Path(target_path).exists():
-            raise forms.ValidationError(f"File {target_path} does not exist")
+            raise ValidationError(f"File {target_path} does not exist")
 
         return target_path
 
 
 class DateMoveForm(Form):
-    move_from = forms.SlugField()
-    move_to = forms.SlugField()
+    """Request to move from one date to another"""
+    move_from = SlugField()
+    move_to = SlugField()
 
-    def clean_move_from(self):
+    def clean_move_from(self) -> SlugField:
+        """Ensure moving from date is valid"""
         clean_data = super().clean()
         move_from = clean_data["move_from"]
 
         if not models.Entry.objects.filter(pk=move_from).exists():
-            raise forms.ValidationError(f"Source date {move_from} is not saved")
+            raise ValidationError(f"Source date {move_from} is not saved")
 
         return move_from
 
-    def clean_move_to(self):
+    def clean_move_to(self) -> SlugField:
+        """Ensure moving to date is valid"""
         clean_data = super().clean()
         move_to = clean_data["move_to"]
 
         if not get_valid_date_from_slug(move_to):
-            raise forms.ValidationError(
+            raise ValidationError(
                 f"Destination date must be a real date {move_to}"
             )
 
         if models.Entry.objects.filter(pk=move_to).exists():
-            raise forms.ValidationError(f"Destination date {move_to} already exists")
+            raise ValidationError(f"Destination date {move_to} already exists")
 
         return move_to
