@@ -4,7 +4,7 @@ from pathlib import Path
 
 from main.Helpers.file_utils import getStoredMediaPath
 import main.models as models
-from main.Helpers.date_slugs import getValidDateFromSlug
+from main.Helpers.date_slugs import get_valid_date_from_slug
 
 
 class FullImagePath(Form):
@@ -38,7 +38,7 @@ class DateMoveForm(Form):
         clean_data = super().clean()
         move_to = clean_data["move_to"]
 
-        if not getValidDateFromSlug(move_to):
+        if not get_valid_date_from_slug(move_to):
             raise forms.ValidationError(
                 f"Destination date must be a real date {move_to}"
             )

@@ -16,7 +16,7 @@ from main.Helpers.file_utils import (
     moveMediaToSavePath,
 )
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.date_slugs import getValidDateFromSlug
+from main.Helpers.date_slugs import get_valid_date_from_slug
 
 
 class EntryForm(ModelForm):
@@ -28,7 +28,7 @@ class EntryForm(ModelForm):
         clean_data = super().clean()
         name = clean_data["name"]
 
-        entry_date = getValidDateFromSlug(name)
+        entry_date = get_valid_date_from_slug(name)
 
         if entry_date is None:
             raise forms.ValidationError(f"Entry must have a real date {name}")

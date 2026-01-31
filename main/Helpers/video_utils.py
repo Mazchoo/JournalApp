@@ -13,7 +13,7 @@ from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import get_icon_file_path, get_resized_filename
 from main.Helpers.image_utils import (
     load_image_directly,
-    getSquareResizedImage,
+    get_square_resized_image,
     add_encoding_type_to_base64,
 )
 from main.Helpers.video_capture import VideoCapture
@@ -52,7 +52,7 @@ def create_video_icon(video_path: Path) -> bool:
 
         image = Image.fromarray(frame)
 
-    image_resized = getSquareResizedImage(image, VideoConstants.icon_size)
+    image_resized = get_square_resized_image(image, VideoConstants.icon_size)
     image_resized.save(target_icon_file_path)
 
     return True

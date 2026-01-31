@@ -7,14 +7,14 @@ from main.Helpers.date_information import (
     addYearInformation,
 )
 from main.Helpers.date_request import putVargsIntoContext
-from main.Helpers.date_slugs import dateExists
+from main.Helpers.date_slugs import date_exists
 from main.Helpers.ajax_request import ajaxRequest
 from main.Helpers.get_year_entry_data import get_year_entry_information
 from main.Helpers.get_all_years_summary import (
     get_all_year_summary_information,
     get_all_entry_years,
 )
-from main.Helpers.get_latest_entry import getLatestEntryTuple
+from main.Helpers.get_latest_entry import get_latest_entry_tuple
 
 from main.ContentGeneration.save_entry import updateOrGenerateEntry
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
@@ -35,7 +35,7 @@ def homePage(request, context):
 
 
 def latestPage(_request):
-    last_date_tuple = getLatestEntryTuple()
+    last_date_tuple = get_latest_entry_tuple()
     if last_date_tuple:
         return redirect(f"/edit/{'/'.join(last_date_tuple)}")
     return redirect("/")
@@ -43,7 +43,7 @@ def latestPage(_request):
 
 @putVargsIntoContext
 def yearPage(request, context):
-    if not dateExists(context):
+    if not date_exists(context):
         return redirect("/date-not-found")
 
     addYearInformation(context)
@@ -53,7 +53,7 @@ def yearPage(request, context):
 
 @putVargsIntoContext
 def monthPage(request, context):
-    if not dateExists(context):
+    if not date_exists(context):
         return redirect("/date-not-found")
 
     addMonthInformation(context)
@@ -63,7 +63,7 @@ def monthPage(request, context):
 
 @putVargsIntoContext
 def editEntryPage(request, context):
-    if not dateExists(context):
+    if not date_exists(context):
         return redirect("/date-not-found")
 
     addDayInformation(context)

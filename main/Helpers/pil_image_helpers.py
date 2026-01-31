@@ -1,20 +1,26 @@
+"""Wrapper around PIL functions"""
 from pathlib import Path
+from typing import Optional
 
 from PIL import Image, ExifTags
+from PIL.Image import Exif
 
 from main.Helpers.image_constants import ImageConstants
 
 
-def getOrientationFlag():
+def get_orientation_flag() -> Optional[str]:
+    """If orientation key is specified in exif tags return it"""
     for key, value in ExifTags.TAGS.items():
         if value == "Orientation":
             return key
+    return None
 
 
-def orientatePILImage(image, exif):
+def orientate_pil_image(image: Image, exif: Exif):
+    """Rotate image to exif orientation if it was specified"""
     if exif is None:
         return image
-    orientation_key = getOrientationFlag()
+    orientation_key = get_orientation_flag()
 
     if orientation_key in exif:
         if exif[orientation_key] == 3:
@@ -27,7 +33,8 @@ def orientatePILImage(image, exif):
     return image
 
 
-def cropImageToSquare(image: Image.Image):
+def crop_image_to_square(image: Image):
+    """Crop image to square size"""
     width, height = image.size
     crop_amount = (max(width, height) - min(width, height)) // 2
 
@@ -39,7 +46,8 @@ def cropImageToSquare(image: Image.Image):
     return image_resized
 
 
-def getResizingFactorToDownSized(file_path: Path):
+def get_resizing_factor_to_downsized(file_path: Path) -> float:
+    """Get factor to resize image to downsized version"""
     image = Image.open(file_path)
     width, height = image.size
     max_dimension = max(width, height)
@@ -52,7 +60,8 @@ def getResizingFactorToDownSized(file_path: Path):
     return factor
 
 
-def getSquareResizedImage(image: Image, target_size: int) -> Image:
-    image = cropImageToSquare(image)
-    image = image.resize((target_size, target_size), resample=Image.LANCZOS)
-    return orientatePILImage(image, image.getexif())
+def get_square_resized_image(image: Image, target_size: int) -> Image:
+    """Get image cropped to square at target size"""
+    image = crop_image_to_square(image)
+    image = image.resize((target_size, target_size), resample=Image.Resampling.BILINEAR)
+    return orientate_pil_image(image, image.getexif())

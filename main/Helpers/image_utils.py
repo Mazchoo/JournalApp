@@ -9,9 +9,9 @@ from PIL import Image
 
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.pil_image_helpers import (
-    getSquareResizedImage,
-    getResizingFactorToDownSized,
-    orientatePILImage,
+    get_square_resized_image,
+    get_resizing_factor_to_downsized,
+    orientate_pil_image,
 )
 from main.Helpers.file_utils import (
     get_icon_file_path,
@@ -35,7 +35,7 @@ def create_image_icon(target_path_obj: Path):
     image = Image.open(target_path_obj)
     icon_size = ImageConstants.icon_size
 
-    image_resized = getSquareResizedImage(image, icon_size)
+    image_resized = get_square_resized_image(image, icon_size)
     image_resized.save(target_icon_file_path)
 
     return True
@@ -76,7 +76,7 @@ def get_resized_base64(file_path: Path, factor: float, ecoding_type: str) -> str
     image_resized = image.resize(
         (width // factor, height // factor), resample=Image.Resampling.BILINEAR
     )  # type: ignore
-    image_resized = orientatePILImage(image_resized, image.getexif())
+    image_resized = orientate_pil_image(image_resized, image.getexif())
 
     image_resized.save(resized_path, format=ecoding_type)
 
@@ -107,7 +107,7 @@ def fetch_base64_image_data(file_path: Union[Path, str]) -> str:
         file_path.exists()
         and file_path.suffix.lower() in ImageConstants.supported_extensions
     ):
-        factor = getResizingFactorToDownSized(file_path)
+        factor = get_resizing_factor_to_downsized(file_path)
         ecoding_type = get_encoding_type(file_path)
         if factor > 1:
             b64_string = get_resized_base64(file_path, factor, ecoding_type)
