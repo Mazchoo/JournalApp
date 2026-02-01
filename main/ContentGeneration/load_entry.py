@@ -27,7 +27,7 @@ def load_all_content_from_entry(context: dict):
 
 
 # ToDo - this is month information, it should be moved somewhere else
-def addDaysWithAnEntry(context):
+def add_statistics_from_entries_in_month(context):
     """Given month information in context, add list of days where entries exist."""
     month_ind = context["months_in_year"].index(context["month"]) + 1
     next_month_ind = context["months_in_year"].index(context["next_month"]) + 1

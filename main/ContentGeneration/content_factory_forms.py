@@ -1,3 +1,3 @@
-from main.forms import ImageForm, TinyMCEComponent, VideoForm
+from main.forms import ImageForm, ParagraphForm, VideoForm
 
-CONTENT_FORMS = {"image": ImageForm, "paragraph": TinyMCEComponent, "video": VideoForm}
+CONTENT_FORMS = {"image": ImageForm, "paragraph": ParagraphForm, "video": VideoForm}

@@ -19,7 +19,7 @@ from main.Helpers.get_latest_entry import get_latest_entry_tuple
 from main.ContentGeneration.save_entry import update_or_generate_from_request
 from main.ContentGeneration.load_entry import (
     load_all_content_from_entry,
-    addDaysWithAnEntry,
+    add_statistics_from_entries_in_month,
 )
 from main.ContentGeneration.delete_entry import delete_entry_and_content
 from main.ContentGeneration.get_full_image import get_full_image_reponse
@@ -59,7 +59,7 @@ def monthPage(request, context):
         return redirect("/date-not-found")
 
     add_month_information(context)
-    addDaysWithAnEntry(context)
+    add_statistics_from_entries_in_month(context)
     return render(request=request, template_name="month.html", context=context)
 
 
@@ -72,7 +72,7 @@ def editEntryPage(request, context):
     get_all_entry_years(context)
     load_all_content_from_entry(context)
 
-    context["tiny_mce"] = forms.TinyMCEComponent()
+    context["tiny_mce"] = forms.ParagraphForm()
 
     return render(request=request, template_name="day.html", context=context)
 

@@ -108,7 +108,7 @@ class VideoForm(ModelForm):
         return makeImagePathRelative(target_path)
 
 
-class TinyMCEComponent(ModelForm):
+class ParagraphForm(ModelForm):
     text = forms.CharField(
         widget=TinyMCE(attrs={"cols": 80, "rows": 30, "required": False})
     )
