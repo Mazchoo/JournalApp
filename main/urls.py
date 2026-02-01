@@ -4,16 +4,16 @@ import main.views as views
 app_name = "main"
 
 urlpatterns = [
-    path("", views.homePage, name="homepage"),
-    path("year/<int:year>/", views.yearPage, name="year"),
-    path("month/<int:year>/<str:month>/", views.monthPage, name="month"),
-    path("edit/<int:year>/<str:month>/<int:day>/", views.editEntryPage, name="edit"),
-    path("show/<int:year>/<str:month>/<int:day>/", views.editEntryPage, name="show"),
-    path("latest", views.latestPage, name="latest"),
-    path("date-not-found", views.dateNotFoundPage, name="date-not-found"),
-    path("ajax/save-entry/", views.saveEntry, name="save-entry"),
-    path("ajax/delete-entry/", views.deleteEntry, name="delete-entry"),
-    path("ajax/get-image/", views.getImage, name="get-image"),
-    path("ajax/get-video/", views.getVideo, name="get-video"),
-    path("ajax/move-date/", views.moveEntryDate, name="move-date"),
+    path("", views.home_page, name="homepage"),
+    path("year/<int:year>/", views.year_page, name="year"),
+    path("month/<int:year>/<str:month>/", views.month_page, name="month"),
+    path("edit/<int:year>/<str:month>/<int:day>/", views.edit_entry_page, name="edit"),
+    path("show/<int:year>/<str:month>/<int:day>/", views.edit_entry_page, name="show"),
+    path("latest", views.latest_page, name="latest"),
+    path("date-not-found", views.date_not_found_page, name="date-not-found"),
+    path("ajax/save-entry/", views.save_entry, name="save-entry"),
+    path("ajax/delete-entry/", views.delete_entry, name="delete-entry"),
+    path("ajax/get-image/", views.get_image, name="get-image"),
+    path("ajax/get-video/", views.get_video, name="get-video"),
+    path("ajax/move-date/", views.move_entry_date, name="move-date"),
 ]
