@@ -9,6 +9,7 @@ from Journal.settings import ENTRY_FOLDER
 
 
 def main():
+    """Unzip all zip files in entry folder"""
     root = Path(ENTRY_FOLDER)
     for _, _, files in os.walk(ENTRY_FOLDER):
         for file in files:
