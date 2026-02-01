@@ -48,11 +48,14 @@ def get_base_entry_path(file_name: Union[str, Path]) -> str:
     return f"{ENTRY_FOLDER}/{file_name}"
 
 
+# ToDo - generate icon path on file creation
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
     extention = ".jpg" if image_file_path.suffix == ".mp4" else image_file_path.suffix
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
-    return image_file_path.parent / icon_file_name
+    month = image_file_path.parent.parent.stem
+    year = image_file_path.parent.parent.parent.stem
+    return Path(f"{ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
 
 
 def get_stored_media_folder(date_pattern: str) -> str:
