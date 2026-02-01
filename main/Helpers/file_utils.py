@@ -48,17 +48,11 @@ def get_base_entry_path(file_name: Union[str, Path]) -> str:
     return f"{ENTRY_FOLDER}/{file_name}"
 
 
-def get_icon_filename(image_file_path: Path) -> Path:
-    """Get the equivalent icon filename for an image path"""
+def get_icon_file_path(image_file_path: Path) -> Path:
+    """Get icon file path from image file path"""
     extention = ".jpg" if image_file_path.suffix == ".mp4" else image_file_path.suffix
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     return image_file_path.parent / icon_file_name
-
-
-def get_icon_file_path(realtive_file_path: Path) -> Path:
-    """Get icon file path from image file path"""
-    target_icon_file_path = f"{ENTRY_FOLDER}/{get_icon_filename(realtive_file_path)}"
-    return Path(target_icon_file_path)
 
 
 def get_stored_media_folder(date_pattern: str) -> str:
