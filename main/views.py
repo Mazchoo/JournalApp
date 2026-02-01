@@ -35,7 +35,10 @@ from main.ContentGeneration.move_date import move_source_date_to_desination_requ
 @put_day_and_month_names_into_context
 def home_page(request, context):
     """Home page summarising all years"""
-    get_all_year_summary_information(context)
+    get_all_entry_years(context)
+    context["icon_paths"] = get_all_year_summary_information(
+        tuple(context["all_years"])
+    )
     return render(request=request, template_name="home.html", context=context)
 
 

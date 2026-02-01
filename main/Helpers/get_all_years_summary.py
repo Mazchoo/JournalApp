@@ -4,7 +4,7 @@ import random
 import datetime
 from os import getcwd
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 from functools import lru_cache
 
 from django.db.models.functions import ExtractYear
@@ -81,9 +81,9 @@ def get_random_images_from_year(year: int) -> List[str]:
 
 
 @lru_cache(maxsize=1)
-def get_all_year_summary_information(context: dict):
+def get_all_year_summary_information(years: Tuple[str]):
     """Get information about stored years."""
-    context = get_all_entry_years(context)
-    context["icon_paths"] = {}
-    for year in context["all_years"]:
-        context["icon_paths"][year] = get_random_images_from_year(year)
+    icons = {}
+    for year in years:
+        icons[year] = get_random_images_from_year(year)
+    return icons
