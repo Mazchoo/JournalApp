@@ -21,7 +21,7 @@ from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAn
 from main.ContentGeneration.delete_entry import delete_entry_and_content
 from main.ContentGeneration.get_full_image import get_full_image_reponse
 from main.ContentGeneration.get_full_video import getFullVideoResponse
-from main.ContentGeneration.move_date import moveSourceDateToDestinationDate
+from main.ContentGeneration.move_date import move_source_date_to_desination_request
 
 # ToDo - Consider using type script and bundle to compile javascript functions
 # ToDo - Add some tests for saving content from scratch
@@ -104,5 +104,5 @@ def getVideo(post_data: dict):
 
 @ajax_request
 def moveEntryDate(post_data: dict):
-    return moveSourceDateToDestinationDate(post_data)
+    return move_source_date_to_desination_request(post_data)
 

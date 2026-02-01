@@ -1,4 +1,5 @@
 """Forms to get full images and move an entry to another date"""
+
 from pathlib import Path
 
 from django.forms import Form, SlugField, CharField, ValidationError
@@ -11,6 +12,7 @@ from main.Helpers.date_slugs import get_valid_date_from_slug
 
 class FullImagePath(Form):
     """Request a full image path"""
+
     name = SlugField()
     file = CharField(max_length=256)
 
@@ -27,6 +29,7 @@ class FullImagePath(Form):
 
 class DateMoveForm(Form):
     """Request to move from one date to another"""
+
     move_from = SlugField()
     move_to = SlugField()
 
@@ -46,9 +49,7 @@ class DateMoveForm(Form):
         move_to = clean_data["move_to"]
 
         if not get_valid_date_from_slug(move_to):
-            raise ValidationError(
-                f"Destination date must be a real date {move_to}"
-            )
+            raise ValidationError(f"Destination date must be a real date {move_to}")
 
         if Entry.objects.filter(pk=move_to).exists():
             raise ValidationError(f"Destination date {move_to} already exists")

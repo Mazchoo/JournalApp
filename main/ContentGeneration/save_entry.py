@@ -1,4 +1,5 @@
 """Save an entry to the database"""
+
 from datetime import datetime
 import re
 from typing import Tuple, List, Optional
@@ -49,7 +50,9 @@ def create_or_get_entry(name: str) -> Tuple[Optional[str], Optional[Entry]]:
     return error, entry
 
 
-def generate_new_content(model_form: ModelForm, entry_type: str) -> Tuple[Optional[ErrorDict], Optional[str]]:
+def generate_new_content(
+    model_form: ModelForm, entry_type: str
+) -> Tuple[Optional[ErrorDict], Optional[str]]:
     """Delegate content type to its form and check the form is valid"""
     if model_form.is_valid():
         model_form.save(commit=True)
