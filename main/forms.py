@@ -1,30 +1,36 @@
+"""Data validation to create or edit models"""
+
+from pathlib import Path
+
 from django import forms
 from django.forms import ModelForm
 from django.db import models as django_models
-from pathlib import Path
 from tinymce.widgets import TinyMCE  # type: ignore
 
-import main.models as models
+from main.models import Entry, EntryImage, EntryParagraph, EntryVideo, Content
 from main.Helpers.image_utils import move_image_to_save_path
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import (
-    pathHasImageTag,
-    getStoredMediaPath,
-    getMediaPath,
-    makeImagePathRelative,
-    moveMediaToSavePath,
+    path_has_image_extension,
+    get_stored_media_path,
+    get_base_entry_path,
+    make_image_path_relative,
+    move_media_to_save_path,
 )
 from main.ContentGeneration.content_factory_models import CONTENT_MODELS
 from main.Helpers.date_slugs import get_valid_date_from_slug
 
 
 class EntryForm(ModelForm):
+    """A dated journal entry - at most one entry per date"""
+
     class Meta:
-        model = models.Entry
+        model = Entry
         fields = ["name", "first_created", "last_edited", "date"]
 
     def clean_date(self):
+        """Convert slug string into date object"""
         clean_data = super().clean()
         name = clean_data["name"]
 
@@ -37,11 +43,14 @@ class EntryForm(ModelForm):
 
 
 class ImageForm(ModelForm):
+    """Image content that belongs to an entry form"""
+
     class Meta:
-        model = models.EntryImage
+        model = EntryImage
         fields = "__all__"
 
     def clean_file_path(self):
+        """Ensure file path refers to usuable file"""
         clean_data = super().clean()
         file_name = clean_data["file_path"]
         entry = clean_data["entry"]
@@ -52,10 +61,10 @@ class ImageForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        target_path = getStoredMediaPath(file_name, entry.name)
+        target_path = get_stored_media_path(file_name, entry.name)
         target_file_obj = Path(target_path)
 
-        source_path = getMediaPath(file_name)
+        source_path = get_base_entry_path(file_name)
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
@@ -65,21 +74,24 @@ class ImageForm(ModelForm):
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
-        if pathHasImageTag(target_file_obj):
+        if path_has_image_extension(target_file_obj):
             message = f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}"
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)
 
-        return makeImagePathRelative(target_path)
+        return make_image_path_relative(target_path)
 
 
 class VideoForm(ModelForm):
+    """Form to create a video content for entry"""
+
     class Meta:
-        model = models.EntryVideo
+        model = EntryVideo
         fields = "__all__"
 
     def clean_file_path(self):
+        """Ensure file path refers to usuable file"""
         clean_data = super().clean()
         file_name = clean_data["file_path"]
         entry = clean_data["entry"]
@@ -90,10 +102,10 @@ class VideoForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        target_path = getStoredMediaPath(file_name, entry.name)
+        target_path = get_stored_media_path(file_name, entry.name)
         target_file_obj = Path(target_path)
 
-        source_path = getMediaPath(file_name)
+        source_path = get_base_entry_path(file_name)
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
@@ -103,28 +115,32 @@ class VideoForm(ModelForm):
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
-        moveMediaToSavePath(target_path, file_name)
-
-        return makeImagePathRelative(target_path)
+        move_media_to_save_path(target_path, file_name)
+        return make_image_path_relative(target_path)
 
 
 class ParagraphForm(ModelForm):
+    """Text content in journal entry"""
+
     text = forms.CharField(
         widget=TinyMCE(attrs={"cols": 80, "rows": 30, "required": False})
     )
-    entry = django_models.ForeignKey(models.Entry, on_delete=django_models.CASCADE)
+    entry = django_models.ForeignKey(Entry, on_delete=django_models.CASCADE)
 
     class Meta:
-        model = models.EntryParagraph
+        model = EntryParagraph
         fields = "__all__"
 
 
 class ContentForm(ModelForm):
+    """Generic content that applies to all content types e.g. image, text, ect."""
+
     class Meta:
-        model = models.Content
+        model = Content
         fields = "__all__"
 
     def clean(self):
+        """Ensure content type can refer to model"""
         clean_data = super().clean()
         content_type = clean_data["content_type"]
         if content_type not in CONTENT_MODELS:

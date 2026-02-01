@@ -138,7 +138,7 @@ def create_collage_image(
 
 
 @lru_cache(maxsize=1024)
-def getCollageBase64Data(file_path: Union[Path, str]) -> str:
+def get_collage_base64(file_path: Union[Path, str]) -> str:
     """Will create collage once and not update it when the video parameters change"""
     file_path = Path(file_path)
     create_video_icon(file_path)

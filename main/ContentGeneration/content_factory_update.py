@@ -1,4 +1,5 @@
 """Update content delegate update date functions"""
+
 from pathlib import Path
 from django.forms import model_to_dict
 
@@ -24,7 +25,9 @@ def get_updated_date_video(video: EntryVideo, destination_slug: str) -> VideoFor
     return VideoForm(new_video_dict)
 
 
-def getUpdatedDateParagraph(paragraph: EntryParagraph, destination_slug: str) -> ParagraphForm:
+def getUpdatedDateParagraph(
+    paragraph: EntryParagraph, destination_slug: str
+) -> ParagraphForm:
     """Update paragraph content date with a new form"""
     new_paragraph_dict = model_to_dict(paragraph)
     new_paragraph_dict["entry"] = destination_slug

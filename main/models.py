@@ -1,13 +1,18 @@
-from django.db.models import Model
-from django.db import models
+"""Defintition of information need to use dated entries and contents of entries"""
+
 from pathlib import Path
 
+from django.db.models import Model
+from django.db import models
+
 from main.Helpers.image_utils import fetch_base64_image_data
-from main.Helpers.file_utils import getMediaPath
-from main.Helpers.video_utils import getCollageBase64Data
+from main.Helpers.file_utils import get_base_entry_path
+from main.Helpers.video_utils import get_collage_base64
 
 
 class Content(Model):
+    """Stored data added to an entry (e.g. text, image, ect.)"""
+
     content_type = models.CharField(max_length=10)
     content_id = models.BigIntegerField()
 
@@ -16,6 +21,8 @@ class Content(Model):
 
 
 class Entry(Model):
+    """A dated journal entry"""
+
     name = models.SlugField(max_length=10, primary_key=True)
     date = models.DateTimeField()
     first_created = models.DateTimeField()
@@ -27,6 +34,8 @@ class Entry(Model):
 
 
 class EntryImage(Model):
+    """Image content added to an entry"""
+
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
     original = models.BooleanField()
@@ -37,8 +46,9 @@ class EntryImage(Model):
     def __str__(self):
         return self.file_path
 
-    def view(self):
-        full_path = getMediaPath(self.file_path)
+    def view(self) -> dict:
+        """Web displayable view"""
+        full_path = get_base_entry_path(self.file_path)
         file_name = Path(self.file_path).name
         b64_string = fetch_base64_image_data(full_path)
 
@@ -50,6 +60,8 @@ class EntryImage(Model):
 
 
 class EntryVideo(Model):
+    """Video content added to an entry"""
+
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
     original = models.BooleanField()
@@ -60,10 +72,11 @@ class EntryVideo(Model):
     def __str__(self):
         return self.file_path
 
-    def view(self):
-        full_path = getMediaPath(self.file_path)
+    def view(self) -> dict:
+        """Web displayable view"""
+        full_path = get_base_entry_path(self.file_path)
         file_name = Path(self.file_path).name
-        b64_string = getCollageBase64Data(full_path)
+        b64_string = get_collage_base64(full_path)
 
         return {
             "base64": b64_string,
@@ -73,6 +86,8 @@ class EntryVideo(Model):
 
 
 class EntryParagraph(Model):
+    """Text added to an entry"""
+
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     text = models.TextField()
     height = models.IntegerField()
@@ -83,5 +98,6 @@ class EntryParagraph(Model):
     def __str__(self):
         return self.text
 
-    def view(self):
+    def view(self) -> dict:
+        """Web displayable view"""
         return {"text": self.text, "height": self.height}
