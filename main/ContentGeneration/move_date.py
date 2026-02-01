@@ -91,7 +91,9 @@ def generate_content_linked_to_new_entry(
     return new_content_record_id
 
 
-def update_all_content_with_new_entry(content: Content, destination_slug: str, content_ids: List[int], errors: ErrorDict):
+def update_all_content_with_new_entry(
+    content: Content, destination_slug: str, content_ids: List[int], errors: ErrorDict
+):
     """Each each content id move all content to destination date"""
     new_instance_id = generate_new_content_from_source(
         content, destination_slug, errors
@@ -102,7 +104,9 @@ def update_all_content_with_new_entry(content: Content, destination_slug: str, c
         content_ids.append(content_id)
 
 
-def update_entry_date(source_slug: str, destination_slug: str) -> Tuple[Optional[Entry], ErrorDict]:
+def update_entry_date(
+    source_slug: str, destination_slug: str
+) -> Tuple[Optional[Entry], ErrorDict]:
     """Load and move entry from source date slug to destination date slug"""
     entry = Entry.objects.get(name=source_slug)
     move_files_from_entry(entry)
@@ -114,7 +118,9 @@ def update_entry_date(source_slug: str, destination_slug: str) -> Tuple[Optional
     errors = ErrorDict()
     content_ids = []
     for content in entry.content.all():
-        update_all_content_with_new_entry(content, destination_slug, content_ids, errors)
+        update_all_content_with_new_entry(
+            content, destination_slug, content_ids, errors
+        )
 
     new_entry.content.set(content_ids)
     new_entry.save()
