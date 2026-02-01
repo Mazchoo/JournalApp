@@ -9,6 +9,9 @@ import numpy as np
 from main.Helpers.video_constants import VideoConstants
 
 
+# ToDo - try and do with with image io ffmpeg instead of relying on open cv
+
+
 class VideoCapture:
     """File handle to get video information"""
 
