@@ -5,6 +5,7 @@ import datetime
 from os import getcwd
 from pathlib import Path
 from typing import List
+from functools import lru_cache
 
 from django.db.models.functions import ExtractYear
 
@@ -47,8 +48,6 @@ def get_selection_of_icons(valid_images: List[Path]) -> List[Path]:
     elif valid_images:
         selected_image_paths = random.choices(valid_images, k=NR_IMAGES_TO_DISPLAY)
     else:
-        # ToDo Make missing image a fixed path
-        # ToDo get a completely random set of icons for this case
         selected_image_paths = [Path(f"{getcwd()}{MISSING_IMAGE}")]
         selected_image_paths *= NR_IMAGES_TO_DISPLAY
 
@@ -81,6 +80,7 @@ def get_random_images_from_year(year: int) -> List[str]:
     return [get_base64_from_image(p) for p in valid_icon_paths]
 
 
+@lru_cache(maxsize=1)
 def get_all_year_summary_information(context: dict):
     """Get information about stored years."""
     context = get_all_entry_years(context)
