@@ -1,18 +1,23 @@
+"""Save an entry to the database"""
 from datetime import datetime
 import re
+from typing import Tuple, List, Optional
+
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
-from typing import Tuple, List
+from django.forms import ModelForm
 
-import main.models as models
-import main.forms as forms
-
+from main.models import Entry
+from main.forms import EntryForm, ContentForm
 from main.ContentGeneration.delete_entry import delete_entry_content
 from main.ContentGeneration.content_factory_forms import CONTENT_FORMS
 
+# ToDo - Errors as return should probably be single type and not return tuple
 
-def generateNewEntry(name: str):
-    entry_form = forms.EntryForm(
+
+def generate_new_entry(name: str) -> Tuple[Optional[str], Optional[Entry]]:
+    """If entry form is valid return new entry referred to by name"""
+    entry_form = EntryForm(
         {
             "name": name,
             "first_created": datetime.now(),
@@ -31,22 +36,24 @@ def generateNewEntry(name: str):
     return None, entry
 
 
-def getPostEntry(name: str):
-    entry_query = models.Entry.objects.all().filter(name=name)
+def create_or_get_entry(name: str) -> Tuple[Optional[str], Optional[Entry]]:
+    """Create entry if it doesn't exist else return it"""
+    entry_query = Entry.objects.all().filter(name=name)
     error = None
 
     if entry_query.exists():
         entry = entry_query[0]
     else:
-        error, entry = generateNewEntry(name)
+        error, entry = generate_new_entry(name)
 
     return error, entry
 
 
-def generateNewContent(model_form, entry_type):
+def generate_new_content(model_form: ModelForm, entry_type: str) -> Tuple[Optional[ErrorDict], Optional[str]]:
+    """Delegate content type to its form and check the form is valid"""
     if model_form.is_valid():
         model_form.save(commit=True)
-        content_form = forms.ContentForm(
+        content_form = ContentForm(
             {"content_type": entry_type, "content_id": model_form.instance.pk}
         )
 
@@ -62,9 +69,10 @@ def generateNewContent(model_form, entry_type):
     return None, content_key
 
 
-def processSubmittedContent(
+def parse_submitted_new_content(
     key: str, value: dict, errors: ErrorDict, content_keys: List[str]
 ) -> bool:
+    """Create new content from post data"""
     content_type_match = re.search(r"([A-Za-z]+)\d+", key)
     if not content_type_match:
         errors[f"{key}"] = " => Invalid content syntax"
@@ -78,7 +86,7 @@ def processSubmittedContent(
     content_fields = dict(value)
     model_form = CONTENT_FORMS[entry_type](content_fields)
 
-    error, content_key = generateNewContent(model_form, entry_type)
+    error, content_key = generate_new_content(model_form, entry_type)
     if error:
         for field_name, message in error.items():
             errors[f"{key}.{field_name}"] = message
@@ -88,20 +96,21 @@ def processSubmittedContent(
     return True
 
 
-def saveContentToDatabase(content_dict: dict) -> Tuple[ErrorDict, list]:
+def process_content_submitted(content_dict: dict) -> Tuple[ErrorDict, List[str]]:
+    """For all content in post save content to database"""
     content_keys = []  # type: list
     errors = ErrorDict()
 
     for key, value in content_dict.items():
         try:
-            processSubmittedContent(key, value, errors, content_keys)
-        except Exception:
-            errors[f"{key}"] = " => Internal server error"
+            parse_submitted_new_content(key, value, errors, content_keys)
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            errors[f"{key}"] = f" => Internal server error: {e}"
 
     return errors, content_keys
 
 
-def updateOrGenerateEntry(post_data: dict):
+def update_or_generate_from_request(post_data: dict):
     """
     Delete all previous objects associated with entry and save the object again.
     Each entry has content which are content objects with types and a foreign key.
@@ -110,7 +119,7 @@ def updateOrGenerateEntry(post_data: dict):
     if "name" not in post_data:
         return JsonResponse({"error": "Entry name not specified"})
 
-    error, entry = getPostEntry(post_data["name"])
+    error, entry = create_or_get_entry(post_data["name"])
     if error is not None:
         return JsonResponse({"error": error})
 
@@ -118,7 +127,7 @@ def updateOrGenerateEntry(post_data: dict):
         return JsonResponse({"error": "No content in entry"})
 
     delete_entry_content(entry)
-    content_errors, content_ids = saveContentToDatabase(post_data["content"])
+    content_errors, content_ids = process_content_submitted(post_data["content"])
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)

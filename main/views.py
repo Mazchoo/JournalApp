@@ -16,7 +16,7 @@ from main.Helpers.get_all_years_summary import (
 )
 from main.Helpers.get_latest_entry import get_latest_entry_tuple
 
-from main.ContentGeneration.save_entry import updateOrGenerateEntry
+from main.ContentGeneration.save_entry import update_or_generate_from_request
 from main.ContentGeneration.load_entry import loadContentForEntry, addDaysWithAnEntry
 from main.ContentGeneration.delete_entry import delete_entry_and_content
 from main.ContentGeneration.get_full_image import get_full_image_reponse
@@ -89,7 +89,7 @@ def deleteEntry(post_data: dict):
 
 @ajax_request
 def saveEntry(post_data: dict):
-    return updateOrGenerateEntry(post_data)
+    return update_or_generate_from_request(post_data)
 
 
 @ajax_request
@@ -105,3 +105,4 @@ def getVideo(post_data: dict):
 @ajax_request
 def moveEntryDate(post_data: dict):
     return moveSourceDateToDestinationDate(post_data)
+

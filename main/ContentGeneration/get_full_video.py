@@ -1,13 +1,14 @@
 """Handle video request to view a single video"""
 
 from pathlib import Path
-from django.http import JsonResponse, FileResponse
 import mimetypes
+
+from django.http import JsonResponse, FileResponse
 
 from main.ContentGeneration.request_forms import FullImagePath
 
 
-def getVideoPath(post_data):
+def get_video_path_from_post(post_data: dict):
     """Get video path from content data"""
     full_video_form = FullImagePath(post_data)
 
@@ -17,7 +18,7 @@ def getVideoPath(post_data):
     return full_video_form.cleaned_data["file"], None
 
 
-def getVideoMimeType(target_path):
+def get_video_mime_type(target_path: str):
     """Get the MIME type for the video file."""
     mime_type, _ = mimetypes.guess_type(target_path)
     if mime_type and mime_type.startswith("video/"):
@@ -26,15 +27,15 @@ def getVideoMimeType(target_path):
     return "video/mp4"
 
 
-def createVideoStreamResponse(target_path):
+def create_video_stream_response(target_path: str):
     """Create a streaming response for the video file."""
-    target_path = Path(target_path)
+    path = Path(target_path)
 
-    if not target_path.exists():
+    if not path.exists():
         return None, "Video file does not exist"
 
     try:
-        mime_type = getVideoMimeType(str(target_path))
+        mime_type = get_video_mime_type(target_path)
 
         # Use FileResponse for efficient video streaming with range request support
         # pylint: disable=consider-using-with
@@ -42,21 +43,21 @@ def createVideoStreamResponse(target_path):
 
         # Set headers for video streaming
         response["Accept-Ranges"] = "bytes"
-        response["Content-Length"] = target_path.stat().st_size
+        response["Content-Length"] = path.stat().st_size
 
         return response, None
 
-    except Exception as e:
+    except (OSError, ValueError, KeyError) as e:
         return None, f"Error streaming video: {str(e)}"
 
 
 def getFullVideoResponse(post_data: dict):
     """Return video streaming data if video exists"""
-    target_path, error = getVideoPath(post_data)
+    target_path, error = get_video_path_from_post(post_data)
     if error is not None:
         return JsonResponse({"error": error})
 
-    video_response, error = createVideoStreamResponse(target_path)
+    video_response, error = create_video_stream_response(target_path)
     if error is not None:
         return JsonResponse({"error": error})
 
