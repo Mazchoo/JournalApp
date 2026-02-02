@@ -97,6 +97,7 @@ def date_not_found_page(request):
     return render(request=request, template_name="DateNotFound.html")
 
 
+# ToDo delete related icons as well if they exist
 @ajax_request
 def delete_entry(post_data):
     """Async delete an entry"""

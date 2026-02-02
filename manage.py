@@ -13,11 +13,12 @@ from django.core.management.utils import get_random_secret_key
 USERNAME_REGEX = "^[A-Za-z_][A-Za-z0-9_]*"
 
 
-def generate_security_dict(username: str, password: str):
+def generate_security_dict(username: str, password: str, entry_folder: str):
     """Create security credentials for user and saves them to git-ignored file"""
     security_dict = {
         "ADMIN_USERNAME": username,
         "ADMIN_PASSWORD": password,
+        "ENTRY_FOLDER": entry_folder,
         "SECRET_KEY": f"django-insecure-{get_random_secret_key()}",
     }
     with open(f"{os.getcwd()}/security.json", "w", encoding="utf-8") as f:
@@ -35,7 +36,11 @@ def add_security_key():
     while len(password) < 8:
         password = input("Create a password with 8 characters or more :")
 
-    generate_security_dict(username, password)
+    entry_folder = ""
+    while not entry_folder or not Path(entry_folder).exists():
+        entry_folder = input("Specify the directory of the entry folder e.g. D:/Entries :")
+
+    generate_security_dict(username, password, entry_folder)
 
 
 def main(command: List[str]):

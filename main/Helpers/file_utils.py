@@ -8,7 +8,7 @@ from shutil import move
 from main.Helpers.image_constants import ImageConstants
 from main.Helpers.video_constants import VideoConstants
 
-from Journal.settings import ENTRY_FOLDER
+from Journal.settings import ENTRY_FOLDER, MISSING_ICON_IMAGE
 
 
 def remove_empty_parent_folders(folder: Path):
@@ -51,6 +51,9 @@ def get_base_entry_path(file_name: Union[str, Path]) -> str:
 # ToDo - generate icon path on file creation
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
+    if image_file_path == MISSING_ICON_IMAGE:
+        return image_file_path  # Already suitable to be an icon
+
     extention = ".jpg" if image_file_path.suffix == ".mp4" else image_file_path.suffix
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     month = image_file_path.parent.parent.stem

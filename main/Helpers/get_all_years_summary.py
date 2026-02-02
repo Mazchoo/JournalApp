@@ -9,13 +9,13 @@ from functools import lru_cache
 
 from django.db.models.functions import ExtractYear
 
+from Journal.settings import MISSING_ICON_IMAGE
 from main.models import Entry, EntryImage
 from main.Helpers.image_utils import get_base64_from_image, create_image_icon
 from main.Helpers.file_utils import get_icon_file_path, get_base_entry_path
 
 # ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18
-MISSING_IMAGE = "/static/Image/missing_icon.png"
 
 
 def get_current_year():
@@ -48,7 +48,7 @@ def get_selection_of_icons(valid_images: List[Path]) -> List[Path]:
     elif valid_images:
         selected_image_paths = random.choices(valid_images, k=NR_IMAGES_TO_DISPLAY)
     else:
-        selected_image_paths = [Path(f"{getcwd()}{MISSING_IMAGE}")]
+        selected_image_paths = [MISSING_ICON_IMAGE]
         selected_image_paths *= NR_IMAGES_TO_DISPLAY
 
     return selected_image_paths
@@ -62,7 +62,7 @@ def get_valid_icon_paths(selected_img_paths: List[Path]) -> List[Path]:
         if icon_path.exists() or create_image_icon(path):
             valid_icon_paths.append(icon_path)
         else:
-            valid_icon_paths.append(Path(f"{getcwd()}{MISSING_IMAGE}"))
+            valid_icon_paths.append(Path(f"{getcwd()}{MISSING_ICON_IMAGE}"))
 
     return valid_icon_paths
 

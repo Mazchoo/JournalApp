@@ -36,6 +36,7 @@ def create_image_icon(target_path_obj: Path):
     icon_size = ImageConstants.icon_size
 
     image_resized = get_square_resized_image(image, icon_size)
+    target_icon_file_path.parent.mkdir(parents=True, exist_ok=True)
     image_resized.save(target_icon_file_path)
 
     return True

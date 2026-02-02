@@ -29,6 +29,9 @@ ADMIN_USERNAME = SECURITY_JSON["ADMIN_USERNAME"]
 ADMIN_PASSWORD = SECURITY_JSON["ADMIN_PASSWORD"]
 ENTRY_FOLDER = SECURITY_JSON["ENTRY_FOLDER"]
 
+# Display Settings
+MISSING_ICON_IMAGE = STATIC_DIR / "Image/missing_icon.png"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
