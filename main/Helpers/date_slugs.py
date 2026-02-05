@@ -33,9 +33,9 @@ def convert_date_to_url_tuple(date: datetime) -> Tuple[str, str, str]:
 def date_exists(context) -> bool:
     """Return if day, month, year in context represents a real date"""
     # ToDo - use better type instead of context
-    day = context["day"] if "day" in context else 1
+    day = context.get("day", 1)
 
-    month = context["month"] if "month" in context else "January"
+    month = context.get("month", "January")
     month_names = DateConstants.month_names
     month_ind = month_names.index(month) + 1
 

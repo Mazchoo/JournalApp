@@ -1,5 +1,4 @@
 
-# ToDo - make a new security file if none exists
 security.json
 
 *.pyc

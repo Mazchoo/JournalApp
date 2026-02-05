@@ -5,9 +5,8 @@ from pathlib import Path
 from functools import lru_cache
 from collections import namedtuple
 
-import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 from main.Helpers.video_constants import VideoConstants
 from main.Helpers.file_utils import get_icon_file_path, get_resized_filename
@@ -112,15 +111,28 @@ def draw_frame_to_collage(
     frame_index += j * collage_dims.frame_increment
 
     frame = capture.get_frame_at_idx(frame_index)
-    frame = cv2.resize(frame, dsize=(collage_dims.width, collage_dims.height))
+    if frame is None:
+        return
+
+    # Convert to PIL for resizing
+    pil_frame = Image.fromarray(frame)
+    pil_frame = pil_frame.resize(
+        (collage_dims.width, collage_dims.height),
+        resample=Image.Resampling.BILINEAR,
+    )
+
+    # Apply smoothing filter if bilateral filter flag is enabled
     if VideoConstants.billateral_filter:
-        frame = cv2.bilateralFilter(frame, 15, 75, 75)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pil_frame = pil_frame.filter(ImageFilter.SMOOTH)
+
+    # Convert back to numpy array (already RGB - no conversion needed)
+    frame = np.array(pil_frame)
+
     collage_image[start_y:end_y, start_x:end_x, :] = frame
 
 
 def create_collage_image(
-    capture: VideoCapture, rescale_factor: int, resized_path: Path
+    capture: VideoCapture, rescale_factor: int, target_path: Path
 ) -> Image:
     """Create collage image from video"""
     collage_dims = get_collage_display_dimensions(capture, rescale_factor)
@@ -133,6 +145,7 @@ def create_collage_image(
             draw_frame_to_collage(capture, collage_dims, i, j, collage_image)
 
     image_resized = Image.fromarray(collage_image)
+    resized_path = target_path.parent / target_path.name
     image_resized.save(resized_path, format=VideoConstants.save_image_extention)
     return load_image_directly(resized_path)
 
@@ -158,7 +171,7 @@ def get_collage_base64(file_path: Union[Path, str]) -> str:
                     collage_b64, VideoConstants.save_image_extention
                 )
             else:
-                print(f"Error! Video {file_path} could not creat collage!")
+                print(f"Error! Video {file_path} could not create collage!")
                 b64_string = ""
 
         else:
@@ -171,8 +184,8 @@ def get_collage_base64(file_path: Union[Path, str]) -> str:
 if __name__ == "__main__":
     from Journal.settings import ENTRY_FOLDER
 
-    with VideoCapture(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4")) as cap:
+    with VideoCapture(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4")) as cap:
         create_collage_image(
-            cap, 2, Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838_resized.jpeg")
+            cap, 2, Path(f"{ENTRY_FOLDER}/20260129_222725.jpg")
         )
-    create_video_icon(Path(f"{ENTRY_FOLDER}/2024/06/08/20240608_142838.mp4"))
+    create_video_icon(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4"))

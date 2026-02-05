@@ -1,107 +1,89 @@
-"""Wrapper around video feed"""
+"""Wrapper around video feed using imageio-ffmpeg"""
 
 from typing import Tuple, Optional
 from pathlib import Path
+from contextlib import closing
 
-import cv2
 import numpy as np
+import imageio.v3 as iio
+from imageio_ffmpeg import read_frames, count_frames_and_secs
 
 from main.Helpers.video_constants import VideoConstants
 
 
-# ToDo - try and do with with image io ffmpeg instead of relying on open cv
-
-
 class VideoCapture:
-    """File handle to get video information"""
+    """File handle to get video information using imageio-ffmpeg"""
 
     def __init__(self, video_path: Path):
-        self.capture = None
-        self.rotation = 0
+        self._video_path = video_path
+        self._width = 0
+        self._height = 0
+        self._frame_count = 0
+        self._fps = 30.0
+        self._duration = 0.0
+        self._is_valid = False
+
         if not video_path.exists():
             return
-        if not video_path.suffix.lower() in VideoConstants.supported_extensions:
+        if video_path.suffix.lower() not in VideoConstants.supported_extensions:
             return
-        self.capture = cv2.VideoCapture(str(video_path))
-        if self.capture is not None and self.capture.isOpened():
-            self._read_rotation_metadata()
 
-    def _read_rotation_metadata(self):
-        """Read rotation metadata from video file."""
-        try:
-            # Try to get rotation from CAP_PROP_ORIENTATION (OpenCV 4.5+)
-            if hasattr(cv2, "CAP_PROP_ORIENTATION_META"):
-                rotation = self.capture.get(cv2.CAP_PROP_ORIENTATION_META)
-                if rotation in [0, 90, 180, 270]:
-                    self.rotation = int(rotation)
-                    return
+        self._initialize()
 
-            # Fallback: Try to get rotation from CAP_PROP_ORIENTATION_AUTO
-            if hasattr(cv2, "CAP_PROP_ORIENTATION_AUTO"):
-                rotation = self.capture.get(cv2.CAP_PROP_ORIENTATION_AUTO)
-                if rotation in [0, 90, 180, 270]:
-                    self.rotation = int(rotation)
-                    return
-        except AttributeError:
-            # If reading rotation fails, default to 0 (no rotation)
-            pass
+    def _initialize(self):
+        """Initialize video metadata via imageio-ffmpeg."""
+        # Get frame count and duration
+        self._frame_count, self._duration = count_frames_and_secs(str(self._video_path))
 
-    def get_rotation(self) -> int:
-        """Get the rotation angle in degrees (0, 90, 180, or 270)."""
-        return self.rotation
+        if self._duration > 0 and self._frame_count > 0:
+            self._fps = self._frame_count / self._duration
+
+        # Get dimensions by reading first frame
+        frame = iio.imread(str(self._video_path), index=0)
+        self._height, self._width = frame.shape[:2]
+
+        self._is_valid = self._width > 0 and self._height > 0
 
     def get_width_height(self) -> Tuple[int, int]:
-        """Get width and height of each frame"""
+        """Get width and height of each frame."""
         if not self:
             return (0, 0)
-
-        width = int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-        # Swap dimensions if video is rotated 90 or 270 degrees
-        if self.rotation in [90, 270]:
-            width, height = height, width
-
-        return (width, height)
+        return (self._width, self._height)
 
     def get_total_frames(self) -> int:
-        """Get total number of frames from video"""
+        """Get total number of frames from video."""
         if not self:
             return 0
-
-        return int(self.capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        return self._frame_count
 
     def get_frame_at_idx(self, frame_index: int) -> Optional[np.ndarray]:
-        """Return frame at index if it exists else None"""
+        """Return frame at index using time-based seeking."""
         if not self:
             return None
 
-        self.capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
-
-        ret, frame = self.capture.read()
-        if not ret:
+        if frame_index < 0 or frame_index >= self._frame_count:
             return None
 
-        return self._apply_rotation(frame)
+        timestamp = frame_index / self._fps
 
-    def _apply_rotation(self, frame: np.ndarray) -> np.ndarray:
-        """Apply rotation to frame based on video metadata."""
-        if self.rotation == 90:
-            return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-        if self.rotation == 180:
-            return cv2.rotate(frame, cv2.ROTATE_180)
-        if self.rotation == 270:
-            return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        with closing(read_frames(
+            str(self._video_path),
+            input_params=["-ss", f"{timestamp:.3f}"],
+            output_params=["-vframes", "1"],
+            pix_fmt="rgb24",
+        )) as frame_generator:
+            frame_meta = next(frame_generator)
+            frame_bytes = next(frame_generator)
+
+        w, h = frame_meta.get("size", (self._width, self._height))
+        frame = np.frombuffer(frame_bytes, dtype=np.uint8).reshape((h, w, 3))
         return frame
 
     def __enter__(self):
-        if self.capture is not None and not self.capture.isOpened():
-            self.capture.release()  # Could not open, no point doing anything with capture
         return self
 
     def __bool__(self):
-        return self.capture is not None and self.capture.isOpened()
+        return self._is_valid
 
     def __exit__(self, _type, _value, _traceback):
-        if self.capture is not None:
-            self.capture.release()
+        pass
