@@ -4,9 +4,9 @@ from pathlib import Path
 
 from django.forms import Form, SlugField, CharField, ValidationError
 
-from main.Helpers.file_utils import get_stored_media_path
+from main.utils.file_io import get_stored_media_path
 from main.models import Entry
-from main.Helpers.date_slugs import get_valid_date_from_slug
+from main.helpers.date_slugs import get_valid_date_from_slug
 # ToDo - forms probably belong in one place
 
 

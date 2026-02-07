@@ -1,9 +1,8 @@
 """Request information from single entries"""
 
-from datetime import datetime
-
 from main.models import Entry
-from main.ContentGeneration.content_factory_models import CONTENT_MODELS
+
+from main.content_generation.content_factory_models import CONTENT_MODELS
 
 
 def load_all_content_from_entry(context: dict):
@@ -24,20 +23,3 @@ def load_all_content_from_entry(context: dict):
             output[str(content)] = content_obj.view()  # type: ignore
 
     context["saved_content"] = output
-
-
-# ToDo - this is month information, it should be moved somewhere else
-def add_statistics_from_entries_in_month(context):
-    """Given month information in context, add list of days where entries exist."""
-    month_ind = context["months_in_year"].index(context["month"]) + 1
-    next_month_ind = context["months_in_year"].index(context["next_month"]) + 1
-    first_day = datetime(context["year"], month_ind, 1)
-    last_day = datetime(context["next_month_year"], next_month_ind, 1)
-
-    entries = (
-        Entry.objects.all()
-        .filter(date__date__gte=first_day)
-        .filter(date__date__lt=last_day)
-    )
-
-    context["days_with_an_entry"] = [entry.date.day for entry in entries]

@@ -4,14 +4,8 @@ from typing import Callable
 
 from django.shortcuts import redirect
 
-from main.Helpers.date_contants import DateConstants
-
-
-def add_day_and_month_names(context):
-    """Add names of days and months"""
-    context["full_day_names"] = DateConstants.day_names
-    context["short_day_names"] = DateConstants.day_names_short
-    context["months_in_year"] = DateConstants.month_names
+from main.config.date_constants import DateConstants
+from main.helpers.date_information import add_day_and_month_names
 
 
 # ToDo - checking the date is different from adding general information

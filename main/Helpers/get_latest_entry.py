@@ -4,7 +4,7 @@ from typing import Tuple, Optional
 
 from main.models import Entry
 
-from main.Helpers.date_slugs import convert_date_to_url_tuple
+from main.helpers.date_slugs import convert_date_to_url_tuple
 
 
 def get_latest_entry_tuple() -> Optional[Tuple[str, str, str]]:

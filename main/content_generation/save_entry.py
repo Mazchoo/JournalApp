@@ -10,8 +10,8 @@ from django.forms import ModelForm
 
 from main.models import Entry
 from main.forms import EntryForm, ContentForm
-from main.ContentGeneration.delete_entry import delete_entry_content
-from main.ContentGeneration.content_factory_forms import CONTENT_FORMS
+from main.content_generation.delete_entry import delete_entry_content
+from main.content_generation.content_factory_forms import CONTENT_FORMS
 
 # ToDo - Errors as return should probably be single type and not return tuple
 

@@ -11,8 +11,8 @@ from django.db.models.functions import ExtractYear
 
 from Journal.settings import MISSING_ICON_IMAGE
 from main.models import Entry, EntryImage
-from main.Helpers.image_utils import get_base64_from_image, create_image_icon
-from main.Helpers.file_utils import get_icon_file_path, get_base_entry_path
+from main.utils.image import get_base64_from_image, create_image_icon
+from main.utils.file_io import get_icon_file_path, get_base_entry_path
 
 # ToDo - This should be from a common settings file
 NR_IMAGES_TO_DISPLAY = 18

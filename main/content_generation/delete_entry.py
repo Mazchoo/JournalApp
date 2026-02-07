@@ -9,8 +9,8 @@ from django.http import JsonResponse
 
 from Journal.settings import ENTRY_FOLDER
 from main.models import Entry, Content
-from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.file_utils import (
+from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.utils.file_io import (
     get_stored_media_folder,
     remove_empty_parent_folders,
     path_has_image_extension,

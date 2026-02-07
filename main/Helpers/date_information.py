@@ -3,7 +3,8 @@
 from typing import Optional, Tuple
 from datetime import datetime
 
-from main.Helpers.date_contants import DateConstants
+from main.models import Entry
+from main.config.date_constants import DateConstants
 
 
 def add_year_information(context: dict) -> Optional[int]:
@@ -114,3 +115,26 @@ def add_day_information(context: dict) -> Optional[Tuple[int, int, int]]:
     context["day_name"] = datetime(year, month_ind, day).strftime("%A")
 
     return year, month_ind, day
+
+
+def add_statistics_from_entries_in_month(context):
+    """Given month information in context, add list of days where entries exist."""
+    month_ind = context["months_in_year"].index(context["month"]) + 1
+    next_month_ind = context["months_in_year"].index(context["next_month"]) + 1
+    first_day = datetime(context["year"], month_ind, 1)
+    last_day = datetime(context["next_month_year"], next_month_ind, 1)
+
+    entries = (
+        Entry.objects.all()
+        .filter(date__date__gte=first_day)
+        .filter(date__date__lt=last_day)
+    )
+
+    context["days_with_an_entry"] = [entry.date.day for entry in entries]
+
+
+def add_day_and_month_names(context):
+    """Add names of days and months"""
+    context["full_day_names"] = DateConstants.day_names
+    context["short_day_names"] = DateConstants.day_names_short
+    context["months_in_year"] = DateConstants.month_names

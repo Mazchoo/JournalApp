@@ -5,8 +5,8 @@ from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
 
-from main.Helpers.image_constants import ImageConstants
-from main.Helpers.video_constants import VideoConstants
+from main.config.image_constants import ImageConstants
+from main.config.video_constants import VideoConstants
 
 from Journal.settings import ENTRY_FOLDER, MISSING_ICON_IMAGE
 

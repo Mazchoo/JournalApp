@@ -8,18 +8,18 @@ from django.db import models as django_models
 from tinymce.widgets import TinyMCE  # type: ignore
 
 from main.models import Entry, EntryImage, EntryParagraph, EntryVideo, Content
-from main.Helpers.image_utils import move_image_to_save_path
-from main.Helpers.image_constants import ImageConstants
-from main.Helpers.video_constants import VideoConstants
-from main.Helpers.file_utils import (
+from main.utils.image import move_image_to_save_path
+from main.utils.file_io import (
     path_has_image_extension,
     get_stored_media_path,
     get_base_entry_path,
     make_image_path_relative,
     move_media_to_save_path,
 )
-from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.Helpers.date_slugs import get_valid_date_from_slug
+from main.config.image_constants import ImageConstants
+from main.config.video_constants import VideoConstants
+from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.helpers.date_slugs import get_valid_date_from_slug
 
 
 class EntryForm(ModelForm):

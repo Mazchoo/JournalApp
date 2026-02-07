@@ -3,30 +3,30 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
-from main.Helpers.date_information import (
+from main.helpers.date_information import (
     add_day_information,
     add_month_information,
     add_year_information,
+    add_statistics_from_entries_in_month
 )
-from main.Helpers.date_request import put_day_and_month_names_into_context
-from main.Helpers.date_slugs import date_exists
-from main.Helpers.ajax_request import ajax_request
-from main.Helpers.get_year_entry_data import get_year_entry_information
-from main.Helpers.get_all_years_summary import (
+from main.helpers.date_request import put_day_and_month_names_into_context
+from main.helpers.date_slugs import date_exists
+from main.helpers.ajax_request import ajax_request
+from main.helpers.get_year_entry_data import get_year_entry_information
+from main.helpers.get_all_years_summary import (
     get_all_year_summary_information,
     get_all_entry_years,
 )
-from main.Helpers.get_latest_entry import get_latest_entry_tuple
+from main.helpers.get_latest_entry import get_latest_entry_tuple
 
-from main.ContentGeneration.save_entry import update_or_generate_from_request
-from main.ContentGeneration.load_entry import (
-    load_all_content_from_entry,
-    add_statistics_from_entries_in_month,
+from main.content_generation.save_entry import update_or_generate_from_request
+from main.content_generation.load_entry import (
+    load_all_content_from_entry
 )
-from main.ContentGeneration.delete_entry import delete_entry_and_content
-from main.ContentGeneration.get_full_image import get_full_image_reponse
-from main.ContentGeneration.get_full_video import getFullVideoResponse
-from main.ContentGeneration.move_date import move_source_date_to_desination_request
+from main.content_generation.delete_entry import delete_entry_and_content
+from main.content_generation.get_full_image import get_full_image_reponse
+from main.content_generation.get_full_video import getFullVideoResponse
+from main.content_generation.move_date import move_source_date_to_desination_request
 
 # ToDo - Consider using type script and bundle to compile javascript functions
 # ToDo - Add some tests for saving content from scratch

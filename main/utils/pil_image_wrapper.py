@@ -6,7 +6,7 @@ from typing import Optional
 from PIL import Image, ExifTags
 from PIL.Image import Exif
 
-from main.Helpers.image_constants import ImageConstants
+from main.config.image_constants import ImageConstants
 
 
 def get_orientation_flag() -> Optional[str]:

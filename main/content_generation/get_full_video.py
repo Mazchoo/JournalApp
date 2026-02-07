@@ -5,7 +5,7 @@ import mimetypes
 
 from django.http import JsonResponse, FileResponse
 
-from main.ContentGeneration.request_forms import FullImagePath
+from main.content_generation.request_forms import FullImagePath
 
 
 def get_video_path_from_post(post_data: dict):

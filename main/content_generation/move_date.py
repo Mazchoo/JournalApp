@@ -9,11 +9,11 @@ from django.forms import model_to_dict
 from main.models import Entry, Content
 from main.forms import EntryForm, ContentForm
 
-from main.ContentGeneration.request_forms import DateMoveForm
-from main.Helpers.date_slugs import get_valid_date_from_slug, convert_date_to_url_tuple
-from main.ContentGeneration.delete_entry import move_files_from_entry
-from main.ContentGeneration.content_factory_models import CONTENT_MODELS
-from main.ContentGeneration.content_factory_update import CONTENT_UPDATE_DATE
+from main.content_generation.request_forms import DateMoveForm
+from main.helpers.date_slugs import get_valid_date_from_slug, convert_date_to_url_tuple
+from main.content_generation.delete_entry import move_files_from_entry
+from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.content_generation.content_factory_update import CONTENT_UPDATE_DATE
 
 
 def check_move_request(

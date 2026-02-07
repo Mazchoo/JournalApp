@@ -8,14 +8,14 @@ from collections import namedtuple
 import numpy as np
 from PIL import Image, ImageFilter
 
-from main.Helpers.video_constants import VideoConstants
-from main.Helpers.file_utils import get_icon_file_path, get_resized_filename
-from main.Helpers.image_utils import (
+from main.config.video_constants import VideoConstants
+from main.utils.file_io import get_icon_file_path, get_resized_filename
+from main.utils.image import (
     load_image_directly,
     get_square_resized_image,
     add_encoding_type_to_base64,
 )
-from main.Helpers.video_capture import VideoCapture
+from main.utils.video_capture import VideoCapture
 
 CollageDrawDimensions = namedtuple(
     "CollageDrawDimensions",

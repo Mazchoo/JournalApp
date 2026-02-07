@@ -5,9 +5,9 @@ from pathlib import Path
 from django.db.models import Model
 from django.db import models
 
-from main.Helpers.image_utils import fetch_base64_image_data
-from main.Helpers.file_utils import get_base_entry_path
-from main.Helpers.video_utils import get_collage_base64
+from main.utils.image import fetch_base64_image_data
+from main.utils.file_io import get_base_entry_path
+from main.utils.video import get_collage_base64
 
 
 class Content(Model):

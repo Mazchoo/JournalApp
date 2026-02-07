@@ -5,13 +5,13 @@ from typing import Tuple, Optional
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
 
-from main.Helpers.image_utils import (
+from main.utils.image import (
     load_image_directly,
     add_encoding_type_to_base64,
     get_encoding_type,
 )
-from main.Helpers.image_constants import ImageConstants
-from main.ContentGeneration.request_forms import FullImagePath
+from main.config.image_constants import ImageConstants
+from main.content_generation.request_forms import FullImagePath
 
 
 def check_target_path_in_post(

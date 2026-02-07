@@ -7,8 +7,8 @@ from typing import Tuple, List, Dict
 from django.db.models import DateTimeField
 
 from main.models import Entry, EntryImage, EntryVideo
-from main.Helpers.image_utils import get_base64_from_image, create_image_icon
-from main.Helpers.file_utils import get_base_entry_path, get_icon_file_path
+from main.utils.image import get_base64_from_image, create_image_icon
+from main.utils.file_io import get_base_entry_path, get_icon_file_path
 
 
 def get_month_strings(i: int, context: dict) -> Tuple[str, str]:
