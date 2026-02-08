@@ -5,21 +5,20 @@ from typing import Callable
 from django.shortcuts import redirect
 
 from main.config.date_constants import DateConstants
-from main.helpers.date_information import add_day_and_month_names
+from main.database_layer.date_information import get_day_and_month_names
+from main.database_layer.fe_interfaces import DayAndMonthNamesContext
 
 
-# ToDo - checking the date is different from adding general information
-# Needs more explicit decorators (or just function calls)
 def put_day_and_month_names_into_context(func) -> Callable:
     """Put general date information from slug into context"""
 
     def wrap_function(request, **kwargs):
         """Inner function that sanity checks date and adds general information"""
-        context = kwargs.copy()
-        if "month" in context and context["month"] not in DateConstants.month_names:
+        if "month" in kwargs and kwargs["month"] not in DateConstants.month_names:
             return redirect("/date-not-found")
 
-        add_day_and_month_names(context)
+        context: DayAndMonthNamesContext = get_day_and_month_names()
+        context.update(kwargs)
         return func(request, context)
 
     return wrap_function

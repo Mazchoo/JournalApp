@@ -19,7 +19,7 @@ from main.utils.file_io import (
 from main.config.image_constants import ImageConstants
 from main.config.video_constants import VideoConstants
 from main.content_generation.content_factory_models import CONTENT_MODELS
-from main.helpers.date_slugs import get_valid_date_from_slug
+from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
 class EntryForm(ModelForm):

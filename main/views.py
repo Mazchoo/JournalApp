@@ -3,43 +3,30 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
-from main.helpers.date_information import (
-    add_day_information,
-    add_month_information,
-    add_year_information,
-    add_statistics_from_entries_in_month
+from main.database_layer.fe_interfaces import DayAndMonthNamesContext
+from main.database_layer.date_request import put_day_and_month_names_into_context
+from main.database_layer.date_slugs import date_exists
+from main.database_layer.ajax_request import ajax_request
+from main.database_layer.get_context import (
+    get_home_page_context,
+    get_year_page_context,
+    get_month_page_context,
+    get_day_page_context,
 )
-from main.helpers.date_request import put_day_and_month_names_into_context
-from main.helpers.date_slugs import date_exists
-from main.helpers.ajax_request import ajax_request
-from main.helpers.get_year_entry_data import get_year_entry_information
-from main.helpers.get_all_years_summary import (
-    get_all_year_summary_information,
-    get_all_entry_years,
-)
-from main.helpers.get_latest_entry import get_latest_entry_tuple
+from main.database_layer.get_latest_entry import get_latest_entry_tuple
 
 from main.content_generation.save_entry import update_or_generate_from_request
-from main.content_generation.load_entry import (
-    load_all_content_from_entry
-)
 from main.content_generation.delete_entry import delete_entry_and_content
 from main.content_generation.get_full_image import get_full_image_reponse
 from main.content_generation.get_full_video import getFullVideoResponse
 from main.content_generation.move_date import move_source_date_to_desination_request
 
-# ToDo - Consider using type script and bundle to compile javascript functions
-# ToDo - Add some tests for saving content from scratch
-
 
 @put_day_and_month_names_into_context
-def home_page(request, context):
+def home_page(request, context: DayAndMonthNamesContext):
     """Home page summarising all years"""
-    get_all_entry_years(context)
-    context["icon_paths"] = get_all_year_summary_information(
-        tuple(context["all_years"])
-    )
-    return render(request=request, template_name="home.html", context=context)
+    page_context = get_home_page_context(context)
+    return render(request=request, template_name="home.html", context=page_context)
 
 
 def latest_page(_request):
@@ -51,40 +38,44 @@ def latest_page(_request):
 
 
 @put_day_and_month_names_into_context
-def year_page(request, context):
+def year_page(request, context: DayAndMonthNamesContext):
     """Return page that summarises a year"""
-    if not date_exists(context):
+    year: int = context["year"]  # type: ignore[typeddict-item]
+
+    if not date_exists(year):
         return redirect("/date-not-found")
 
-    add_year_information(context)
-    get_year_entry_information(context)
-    return render(request=request, template_name="year.html", context=context)
+    page_context = get_year_page_context(context, year)
+    return render(request=request, template_name="year.html", context=page_context)
 
 
 @put_day_and_month_names_into_context
-def month_page(request, context):
+def month_page(request, context: DayAndMonthNamesContext):
     """Return page that summarises a month"""
-    if not date_exists(context):
+    year: int = context["year"]  # type: ignore[typeddict-item]
+    month: str = context["month"]  # type: ignore[typeddict-item]
+
+    if not date_exists(year, month):
         return redirect("/date-not-found")
 
-    add_month_information(context)
-    add_statistics_from_entries_in_month(context)
-    return render(request=request, template_name="month.html", context=context)
+    page_context = get_month_page_context(context, year, month)
+    return render(request=request, template_name="month.html", context=page_context)
 
 
 @put_day_and_month_names_into_context
-def edit_entry_page(request, context):
+def edit_entry_page(request, context: DayAndMonthNamesContext):
     """Return content for single entry page"""
-    if not date_exists(context):
+    year: int = context["year"]  # type: ignore[typeddict-item]
+    month: str = context["month"]  # type: ignore[typeddict-item]
+    day: int = context["day"]  # type: ignore[typeddict-item]
+
+    if not date_exists(year, month, day):
         return redirect("/date-not-found")
 
-    add_day_information(context)
-    get_all_entry_years(context)
-    load_all_content_from_entry(context)
+    page_context = get_day_page_context(context, year, month, day)
+    page_context["tiny_mce"] = ParagraphForm()  # type: ignore[typeddict-unknown-key]
 
-    context["tiny_mce"] = ParagraphForm()
-
-    return render(request=request, template_name="day.html", context=context)
+    return render(request=request, template_name="day.html", context=page_context)
 
 
 def show_entry_page(request, _day: int, _month: str, _year: int):
@@ -97,7 +88,6 @@ def date_not_found_page(request):
     return render(request=request, template_name="DateNotFound.html")
 
 
-# ToDo delete related icons as well if they exist
 @ajax_request
 def delete_entry(post_data):
     """Async delete an entry"""

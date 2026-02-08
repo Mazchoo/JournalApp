@@ -30,16 +30,10 @@ def convert_date_to_url_tuple(date: datetime) -> Tuple[str, str, str]:
     return (str(date.year), date.strftime("%B"), str(date.day))
 
 
-def date_exists(context) -> bool:
-    """Return if day, month, year in context represents a real date"""
-    # ToDo - use better type instead of context
-    day = context.get("day", 1)
-
-    month = context.get("month", "January")
+def date_exists(year: int, month: str = "January", day: int = 1) -> bool:
+    """Return if day, month, year represents a real date."""
     month_names = DateConstants.month_names
     month_ind = month_names.index(month) + 1
-
-    year = context["year"]
 
     try:
         datetime(year, month_ind, day)

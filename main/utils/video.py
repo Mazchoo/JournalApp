@@ -185,7 +185,5 @@ if __name__ == "__main__":
     from Journal.settings import ENTRY_FOLDER
 
     with VideoCapture(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4")) as cap:
-        create_collage_image(
-            cap, 2, Path(f"{ENTRY_FOLDER}/20260129_222725.jpg")
-        )
+        create_collage_image(cap, 2, Path(f"{ENTRY_FOLDER}/20260129_222725.jpg"))
     create_video_icon(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4"))

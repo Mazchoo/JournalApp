@@ -10,6 +10,7 @@ from functools import lru_cache
 from django.db.models.functions import ExtractYear
 
 from Journal.settings import MISSING_ICON_IMAGE
+from main.database_layer.fe_interfaces import AllEntryYearsContext
 from main.models import Entry, EntryImage
 from main.utils.image import get_base64_from_image, create_image_icon
 from main.utils.file_io import get_icon_file_path, get_base_entry_path
@@ -28,16 +29,15 @@ def get_all_images_in_year(year: int):
     return EntryImage.objects.all().filter(entry__name__istartswith=f"{year}-")
 
 
-def get_all_entry_years(context: dict) -> dict:
-    """Add all available years to context dictionary"""
+def get_all_entry_years() -> AllEntryYearsContext:
+    """Return all available years."""
     distinct_years = (
         Entry.objects.all().annotate(year=ExtractYear("date")).values("year").distinct()
     )
     years = [entry["year"] for entry in distinct_years]
     years.sort()
 
-    context["all_years"] = years if years else [get_current_year()]
-    return context
+    return {"all_years": years if years else [get_current_year()]}
 
 
 def get_selection_of_icons(valid_images: List[Path]) -> List[Path]:

@@ -38,7 +38,9 @@ def add_security_key():
 
     entry_folder = ""
     while not entry_folder or not Path(entry_folder).exists():
-        entry_folder = input("Specify the directory of the entry folder e.g. D:/Entries :")
+        entry_folder = input(
+            "Specify the directory of the entry folder e.g. D:/Entries :"
+        )
 
     generate_security_dict(username, password, entry_folder)
 

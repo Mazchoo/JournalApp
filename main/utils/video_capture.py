@@ -66,12 +66,14 @@ class VideoCapture:
 
         timestamp = frame_index / self._fps
 
-        with closing(read_frames(
-            str(self._video_path),
-            input_params=["-ss", f"{timestamp:.3f}"],
-            output_params=["-vframes", "1"],
-            pix_fmt="rgb24",
-        )) as frame_generator:
+        with closing(
+            read_frames(
+                str(self._video_path),
+                input_params=["-ss", f"{timestamp:.3f}"],
+                output_params=["-vframes", "1"],
+                pix_fmt="rgb24",
+            )
+        ) as frame_generator:
             frame_meta = next(frame_generator)
             frame_bytes = next(frame_generator)
 
