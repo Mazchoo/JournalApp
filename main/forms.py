@@ -140,6 +140,22 @@ class ParagraphForm(ModelForm):
         fields = "__all__"
 
 
+class DeleteEntryForm(forms.Form):
+    """Validate request to delete a journal entry"""
+
+    entry = forms.SlugField(max_length=10)
+
+    def clean_entry(self):
+        """Ensure entry exists and return the entry object"""
+        entry_name = self.cleaned_data["entry"]
+        entry = Entry.objects.filter(name=entry_name).first()
+
+        if entry is None:
+            raise forms.ValidationError(f"Invalid entry {entry_name}")
+
+        return entry
+
+
 class ContentForm(ModelForm):
     """Generic content that applies to all content types e.g. image, text, ect."""
 

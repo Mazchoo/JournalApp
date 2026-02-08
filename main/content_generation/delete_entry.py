@@ -9,6 +9,7 @@ from django.http import JsonResponse
 
 from Journal.settings import ENTRY_FOLDER
 from main.models import Entry, Content
+from main.forms import DeleteEntryForm
 from main.content_generation.content_factory_models import CONTENT_MODELS
 from main.utils.file_io import (
     get_stored_media_folder,
@@ -56,16 +57,12 @@ def move_files_from_entry(entry: Entry):
 
 def delete_entry_and_content(post_data):
     """Clear out content from entry's date folder and update database"""
-    if "name" not in post_data:
-        return JsonResponse({"error": "No name in post data"})
+    form = DeleteEntryForm(post_data)
 
-    name = post_data["name"]
-    entry = Entry.objects.filter(name=name)
+    if not form.is_valid():
+        return JsonResponse({"error": form.errors})
 
-    if not entry.exists():
-        return JsonResponse({"error": f"Invalid entry {name}"})
-
-    entry = entry[0]
+    entry = form.cleaned_data["entry"]
     delete_entry_content(entry)
     move_files_from_entry(entry)
     entry.delete()

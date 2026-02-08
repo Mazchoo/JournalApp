@@ -2,23 +2,26 @@
 
 from pathlib import Path
 import mimetypes
+from typing import Optional
 
 from django.http import JsonResponse, FileResponse
+from django.forms.utils import ErrorDict, ErrorList
 
 from main.content_generation.request_forms import FullContentPath
 
 
-def get_video_path_from_post(post_data: dict):
+def get_video_path_from_post(post_data: dict, errors: ErrorDict) -> Optional[str]:
     """Get video path from content data"""
     full_video_form = FullContentPath(post_data)
 
     if not full_video_form.is_valid():
-        return None, full_video_form.errors
+        errors.update(full_video_form.errors)
+        return None
 
-    return full_video_form.cleaned_data["file"], None
+    return full_video_form.cleaned_data["file"]
 
 
-def get_video_mime_type(target_path: str):
+def get_video_mime_type(target_path: str) -> str:
     """Get the MIME type for the video file."""
     mime_type, _ = mimetypes.guess_type(target_path)
     if mime_type and mime_type.startswith("video/"):
@@ -27,12 +30,15 @@ def get_video_mime_type(target_path: str):
     return "video/mp4"
 
 
-def create_video_stream_response(target_path: str):
+def create_video_stream_response(
+    target_path: str, errors: ErrorDict
+) -> Optional[FileResponse]:
     """Create a streaming response for the video file."""
     path = Path(target_path)
 
     if not path.exists():
-        return None, "Video file does not exist"
+        errors["file"] = ErrorList(["Video file does not exist"])
+        return None
 
     try:
         mime_type = get_video_mime_type(target_path)
@@ -45,20 +51,23 @@ def create_video_stream_response(target_path: str):
         response["Accept-Ranges"] = "bytes"
         response["Content-Length"] = path.stat().st_size
 
-        return response, None
+        return response
 
     except (OSError, ValueError, KeyError) as e:
-        return None, f"Error streaming video: {str(e)}"
+        errors["stream"] = ErrorList([f"Error streaming video: {str(e)}"])
+        return None
 
 
-def get_full_video_response(post_data: dict):
+def get_full_video_response(post_data: dict) -> JsonResponse | FileResponse:
     """Return video streaming data if video exists"""
-    target_path, error = get_video_path_from_post(post_data)
-    if error is not None:
-        return JsonResponse({"error": error})
+    errors = ErrorDict()
 
-    video_response, error = create_video_stream_response(target_path)
-    if error is not None:
-        return JsonResponse({"error": error})
+    target_path = get_video_path_from_post(post_data, errors)
+    if target_path is None:
+        return JsonResponse({"error": errors})
+
+    video_response = create_video_stream_response(target_path, errors)
+    if video_response is None:
+        return JsonResponse({"error": errors})
 
     return video_response
