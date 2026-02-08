@@ -3,15 +3,14 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
-from main.config.date_constants import DateConstants
 from main.content_generation.request_forms import (
     YearPageForm,
     MonthPageForm,
     DayPageForm,
 )
 from main.database_layer.ajax_request import ajax_request
-from main.database_layer.date_information import get_day_and_month_names
 from main.database_layer.get_context import (
+    put_day_and_month_names_into_context,
     get_home_page_context,
     get_year_page_context,
     get_month_page_context,
@@ -24,15 +23,6 @@ from main.content_generation.delete_entry import delete_entry_and_content
 from main.content_generation.get_full_image import get_full_image_reponse
 from main.content_generation.get_full_video import get_full_video_response
 from main.content_generation.move_date import move_source_date_to_desination_request
-
-
-def put_day_and_month_names_into_context(**kwargs) -> dict | None:
-    """Put general date information from slug into context. Returns None if month is invalid."""
-    if "month" in kwargs and kwargs["month"] not in DateConstants.month_names:
-        return None
-    context = get_day_and_month_names()
-    context.update(kwargs)
-    return context
 
 
 def home_page(request, **kwargs):
@@ -57,6 +47,7 @@ def year_page(request, **kwargs):
     context = put_day_and_month_names_into_context(**kwargs)
     if context is None:
         return redirect("/date-not-found")
+
     year_form = YearPageForm({"year": context.get("year")})
     if not year_form.is_valid():
         return redirect("/date-not-found")
@@ -70,6 +61,7 @@ def month_page(request, **kwargs):
     context = put_day_and_month_names_into_context(**kwargs)
     if context is None:
         return redirect("/date-not-found")
+
     month_form = MonthPageForm(
         {"year": context.get("year"), "month": context.get("month")}
     )

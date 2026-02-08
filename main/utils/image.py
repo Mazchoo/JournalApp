@@ -32,7 +32,7 @@ def create_image_icon(target_path_obj: Path):
     if target_icon_file_path.exists():
         return False
 
-    image = Image.open(target_path_obj)
+    image = Image.open(target_path_obj)  # type: Image.Image
     icon_size = ImageConstants.icon_size
 
     image_resized = get_square_resized_image(image, icon_size)
@@ -70,12 +70,12 @@ def get_resized_base64(file_path: Path, factor: float, ecoding_type: str) -> str
     if resized_path.exists():
         return load_image_directly(resized_path)
 
-    image = Image.open(file_path)
+    image = Image.open(file_path)  # type: Image.Image
 
     width, height = image.size
 
     image_resized = image.resize(
-        (width // factor, height // factor), resample=Image.Resampling.BILINEAR
+        (int(width / factor), int(height / factor)), resample=Image.Resampling.BILINEAR
     )  # type: ignore
     image_resized = orientate_pil_image(image_resized, image.getexif())
 

@@ -57,7 +57,7 @@ def create_video_icon(video_path: Path) -> bool:
     return True
 
 
-def get_resizing_factor_to_collage_size(capture: VideoCapture) -> float:
+def get_resizing_factor_to_collage_size(capture: VideoCapture) -> int:
     """Get downsizing factor resize frame to collage size of frame"""
     width, height = capture.get_width_height()
     max_dimension = max(width, height)
@@ -133,7 +133,7 @@ def draw_frame_to_collage(
 
 def create_collage_image(
     capture: VideoCapture, rescale_factor: int, target_path: Path
-) -> Image:
+) -> str:
     """Create collage image from video"""
     collage_dims = get_collage_display_dimensions(capture, rescale_factor)
     collage_image = np.zeros(

@@ -1,12 +1,16 @@
 """High level provision of date and entry information for different views"""
 
+from typing import Optional
+
 from main.database_layer.fe_interfaces import (
+    DayAndMonthNamesContext,
     HomePageContext,
     YearPageContext,
     MonthPageContext,
     DayPageContext,
 )
 from main.database_layer.date_information import (
+    get_day_and_month_names,
     get_day_information,
     get_month_information,
     get_year_information,
@@ -18,10 +22,24 @@ from main.database_layer.get_all_years_summary import (
     get_all_entry_years,
 )
 from main.content_generation.load_entry import load_all_content_from_entry
+from main.content_generation.request_forms import MonthNameForm
+
+
+def put_day_and_month_names_into_context(
+    **kwargs,
+) -> Optional[DayAndMonthNamesContext]:
+    """Put general date information from slug into context. Returns None if month is invalid."""
+    if "month" in kwargs:
+        form = MonthNameForm({"month": kwargs["month"]})
+        if not form.is_valid():
+            return None
+    context = get_day_and_month_names()
+    context.update(kwargs)  # type: ignore[typeddict-item]
+    return context
 
 
 def get_home_page_context(
-    context: dict,
+    context: DayAndMonthNamesContext,
 ) -> HomePageContext:
     """Build context for home page."""
     all_years_info = get_all_entry_years()
@@ -31,11 +49,11 @@ def get_home_page_context(
         **context,
         **all_years_info,
         "icon_paths": icon_paths,
-    }  # type: ignore
+    }
 
 
 def get_year_page_context(
-    context: dict,
+    context: DayAndMonthNamesContext,
     year: int,
 ) -> YearPageContext:
     """Build context for year page."""
@@ -46,11 +64,11 @@ def get_year_page_context(
         **context,
         **year_info,
         **year_entry_info,
-    }  # type: ignore
+    }
 
 
 def get_month_page_context(
-    context: dict,
+    context: DayAndMonthNamesContext,
     year: int,
     month: str,
 ) -> MonthPageContext:
@@ -66,11 +84,11 @@ def get_month_page_context(
         **year_info,
         **month_info,
         **days_info,
-    }  # type: ignore
+    }
 
 
 def get_day_page_context(
-    context: dict,
+    context: DayAndMonthNamesContext,
     year: int,
     month: str,
     day: int,
@@ -89,4 +107,4 @@ def get_day_page_context(
         **day_info,
         **all_years_info,
         **entry_content,
-    }  # type: ignore
+    }

@@ -11,6 +11,19 @@ from main.models import Entry
 from main.utils.file_io import get_stored_media_path
 
 
+class MonthNameForm(Form):
+    """Validates that a month parameter is a valid month name."""
+
+    month = CharField()
+
+    def clean_month(self) -> str:
+        """Ensure month is a valid month name."""
+        month = self.cleaned_data["month"]
+        if month not in DateConstants.month_names:
+            raise ValidationError(f"month must be one of {DateConstants.month_names}")
+        return month
+
+
 class YearPageForm(Form):
     """Validated year parameter from URL."""
 

@@ -34,9 +34,13 @@ class VideoCapture:
         """Initialize video metadata via imageio-ffmpeg."""
         # Get frame count and duration
         self._frame_count, self._duration = count_frames_and_secs(str(self._video_path))
+        self._frame_count = self._frame_count or 0
+        self._duration = self._duration or 0.0
 
         if self._duration > 0 and self._frame_count > 0:
             self._fps = self._frame_count / self._duration
+        else:
+            self._fps = 0.0
 
         # Get dimensions by reading first frame
         frame = iio.imread(str(self._video_path), index=0)
@@ -54,14 +58,14 @@ class VideoCapture:
         """Get total number of frames from video."""
         if not self:
             return 0
-        return self._frame_count
+        return self._frame_count or 0
 
     def get_frame_at_idx(self, frame_index: int) -> Optional[np.ndarray]:
         """Return frame at index using time-based seeking."""
         if not self:
             return None
 
-        if frame_index < 0 or frame_index >= self._frame_count:
+        if frame_index < 0 or frame_index > (self._frame_count or 0) - 1:
             return None
 
         timestamp = frame_index / self._fps
@@ -84,7 +88,7 @@ class VideoCapture:
     def __enter__(self):
         return self
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self._is_valid
 
     def __exit__(self, _type, _value, _traceback):
