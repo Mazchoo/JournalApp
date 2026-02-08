@@ -6,7 +6,6 @@ from django.shortcuts import redirect
 
 from main.config.date_constants import DateConstants
 from main.database_layer.date_information import get_day_and_month_names
-from main.database_layer.fe_interfaces import DayAndMonthNamesContext
 
 
 def put_day_and_month_names_into_context(func) -> Callable:
@@ -17,7 +16,8 @@ def put_day_and_month_names_into_context(func) -> Callable:
         if "month" in kwargs and kwargs["month"] not in DateConstants.month_names:
             return redirect("/date-not-found")
 
-        context: DayAndMonthNamesContext = get_day_and_month_names()
+        day_month_context = get_day_and_month_names()
+        context = day_month_context.to_dict()
         context.update(kwargs)
         return func(request, context)
 

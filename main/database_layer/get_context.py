@@ -5,7 +5,6 @@ from main.database_layer.fe_interfaces import (
     YearPageContext,
     MonthPageContext,
     DayPageContext,
-    DayAndMonthNamesContext,
 )
 from main.database_layer.date_information import (
     get_day_information,
@@ -22,7 +21,7 @@ from main.content_generation.load_entry import load_all_content_from_entry
 
 
 def get_home_page_context(
-    context: DayAndMonthNamesContext,
+    context: dict,
 ) -> HomePageContext:
     """Build context for home page."""
     all_years_info = get_all_entry_years()
@@ -36,11 +35,11 @@ def get_home_page_context(
 
 
 def get_year_page_context(
-    context: DayAndMonthNamesContext,
+    context: dict,
     year: int,
 ) -> YearPageContext:
     """Build context for year page."""
-    year_info = get_year_information(year)
+    year_info = get_year_information(year).to_dict()
     year_entry_info = get_year_entry_information(year)
 
     return {
@@ -51,12 +50,12 @@ def get_year_page_context(
 
 
 def get_month_page_context(
-    context: DayAndMonthNamesContext,
+    context: dict,
     year: int,
     month: str,
 ) -> MonthPageContext:
     """Build context for month page."""
-    year_info = get_year_information(year)
+    year_info = get_year_information(year).to_dict()
     month_info = get_month_information(year, month)
     days_info = get_days_with_entries_in_month(
         year, month, month_info["next_month"], month_info["next_month_year"]
@@ -71,13 +70,13 @@ def get_month_page_context(
 
 
 def get_day_page_context(
-    context: DayAndMonthNamesContext,
+    context: dict,
     year: int,
     month: str,
     day: int,
 ) -> DayPageContext:
     """Build context for day/edit page."""
-    year_info = get_year_information(year)
+    year_info = get_year_information(year).to_dict()
     month_info = get_month_information(year, month)
     day_info = get_day_information(year, day, month_info)
     all_years_info = get_all_entry_years()

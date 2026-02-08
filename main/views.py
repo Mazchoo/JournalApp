@@ -3,9 +3,8 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
-from main.database_layer.fe_interfaces import DayAndMonthNamesContext
+from main.requests import YearPageRequest, MonthPageRequest, DayPageRequest
 from main.database_layer.date_request import put_day_and_month_names_into_context
-from main.database_layer.date_slugs import date_exists
 from main.database_layer.ajax_request import ajax_request
 from main.database_layer.get_context import (
     get_home_page_context,
@@ -23,7 +22,7 @@ from main.content_generation.move_date import move_source_date_to_desination_req
 
 
 @put_day_and_month_names_into_context
-def home_page(request, context: DayAndMonthNamesContext):
+def home_page(request, context: dict):
     """Home page summarising all years"""
     page_context = get_home_page_context(context)
     return render(request=request, template_name="home.html", context=page_context)
@@ -38,41 +37,44 @@ def latest_page(_request):
 
 
 @put_day_and_month_names_into_context
-def year_page(request, context: DayAndMonthNamesContext):
+def year_page(request, context: dict):
     """Return page that summarises a year"""
-    year: int = context["year"]  # type: ignore[typeddict-item]
-
-    if not date_exists(year):
+    if not (year_request := YearPageRequest.create(year=context.get("year"))):
         return redirect("/date-not-found")
 
-    page_context = get_year_page_context(context, year)
+    page_context = get_year_page_context(context, year_request.year)
     return render(request=request, template_name="year.html", context=page_context)
 
 
 @put_day_and_month_names_into_context
-def month_page(request, context: DayAndMonthNamesContext):
+def month_page(request, context: dict):
     """Return page that summarises a month"""
-    year: int = context["year"]  # type: ignore[typeddict-item]
-    month: str = context["month"]  # type: ignore[typeddict-item]
-
-    if not date_exists(year, month):
+    if not (
+        month_request := MonthPageRequest.create(
+            year=context.get("year"), month=context.get("month")
+        )
+    ):
         return redirect("/date-not-found")
 
-    page_context = get_month_page_context(context, year, month)
+    page_context = get_month_page_context(
+        context, month_request.year, month_request.month
+    )
     return render(request=request, template_name="month.html", context=page_context)
 
 
 @put_day_and_month_names_into_context
-def edit_entry_page(request, context: DayAndMonthNamesContext):
+def edit_entry_page(request, context: dict):
     """Return content for single entry page"""
-    year: int = context["year"]  # type: ignore[typeddict-item]
-    month: str = context["month"]  # type: ignore[typeddict-item]
-    day: int = context["day"]  # type: ignore[typeddict-item]
-
-    if not date_exists(year, month, day):
+    if not (
+        day_request := DayPageRequest.create(
+            year=context.get("year"), month=context.get("month"), day=context.get("day")
+        )
+    ):
         return redirect("/date-not-found")
 
-    page_context = get_day_page_context(context, year, month, day)
+    page_context = get_day_page_context(
+        context, day_request.year, day_request.month, day_request.day
+    )
     page_context["tiny_mce"] = ParagraphForm()  # type: ignore[typeddict-unknown-key]
 
     return render(request=request, template_name="day.html", context=page_context)

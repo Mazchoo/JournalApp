@@ -44,7 +44,7 @@ class EntryImage(Model):
         return f"image{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
-        return self.file_path
+        return str(self.file_path)
 
     def view(self) -> dict:
         """Web displayable view"""
@@ -70,7 +70,7 @@ class EntryVideo(Model):
         return f"video{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
-        return self.file_path
+        return str(self.file_path)
 
     def view(self) -> dict:
         """Web displayable view"""
@@ -96,7 +96,7 @@ class EntryParagraph(Model):
         return f"paragraph{self.pk} - Entry {self.entry.name}"
 
     def __str__(self):
-        return self.text
+        return str(self.text)
 
     def view(self) -> dict:
         """Web displayable view"""

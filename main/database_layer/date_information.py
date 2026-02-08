@@ -3,33 +3,28 @@
 from datetime import datetime
 
 from main.models import Entry
+from main.requests import DayAndMonthNamesContext, YearNavigationContext
 from main.config.date_constants import DateConstants
 
 from main.database_layer.fe_interfaces import (
-    YearNavigationContext,
     MonthNavigationContext,
     DayNavigationContext,
     DaysWithEntriesContext,
-    DayAndMonthNamesContext,
 )
 
 
 def get_day_and_month_names() -> DayAndMonthNamesContext:
     """Return names of days and months."""
-    return {
-        "full_day_names": DateConstants.day_names,
-        "short_day_names": DateConstants.day_names_short,
-        "months_in_year": DateConstants.month_names,
-    }
+    return DayAndMonthNamesContext(
+        full_day_names=DateConstants.day_names,
+        short_day_names=DateConstants.day_names_short,
+        months_in_year=DateConstants.month_names,
+    )
 
 
 def get_year_information(year: int) -> YearNavigationContext:
     """Return navigation information for a year."""
-    return {
-        "year": year,
-        "next_year": year + 1,
-        "prev_year": year - 1,
-    }
+    return YearNavigationContext(year=year)
 
 
 def get_month_information(year: int, month: str) -> MonthNavigationContext:
