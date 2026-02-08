@@ -4,10 +4,10 @@ from collections import OrderedDict
 from typing import Any, List
 
 from django.http.request import QueryDict
-from django.http import Http404
+from django.http import Http404, HttpRequest
 
 
-def is_ajax(request: dict) -> bool:
+def is_ajax(request: HttpRequest) -> bool:
     """Return true is ajax made the request"""
     if not hasattr(request, "META"):
         return False

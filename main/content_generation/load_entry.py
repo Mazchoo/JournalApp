@@ -18,6 +18,6 @@ def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
                 content.content_type
             ]  # ToDo - Make an abstract class for this type
             content_obj = Model.objects.get(pk=content.content_id)
-            output[str(content)] = content_obj.view()  # type: ignore
+            output[str(content)] = content_obj.view()
 
     return {"entry_exists": entry is not None, "saved_content": output}

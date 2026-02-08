@@ -3,13 +3,14 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
+from main.config.date_constants import DateConstants
 from main.content_generation.request_forms import (
     YearPageForm,
     MonthPageForm,
     DayPageForm,
 )
-from main.database_layer.date_request import put_day_and_month_names_into_context
 from main.database_layer.ajax_request import ajax_request
+from main.database_layer.date_information import get_day_and_month_names
 from main.database_layer.get_context import (
     get_home_page_context,
     get_year_page_context,
@@ -25,9 +26,20 @@ from main.content_generation.get_full_video import get_full_video_response
 from main.content_generation.move_date import move_source_date_to_desination_request
 
 
-@put_day_and_month_names_into_context
-def home_page(request, context: dict):
+def put_day_and_month_names_into_context(**kwargs) -> dict | None:
+    """Put general date information from slug into context. Returns None if month is invalid."""
+    if "month" in kwargs and kwargs["month"] not in DateConstants.month_names:
+        return None
+    context = get_day_and_month_names()
+    context.update(kwargs)
+    return context
+
+
+def home_page(request, **kwargs):
     """Home page summarising all years"""
+    context = put_day_and_month_names_into_context(**kwargs)
+    if context is None:
+        return redirect("/date-not-found")
     page_context = get_home_page_context(context)
     return render(request=request, template_name="home.html", context=page_context)
 
@@ -40,9 +52,11 @@ def latest_page(_request):
     return redirect("/")
 
 
-@put_day_and_month_names_into_context
-def year_page(request, context: dict):
+def year_page(request, **kwargs):
     """Return page that summarises a year"""
+    context = put_day_and_month_names_into_context(**kwargs)
+    if context is None:
+        return redirect("/date-not-found")
     year_form = YearPageForm({"year": context.get("year")})
     if not year_form.is_valid():
         return redirect("/date-not-found")
@@ -51,9 +65,11 @@ def year_page(request, context: dict):
     return render(request=request, template_name="year.html", context=page_context)
 
 
-@put_day_and_month_names_into_context
-def month_page(request, context: dict):
+def month_page(request, **kwargs):
     """Return page that summarises a month"""
+    context = put_day_and_month_names_into_context(**kwargs)
+    if context is None:
+        return redirect("/date-not-found")
     month_form = MonthPageForm(
         {"year": context.get("year"), "month": context.get("month")}
     )
@@ -66,9 +82,11 @@ def month_page(request, context: dict):
     return render(request=request, template_name="month.html", context=page_context)
 
 
-@put_day_and_month_names_into_context
-def edit_entry_page(request, context: dict):
+def edit_entry_page(request, **kwargs):
     """Return content for single entry page"""
+    context = put_day_and_month_names_into_context(**kwargs)
+    if context is None:
+        return redirect("/date-not-found")
     day_form = DayPageForm(
         {
             "year": context.get("year"),

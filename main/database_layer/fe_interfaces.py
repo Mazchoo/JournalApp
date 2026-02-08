@@ -4,13 +4,15 @@
 from datetime import datetime
 from typing import TypedDict, Union
 
+from main.config.date_constants import IDayNamesOfWeek, IMonthNamesOfYear
+
 
 class DayAndMonthNamesContext(TypedDict):
     """Output from get_day_and_month_names."""
 
-    full_day_names: list[str]
-    short_day_names: list[str]
-    months_in_year: list[str]
+    full_day_names: IDayNamesOfWeek
+    short_day_names: IDayNamesOfWeek
+    months_in_year: IMonthNamesOfYear
 
 
 class YearNavigationContext(TypedDict):

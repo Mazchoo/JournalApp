@@ -31,7 +31,7 @@ def get_home_page_context(
         **context,
         **all_years_info,
         "icon_paths": icon_paths,
-    }
+    }  # type: ignore
 
 
 def get_year_page_context(
@@ -46,7 +46,7 @@ def get_year_page_context(
         **context,
         **year_info,
         **year_entry_info,
-    }
+    }  # type: ignore
 
 
 def get_month_page_context(
@@ -66,7 +66,7 @@ def get_month_page_context(
         **year_info,
         **month_info,
         **days_info,
-    }
+    }  # type: ignore
 
 
 def get_day_page_context(
@@ -89,4 +89,4 @@ def get_day_page_context(
         **day_info,
         **all_years_info,
         **entry_content,
-    }
+    }  # type: ignore

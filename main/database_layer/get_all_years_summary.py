@@ -81,7 +81,7 @@ def get_random_images_from_year(year: int) -> List[str]:
 
 
 @lru_cache(maxsize=1)
-def get_all_year_summary_information(years: Tuple[str]):
+def get_all_year_summary_information(years: Tuple[int]):
     """Get information about stored years."""
     icons = {}
     for year in years:
