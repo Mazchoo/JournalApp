@@ -5,12 +5,12 @@ import mimetypes
 
 from django.http import JsonResponse, FileResponse
 
-from main.content_generation.request_forms import FullImagePath
+from main.content_generation.request_forms import FullContentPath
 
 
 def get_video_path_from_post(post_data: dict):
     """Get video path from content data"""
-    full_video_form = FullImagePath(post_data)
+    full_video_form = FullContentPath(post_data)
 
     if not full_video_form.is_valid():
         return None, full_video_form.errors
@@ -51,7 +51,7 @@ def create_video_stream_response(target_path: str):
         return None, f"Error streaming video: {str(e)}"
 
 
-def getFullVideoResponse(post_data: dict):
+def get_full_video_response(post_data: dict):
     """Return video streaming data if video exists"""
     target_path, error = get_video_path_from_post(post_data)
     if error is not None:

@@ -39,7 +39,7 @@ def get_year_page_context(
     year: int,
 ) -> YearPageContext:
     """Build context for year page."""
-    year_info = get_year_information(year).to_dict()
+    year_info = get_year_information(year)
     year_entry_info = get_year_entry_information(year)
 
     return {
@@ -55,7 +55,7 @@ def get_month_page_context(
     month: str,
 ) -> MonthPageContext:
     """Build context for month page."""
-    year_info = get_year_information(year).to_dict()
+    year_info = get_year_information(year)
     month_info = get_month_information(year, month)
     days_info = get_days_with_entries_in_month(
         year, month, month_info["next_month"], month_info["next_month_year"]
@@ -76,7 +76,7 @@ def get_day_page_context(
     day: int,
 ) -> DayPageContext:
     """Build context for day/edit page."""
-    year_info = get_year_information(year).to_dict()
+    year_info = get_year_information(year)
     month_info = get_month_information(year, month)
     day_info = get_day_information(year, day, month_info)
     all_years_info = get_all_entry_years()

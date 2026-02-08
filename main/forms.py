@@ -32,8 +32,10 @@ class EntryForm(ModelForm):
     def clean_date(self):
         """Convert slug string into date object"""
         clean_data = super().clean()
-        name = clean_data["name"]
+        if clean_data is None:
+            raise forms.ValidationError("Date is not defined")
 
+        name = clean_data["name"]
         entry_date = get_valid_date_from_slug(name)
 
         if entry_date is None:
@@ -52,6 +54,9 @@ class ImageForm(ModelForm):
     def clean_file_path(self):
         """Ensure file path refers to usuable file"""
         clean_data = super().clean()
+        if clean_data is None:
+            raise forms.ValidationError("File path is not defined")
+
         file_name = clean_data["file_path"]
         entry = clean_data["entry"]
 
@@ -93,6 +98,9 @@ class VideoForm(ModelForm):
     def clean_file_path(self):
         """Ensure file path refers to usuable file"""
         clean_data = super().clean()
+        if clean_data is None:
+            raise forms.ValidationError("File path is not defined")
+
         file_name = clean_data["file_path"]
         entry = clean_data["entry"]
 
@@ -142,6 +150,9 @@ class ContentForm(ModelForm):
     def clean(self):
         """Ensure content type can refer to model"""
         clean_data = super().clean()
+        if clean_data is None:
+            raise forms.ValidationError("No data provided")
+
         content_type = clean_data["content_type"]
         if content_type not in CONTENT_MODELS:
             raise forms.ValidationError(f"Content type {content_type} not recognised")

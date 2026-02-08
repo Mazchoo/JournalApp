@@ -16,8 +16,7 @@ def put_day_and_month_names_into_context(func) -> Callable:
         if "month" in kwargs and kwargs["month"] not in DateConstants.month_names:
             return redirect("/date-not-found")
 
-        day_month_context = get_day_and_month_names()
-        context = day_month_context.to_dict()
+        context = get_day_and_month_names()
         context.update(kwargs)
         return func(request, context)
 

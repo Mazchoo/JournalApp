@@ -3,7 +3,11 @@
 from django.shortcuts import render, redirect
 
 from main.forms import ParagraphForm
-from main.requests import YearPageRequest, MonthPageRequest, DayPageRequest
+from main.content_generation.request_forms import (
+    YearPageForm,
+    MonthPageForm,
+    DayPageForm,
+)
 from main.database_layer.date_request import put_day_and_month_names_into_context
 from main.database_layer.ajax_request import ajax_request
 from main.database_layer.get_context import (
@@ -17,7 +21,7 @@ from main.database_layer.get_latest_entry import get_latest_entry_tuple
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.content_generation.delete_entry import delete_entry_and_content
 from main.content_generation.get_full_image import get_full_image_reponse
-from main.content_generation.get_full_video import getFullVideoResponse
+from main.content_generation.get_full_video import get_full_video_response
 from main.content_generation.move_date import move_source_date_to_desination_request
 
 
@@ -39,25 +43,25 @@ def latest_page(_request):
 @put_day_and_month_names_into_context
 def year_page(request, context: dict):
     """Return page that summarises a year"""
-    if not (year_request := YearPageRequest.create(year=context.get("year"))):
+    year_form = YearPageForm({"year": context.get("year")})
+    if not year_form.is_valid():
         return redirect("/date-not-found")
 
-    page_context = get_year_page_context(context, year_request.year)
+    page_context = get_year_page_context(context, year_form.cleaned_data["year"])
     return render(request=request, template_name="year.html", context=page_context)
 
 
 @put_day_and_month_names_into_context
 def month_page(request, context: dict):
     """Return page that summarises a month"""
-    if not (
-        month_request := MonthPageRequest.create(
-            year=context.get("year"), month=context.get("month")
-        )
-    ):
+    month_form = MonthPageForm(
+        {"year": context.get("year"), "month": context.get("month")}
+    )
+    if not month_form.is_valid():
         return redirect("/date-not-found")
 
     page_context = get_month_page_context(
-        context, month_request.year, month_request.month
+        context, month_form.cleaned_data["year"], month_form.cleaned_data["month"]
     )
     return render(request=request, template_name="month.html", context=page_context)
 
@@ -65,15 +69,21 @@ def month_page(request, context: dict):
 @put_day_and_month_names_into_context
 def edit_entry_page(request, context: dict):
     """Return content for single entry page"""
-    if not (
-        day_request := DayPageRequest.create(
-            year=context.get("year"), month=context.get("month"), day=context.get("day")
-        )
-    ):
+    day_form = DayPageForm(
+        {
+            "year": context.get("year"),
+            "month": context.get("month"),
+            "day": context.get("day"),
+        }
+    )
+    if not day_form.is_valid():
         return redirect("/date-not-found")
 
     page_context = get_day_page_context(
-        context, day_request.year, day_request.month, day_request.day
+        context,
+        day_form.cleaned_data["year"],
+        day_form.cleaned_data["month"],
+        day_form.cleaned_data["day"],
     )
     page_context["tiny_mce"] = ParagraphForm()  # type: ignore[typeddict-unknown-key]
 
@@ -111,7 +121,7 @@ def get_image(post_data):
 @ajax_request
 def get_video(post_data):
     """Async stream a video"""
-    return getFullVideoResponse(post_data)
+    return get_full_video_response(post_data)
 
 
 @ajax_request

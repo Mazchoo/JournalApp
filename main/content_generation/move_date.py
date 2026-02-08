@@ -1,6 +1,6 @@
 """Handle moving an entry from one date to another"""
 
-from typing import Optional, Tuple, Any, Dict, List
+from typing import Optional, Dict, List, Any
 
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
@@ -20,22 +20,22 @@ from main.content_generation.content_factory_update import CONTENT_UPDATE_DATE
 
 
 def check_move_request(
-    post_data: dict,
-) -> Tuple[Optional[Dict[str, Any]], Optional[ErrorDict]]:
+    post_data: dict, errors: Dict[str, ErrorDict]
+) -> Optional[Dict[str, Any]]:
     """Return cleaned data of moved request else errors"""
     date_move_form = DateMoveForm(post_data)
 
     if not date_move_form.is_valid():
-        return None, ErrorDict(date=date_move_form.errors)
+        errors["date"] = date_move_form.errors
+        return None
 
-    return date_move_form.cleaned_data, None
+    return date_move_form.cleaned_data
 
 
 def create_new_entry_at_new_date(
-    source_entry: Entry, destination_slug: str
-) -> Tuple[Optional[Entry], ErrorDict]:
+    source_entry: Entry, destination_slug: str, errors: Dict[str, ErrorDict]
+) -> Optional[Entry]:
     """Moves an entry to destination date"""
-    errors = ErrorDict()
     new_entry = None
     move_files_from_entry(source_entry)
 
@@ -51,11 +51,11 @@ def create_new_entry_at_new_date(
     else:
         errors["entry"] = new_entry_form.errors
 
-    return new_entry, errors
+    return new_entry
 
 
 def generate_new_content_from_source(
-    content: Content, new_slug: str, errors: ErrorDict
+    content: Content, new_slug: str, errors: Dict[str, ErrorDict]
 ) -> Optional[int]:
     """Create new content with updated slugs, return optional key if it was success else update error log"""
     content_type = content.content_type
@@ -76,7 +76,7 @@ def generate_new_content_from_source(
 
 
 def generate_content_linked_to_new_entry(
-    content: Content, new_instance_id: int, errors: ErrorDict
+    content: Content, new_instance_id: int, errors: Dict[str, ErrorDict]
 ) -> Optional[int]:
     """Validate form for updated content"""
     new_content_form = ContentForm(
@@ -89,36 +89,38 @@ def generate_content_linked_to_new_entry(
         new_content_record_id = new_content_form.instance.pk
         content.delete()
     else:
-        errors[f"content-{content.id}"] = new_content_form.errors
+        errors[str({content})] = new_content_form.errors
 
     return new_content_record_id
 
 
 def update_all_content_with_new_entry(
-    content: Content, destination_slug: str, content_ids: List[int], errors: ErrorDict
+    content: Content,
+    destination_slug: str,
+    content_ids: List[int],
+    errors: Dict[str, ErrorDict],
 ):
     """Each each content id move all content to destination date"""
-    new_instance_id = generate_new_content_from_source(
+    if new_instance_id := generate_new_content_from_source(
         content, destination_slug, errors
-    )
-    if content_id := generate_content_linked_to_new_entry(
-        content, new_instance_id, errors
     ):
-        content_ids.append(content_id)
+        if content_id := generate_content_linked_to_new_entry(
+            content, new_instance_id, errors
+        ):
+            content_ids.append(content_id)
 
 
 def update_entry_date(
-    source_slug: str, destination_slug: str
-) -> Tuple[Optional[Entry], ErrorDict]:
+    source_slug: str, destination_slug: str, errors: Dict[str, ErrorDict]
+) -> Optional[Entry]:
     """Load and move entry from source date slug to destination date slug"""
     entry = Entry.objects.get(name=source_slug)
     move_files_from_entry(entry)
 
-    new_entry, errors = create_new_entry_at_new_date(entry, destination_slug)
-    if errors:
-        return new_entry, errors
+    new_entry = create_new_entry_at_new_date(entry, destination_slug, errors)
+    if errors or new_entry is None:
+        return new_entry
 
-    errors = ErrorDict()
     content_ids = []
     for content in entry.content.all():
         update_all_content_with_new_entry(
@@ -130,26 +132,26 @@ def update_entry_date(
     if not errors:
         entry.delete()
 
-    return new_entry, errors
+    return new_entry
 
 
 def move_source_date_to_desination_request(post_data: dict) -> JsonResponse:
     """Handle request to change the date of an entry"""
-    cleaned_data, error = check_move_request(post_data)
+    errors: Dict[str, ErrorDict] = {}
 
-    if error is not None:
-        return JsonResponse({"error": f"Invalid dates {error}"})
+    cleaned_data = check_move_request(post_data, errors)
 
-    new_entry, error = update_entry_date(
-        cleaned_data["move_from"], cleaned_data["move_to"]
+    if cleaned_data is None:
+        return JsonResponse({"error": f"Invalid dates {errors}"})
+
+    new_entry = update_entry_date(
+        cleaned_data["move_from"], cleaned_data["move_to"], errors
     )
 
-    if error:
-        return JsonResponse({"error": f"Update errors {error}"})
+    if new_entry is None:
+        return JsonResponse({"error": f"Update errors {errors}"})
 
-    date_tuple = convert_date_to_url_tuple(new_entry.date)
-
-    if date_tuple:
+    if date_tuple := convert_date_to_url_tuple(new_entry.date):
         return JsonResponse({"new_date": f"/edit/{'/'.join(date_tuple)}"})
 
-    return JsonResponse({"error": f"Update errors {error}"})
+    return JsonResponse({"error": f"Update errors {errors}"})

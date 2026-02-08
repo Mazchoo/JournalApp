@@ -5,16 +5,16 @@ from datetime import datetime
 from typing import TypedDict, Union
 
 
-class DayAndMonthNamesContextDict(TypedDict):
-    """TypedDict version of DayAndMonthNamesContext for combined types."""
+class DayAndMonthNamesContext(TypedDict):
+    """Output from get_day_and_month_names."""
 
     full_day_names: list[str]
     short_day_names: list[str]
     months_in_year: list[str]
 
 
-class YearNavigationContextDict(TypedDict):
-    """TypedDict version of YearNavigationContext for combined types."""
+class YearNavigationContext(TypedDict):
+    """Navigation info computed from year."""
 
     year: int
     next_year: int
@@ -79,7 +79,7 @@ class EntryContentContext(TypedDict):
 
 
 # Full context types - combined for template rendering
-class YearInformationContext(DayAndMonthNamesContextDict, YearNavigationContextDict):
+class YearInformationContext(DayAndMonthNamesContext, YearNavigationContext):
     """Full context for year page template."""
 
 
@@ -92,7 +92,7 @@ class DayInformationContext(MonthInformationContext, DayNavigationContext):
 
 
 # Page-level context types - what each page view needs
-class HomePageContext(DayAndMonthNamesContextDict, AllEntryYearsContext):
+class HomePageContext(DayAndMonthNamesContext, AllEntryYearsContext):
     """Full context for home page."""
 
     icon_paths: dict[int, list[str]]

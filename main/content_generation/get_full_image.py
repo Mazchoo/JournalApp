@@ -11,14 +11,14 @@ from main.utils.image import (
     get_encoding_type,
 )
 from main.config.image_constants import ImageConstants
-from main.content_generation.request_forms import FullImagePath
+from main.content_generation.request_forms import FullContentPath
 
 
 def check_target_path_in_post(
     post_data: dict,
 ) -> Tuple[Optional[dict], Optional[ErrorDict]]:
     """Assert target path is valid"""
-    full_image_form = FullImagePath(post_data)
+    full_image_form = FullContentPath(post_data)
 
     if not full_image_form.is_valid():
         return None, full_image_form.errors
