@@ -7,6 +7,7 @@ from typing import Optional
 
 from main.config.date_constants import DateConstants
 from main.database_layer.date_slugs import date_exists
+from main.config.date_constants import IDayNamesOfWeek, IMonthNamesOfYear
 
 
 @dataclass
@@ -97,9 +98,9 @@ class DayPageRequest:
 class DayAndMonthNamesContext:
     """Output from get_day_and_month_names."""
 
-    full_day_names: list[str] = field(default_factory=list)
-    short_day_names: list[str] = field(default_factory=list)
-    months_in_year: list[str] = field(default_factory=list)
+    full_day_names: IDayNamesOfWeek = field()
+    short_day_names: IDayNamesOfWeek = field()
+    months_in_year: IMonthNamesOfYear = field()
 
     def __post_init__(self):
         if not self.full_day_names:
