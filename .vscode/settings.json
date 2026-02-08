@@ -4,5 +4,8 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true
 }
