@@ -1,6 +1,7 @@
 """Forms for page requests, full content, and date moves"""
 
 from pathlib import Path
+from typing import Optional
 
 from django.forms import Form, SlugField, CharField, IntegerField, ValidationError
 
@@ -127,3 +128,22 @@ class DateMoveForm(Form):
             raise ValidationError(f"Destination date {move_to} already exists")
 
         return move_to
+
+
+class SaveEntryForm(Form):
+    """Validate request to save a journal entry"""
+
+    name = SlugField()
+
+    def __init__(self, *args, content: Optional[dict] = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.content: dict = content or {}
+
+    def clean(self) -> dict:
+        """Ensure content is provided"""
+        cleaned_data = super().clean()
+        if cleaned_data is None:
+            return {}
+        if not self.content:
+            raise ValidationError("No content in entry")
+        return cleaned_data
