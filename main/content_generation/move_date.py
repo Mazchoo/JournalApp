@@ -15,7 +15,7 @@ from main.database_layer.date_slugs import (
     convert_date_to_url_tuple,
 )
 from main.content_generation.delete_entry import move_files_from_entry
-from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.content_generation.content_factory_models import ContentFactory
 from main.content_generation.content_factory_update import CONTENT_UPDATE_DATE
 
 
@@ -60,8 +60,8 @@ def generate_new_content_from_source(
     """Create new content with updated slugs, return optional key if it was success else update error log"""
     content_type = content.content_type
 
-    Model = CONTENT_MODELS[content_type]
-    obj = Model.objects.get(id=content.content_id)
+    model = ContentFactory.get(content_type)
+    obj = model.objects.get(id=content.content_id)
     new_obj_form = CONTENT_UPDATE_DATE[content_type](obj, new_slug)
 
     new_instance_id = None
@@ -70,7 +70,7 @@ def generate_new_content_from_source(
         new_instance_id = new_obj_form.instance.pk
         obj.delete()
     else:
-        errors[f"{content_type}-{obj.id}"] = new_obj_form.errors
+        errors[f"{content_type}-{obj.pk}"] = new_obj_form.errors
 
     return new_instance_id
 

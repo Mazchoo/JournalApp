@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from Journal.settings import ENTRY_FOLDER
 from main.models import Entry, Content
 from main.forms import DeleteEntryForm
-from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.content_generation.content_factory_models import ContentFactory
 from main.utils.file_io import (
     get_stored_media_folder,
     remove_empty_parent_folders,
@@ -23,8 +23,8 @@ def delete_entry_content(entry: Entry):
     delete_content_ids = entry.content.get_queryset()
     Content.objects.filter(id__in=delete_content_ids).delete()
 
-    for Model in CONTENT_MODELS.values():
-        Model.objects.filter(entry=entry.name).delete()
+    for model in ContentFactory.all_content_models():
+        model.objects.filter(entry=entry.name).delete()
 
 
 def move_files_out_of_folder(files: List[Path]):

@@ -18,7 +18,7 @@ from main.utils.file_io import (
 )
 from main.config.image_constants import ImageConstants
 from main.config.video_constants import VideoConstants
-from main.content_generation.content_factory_models import CONTENT_MODELS
+from main.config.config import ALLOWED_CONTENT_TYPES
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
@@ -170,5 +170,5 @@ class ContentForm(ModelForm):
             raise forms.ValidationError("No data provided")
 
         content_type = clean_data["content_type"]
-        if content_type not in CONTENT_MODELS:
+        if content_type not in ALLOWED_CONTENT_TYPES:
             raise forms.ValidationError(f"Content type {content_type} not recognised")
