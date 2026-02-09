@@ -16,7 +16,7 @@ from main.database_layer.date_slugs import (
 )
 from main.content_generation.delete_entry import move_files_from_entry
 from main.content_generation.content_factory_models import ContentFactory
-from main.content_generation.content_factory_update import CONTENT_UPDATE_DATE
+from main.content_generation.content_factory_update import ContentUpdateFactory
 
 
 def check_move_request(
@@ -62,7 +62,7 @@ def generate_new_content_from_source(
 
     model = ContentFactory.get(content_type)
     obj = model.objects.get(id=content.content_id)
-    new_obj_form = CONTENT_UPDATE_DATE[content_type](obj, new_slug)
+    new_obj_form = ContentUpdateFactory.get(content_type)(obj, new_slug)
 
     new_instance_id = None
     if new_obj_form.is_valid():

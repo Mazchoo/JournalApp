@@ -11,7 +11,8 @@ from django.forms.utils import ErrorDict, ErrorList
 from main.models import Entry
 from main.forms import EntryForm, ContentForm
 from main.content_generation.delete_entry import delete_entry_content
-from main.content_generation.content_factory_forms import CONTENT_FORMS
+from main.config.config import ALLOWED_CONTENT_TYPES
+from main.content_generation.content_factory_forms import ContentFormFactory
 from main.content_generation.request_forms import SaveEntryForm
 
 
@@ -77,15 +78,15 @@ def parse_submitted_new_content(
         errors[f"{key}"] = ErrorList([" => Invalid content syntax"])
         return
 
-    entry_type = content_type_match.group(1)
-    if entry_type not in CONTENT_FORMS:
+    content_type = content_type_match.group(1)
+    if content_type not in ALLOWED_CONTENT_TYPES:
         errors[f"{key}"] = ErrorList([" => Invalid content type"])
         return
 
     content_fields = dict(value)
-    model_form = CONTENT_FORMS[entry_type](content_fields)
+    model_form = ContentFormFactory.get(content_type)(content_fields)  # type: ignore
 
-    content_key = generate_new_content(model_form, entry_type, key, errors)
+    content_key = generate_new_content(model_form, content_type, key, errors)
     if content_key is not None:
         content_keys.append(content_key)
 
