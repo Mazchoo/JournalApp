@@ -8,7 +8,7 @@ from collections import namedtuple
 import numpy as np
 from PIL import Image, ImageFilter
 
-from main.config.video_constants import VideoConstants
+from main.config import VideoConstants
 from main.utils.file_io import get_icon_file_path, get_resized_filename
 from main.utils.image import (
     load_image_directly,

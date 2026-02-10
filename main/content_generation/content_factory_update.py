@@ -7,7 +7,7 @@ from django.forms import model_to_dict
 
 from main.forms import ImageForm, ParagraphForm, VideoForm
 from main.models import EntryImage, EntryParagraph, EntryVideo
-from main.config.config import IContentTypes
+from main.config import IContentTypes
 
 
 def get_updated_date_image(image: EntryImage, destination_slug: str) -> ImageForm:

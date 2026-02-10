@@ -7,7 +7,7 @@ from functools import lru_cache
 
 from PIL import Image
 
-from main.config.image_constants import ImageConstants
+from main.config import ImageConstants
 from main.utils.pil_image_wrapper import (
     get_square_resized_image,
     get_resizing_factor_to_downsized,

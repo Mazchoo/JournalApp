@@ -8,7 +8,7 @@ import numpy as np
 import imageio.v3 as iio
 from imageio_ffmpeg import read_frames, count_frames_and_secs
 
-from main.config.video_constants import VideoConstants
+from main.config import VideoConstants
 
 
 class VideoCapture:

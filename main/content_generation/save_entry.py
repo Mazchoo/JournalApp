@@ -11,7 +11,7 @@ from django.forms.utils import ErrorDict, ErrorList
 from main.models import Entry
 from main.forms import EntryForm, ContentForm
 from main.content_generation.delete_entry import delete_entry_content
-from main.config.config import ALLOWED_CONTENT_TYPES
+from main.config import ALLOWED_CONTENT_TYPES
 from main.content_generation.content_factory_forms import ContentFormFactory
 from main.content_generation.request_forms import SaveEntryForm
 

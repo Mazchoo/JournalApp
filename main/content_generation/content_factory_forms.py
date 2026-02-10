@@ -3,7 +3,7 @@
 from typing import Iterable, Union
 
 from main.forms import ImageForm, ParagraphForm, VideoForm
-from main.config.config import IContentTypes
+from main.config import IContentTypes
 
 
 class ContentFormFactory:

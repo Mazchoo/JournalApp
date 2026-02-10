@@ -4,7 +4,7 @@
 from datetime import datetime
 from typing import TypedDict, Union
 
-from main.config.date_constants import IDayNamesOfWeek, IMonthNamesOfYear
+from main.config import IDayNamesOfWeek, IMonthNamesOfYear
 
 
 class DayAndMonthNamesContext(TypedDict):

@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 from typing import Tuple, Optional
 
-from main.config.date_constants import DateConstants
+from main.config import DateConstants
 
 
 def get_valid_date_from_slug(slug: str) -> Optional[datetime]:

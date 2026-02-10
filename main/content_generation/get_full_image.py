@@ -10,7 +10,7 @@ from main.utils.image import (
     add_encoding_type_to_base64,
     get_encoding_type,
 )
-from main.config.image_constants import ImageConstants
+from main.config import ImageConstants
 from main.content_generation.request_forms import FullContentPath
 
 

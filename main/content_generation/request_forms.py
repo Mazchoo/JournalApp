@@ -5,7 +5,7 @@ from typing import Optional
 
 from django.forms import Form, SlugField, CharField, IntegerField, ValidationError
 
-from main.config.date_constants import DateConstants
+from main.config import DateConstants
 from main.database_layer.date_slugs import date_exists, get_valid_date_from_slug
 from main.models import Entry
 from main.utils.file_io import get_stored_media_path

@@ -15,8 +15,7 @@ from main.models import Entry, EntryImage
 from main.utils.image import get_base64_from_image, create_image_icon
 from main.utils.file_io import get_icon_file_path, get_base_entry_path
 
-# ToDo - This should be from a common settings file
-NR_IMAGES_TO_DISPLAY = 18
+from main.config import NR_IMAGES_TO_DISPLAY
 
 
 def get_current_year():

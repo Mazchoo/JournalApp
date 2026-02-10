@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Tuple, Union
 
-from main.config.date_constants import DateConstants
+from main.config import DateConstants
 from main.database_layer.fe_interfaces import YearEntryInformationContext
 from main.models import Entry, EntryImage, EntryVideo
 from main.utils.image import get_base64_from_image, create_image_icon

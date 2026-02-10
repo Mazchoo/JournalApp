@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from main.models import Entry
-from main.config.date_constants import DateConstants
+from main.config import DateConstants
 
 from main.database_layer.fe_interfaces import (
     DayAndMonthNamesContext,

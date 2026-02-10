@@ -16,9 +16,7 @@ from main.utils.file_io import (
     make_image_path_relative,
     move_media_to_save_path,
 )
-from main.config.image_constants import ImageConstants
-from main.config.video_constants import VideoConstants
-from main.config.config import ALLOWED_CONTENT_TYPES
+from main.config import ImageConstants, VideoConstants, ALLOWED_CONTENT_TYPES
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
 

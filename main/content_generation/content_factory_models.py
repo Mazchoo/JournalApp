@@ -3,7 +3,7 @@
 from typing import Iterable, Union
 
 from main.models import EntryImage, EntryParagraph, EntryVideo
-from main.config.config import IContentTypes
+from main.config import IContentTypes
 
 
 class ContentFactory:
