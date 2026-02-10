@@ -8,13 +8,14 @@ from django.db import models as django_models
 from tinymce.widgets import TinyMCE  # type: ignore
 
 from main.models import Entry, EntryImage, EntryParagraph, EntryVideo, Content
-from main.utils.image import move_image_to_save_path
+from main.utils.image import move_image_to_save_path, create_image_icon
 from main.utils.file_io import (
     path_has_image_extension,
     get_stored_media_path,
     get_base_entry_path,
     make_image_path_relative,
     move_media_to_save_path,
+    get_icon_file_path,
 )
 from main.config import ImageConstants, VideoConstants, ALLOWED_CONTENT_TYPES
 from main.database_layer.date_slugs import get_valid_date_from_slug
@@ -82,6 +83,9 @@ class ImageForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)
+        icon_path = get_icon_file_path(target_file_obj)
+        if not icon_path.exists():
+            create_image_icon(target_file_obj)
 
         return make_image_path_relative(target_path)
 
