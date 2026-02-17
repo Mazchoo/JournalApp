@@ -10,7 +10,7 @@ let createTinyMCE = function(component_name, height, initCallback=emptyFunction)
         promotion: false,
         branding: false,
         setup:function(editor) {
-            editor.on('change', function(e) {
+            editor.on('input', function(e) {
                 enableSaveButton();
             }),
             editor.on('init', function(e) {

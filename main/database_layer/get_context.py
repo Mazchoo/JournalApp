@@ -80,7 +80,7 @@ def get_month_page_context(
     )
 
     return {
-        **context,
+        **context,  # type: ignore[typeddict-item]
         **year_info,
         **month_info,
         **days_info,
@@ -101,7 +101,7 @@ def get_day_page_context(
     entry_content = load_all_content_from_entry(day_info["date_slug"])
 
     return {
-        **context,
+        **context,  # type: ignore[typeddict-item]
         **year_info,
         **month_info,
         **day_info,

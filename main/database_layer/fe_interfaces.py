@@ -2,7 +2,7 @@
 # pylint: disable=too-many-ancestors
 
 from datetime import datetime
-from typing import TypedDict, Union
+from typing import TypedDict, Union, Optional
 
 from main.config import IDayNamesOfWeek, IMonthNamesOfYear
 
@@ -13,6 +13,8 @@ class DayAndMonthNamesContext(TypedDict):
     full_day_names: IDayNamesOfWeek
     short_day_names: IDayNamesOfWeek
     months_in_year: IMonthNamesOfYear
+    year: int
+    month: Optional[int]
 
 
 class YearNavigationContext(TypedDict):
