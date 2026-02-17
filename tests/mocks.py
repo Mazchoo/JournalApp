@@ -1,11 +1,15 @@
 """Helper objects to test database and request interactions"""
 
-from datetime import datetime
-from typing import List
+from __future__ import annotations
 
+from datetime import datetime
+from typing import TYPE_CHECKING, List
+
+from django.apps import apps
 from django.test import Client
 
-from main.models import Entry, EntryParagraph, Content
+if TYPE_CHECKING:
+    from main.models import Entry
 
 
 def create_mock_client():
@@ -27,6 +31,7 @@ def create_mock_entry() -> Entry:
     page-level views (year, month, day) have data to find.
     """
 
+    Entry = apps.get_model("main", "Entry")
     entry = Entry.objects.create(
         name="2025-02-12",
         date=datetime(2025, 2, 12),
@@ -43,6 +48,9 @@ def create_mock_entry_with_paragraph() -> Entry:
     This lets us test views that render entry content (the edit/show page).
     """
     entry = create_mock_entry()
+
+    EntryParagraph = apps.get_model("main", "EntryParagraph")
+    Content = apps.get_model("main", "Content")
 
     # Create the paragraph model instance
     paragraph = EntryParagraph.objects.create(
@@ -69,6 +77,7 @@ def create_multiple_mock_entries() -> List[Entry]:
     have meaningful data to aggregate.
     """
 
+    Entry = apps.get_model("main", "Entry")
     entries = []
     for year, month, day in [(2023, 6, 15), (2024, 1, 10), (2025, 2, 12)]:
         month_str = f"{month:02d}"

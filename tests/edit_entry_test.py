@@ -1,7 +1,8 @@
 """Tests for the edit_entry_page view (URLs: /edit/... and /show/...) and load_all_content_from_entry."""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from tests.mocks import (
     create_mock_client,

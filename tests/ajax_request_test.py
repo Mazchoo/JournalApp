@@ -1,15 +1,13 @@
 """Tests for the @ajax_request decorator and ajax_request.py helper functions."""
 
-import pytest
 from unittest.mock import MagicMock
 from django.http import QueryDict
+
+import pytest
 
 from tests.mocks import create_mock_client, create_ajax_headers
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
-
-
-# --- @ajax_request decorator behaviour ---
 
 
 @pytest.mark.django_db

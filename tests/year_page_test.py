@@ -1,7 +1,8 @@
 """Tests for the year_page view (URL: /year/<int:year>/)."""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from tests.mocks import create_mock_client
 

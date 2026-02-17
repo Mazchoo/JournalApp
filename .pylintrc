@@ -91,6 +91,7 @@ disable=raw-checker-failed,
         pointless-string-statement,  # Commented out code blocks do this
         import-error, # Environment issue
         duplicate-code, # Too strict IMO
+        import-outside-toplevel, # Tests use local imports extensively
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
