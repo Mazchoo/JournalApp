@@ -17,11 +17,7 @@ def test_edit_page_returns_200_for_valid_date():
     client = create_mock_client()
     create_mock_entry()
 
-    with patch(
-        "main.database_layer.get_context.load_all_content_from_entry",
-        return_value={"entry_exists": True, "saved_content": {}},
-    ):
-        response = client.get("/edit/2025/February/12/")
+    response = client.get("/edit/2025/February/12/")
 
     assert response.status_code == 200
     assert "day.html" in [t.name for t in response.templates]
@@ -33,11 +29,7 @@ def test_edit_page_includes_tinymce_form():
     client = create_mock_client()
     create_mock_entry()
 
-    with patch(
-        "main.database_layer.get_context.load_all_content_from_entry",
-        return_value={"entry_exists": True, "saved_content": {}},
-    ):
-        response = client.get("/edit/2025/February/12/")
+    response = client.get("/edit/2025/February/12/")
 
     assert "tiny_mce" in response.context
 
@@ -48,11 +40,7 @@ def test_show_page_uses_same_view_as_edit():
     client = create_mock_client()
     create_mock_entry()
 
-    with patch(
-        "main.database_layer.get_context.load_all_content_from_entry",
-        return_value={"entry_exists": True, "saved_content": {}},
-    ):
-        response = client.get("/show/2025/February/12/")
+    response = client.get("/show/2025/February/12/")
 
     assert response.status_code == 200
     assert "day.html" in [t.name for t in response.templates]
@@ -96,18 +84,13 @@ def test_edit_page_loads_paragraph_content():
     client = create_mock_client()
     create_mock_entry_with_paragraph()
 
-    paragraph_data = {"paragraph1": {"text": "<p>Hello World</p>", "height": 200}}
-    with patch(
-        "main.database_layer.get_context.load_all_content_from_entry",
-        return_value={
-            "entry_exists": True,
-            "saved_content": paragraph_data,
-        },
-    ):
-        response = client.get("/edit/2025/February/12/")
+    response = client.get("/edit/2025/February/12/")
 
     assert response.status_code == 200
-    assert response.context["saved_content"] == paragraph_data
+    saved_content = response.context["saved_content"]
+    first_content = next(iter(saved_content.values()))
+    assert first_content["text"] == "<p>Hello World</p>"
+    assert first_content["height"] == 200
 
 
 @pytest.mark.django_db
@@ -116,11 +99,7 @@ def test_edit_page_for_date_without_entry():
     client = create_mock_client()
     create_mock_entry()
 
-    with patch(
-        "main.database_layer.get_context.load_all_content_from_entry",
-        return_value={"entry_exists": False, "saved_content": {}},
-    ):
-        response = client.get("/edit/2025/February/11/")
+    response = client.get("/edit/2025/February/11/")
 
     assert response.status_code == 200
 
@@ -143,14 +122,13 @@ def test_load_entry_with_paragraph():
 
     create_mock_entry_with_paragraph()
 
-    with patch(
-        "main.models.EntryParagraph.view",
-        return_value={"text": "<p>Hello World</p>", "height": 200},
-    ):
-        result = load_all_content_from_entry("2025-02-12")
+    result = load_all_content_from_entry("2025-02-12")
 
     assert result["entry_exists"] is True
     assert len(result["saved_content"]) == 1
+    first_content = next(iter(result["saved_content"].values()))
+    assert first_content["text"] == "<p>Hello World</p>"
+    assert first_content["height"] == 200
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 # pylint: disable=too-many-ancestors
 
 from datetime import datetime
-from typing import TypedDict, Union, Optional
+from typing import Any, TypedDict, Union, Optional
 
 from main.config import IDayNamesOfWeek, IMonthNamesOfYear
 
@@ -79,7 +79,7 @@ class EntryContentContext(TypedDict):
     """Output from load_all_content_from_entry."""
 
     entry_exists: bool
-    saved_content: dict[str, str]
+    saved_content: dict[str, Any]
 
 
 # Full context types - combined for template rendering
