@@ -5,48 +5,60 @@ from datetime import datetime
 import pytest
 
 from tests.mocks import create_mock_entry
-from main.database_layer.date_slugs import (
-    get_valid_date_from_slug,
-    convert_date_to_url_tuple,
-    date_exists,
-)
 
 
 def test_valid_slug_returns_datetime():
     """A correctly formatted slug should return a datetime object."""
+    from main.database_layer.date_slugs import get_valid_date_from_slug
+
     result = get_valid_date_from_slug("2025-02-12")
     assert result == datetime(2025, 2, 12)
 
 
 def test_invalid_slug_returns_none():
     """A malformed slug should return None."""
+    from main.database_layer.date_slugs import get_valid_date_from_slug
+
     assert get_valid_date_from_slug("not-a-date") is None
 
 
 def test_impossible_date_returns_none():
     """February 30 doesn't exist, so the slug should return None."""
+    from main.database_layer.date_slugs import get_valid_date_from_slug
+
     assert get_valid_date_from_slug("2025-02-30") is None
 
 
 def test_convert_date_to_url_tuple():
     """A datetime should be converted to a (year, month, day) string tuple."""
+    from main.database_layer.date_slugs import convert_date_to_url_tuple
+
     result = convert_date_to_url_tuple(datetime(2025, 2, 12))
     assert result == ("2025", "February", "12")
 
 
 def test_date_exists_valid():
     """A real date should return True."""
-    assert date_exists(2025, "February", 12)
+    from main.database_layer.date_slugs import date_exists
+
+    assert date_exists(2025, "February", 12) is True
 
 
 def test_date_exists_invalid():
     """An impossible date (Feb 31) should return False."""
-    assert not date_exists(2025, "February", 31)
+    from main.database_layer.date_slugs import date_exists
+
+    assert date_exists(2025, "February", 31) is False
 
 
 def test_date_exists_default_month_and_day():
     """With only a year argument, date_exists defaults to January 1."""
+    from main.database_layer.date_slugs import date_exists
+
     assert date_exists(2025) is True
+
+
+# --- put_day_and_month_names_into_context ---
 
 
 def test_context_with_no_month():
@@ -78,9 +90,6 @@ def test_context_returns_none_for_invalid_month():
 
     result = put_day_and_month_names_into_context(year=2025, month="Smarch")
     assert result is None
-
-
-# --- Date information helpers ---
 
 
 def test_get_day_and_month_names():
@@ -219,9 +228,6 @@ def test_get_days_with_entries_empty_month():
 
     result = get_days_with_entries_in_month(2025, "March", "April", 2025)
     assert result["days_with_an_entry"] == []
-
-
-# --- Request form validation ---
 
 
 def test_month_name_form_valid():

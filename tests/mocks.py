@@ -111,6 +111,25 @@ def create_mock_video_file(base_path, name="2025-02-12", file_name="clip.mp4"):
     return video_path
 
 
+def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
+    """
+    Create a small JPEG file inside a temporary entry folder structure.
+
+    Returns the full path to the created file. The caller is responsible
+    for patching main.utils.file_io.ENTRY_FOLDER to *base_path* and for
+    cleaning up (e.g. via tmp_path which tears down automatically).
+    """
+    from pathlib import Path
+
+    year, month, day = name.split("-")
+    image_dir = Path(base_path) / year / month / day
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / file_name
+    # Minimal valid JPEG: SOI marker + EOI marker
+    image_path.write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 20 + b"\xff\xd9")
+    return image_path
+
+
 def create_ajax_headers() -> dict:
     """
     Return HTTP headers that the @ajax_request decorator expects.
