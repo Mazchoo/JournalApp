@@ -6,7 +6,30 @@ let loadParagraphContent = function(paragraphContent) {
 
 let loadImageContent = function(imageContent) {
     appendImageToList();
-    editImageWhenInitialised(CONTENT_INDEX, imageContent, MAX_CHANGE_ATTEMPTS);
+    let contentIndex = CONTENT_INDEX;
+
+    editImageMetaWhenInitialised(contentIndex, imageContent, MAX_CHANGE_ATTEMPTS);
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    $.ajax({
+        type: 'POST',
+        url: DOWNSIZED_IMAGE_URL,
+        data: {
+            "image_id": imageContent["image_id"],
+            "csrfmiddlewaretoken": csrftoken,
+        },
+        success: function(response) {
+            if ("base64" in response) {
+                $("#image" + contentIndex).attr("src", response["base64"]);
+            }
+            if ("error" in response) {
+                console.log('Image load error:', response["error"]);
+            }
+        },
+        error: function(_jqXhr, _textStatus, errorThrown) {
+            console.log('Failed to load image:', errorThrown);
+        }
+    });
 }
 
 

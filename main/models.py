@@ -5,7 +5,6 @@ from pathlib import Path
 from django.db.models import Model
 from django.db import models
 
-from main.utils.image import fetch_base64_image_data
 from main.utils.file_io import get_base_entry_path
 from main.utils.video import get_collage_base64
 
@@ -47,13 +46,10 @@ class EntryImage(Model):
         return str(self.file_path)
 
     def view(self) -> dict:
-        """Web displayable view"""
-        full_path = get_base_entry_path(self.file_path)
+        """Web displayable view - returns image_id for async loading"""
         file_name = Path(self.file_path).name
-        b64_string = fetch_base64_image_data(full_path)
-
         return {
-            "base64": b64_string,
+            "image_id": self.pk,
             "file_name": file_name,
             "original": int(self.original),
         }

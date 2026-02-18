@@ -9,6 +9,7 @@ let createTinyMCE = function(component_name, height, initCallback=emptyFunction)
         height: height,
         promotion: false,
         branding: false,
+        license_key: "gpl",
         setup:function(editor) {
             editor.on('input', function(e) {
                 enableSaveButton();

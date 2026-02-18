@@ -129,6 +129,27 @@ let editImageWhenInitialised = function(updateInd, imageContent, counter) {
 }
 
 
+let editImageMeta = function(updateInd, imageContent) {
+    let infoArea = $("#upload-label" + updateInd);
+    let originalCheck = $("#original-check" + updateInd);
+    if (infoArea[0] == undefined || originalCheck[0] == undefined) { return; }
+
+    originalCheck.prop("checked", imageContent["original"] === 1);
+    infoArea.text(imageContent["file_name"]);
+    return true;
+}
+
+
+let editImageMetaWhenInitialised = function(updateInd, imageContent, counter) {
+    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
+
+    if (!editImageMeta(updateInd, imageContent)) {
+        counter--;
+        setTimeout(editImageMetaWhenInitialised, 1000, updateInd, imageContent, counter);
+    }
+}
+
+
 let changeImageToVideoClass = function(updateInd) {
     let imageArea = $("#image" + updateInd);
     if (imageArea[0] == undefined) { return; }

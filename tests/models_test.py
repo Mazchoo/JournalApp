@@ -134,7 +134,7 @@ def test_image_str():
 
 @pytest.mark.django_db
 def test_image_view_method():
-    """view() should return base64 data, file_name, and original flag."""
+    """view() should return image_id, file_name, and original flag for async loading."""
     from main.models import EntryImage
 
     entry = create_mock_entry()
@@ -144,13 +144,9 @@ def test_image_view_method():
         original=True,
     )
 
-    with patch(
-        "main.models.fetch_base64_image_data",
-        return_value="base64encodeddata",
-    ):
-        result = img.view()
+    result = img.view()
 
-    assert result["base64"] == "base64encodeddata"
+    assert result["image_id"] == img.pk
     assert result["file_name"] == "photo.jpg"
     assert result["original"] == 1
 
@@ -167,11 +163,7 @@ def test_image_view_non_original():
         original=False,
     )
 
-    with patch(
-        "main.models.fetch_base64_image_data",
-        return_value="b64data",
-    ):
-        result = img.view()
+    result = img.view()
 
     assert result["original"] == 0
 
