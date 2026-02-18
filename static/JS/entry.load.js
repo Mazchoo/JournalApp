@@ -33,9 +33,32 @@ let loadImageContent = function(imageContent) {
 }
 
 
-let loadVideoContent = function(imageContent) {
+let loadVideoContent = function(videoContent) {
     appendImageToList();
-    editVideoWhenInitialised(CONTENT_INDEX, imageContent, MAX_CHANGE_ATTEMPTS);
+    let contentIndex = CONTENT_INDEX;
+
+    editVideoMetaWhenInitialised(contentIndex, videoContent, MAX_CHANGE_ATTEMPTS);
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    $.ajax({
+        type: 'POST',
+        url: DOWNSIZED_VIDEO_IMAGE_URL,
+        data: {
+            "video_id": videoContent["video_id"],
+            "csrfmiddlewaretoken": csrftoken,
+        },
+        success: function(response) {
+            if ("base64" in response) {
+                $("#image" + contentIndex).attr("src", response["base64"]);
+            }
+            if ("error" in response) {
+                console.log('Video image load error:', response["error"]);
+            }
+        },
+        error: function(_jqXhr, _textStatus, errorThrown) {
+            console.log('Failed to load video image:', errorThrown);
+        }
+    });
 }
 
 

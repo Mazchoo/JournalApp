@@ -76,6 +76,12 @@ def test_get_video_url_resolves():
     assert match.url_name == "get-video"
 
 
+def test_get_downsized_video_image_url_resolves():
+    """URL /ajax/get-downsized-video-image/ should resolve via its URL name."""
+    match = resolve("/ajax/get-downsized-video-image/")
+    assert match.url_name == "get-downsized-video-image"
+
+
 def test_move_date_url_resolves():
     """URL /ajax/move-date/ should resolve via its URL name."""
     match = resolve("/ajax/move-date/")

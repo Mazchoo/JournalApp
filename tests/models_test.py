@@ -185,7 +185,7 @@ def test_create_video():
 
 @pytest.mark.django_db
 def test_video_view_method():
-    """view() should return collage base64 data, file_name, and original flag."""
+    """view() should return video_id, file_name, and original flag for async loading."""
     from main.models import EntryVideo
 
     entry = create_mock_entry()
@@ -195,13 +195,9 @@ def test_video_view_method():
         original=True,
     )
 
-    with patch(
-        "main.models.get_collage_base64",
-        return_value="collage_b64",
-    ):
-        result = vid.view()
+    result = vid.view()
 
-    assert result["base64"] == "collage_b64"
+    assert result["video_id"] == vid.pk
     assert result["file_name"] == "clip.mp4"
     assert result["original"] == 1
 

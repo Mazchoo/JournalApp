@@ -161,12 +161,12 @@ let changeImageToVideoClass = function(updateInd) {
 }
 
 
-let editVideoWhenInitialised = function(updateInd, imageContent, counter) {
+let editVideoMetaWhenInitialised = function(updateInd, imageContent, counter) {
     if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
 
-    if (!editImageContent(updateInd, imageContent) || !changeImageToVideoClass(updateInd)) {
+    if (!editImageMeta(updateInd, imageContent) || !changeImageToVideoClass(updateInd)) {
         counter--;
-        setTimeout(editVideoWhenInitialised, 1000, updateInd, imageContent, counter);
+        setTimeout(editVideoMetaWhenInitialised, 1000, updateInd, imageContent, counter);
     }
 }
 

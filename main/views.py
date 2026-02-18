@@ -23,6 +23,9 @@ from main.content_generation.delete_entry import delete_entry_and_content
 from main.content_generation.get_full_image import get_full_image_reponse
 from main.content_generation.get_downsized_image import get_downsized_image_response
 from main.content_generation.get_full_video import get_full_video_response
+from main.content_generation.get_downsized_video_image import (
+    get_downsized_video_image_response,
+)
 from main.content_generation.move_date import move_source_date_to_desination_request
 
 
@@ -139,6 +142,12 @@ def get_downsized_image(post_data):
 def get_video(post_data):
     """Async stream a video"""
     return get_full_video_response(post_data)
+
+
+@ajax_request
+def get_downsized_video_image(post_data):
+    """Async get a downsized video collage image by video_id"""
+    return get_downsized_video_image_response(post_data)
 
 
 @ajax_request

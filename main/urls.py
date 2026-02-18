@@ -13,6 +13,7 @@ from main.views import (
     get_image,
     get_downsized_image,
     get_video,
+    get_downsized_video_image,
     move_entry_date,
 )
 
@@ -31,5 +32,10 @@ urlpatterns = [
     path("ajax/get-image/", get_image, name="get-image"),
     path("ajax/get-downsized-image/", get_downsized_image, name="get-downsized-image"),
     path("ajax/get-video/", get_video, name="get-video"),
+    path(
+        "ajax/get-downsized-video-image/",
+        get_downsized_video_image,
+        name="get-downsized-video-image",
+    ),
     path("ajax/move-date/", move_entry_date, name="move-date"),
 ]
