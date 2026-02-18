@@ -1,28 +1,16 @@
 
-let loadParagraphContent = function(paragraphContent) {
-    appendParagraphToList(null, paragraphContent["height"], paragraphContent["text"]);
-}
-
-
-let loadImageContent = function(imageContent) {
-    appendImageToList();
-    let contentIndex = CONTENT_INDEX;
-
-    $(document).ready(function() {
-        editImageMeta(contentIndex, imageContent);
-    });
-
+let loadServerRenderedImage = function(index, imageId) {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $.ajax({
         type: 'POST',
         url: DOWNSIZED_IMAGE_URL,
         data: {
-            "image_id": imageContent["image_id"],
+            "image_id": imageId,
             "csrfmiddlewaretoken": csrftoken,
         },
         success: function(response) {
             if ("base64" in response) {
-                $("#image" + contentIndex).attr("src", response["base64"]);
+                $("#image" + index).attr("src", response["base64"]);
             }
             if ("error" in response) {
                 console.log('Image load error:', response["error"]);
@@ -35,26 +23,18 @@ let loadImageContent = function(imageContent) {
 }
 
 
-let loadVideoContent = function(videoContent) {
-    appendImageToList();
-    let contentIndex = CONTENT_INDEX;
-
-    $(document).ready(function() {
-        editImageMeta(contentIndex, videoContent);
-        changeImageToVideoClass(contentIndex);
-    });
-
+let loadServerRenderedVideo = function(index, videoId) {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $.ajax({
         type: 'POST',
         url: DOWNSIZED_VIDEO_IMAGE_URL,
         data: {
-            "video_id": videoContent["video_id"],
+            "video_id": videoId,
             "csrfmiddlewaretoken": csrftoken,
         },
         success: function(response) {
             if ("base64" in response) {
-                $("#image" + contentIndex).attr("src", response["base64"]);
+                $("#image" + index).attr("src", response["base64"]);
             }
             if ("error" in response) {
                 console.log('Video image load error:', response["error"]);
@@ -67,34 +47,33 @@ let loadVideoContent = function(videoContent) {
 }
 
 
-let parseLoadedStoryContent = function(key, content) {
-    let contentType = getContentType(key);
-    if (contentType === undefined) return;
+let initializeServerRenderedContent = function() {
+    // Initialize TinyMCE and event handlers on server-rendered paragraphs
+    $('.paragraph-entry').each(function() {
+        let textarea = $(this).find('textarea.entry-text')[0];
+        if (!textarea) return;
+        let index = textarea.id.replace('paragraph', '');
+        let height = parseInt(textarea.getAttribute('data-height')) || 220;
+        initializeNewParagraph(index, height);
+    });
 
-    if (contentType === 'paragraph') {
-        loadParagraphContent(content);
-    } else if (contentType === 'image') {
-        loadImageContent(content);
-    } else if (contentType === 'video') {
-        loadVideoContent(content)
-    } else {
-        console.log('Unknown content loaded', contentType)
-    }
-}
+    // Initialize event handlers and async loading on server-rendered images/videos
+    $('.image-entry').each(function() {
+        let img = $(this).find('img')[0];
+        if (!img) return;
+        let index = img.id.replace('image', '');
+        initializeNewImage(index);
 
-
-let createBlankEntry = function() {
-    appendParagraphToList();
-}
-
-
-let intializeLoadedContent = function(loadedContent) {
-    if (loadedContent === null) {
-        createBlankEntry();
-    } else {
-        for([key, textContent] of Object.entries(loadedContent)) {
-            parseLoadedStoryContent(key, textContent);
+        let imageId = img.getAttribute('data-image-id');
+        if (imageId) {
+            loadServerRenderedImage(index, imageId);
         }
-    }
+
+        let videoId = img.getAttribute('data-video-id');
+        if (videoId) {
+            loadServerRenderedVideo(index, videoId);
+        }
+    });
+
     window.scrollTo(0, 0);
 }

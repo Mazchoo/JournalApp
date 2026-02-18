@@ -22,11 +22,11 @@
         </div>
     </div>
 </div>
-<!-- Uploaded image area -->
+<!-- Uploaded video area -->
 <div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-{{ item.index }}' name='image{{ item.index }}'>
     <form method = 'get' action = '' class = 'card container image-container'>
         <div class="image-area">
-            <img id="image{{ item.index }}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-image my-3" data-image-id="{{ item.data.image_id }}">
+            <img id="image{{ item.index }}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-video my-3" style="visibility: visible; height: auto;" data-video-id="{{ item.data.video_id }}">
             <video id="video{{ item.index }}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video">
         </div>
     </form>

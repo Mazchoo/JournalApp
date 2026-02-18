@@ -80,6 +80,8 @@ class EntryContentContext(TypedDict):
 
     entry_exists: bool
     saved_content: dict[str, Any]
+    content_list: list[dict[str, Any]]
+    content_count: int
 
 
 # Full context types - combined for template rendering

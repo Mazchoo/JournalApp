@@ -1,0 +1,62 @@
+<div class="row mx-auto entry-region-%{contentInd}">
+    <!-- Upload image input -->
+    <div class="col col-md-11 upload-box input-group px-2 py-2 rounded-pill bg-white shadow-sm">
+        <!-- ToDo: Try uploading code from the following: https://stackoverflow.com/questions/68325018/how-to-upload-video-and-display-in-html-page -->
+        <input id="upload%{contentInd}" type="file" multiple="multiple" class="form-control border-0 upload-image">
+        <label id="upload-label%{contentInd}" for="upload%{contentInd}" class="font-weight-light text-muted upload-label">
+            Choose file
+        </label>
+        <div class="input-group-append">
+            <label for="upload%{contentInd}" class="btn btn-light m-0 rounded-pill px-4">
+                <i class="fa fa-cloud-upload mr-2 text-muted"></i>
+                <small class="text-uppercase font-weight-bold text-muted">Choose file</small>
+            </label>
+        </div>
+    </div>
+    <!-- Original checkbox -->
+    <div class='col col-md-1 py-2 mt-2'>
+        <div class="form-check">
+            <input class="form-check-input original-check" type="checkbox" value="" id="original-check%{contentInd}" checked>
+            <label class="form-check-label" for="original-check%{contentInd}">
+                Original
+            </label>
+        </div>
+    </div>
+</div>
+<!-- Uploaded image area -->
+<div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-%{contentInd}' name='image%{contentInd}'>
+    <form method = 'get' action = '' class = 'card container image-container'>
+        <div class="image-area">
+            <img id="image%{contentInd}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-image my-3">
+            <video id="video%{contentInd}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video">
+        </div>
+    </form>
+</div>
+<!-- Edit buttons -->
+<div class='col col-md-1 py-2 entry-region-%{contentInd}'>
+    <div class='row ml-3 mt-3'>
+        <button id='delete-content%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Delete' name='.entry-region-%{contentInd}'>
+            <i id='delete-content%{contentInd}' class='fa fa-trash style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='insert-paragraph%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Insert Paragraph' name='.entry-region-%{contentInd}'>
+            <i id='insert-paragraph%{contentInd}' class='fa fa-paragraph style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='insert-image%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Insert Image' name='.entry-region-%{contentInd}'>
+            <i id='insert-image%{contentInd}' class='fa fa-picture-o style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='move-content-up%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Move Up' name='.entry-region-%{contentInd}'>
+            <i id='move-content-up%{contentInd}' class='fa fa-arrow-up style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+    <div class='row ml-3 mt-3'>
+        <button id='move-content-down%{contentInd}' class='btn btn-primary btn-sm talk-to px-2 edit-button' data-toggle='tooltip' title='Move Down' name='.entry-region-%{contentInd}'>
+            <i id='move-content-down%{contentInd}' class='fa fa-arrow-down style header_button_icon' name='.entry-region-%{contentInd}'></i>
+        </button>
+    </div>
+</div>

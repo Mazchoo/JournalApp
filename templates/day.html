@@ -23,7 +23,23 @@
 
         <div class='ml-4 bg-light border border-dark rounded' style='position: relative; height: 100%'>
             <br>
-            <div class='px-5' id='edit-area' data-spy='scroll' data-target='#scrollable-data' data-offset='0'></div>
+            <div class='px-5' id='edit-area' data-spy='scroll' data-target='#scrollable-data' data-offset='0'>
+                {% for item in content_list %}
+                    {% if item.type == "paragraph" %}
+                        <div class="row mt-3 paragraph-entry">
+                            {% include "EntryContents/Paragraph.html" %}
+                        </div>
+                    {% elif item.type == "image" %}
+                        <div class="row mt-4 image-entry">
+                            {% include "EntryContents/Image.html" %}
+                        </div>
+                    {% elif item.type == "video" %}
+                        <div class="row mt-4 image-entry">
+                            {% include "EntryContents/Video.html" %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
 
             <div class = 'row mt-3 px-5'>
                 <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-para'>New Paragraph</button>
@@ -50,9 +66,9 @@
     <script src="{% static 'js/entry.move.js' %}"></script>
 
     <script>
-        var CONTENT_INDEX = 0;
-        var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" %}`;
-        var IMAGE_TEMPLATE = `{% include "EntryContents/Image.html" %}`;
+        var CONTENT_INDEX = {{ content_count }};
+        var PARAGRAPH_TEMPLATE = `{% include "EntryContents/NewParagraph.html" %}`;
+        var IMAGE_TEMPLATE = `{% include "EntryContents/NewImage.html" %}`;
         var SAVE_CONTENT = {{saved_content | safe}};
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
@@ -63,7 +79,7 @@
         var DOWNSIZED_VIDEO_IMAGE_URL = '{% url "main:get-downsized-video-image" %}';
         var MOVE_URL = '{% url "main:move-date" %}';
 
-        intializeLoadedContent(SAVE_CONTENT);
+        initializeServerRenderedContent();
 
         $('#btn-new-para').click(appendParagraphToList);
         $('#btn-new-image').click(appendImageToList);

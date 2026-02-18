@@ -113,6 +113,8 @@ def test_load_nonexistent_entry():
 
     assert result["entry_exists"] is False
     assert not result["saved_content"]
+    assert not result["content_list"]
+    assert result["content_count"] == 0
 
 
 @pytest.mark.django_db
@@ -129,6 +131,42 @@ def test_load_entry_with_paragraph():
     first_content = next(iter(result["saved_content"].values()))
     assert first_content["text"] == "<p>Hello World</p>"
     assert first_content["height"] == 200
+
+    assert result["content_count"] == 1
+    assert len(result["content_list"]) == 1
+    item = result["content_list"][0]
+    assert item["index"] == 1
+    assert item["type"] == "paragraph"
+    assert item["data"]["text"] == "<p>Hello World</p>"
+    assert item["data"]["height"] == 200
+
+
+@pytest.mark.django_db
+def test_edit_page_content_list_in_context():
+    """The edit page context should include content_list and content_count."""
+    client = create_mock_client()
+    create_mock_entry_with_paragraph()
+
+    response = client.get("/edit/2025/February/12/")
+
+    assert response.status_code == 200
+    assert "content_list" in response.context
+    assert "content_count" in response.context
+    assert response.context["content_count"] == 1
+    assert len(response.context["content_list"]) == 1
+
+
+@pytest.mark.django_db
+def test_edit_page_renders_paragraph_in_html():
+    """Server-rendered paragraph text should appear in the HTML response."""
+    client = create_mock_client()
+    create_mock_entry_with_paragraph()
+
+    response = client.get("/edit/2025/February/12/")
+
+    content = response.content.decode()
+    assert "<p>Hello World</p>" in content
+    assert "id='paragraph1'" in content
 
 
 if __name__ == "__main__":

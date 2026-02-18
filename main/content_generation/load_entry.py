@@ -17,16 +17,30 @@ from main.database_layer.date_information import get_day_information
 def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
     """For content with a given date slug return content information about the entry."""
     output: dict[str, str] = {}
+    content_list: list[dict] = []
 
     if entry := Entry.objects.filter(name=date_slug).first():
         content_ids = entry.content.get_queryset()
 
-        for content in content_ids:
+        for i, content in enumerate(content_ids, start=1):
             model = ContentFactory.get(content.content_type)
             content_obj = model.objects.get(pk=content.content_id)
-            output[str(content)] = content_obj.view()  # type: ignore
+            view_data = content_obj.view()  # type: ignore
+            output[str(content)] = view_data
+            content_list.append(
+                {
+                    "index": i,
+                    "type": content.content_type,
+                    "data": view_data,
+                }
+            )
 
-    return {"entry_exists": entry is not None, "saved_content": output}
+    return {
+        "entry_exists": entry is not None,
+        "saved_content": output,
+        "content_list": content_list,
+        "content_count": len(content_list),
+    }
 
 
 def get_day_page_context(

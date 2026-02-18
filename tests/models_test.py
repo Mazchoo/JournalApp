@@ -1,7 +1,6 @@
 """Tests for Entry, Content, EntryParagraph, EntryImage, and EntryVideo models."""
 
 from datetime import datetime
-from unittest.mock import patch
 
 import pytest
 
