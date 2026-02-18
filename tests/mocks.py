@@ -130,6 +130,18 @@ def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
     return image_path
 
 
+def mock_paragraph_post_data(
+    name: str, text: str = "<p>Hello</p>", height: int = 200
+) -> str:
+    """Build a form-encoded body with one paragraph content item."""
+    return (
+        f"name={name}"
+        f"&content[paragraph1][entry]={name}"
+        f"&content[paragraph1][text]={text}"
+        f"&content[paragraph1][height]={height}"
+    )
+
+
 def create_ajax_headers() -> dict:
     """
     Return HTTP headers that the @ajax_request decorator expects.

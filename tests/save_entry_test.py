@@ -5,21 +5,13 @@ import json
 import pytest
 from django.apps import apps
 
-from tests.mocks import create_mock_client, create_ajax_headers
+from tests.mocks import (
+    create_mock_client,
+    create_ajax_headers,
+    mock_paragraph_post_data,
+)
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
-
-
-def _paragraph_post_data(
-    name: str, text: str = "<p>Hello</p>", height: int = 200
-) -> str:
-    """Build a form-encoded body with one paragraph content item."""
-    return (
-        f"name={name}"
-        f"&content[paragraph1][entry]={name}"
-        f"&content[paragraph1][text]={text}"
-        f"&content[paragraph1][height]={height}"
-    )
 
 
 @pytest.mark.django_db
@@ -29,7 +21,7 @@ def test_save_entry_success():
 
     response = client.post(
         "/ajax/save-entry/",
-        data=_paragraph_post_data("2025-03-01"),
+        data=mock_paragraph_post_data("2025-03-01"),
         content_type=FORM_CONTENT_TYPE,
         **create_ajax_headers(),
     )
@@ -63,7 +55,7 @@ def test_save_entry_creates_new_entry_in_db():
 
     client.post(
         "/ajax/save-entry/",
-        data=_paragraph_post_data("2025-03-01"),
+        data=mock_paragraph_post_data("2025-03-01"),
         content_type=FORM_CONTENT_TYPE,
         **create_ajax_headers(),
     )
@@ -80,7 +72,7 @@ def test_save_entry_creates_paragraph_content():
 
     client.post(
         "/ajax/save-entry/",
-        data=_paragraph_post_data(
+        data=mock_paragraph_post_data(
             "2025-03-01", text="<p>Test paragraph</p>", height=300
         ),
         content_type=FORM_CONTENT_TYPE,
@@ -110,7 +102,7 @@ def test_save_entry_replaces_existing_content():
     # First save
     client.post(
         "/ajax/save-entry/",
-        data=_paragraph_post_data("2025-03-01", text="<p>Original</p>"),
+        data=mock_paragraph_post_data("2025-03-01", text="<p>Original</p>"),
         content_type=FORM_CONTENT_TYPE,
         **headers,
     )
@@ -118,7 +110,7 @@ def test_save_entry_replaces_existing_content():
     # Second save with different content
     client.post(
         "/ajax/save-entry/",
-        data=_paragraph_post_data("2025-03-01", text="<p>Updated</p>"),
+        data=mock_paragraph_post_data("2025-03-01", text="<p>Updated</p>"),
         content_type=FORM_CONTENT_TYPE,
         **headers,
     )
