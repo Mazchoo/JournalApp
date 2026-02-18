@@ -119,16 +119,6 @@ let editImageContent = function(updateInd, imageContent) {
 }
 
 
-let editImageWhenInitialised = function(updateInd, imageContent, counter) {
-    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
-
-    if (!editImageContent(updateInd, imageContent)) {
-        counter--;
-        setTimeout(editImageWhenInitialised, 1000, updateInd, imageContent, counter);
-    }
-}
-
-
 let editImageMeta = function(updateInd, imageContent) {
     let infoArea = $("#upload-label" + updateInd);
     let originalCheck = $("#original-check" + updateInd);
@@ -140,16 +130,6 @@ let editImageMeta = function(updateInd, imageContent) {
 }
 
 
-let editImageMetaWhenInitialised = function(updateInd, imageContent, counter) {
-    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
-
-    if (!editImageMeta(updateInd, imageContent)) {
-        counter--;
-        setTimeout(editImageMetaWhenInitialised, 1000, updateInd, imageContent, counter);
-    }
-}
-
-
 let changeImageToVideoClass = function(updateInd) {
     let imageArea = $("#image" + updateInd);
     if (imageArea[0] == undefined) { return; }
@@ -158,16 +138,6 @@ let changeImageToVideoClass = function(updateInd) {
     imageArea.addClass("content-video");
     imageArea.css({ visibility: 'visible', height: 'auto' }); 
     return true;
-}
-
-
-let editVideoMetaWhenInitialised = function(updateInd, imageContent, counter) {
-    if (counter <= 0 || updateInd == undefined || imageContent == undefined) return false;
-
-    if (!editImageMeta(updateInd, imageContent) || !changeImageToVideoClass(updateInd)) {
-        counter--;
-        setTimeout(editVideoMetaWhenInitialised, 1000, updateInd, imageContent, counter);
-    }
 }
 
 

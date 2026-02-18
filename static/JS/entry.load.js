@@ -8,7 +8,9 @@ let loadImageContent = function(imageContent) {
     appendImageToList();
     let contentIndex = CONTENT_INDEX;
 
-    editImageMetaWhenInitialised(contentIndex, imageContent, MAX_CHANGE_ATTEMPTS);
+    $(document).ready(function() {
+        editImageMeta(contentIndex, imageContent);
+    });
 
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $.ajax({
@@ -37,7 +39,10 @@ let loadVideoContent = function(videoContent) {
     appendImageToList();
     let contentIndex = CONTENT_INDEX;
 
-    editVideoMetaWhenInitialised(contentIndex, videoContent, MAX_CHANGE_ATTEMPTS);
+    $(document).ready(function() {
+        editImageMeta(contentIndex, videoContent);
+        changeImageToVideoClass(contentIndex);
+    });
 
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $.ajax({
@@ -78,14 +83,14 @@ let parseLoadedStoryContent = function(key, content) {
 }
 
 
-let createBlankStory = function() {
+let createBlankEntry = function() {
     appendParagraphToList();
 }
 
 
 let intializeLoadedContent = function(loadedContent) {
     if (loadedContent === null) {
-        createBlankStory();
+        createBlankEntry();
     } else {
         for([key, textContent] of Object.entries(loadedContent)) {
             parseLoadedStoryContent(key, textContent);
