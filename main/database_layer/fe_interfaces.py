@@ -13,7 +13,7 @@ class DayAndMonthNamesContext(TypedDict):
     full_day_names: IDayNamesOfWeek
     short_day_names: IDayNamesOfWeek
     months_in_year: IMonthNamesOfYear
-    year: int
+    year: Optional[int]
     month: Optional[int]
 
 

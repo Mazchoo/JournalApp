@@ -93,6 +93,24 @@ def create_multiple_mock_entries() -> List[Entry]:
     return entries
 
 
+def create_mock_video_file(base_path, name="2025-02-12", file_name="clip.mp4"):
+    """
+    Create a video file inside a temporary entry folder structure.
+
+    Returns the full path to the created file. The caller is responsible
+    for patching main.utils.file_io.ENTRY_FOLDER to *base_path* and for
+    cleaning up (e.g. via tmp_path which tears down automatically).
+    """
+    from pathlib import Path
+
+    year, month, day = name.split("-")
+    video_dir = Path(base_path) / year / month / day
+    video_dir.mkdir(parents=True, exist_ok=True)
+    video_path = video_dir / file_name
+    video_path.write_bytes(b"\x00\x00\x00\x1cftypisom")
+    return video_path
+
+
 def create_ajax_headers() -> dict:
     """
     Return HTTP headers that the @ajax_request decorator expects.

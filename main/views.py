@@ -14,11 +14,11 @@ from main.database_layer.get_context import (
     get_home_page_context,
     get_year_page_context,
     get_month_page_context,
-    get_day_page_context,
 )
 from main.database_layer.get_latest_entry import get_latest_entry_tuple
 
 from main.content_generation.save_entry import update_or_generate_from_request
+from main.content_generation.load_entry import get_day_page_context
 from main.content_generation.delete_entry import delete_entry_and_content
 from main.content_generation.get_full_image import get_full_image_reponse
 from main.content_generation.get_full_video import get_full_video_response

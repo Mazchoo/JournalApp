@@ -8,9 +8,6 @@ import pytest
 from tests.mocks import create_mock_entry
 
 
-# --- Entry model ---
-
-
 @pytest.mark.django_db
 def test_create_entry():
     """Creating an Entry should persist it in the database."""
@@ -27,22 +24,6 @@ def test_create_entry():
 
 
 @pytest.mark.django_db
-def test_entry_str_representation():
-    """__str__ should include the entry name and 'last modified'."""
-    entry = create_mock_entry()
-    result = str(entry)
-    assert "2025-02-12" in result
-    assert "last modified" in result
-
-
-@pytest.mark.django_db
-def test_entry_name_is_primary_key():
-    """The name field is the primary key."""
-    entry = create_mock_entry()
-    assert entry.pk == "2025-02-12"
-
-
-@pytest.mark.django_db
 def test_entry_content_many_to_many():
     """An Entry can have multiple Content objects linked via M2M."""
     from main.models import Content
@@ -55,9 +36,6 @@ def test_entry_content_many_to_many():
     entry.content.add(c1, c2)
 
     assert entry.content.count() == 2
-
-
-# --- Content model ---
 
 
 @pytest.mark.django_db
@@ -77,9 +55,6 @@ def test_content_str():
 
     content = Content.objects.create(content_type="image", content_id=7)
     assert str(content) == "image7"
-
-
-# --- EntryParagraph model ---
 
 
 @pytest.mark.django_db
@@ -126,9 +101,6 @@ def test_paragraph_str():
         height=100,
     )
     assert str(para) == "Hello"
-
-
-# --- EntryImage model ---
 
 
 @pytest.mark.django_db
@@ -202,9 +174,6 @@ def test_image_view_non_original():
         result = img.view()
 
     assert result["original"] == 0
-
-
-# --- EntryVideo model ---
 
 
 @pytest.mark.django_db

@@ -1,117 +1,117 @@
-"""Tests for the get_image and get_video AJAX views."""
+"""Tests for get_full_video functions and the video AJAX endpoint."""
 
-import io
 import json
-from unittest.mock import patch
 
 import pytest
+from django.forms.utils import ErrorDict
 from django.http import JsonResponse, FileResponse
 
-from tests.mocks import create_mock_client, create_ajax_headers
+from tests.mocks import create_mock_client, create_mock_video_file
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
-# --- get_image (URL: /ajax/get-image/) ---
+def test_get_video_mime_type_mp4():
+    """mp4 files should return video/mp4 MIME type."""
+    from main.content_generation.get_full_video import get_video_mime_type
+
+    assert get_video_mime_type("video.mp4") == "video/mp4"
 
 
-@pytest.mark.django_db
-def test_get_image_success():
-    """A valid image request should return JSON with a base64-encoded string."""
-    mock_b64 = "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
-    client = create_mock_client()
+def test_get_video_mime_type_webm():
+    """webm files should return video/webm MIME type."""
+    from main.content_generation.get_full_video import get_video_mime_type
 
-    with patch(
-        "main.views.get_full_image_reponse",
-        return_value=JsonResponse({"base64": mock_b64, "errors": {}}, safe=True),
-    ):
-        response = client.post(
-            "/ajax/get-image/",
-            data="name=2025-02-12&file=photo.jpg",
-            content_type=FORM_CONTENT_TYPE,
-            **create_ajax_headers(),
-        )
-
-    data = json.loads(response.content)
-    assert "base64" in data
-    assert data["base64"] == mock_b64
+    assert get_video_mime_type("video.webm") == "video/webm"
 
 
-@pytest.mark.django_db
-def test_get_image_file_not_found():
-    """When the requested image doesn't exist, return a JSON error."""
-    client = create_mock_client()
+def test_get_video_mime_type_unknown_defaults_to_mp4():
+    """Unknown extensions should default to video/mp4."""
+    from main.content_generation.get_full_video import get_video_mime_type
 
-    with patch(
-        "main.views.get_full_image_reponse",
-        return_value=JsonResponse({"error": {"file": ["File does not exist"]}}),
-    ):
-        response = client.post(
-            "/ajax/get-image/",
-            data="name=2025-02-12&file=missing.jpg",
-            content_type=FORM_CONTENT_TYPE,
-            **create_ajax_headers(),
-        )
+    assert get_video_mime_type("video.xyz") == "video/mp4"
 
+
+def test_get_video_path_from_post_valid(tmp_path, monkeypatch):
+    """Valid post data with an existing file should return the path."""
+    from main.content_generation.get_full_video import get_video_path_from_post
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    create_mock_video_file(tmp_path)
+
+    errors = ErrorDict()
+    result = get_video_path_from_post(
+        {"name": "2025-02-12", "file": "clip.mp4"}, errors
+    )
+    assert result is not None
+    assert result.endswith("clip.mp4")
+    assert not errors
+
+
+def test_get_video_path_from_post_missing_fields():
+    """Missing form fields should return None with errors."""
+    from main.content_generation.get_full_video import get_video_path_from_post
+
+    errors = ErrorDict()
+    result = get_video_path_from_post({}, errors)
+    assert result is None
+    assert errors
+
+
+def test_create_video_stream_response_success(tmp_path, monkeypatch):
+    """An existing video file should return a FileResponse with correct headers."""
+    from main.content_generation.get_full_video import create_video_stream_response
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    video_path = create_mock_video_file(tmp_path)
+
+    errors = ErrorDict()
+    response = create_video_stream_response(str(video_path), errors)
+    assert isinstance(response, FileResponse)
+    assert response["Content-Type"] == "video/mp4"
+    assert response["Accept-Ranges"] == "bytes"
+    assert not errors
+
+
+def test_create_video_stream_response_file_not_found():
+    """A nonexistent path should return None with a file error."""
+    from main.content_generation.get_full_video import create_video_stream_response
+
+    errors = ErrorDict()
+    response = create_video_stream_response("/nonexistent/video.mp4", errors)
+    assert response is None
+    assert "file" in errors
+
+
+def test_get_full_video_response_success(tmp_path, monkeypatch):
+    """A valid request with an existing file should return a streaming FileResponse."""
+    from main.content_generation.get_full_video import get_full_video_response
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    create_mock_video_file(tmp_path)
+
+    response = get_full_video_response({"name": "2025-02-12", "file": "clip.mp4"})
+    assert isinstance(response, FileResponse)
+    assert response["Content-Type"] == "video/mp4"
+
+
+def test_get_full_video_response_file_not_found(tmp_path, monkeypatch):
+    """A request for a nonexistent video should return a JSON error."""
+    from main.content_generation.get_full_video import get_full_video_response
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    response = get_full_video_response({"name": "2025-02-12", "file": "missing.mp4"})
+    assert isinstance(response, JsonResponse)
     data = json.loads(response.content)
     assert "error" in data
 
 
-@pytest.mark.django_db
-def test_get_image_non_ajax_returns_404():
-    """A non-AJAX request to /ajax/get-image/ should return 404."""
-    client = create_mock_client()
-    response = client.post(
-        "/ajax/get-image/",
-        data="name=2025-02-12&file=photo.jpg",
-        content_type=FORM_CONTENT_TYPE,
-    )
-    assert response.status_code == 404
+def test_get_full_video_response_invalid_form():
+    """An empty request should return a JSON error from form validation."""
+    from main.content_generation.get_full_video import get_full_video_response
 
-
-# --- get_video (URL: /ajax/get-video/) ---
-
-
-@pytest.mark.django_db
-def test_get_video_success():
-    """A valid video request should return a streaming FileResponse."""
-    client = create_mock_client()
-
-    fake_video_bytes = b"\x00\x00\x00\x1cftypisom"
-    mock_response = FileResponse(io.BytesIO(fake_video_bytes), content_type="video/mp4")
-    mock_response["Accept-Ranges"] = "bytes"
-    mock_response["Content-Length"] = len(fake_video_bytes)
-
-    with patch(
-        "main.views.get_full_video_response",
-        return_value=mock_response,
-    ):
-        response = client.post(
-            "/ajax/get-video/",
-            data="name=2025-02-12&file=clip.mp4",
-            content_type=FORM_CONTENT_TYPE,
-            **create_ajax_headers(),
-        )
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_get_video_not_found():
-    """When the video file doesn't exist, a JSON error should be returned."""
-    client = create_mock_client()
-
-    with patch(
-        "main.views.get_full_video_response",
-        return_value=JsonResponse({"error": {"file": ["Video file does not exist"]}}),
-    ):
-        response = client.post(
-            "/ajax/get-video/",
-            data="name=2025-02-12&file=missing.mp4",
-            content_type=FORM_CONTENT_TYPE,
-            **create_ajax_headers(),
-        )
-
+    response = get_full_video_response({})
+    assert isinstance(response, JsonResponse)
     data = json.loads(response.content)
     assert "error" in data
 

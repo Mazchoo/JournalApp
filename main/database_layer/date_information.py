@@ -20,6 +20,8 @@ def get_day_and_month_names() -> DayAndMonthNamesContext:
         "full_day_names": DateConstants.day_names,
         "short_day_names": DateConstants.day_names_short,
         "months_in_year": DateConstants.month_names,
+        "year": None,
+        "month": None,
     }
 
 
