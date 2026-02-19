@@ -87,10 +87,10 @@ def test_edit_page_loads_paragraph_content():
     response = client.get("/edit/2025/February/12/")
 
     assert response.status_code == 200
-    saved_content = response.context["saved_content"]
-    first_content = next(iter(saved_content.values()))
-    assert first_content["text"] == "<p>Hello World</p>"
-    assert first_content["height"] == 200
+    content_list = response.context["content_list"]
+    first_content = content_list[0]
+    assert first_content["data"]["text"] == "<p>Hello World</p>"
+    assert first_content["data"]["height"] == 200
 
 
 @pytest.mark.django_db
@@ -112,9 +112,7 @@ def test_load_nonexistent_entry():
     result = load_all_content_from_entry("1999-01-01")
 
     assert result["entry_exists"] is False
-    assert not result["saved_content"]
     assert not result["content_list"]
-    assert result["content_count"] == 0
 
 
 @pytest.mark.django_db
@@ -127,13 +125,8 @@ def test_load_entry_with_paragraph():
     result = load_all_content_from_entry("2025-02-12")
 
     assert result["entry_exists"] is True
-    assert len(result["saved_content"]) == 1
-    first_content = next(iter(result["saved_content"].values()))
-    assert first_content["text"] == "<p>Hello World</p>"
-    assert first_content["height"] == 200
-
-    assert result["content_count"] == 1
     assert len(result["content_list"]) == 1
+
     item = result["content_list"][0]
     assert item["index"] == 1
     assert item["type"] == "paragraph"
@@ -143,7 +136,7 @@ def test_load_entry_with_paragraph():
 
 @pytest.mark.django_db
 def test_edit_page_content_list_in_context():
-    """The edit page context should include content_list and content_count."""
+    """The edit page context should include content_list."""
     client = create_mock_client()
     create_mock_entry_with_paragraph()
 
@@ -151,8 +144,6 @@ def test_edit_page_content_list_in_context():
 
     assert response.status_code == 200
     assert "content_list" in response.context
-    assert "content_count" in response.context
-    assert response.context["content_count"] == 1
     assert len(response.context["content_list"]) == 1
 
 

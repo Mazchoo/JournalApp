@@ -66,10 +66,9 @@
     <script src="{% static 'js/entry.move.js' %}"></script>
 
     <script>
-        var CONTENT_INDEX = {{ content_count }};
+        var CONTENT_INDEX = {{ content_list|length }};
         var PARAGRAPH_TEMPLATE = `{% include "EntryContents/NewParagraph.html" %}`;
         var IMAGE_TEMPLATE = `{% include "EntryContents/NewImage.html" %}`;
-        var SAVE_CONTENT = {{saved_content | safe}};
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
         var DELETE_URL = '{% url "main:delete-entry" %}';

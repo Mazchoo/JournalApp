@@ -16,7 +16,7 @@ from main.database_layer.date_information import get_day_information
 
 def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
     """For content with a given date slug return content information about the entry."""
-    output: dict[str, str] = {}
+    output: dict[str, dict] = {}
     content_list: list[dict] = []
 
     if entry := Entry.objects.filter(name=date_slug).first():
@@ -35,12 +35,7 @@ def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
                 }
             )
 
-    return {
-        "entry_exists": entry is not None,
-        "saved_content": output,
-        "content_list": content_list,
-        "content_count": len(content_list),
-    }
+    return {"entry_exists": entry is not None, "content_list": content_list}
 
 
 def get_day_page_context(
