@@ -14,6 +14,7 @@ from main.database_layer.get_context import (
     get_home_page_context,
     get_year_page_context,
     get_month_page_context,
+    javascript_placeholder_context,
 )
 from main.database_layer.get_latest_entry import get_latest_entry_tuple
 
@@ -99,8 +100,8 @@ def edit_entry_page(request, **kwargs):
         day_form.cleaned_data["month"],
         day_form.cleaned_data["day"],
     )
-    page_context["tiny_mce"] = ParagraphForm()  # type: ignore[typeddict-unknown-key]
-
+    page_context["tiny_mce"] = ParagraphForm()
+    page_context["js_placeholder"] = javascript_placeholder_context()
     return render(request=request, template_name="day.html", context=page_context)
 
 

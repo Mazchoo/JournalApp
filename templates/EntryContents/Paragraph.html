@@ -1,7 +1,7 @@
 <!-- Editable Text Area (server-rendered) -->
 <div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-{{ item.index }}' name='paragraph{{ item.index }}'>
     <form method = 'get' action = '' class = 'card container'>
-        <textarea class='entry-text save-content' name='message' cols='40' rows='10' required='' id='paragraph{{ item.index }}' aria-hidden='true' style='min-height: {{ item.data.height }}px;' data-height='{{ item.data.height }}'>{{ item.data.text|safe }}</textarea>
+        <textarea class='entry-text save-content' name='message' cols='40' rows='10' required='' id='paragraph{{ item.index }}' aria-hidden='true' data-height='{{ item.data.height }}'>{{ item.data.text|safe }}</textarea>
     </form>
 </div>
 <!-- Edit Buttons -->

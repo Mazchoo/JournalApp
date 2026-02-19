@@ -112,3 +112,6 @@ class MonthPageContext(MonthInformationContext, DaysWithEntriesContext):
 
 class DayPageContext(DayInformationContext, AllEntryYearsContext, EntryContentContext):
     """Full context for day/edit page."""
+
+    tiny_mce: Optional[Any]  # tiny MCE metadata
+    js_placeholder: Optional[dict]  # default template parameters

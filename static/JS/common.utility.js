@@ -4,11 +4,6 @@ let reverseString = function(str) {
 }
 
 
-let replaceExpression = function(str, expression, replacement) {
-    return str.replace(expression, () => replacement);
-}
-
-
 let getIndexInArr = function(arr, obj) {
     for(i = 0; i < arr.length; i++) {
         if (arr[i] === obj) return i;
@@ -121,11 +116,6 @@ let moveObjectDown = function(e) {
     resetMCE(parentDiv);
     resetMCE(editAreaList.children[objInd]);
     enableSaveButton();
-}
-
-
-let emptyFunction = function() {
-    return;
 }
 
 

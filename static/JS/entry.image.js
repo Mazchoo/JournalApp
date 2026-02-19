@@ -1,6 +1,6 @@
 
 let generateImageTemplate = function(contentInd) {
-    return replaceExpression(IMAGE_TEMPLATE, /%{contentInd}/g, contentInd);
+    return IMAGE_TEMPLATE.replaceAll('__INDEX__', contentInd);
 }
 
 

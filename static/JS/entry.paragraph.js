@@ -1,6 +1,6 @@
 
 let generateParagraphTemplate = function(contentInd) {
-    return replaceExpression(PARAGRAPH_TEMPLATE, /%{contentInd}/g, contentInd);
+    return PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', contentInd);
 }
 
 
@@ -46,7 +46,7 @@ let editParagraphContent = function(updateInd, paragraphText) {
 
 
 let createInitFunction = function(updateInd, paragraphText) {
-    if (paragraphText.length == 0) return emptyFunction;
+    if (paragraphText.length == 0) return () => {};
     return function() { editParagraphContent(updateInd, paragraphText); };
 }
 

@@ -1,7 +1,5 @@
 
-
-
-let createTinyMCE = function(component_name, height, initCallback=emptyFunction) {
+let createTinyMCE = function(component_name, height, initCallback=() => {}) {
     tinymce.init({
         selector: component_name,
         deprecation_warnings: false,
