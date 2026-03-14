@@ -2,6 +2,7 @@
 let createTinyMCE = function(component_name, height, initCallback=() => {}) {
     tinymce.init({
         selector: component_name,
+        toolbar: 'bold italic | import',
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
@@ -9,6 +10,12 @@ let createTinyMCE = function(component_name, height, initCallback=() => {}) {
         branding: false,
         license_key: "gpl",
         setup:function(editor) {
+            editor.ui.registry.addButton('import', {
+                text: 'Import Markdown', onAction: function () {
+                    console.log('TinyMCE button clicked');
+                }
+            });
+
             editor.on('input', function(e) {
                 enableSaveButton();
             }),
