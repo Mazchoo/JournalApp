@@ -2,7 +2,7 @@
 let createTinyMCE = function(component_name, height, initCallback=() => {}) {
     tinymce.init({
         selector: component_name,
-        toolbar: 'bold italic | import',
+        toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | import',
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
