@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Pytest: Run Tests",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe -m pytest",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Pylint: Run Linter",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe -m pylint main",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Ruff: Format",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe -m ruff format .",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run All: Format, Lint, Test",
+            "dependsOn": [
+                "Ruff: Format",
+                "Pylint: Run Linter",
+                "Pytest: Run Tests"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        }
+    ]
+}
