@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from os.path import join
 from pathlib import Path
 import json
@@ -23,7 +24,17 @@ STATIC_DIR = BASE_DIR / "static"
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECURITY_JSON = json.load((BASE_DIR / "security.json").open())
+_security_path = BASE_DIR / "security.json"
+if _security_path.exists():
+    SECURITY_JSON = json.load(_security_path.open())
+else:
+    SECURITY_JSON = {
+        "SECRET_KEY": os.environ.get("DJANGO_SECRET_KEY", "django-insecure-test-only-not-for-production"),
+        "ADMIN_USERNAME": os.environ.get("ADMIN_USERNAME", "admin"),
+        "ADMIN_PASSWORD": os.environ.get("ADMIN_PASSWORD", "testpassword1"),
+        "ENTRY_FOLDER": os.environ.get("ENTRY_FOLDER", str(BASE_DIR / "test_entries")),
+    }
+
 SECRET_KEY = SECURITY_JSON["SECRET_KEY"]
 ADMIN_USERNAME = SECURITY_JSON["ADMIN_USERNAME"]
 ADMIN_PASSWORD = SECURITY_JSON["ADMIN_PASSWORD"]
