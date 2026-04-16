@@ -22,4 +22,10 @@ jobs:
               python -m pip install --upgrade pip
               pip install tox tox-gh-actions
         - name: Test with tox
+          env:
+            DJANGO_SETTINGS_MODULE: Journal.settings
+            DJANGO_SECRET_KEY: django-insecure-test-only-not-for-production
+            ADMIN_USERNAME: admin
+            ADMIN_PASSWORD: testpassword1
+            ENTRY_FOLDER: /tmp/journal_test
           run: tox
