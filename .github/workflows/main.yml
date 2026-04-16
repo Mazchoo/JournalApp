@@ -20,7 +20,7 @@ jobs:
         - name: Install dependencies
           run: |
               python -m pip install --upgrade pip
-              pip install tox tox-gh-actions
+              pip install tox
         - name: Test with tox
           env:
             DJANGO_SETTINGS_MODULE: Journal.settings
@@ -28,4 +28,4 @@ jobs:
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: testpassword1
             ENTRY_FOLDER: /tmp/journal_test
-          run: tox
+          run: tox -e py312
