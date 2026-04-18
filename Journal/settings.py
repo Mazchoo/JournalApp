@@ -29,7 +29,9 @@ if _security_path.exists():
     SECURITY_JSON = json.load(_security_path.open())
 else:
     SECURITY_JSON = {
-        "SECRET_KEY": os.environ.get("DJANGO_SECRET_KEY", "django-insecure-test-only-not-for-production"),
+        "SECRET_KEY": os.environ.get(
+            "DJANGO_SECRET_KEY", "django-insecure-test-only-not-for-production"
+        ),
         "ADMIN_USERNAME": os.environ.get("ADMIN_USERNAME", "admin"),
         "ADMIN_PASSWORD": os.environ.get("ADMIN_PASSWORD", "testpassword1"),
         "ENTRY_FOLDER": os.environ.get("ENTRY_FOLDER", str(BASE_DIR / "test_entries")),

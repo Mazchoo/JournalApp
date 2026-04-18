@@ -85,7 +85,7 @@ def test_paragraph_view_method():
     )
     result = para.view()
 
-    assert result == {"text": "<h1>Title</h1>", "height": 300}
+    assert result == {"text": "<h1>Title</h1>", "height": 300, "allow_ai_synthesis": 1}
 
 
 @pytest.mark.django_db
@@ -111,10 +111,10 @@ def test_create_image():
     img = EntryImage.objects.create(
         entry=entry,
         file_path="2025-02-12/photo.jpg",
-        original=True,
+        allow_ai_synthesis=True,
     )
     assert img.file_path == "2025-02-12/photo.jpg"
-    assert img.original is True
+    assert img.allow_ai_synthesis is True
 
 
 @pytest.mark.django_db
@@ -126,7 +126,7 @@ def test_image_str():
     img = EntryImage.objects.create(
         entry=entry,
         file_path="some/path.jpg",
-        original=False,
+        allow_ai_synthesis=False,
     )
     assert str(img) == "some/path.jpg"
 
@@ -140,31 +140,31 @@ def test_image_view_method():
     img = EntryImage.objects.create(
         entry=entry,
         file_path="2025-02-12/photo.jpg",
-        original=True,
+        allow_ai_synthesis=True,
     )
 
     result = img.view()
 
     assert result["image_id"] == img.pk
     assert result["file_name"] == "photo.jpg"
-    assert result["original"] == 1
+    assert result["allow_ai_synthesis"] == 1
 
 
 @pytest.mark.django_db
 def test_image_view_non_original():
-    """When original=False, view() dict should have original=0."""
+    """When allow_ai_synthesis=False, view() dict should have original=0."""
     from main.models import EntryImage
 
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,
         file_path="2025-02-12/resized.jpg",
-        original=False,
+        allow_ai_synthesis=False,
     )
 
     result = img.view()
 
-    assert result["original"] == 0
+    assert result["allow_ai_synthesis"] == 0
 
 
 @pytest.mark.django_db
@@ -176,10 +176,10 @@ def test_create_video():
     vid = EntryVideo.objects.create(
         entry=entry,
         file_path="2025-02-12/clip.mp4",
-        original=True,
+        allow_ai_synthesis=True,
     )
     assert vid.file_path == "2025-02-12/clip.mp4"
-    assert vid.original is True
+    assert vid.allow_ai_synthesis is True
 
 
 @pytest.mark.django_db
@@ -191,14 +191,14 @@ def test_video_view_method():
     vid = EntryVideo.objects.create(
         entry=entry,
         file_path="2025-02-12/clip.mp4",
-        original=True,
+        allow_ai_synthesis=True,
     )
 
     result = vid.view()
 
     assert result["video_id"] == vid.pk
     assert result["file_name"] == "clip.mp4"
-    assert result["original"] == 1
+    assert result["allow_ai_synthesis"] == 1
 
 
 if __name__ == "__main__":

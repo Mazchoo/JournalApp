@@ -113,7 +113,7 @@ let editImageContent = function(updateInd, imageContent) {
     if (imageArea[0] == undefined || infoArea[0] == undefined || originalCheck[0] == undefined) { return; }
 
     imageArea.attr("src", imageContent["base64"]);
-    originalCheck.prop("checked", imageContent["original"] === 1);
+    originalCheck.prop("checked", imageContent["allow_ai_synthesis"] === 1);
     infoArea.text(imageContent["file_name"]);
     return true;
 }
@@ -124,7 +124,7 @@ let editImageMeta = function(updateInd, imageContent) {
     let originalCheck = $("#original-check" + updateInd);
     if (infoArea[0] == undefined || originalCheck[0] == undefined) { return; }
 
-    originalCheck.prop("checked", imageContent["original"] === 1);
+    originalCheck.prop("checked", imageContent["allow_ai_synthesis"] === 1);
     infoArea.text(imageContent["file_name"]);
     return true;
 }

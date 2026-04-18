@@ -10,7 +10,7 @@ class Content(Model):
     """Stored data added to an entry (e.g. text, image, ect.)"""
 
     content_type = models.CharField(max_length=10)
-    content_id = models.BigIntegerField()
+    content_id = models.BigIntegerField()  # Refers to primary key of Image, Video, ...
 
     def __str__(self):
         return f"{self.content_type}{self.content_id}"
@@ -34,7 +34,7 @@ class EntryImage(Model):
 
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
-    original = models.BooleanField()
+    allow_ai_synthesis = models.BooleanField()
 
     def __repr__(self):
         return f"image{self.pk} - Entry {self.entry.name}"
@@ -48,7 +48,7 @@ class EntryImage(Model):
         return {
             "image_id": self.pk,
             "file_name": file_name,
-            "original": int(self.original),
+            "allow_ai_synthesis": int(self.allow_ai_synthesis),
         }
 
 
@@ -57,7 +57,7 @@ class EntryVideo(Model):
 
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
-    original = models.BooleanField()
+    allow_ai_synthesis = models.BooleanField()
 
     def __repr__(self):
         return f"video{self.pk} - Entry {self.entry.name}"
@@ -71,7 +71,7 @@ class EntryVideo(Model):
         return {
             "video_id": self.pk,
             "file_name": file_name,
-            "original": int(self.original),
+            "allow_ai_synthesis": int(self.allow_ai_synthesis),
         }
 
 
@@ -81,6 +81,7 @@ class EntryParagraph(Model):
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     text = models.TextField()
     height = models.IntegerField()
+    allow_ai_synthesis = models.BooleanField(default=True)
 
     def __repr__(self):
         return f"paragraph{self.pk} - Entry {self.entry.name}"
@@ -90,4 +91,8 @@ class EntryParagraph(Model):
 
     def view(self) -> dict:
         """Web displayable view"""
-        return {"text": self.text, "height": self.height}
+        return {
+            "text": self.text,
+            "height": self.height,
+            "allow_ai_synthesis": int(self.allow_ai_synthesis),
+        }

@@ -22,7 +22,7 @@ def test_get_downsized_image_success(tmp_path, monkeypatch):
     img = EntryImage.objects.create(
         entry=entry,
         file_path="2025/02/12/photo.jpg",
-        original=True,
+        allow_ai_synthesis=True,
     )
 
     with patch(
