@@ -66,10 +66,12 @@ def test_create_paragraph():
         entry=entry,
         text="<p>Test paragraph</p>",
         height=150,
+        allow_ai_synthesis=False,
     )
     assert para.text == "<p>Test paragraph</p>"
     assert para.height == 150
     assert para.entry == entry
+    assert para.allow_ai_synthesis is False
 
 
 @pytest.mark.django_db
@@ -82,6 +84,7 @@ def test_paragraph_view_method():
         entry=entry,
         text="<h1>Title</h1>",
         height=300,
+        allow_ai_synthesis=True,
     )
     result = para.view()
 
@@ -98,6 +101,7 @@ def test_paragraph_str():
         entry=entry,
         text="Hello",
         height=100,
+        allow_ai_synthesis=True,
     )
     assert str(para) == "Hello"
 

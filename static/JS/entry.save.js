@@ -20,22 +20,22 @@ let generateSaveEntry = function(saveContent) {
                };
           } else if ($(content).hasClass("content-image") && content.src) {
                let ind = contentId.replace("image", "");
-               let original = $("#original-check" + ind).is(":checked");
+               let allowSynthesis = $("#allow-syn" + ind).hasClass("btn-primary");
                let fileName = $("#upload-label" + ind)[0].textContent;
                saveData[contentId] = {
-                    "file_path": fileName,
-                    "original":  original,
-                    "entry":     DATE_SLUG
+                    "file_path":          fileName,
+                    "allow_ai_synthesis": allowSynthesis ? 1 : 0,
+                    "entry":              DATE_SLUG
                }
           } else if ($(content).hasClass("content-video") && content.src) {
                // Can be a video or an image
                let ind = contentId.replace("video", "").replace("image", "");
-               let original = $("#original-check" + ind).is(":checked");
+               let allowSynthesis = $("#allow-syn" + ind).hasClass("btn-primary");
                let fileName = $("#upload-label" + ind)[0].textContent;
                saveData[`video${ind}`] = {
-                    "file_path": fileName,
-                    "original":  original,
-                    "entry":     DATE_SLUG
+                    "file_path":          fileName,
+                    "allow_ai_synthesis": allowSynthesis ? 1 : 0,
+                    "entry":              DATE_SLUG
                }
           }
      }

@@ -12,12 +12,16 @@
             </label>
         </div>
     </div>
-    <!-- Allow Synthesis checkbox -->
-    <div class='col col-md-1 py-2 mt-2'>
-        <div class="form-check">
-            <input class="form-check-input original-check" type="checkbox" value="" id="original-check{{ item.index }}" {% if item.data.allow_ai_synthesis %}checked{% endif %} data-toggle="tooltip" title="Allow content to create new AI generated content visible in the 'Derived Content' section">
-            <label class="form-check-label text-nowrap" for="original-check{{ item.index }}">Allow Synthesis</label>
-        </div>
+    <!-- Allow Synthesis button -->
+    <div class='col col-md-1 py-2 d-flex align-items-center'>
+        <button id="allow-syn{{ item.index }}"
+                type="button"
+                class="btn btn-sm {% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %} allow-syn"
+                data-toggle="tooltip"
+                title="Allow content to create new AI generated content visible in the 'Derived Content' section"
+                style="font-size: 0.7rem; white-space: nowrap;">
+            Allow Synthesis
+        </button>
     </div>
 </div>
 <!-- Uploaded image area -->

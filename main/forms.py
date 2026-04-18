@@ -17,6 +17,7 @@ from main.utils.file_io import (
     move_media_to_save_path,
     get_icon_file_path,
 )
+from main.utils.parsing import coerce_string_int_to_bool
 from main.config import ImageConstants, VideoConstants, ALLOWED_CONTENT_TYPES
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
@@ -54,7 +55,7 @@ class ImageForm(ModelForm):
         """Ensure file path refers to usuable file"""
         clean_data = super().clean()
         if clean_data is None:
-            raise forms.ValidationError("File path is not defined")
+            raise forms.ValidationError("No data provided for image form")
 
         file_name = clean_data["file_path"]
         entry = clean_data["entry"]
@@ -88,6 +89,20 @@ class ImageForm(ModelForm):
             create_image_icon(target_file_obj)
 
         return make_image_path_relative(target_path)
+
+    def clean_allow_ai_synthesis(self):
+        """Ensure file path refers to usuable file"""
+        allow_syn = self.data.get("allow_ai_synthesis")
+        if allow_syn is None:
+            raise forms.ValidationError("Allow synthesis information not provided")
+
+        cleaned_bool = coerce_string_int_to_bool(allow_syn)
+        if cleaned_bool is not None:
+            return cleaned_bool
+
+        raise forms.ValidationError(
+            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
+        )
 
 
 class VideoForm(ModelForm):
@@ -128,6 +143,20 @@ class VideoForm(ModelForm):
         move_media_to_save_path(target_path, file_name)
         return make_image_path_relative(target_path)
 
+    def clean_allow_ai_synthesis(self):
+        """Ensure file path refers to usuable file"""
+        allow_syn = self.data.get("allow_ai_synthesis")
+        if allow_syn is None:
+            raise forms.ValidationError("Allow synthesis information not provided")
+
+        cleaned_bool = coerce_string_int_to_bool(allow_syn)
+        if cleaned_bool is not None:
+            return cleaned_bool
+
+        raise forms.ValidationError(
+            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
+        )
+
 
 class ParagraphForm(ModelForm):
     """Text content in journal entry"""
@@ -140,6 +169,20 @@ class ParagraphForm(ModelForm):
     class Meta:
         model = EntryParagraph
         fields = "__all__"
+
+    def clean_allow_ai_synthesis(self):
+        """Ensure file path refers to usuable file"""
+        allow_syn = self.data.get("allow_ai_synthesis")
+        if allow_syn is None:
+            raise forms.ValidationError("Allow synthesis information not provided")
+
+        cleaned_bool = coerce_string_int_to_bool(allow_syn)
+        if cleaned_bool is not None:
+            return cleaned_bool
+
+        raise forms.ValidationError(
+            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
+        )
 
 
 class DeleteEntryForm(forms.Form):

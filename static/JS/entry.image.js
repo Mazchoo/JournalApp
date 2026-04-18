@@ -25,7 +25,10 @@ let initializeNewImage = function(lastestId) {
     $('#insert-image' + lastestId).click(insertNewImageToPosition);
     $('#move-content-up' + lastestId).click(moveObjectUp);
     $('#move-content-down' + lastestId).click(moveObjectDown);
-    $("#original-check" + lastestId).click(enableSaveButton);
+    $("#allow-syn" + lastestId).click(function() {
+        $(this).toggleClass('btn-primary btn-outline-secondary');
+        enableSaveButton();
+    });
 }
 
 
@@ -109,11 +112,12 @@ let showImageUpload = function(self) {
 let editImageContent = function(updateInd, imageContent) {
     let imageArea = $("#image" + updateInd);
     let infoArea = $("#upload-label" + updateInd);
-    let originalCheck = $("#original-check" + updateInd);
-    if (imageArea[0] == undefined || infoArea[0] == undefined || originalCheck[0] == undefined) { return; }
+    let allowSynthesis = $("#allow-syn" + updateInd);
+    if (imageArea[0] == undefined || infoArea[0] == undefined || allowSynthesis[0] == undefined) { return; }
 
     imageArea.attr("src", imageContent["base64"]);
-    originalCheck.prop("checked", imageContent["allow_ai_synthesis"] === 1);
+    let isActive = imageContent["allow_ai_synthesis"] === 1;
+    allowSynthesis.toggleClass('btn-primary', isActive).toggleClass('btn-outline-secondary', !isActive);
     infoArea.text(imageContent["file_name"]);
     return true;
 }
@@ -121,10 +125,11 @@ let editImageContent = function(updateInd, imageContent) {
 
 let editImageMeta = function(updateInd, imageContent) {
     let infoArea = $("#upload-label" + updateInd);
-    let originalCheck = $("#original-check" + updateInd);
+    let originalCheck = $("#allow-syn" + updateInd);
     if (infoArea[0] == undefined || originalCheck[0] == undefined) { return; }
 
-    originalCheck.prop("checked", imageContent["allow_ai_synthesis"] === 1);
+    let isActiveMeta = imageContent["allow_ai_synthesis"] === 1;
+    originalCheck.toggleClass('btn-primary', isActiveMeta).toggleClass('btn-outline-secondary', !isActiveMeta);
     infoArea.text(imageContent["file_name"]);
     return true;
 }

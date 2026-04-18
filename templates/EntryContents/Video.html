@@ -15,8 +15,8 @@
     <!-- Allow Synthesis checkbox -->
     <div class='col col-md-1 py-2 mt-2'>
         <div class="form-check">
-            <input class="form-check-input original-check" type="checkbox" value="" id="original-check{{ item.index }}" {% if item.data.allow_ai_synthesis %}checked{% endif %}>
-            <label class="form-check-label text-nowrap" for="original-check{{ item.index }}">Allow Synthesis</label>
+            <input class="form-check-input allow-syn" type="checkbox" value="" id="allow-syn{{ item.index }}" {% if item.data.allow_ai_synthesis %}checked{% endif %}>
+            <label class="form-check-label text-nowrap" for="allow-syn{{ item.index }}">Allow Synthesis</label>
         </div>
     </div>
 </div>

@@ -81,7 +81,7 @@ class EntryParagraph(Model):
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     text = models.TextField()
     height = models.IntegerField()
-    allow_ai_synthesis = models.BooleanField(default=True)
+    allow_ai_synthesis = models.BooleanField()
 
     def __repr__(self):
         return f"paragraph{self.pk} - Entry {self.entry.name}"

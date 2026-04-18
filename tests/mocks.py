@@ -54,9 +54,7 @@ def create_mock_entry_with_paragraph() -> Entry:
 
     # Create the paragraph model instance
     paragraph = EntryParagraph.objects.create(
-        entry=entry,
-        text="<p>Hello World</p>",
-        height=200,
+        entry=entry, text="<p>Hello World</p>", height=200, allow_ai_synthesis=True
     )
 
     # Create the generic Content record that links to the paragraph
@@ -131,7 +129,10 @@ def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
 
 
 def mock_paragraph_post_data(
-    name: str, text: str = "<p>Hello</p>", height: int = 200
+    name: str,
+    text: str = "<p>Hello</p>",
+    height: int = 200,
+    allow_ai_synthesis: bool = True,
 ) -> str:
     """Build a form-encoded body with one paragraph content item."""
     return (
@@ -139,6 +140,7 @@ def mock_paragraph_post_data(
         f"&content[paragraph1][entry]={name}"
         f"&content[paragraph1][text]={text}"
         f"&content[paragraph1][height]={height}"
+        f"&content[paragraph1][allow_ai_synthesis]={int(allow_ai_synthesis)}"
     )
 
 
