@@ -54,7 +54,8 @@ let initializeServerRenderedContent = function() {
         if (!textarea) return;
         let index = textarea.id.replace('paragraph', '');
         let height = parseInt(textarea.getAttribute('data-height')) || 220;
-        initializeNewParagraph(index, height);
+        let allowSynthesis = textarea.getAttribute('data-allow-ai-synthesis') !== '0';
+        initializeNewParagraph(index, height, '', allowSynthesis);
     });
 
     // Initialize event handlers and async loading on server-rendered images/videos

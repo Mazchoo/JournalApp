@@ -93,6 +93,6 @@ def javascript_placeholder_context() -> dict:
             "height": 300,
             "file_name": "",
             "image_id": "",
-            "original": False,
+            "allow_ai_synthesis": 1,
         },
     }

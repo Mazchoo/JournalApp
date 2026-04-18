@@ -8,11 +8,14 @@ let generateSaveEntry = function(saveContent) {
           let contentId = content.id;
 
           if ($(content).hasClass("entry-text")) {
-               let textContent = tinyMCE.get(contentId).getContent();
+               let editor = tinyMCE.get(contentId);
+               let textContent = editor.getContent();
                let height = getMCEComponentHeight(contentId);
+               let allowSynthesis = editor.synthesisEnabled ?? true;
                saveData[contentId] = {
                     "text": textContent,
                     "height": height,
+                    "allow_ai_synthesis": allowSynthesis ? 1 : 0,
                     "entry": DATE_SLUG
                };
           } else if ($(content).hasClass("content-image") && content.src) {

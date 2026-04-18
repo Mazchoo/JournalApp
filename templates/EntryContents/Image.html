@@ -15,7 +15,7 @@
     <!-- Allow Synthesis checkbox -->
     <div class='col col-md-1 py-2 mt-2'>
         <div class="form-check">
-            <input class="form-check-input original-check" type="checkbox" value="" id="original-check{{ item.index }}" {% if item.data.allow_ai_synthesis %}checked{% endif %}>
+            <input class="form-check-input original-check" type="checkbox" value="" id="original-check{{ item.index }}" {% if item.data.allow_ai_synthesis %}checked{% endif %} data-toggle="tooltip" title="Allow content to create new AI generated content visible in the 'Derived Content' section">
             <label class="form-check-label text-nowrap" for="original-check{{ item.index }}">Allow Synthesis</label>
         </div>
     </div>

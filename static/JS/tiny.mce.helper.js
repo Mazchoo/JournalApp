@@ -1,8 +1,8 @@
 
-let createTinyMCE = function(component_name, height, initCallback=() => {}) {
+let createTinyMCE = function(component_name, height, allowSynthesis, initCallback=() => {}) {
     tinymce.init({
         selector: component_name,
-        toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | import',
+        toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis',
         deprecation_warnings: false,
         browser_spellcheck: true,
         height: height,
@@ -13,6 +13,22 @@ let createTinyMCE = function(component_name, height, initCallback=() => {}) {
             editor.ui.registry.addButton('import', {
                 text: 'Import Markdown', onAction: function () {
                     console.log('TinyMCE button clicked');
+                }
+            });
+
+            editor.ui.registry.addToggleButton('allowSynthesis', {
+                text: 'Allow AI Synthesis',
+                tooltip: "Allow content to create new AI generated content visible in the 'Derived Content' section",
+                onAction: function(api) {
+                    allowSynthesis = !allowSynthesis;
+                    api.setActive(allowSynthesis);
+                    editor.synthesisEnabled = allowSynthesis;
+                    enableSaveButton();
+                },
+                onSetup: function(api) {
+                    api.setActive(allowSynthesis);
+                    editor.synthesisEnabled = allowSynthesis;
+                    return function() {};
                 }
             });
 
@@ -37,6 +53,7 @@ let resetMCE = function(div) {
 
     let divName = div.children[0].getAttribute('name');
     currentHeight = getMCEComponentHeight(divName);
+    let allowSynthesis = tinymce.get(divName).synthesisEnabled ?? true;
     tinymce.get(divName).remove();
-    createTinyMCE('#' + divName, currentHeight);
+    createTinyMCE('#' + divName, currentHeight, allowSynthesis, () => {});
 }

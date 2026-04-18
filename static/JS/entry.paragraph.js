@@ -51,9 +51,9 @@ let createInitFunction = function(updateInd, paragraphText) {
 }
 
 
-let initializeNewParagraph = function(lastestId, height=220, paragraphText="") {
+let initializeNewParagraph = function(lastestId, height=220, paragraphText="", allowSynthesis=true) {
     let initFunction = createInitFunction(lastestId, paragraphText);
-    createTinyMCE('#paragraph' + lastestId, height, initFunction);
+    createTinyMCE('#paragraph' + lastestId, height, allowSynthesis, initFunction);
 
     $('#delete-content' + lastestId).click(deleteParagraph);
     $('#insert-paragraph' + lastestId).click(insertNewParagraphToPosition);
