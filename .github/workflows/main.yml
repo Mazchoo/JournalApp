@@ -28,4 +28,4 @@ jobs:
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: testpassword1
             ENTRY_FOLDER: /tmp/journal_test
-          run: tox -e py312, check
+          run: tox -e py312,check
