@@ -15,13 +15,13 @@ from main.database_layer.fe_interfaces import (
 
 
 def get_day_and_month_names() -> DayAndMonthNamesContext:
-    """Return names of days and months."""
+    """Return names of days and months. Stub current year and month."""
     return {
         "full_day_names": DateConstants.day_names,
         "short_day_names": DateConstants.day_names_short,
         "months_in_year": DateConstants.month_names,
-        "year": None,
-        "month": None,
+        "year": 2000,
+        "month": "January",
     }
 
 
