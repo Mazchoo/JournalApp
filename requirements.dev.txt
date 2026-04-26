@@ -8,3 +8,4 @@ types-pytz==2026.1.1.20260402
 types-PyYAML==6.0.12.12
 typing_extensions==4.13.2
 ruff==0.15.9
+flake8==7.3.0
