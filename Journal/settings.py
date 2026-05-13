@@ -189,3 +189,6 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1e9
+MAX_IMAGE_CACHE_SIZE = (
+    1024  # Number of base64 images to cache before new entries stop being added
+)

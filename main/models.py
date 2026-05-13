@@ -10,6 +10,7 @@ from main.config import ALLOWED_CONTENT_TYPES
 
 class Content(Model):
     """Stored data added to an entry (e.g. text, image, ect.)"""
+
     CONTENT_TYPES = [(t, t.capitalize()) for t in ALLOWED_CONTENT_TYPES]
 
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES)  # type: ignore[var-annotated]

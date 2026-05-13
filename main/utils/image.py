@@ -18,6 +18,7 @@ from main.utils.file_io import (
     move_media_to_save_path,
     get_resized_filename,
 )
+from main.utils.cache import cache_string
 
 
 def create_image_icon(target_path_obj: Path):
@@ -99,7 +100,7 @@ def add_encoding_type_to_base64(b64_string: str, ecoding_type: str) -> str:
     return f"data:image/{ecoding_type};base64,{b64_string}"
 
 
-@lru_cache(maxsize=1024)
+@cache_string
 def fetch_base64_image_data(file_path: Union[Path, str]) -> str:
     """Load image or create base64 image from downsized original (if original size above threshold)"""
     file_path = Path(file_path)
