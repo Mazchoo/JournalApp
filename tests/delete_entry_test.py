@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime
+from unittest.mock import patch
 
 import pytest
 
@@ -11,7 +12,8 @@ FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
 @pytest.mark.django_db
-def test_delete_entry_success():
+@patch("main.content_generation.delete_entry.move_files_from_entry")
+def test_delete_entry_success(mock_move_files):
     """Deleting an existing entry should return the success message."""
     client = create_mock_client()
     create_mock_entry()
@@ -44,7 +46,8 @@ def test_delete_nonexistent_entry_returns_error():
 
 
 @pytest.mark.django_db
-def test_delete_entry_removes_from_db():
+@patch("main.content_generation.delete_entry.move_files_from_entry")
+def test_delete_entry_removes_from_db(mock_move_files):
     """A deleted entry should be removed from the database."""
     from main.models import Entry
 
