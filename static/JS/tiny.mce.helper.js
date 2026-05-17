@@ -17,7 +17,7 @@ let createTinyMCE = function(component_name, height, allowSynthesis, initCallbac
             });
 
             editor.ui.registry.addToggleButton('allowSynthesis', {
-                text: 'Allow Synthesis',
+                text: 'Generate',
                 tooltip: "Allow content to create new AI generated content visible in the 'Derived Content' section",
                 onAction: function(api) {
                     allowSynthesis = !allowSynthesis;

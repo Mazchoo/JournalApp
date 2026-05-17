@@ -94,7 +94,7 @@ class ImageForm(ModelForm):
         """Ensure file path refers to usuable file"""
         allow_syn = self.data.get("allow_ai_synthesis")
         if allow_syn is None:
-            raise forms.ValidationError("Allow synthesis information not provided")
+            raise forms.ValidationError("Generate information not provided")
 
         cleaned_bool = coerce_string_int_to_bool(allow_syn)
         if cleaned_bool is not None:
@@ -147,7 +147,7 @@ class VideoForm(ModelForm):
         """Ensure file path refers to usuable file"""
         allow_syn = self.data.get("allow_ai_synthesis")
         if allow_syn is None:
-            raise forms.ValidationError("Allow synthesis information not provided")
+            raise forms.ValidationError("Generate information not provided")
 
         cleaned_bool = coerce_string_int_to_bool(allow_syn)
         if cleaned_bool is not None:
@@ -174,7 +174,7 @@ class ParagraphForm(ModelForm):
         """Ensure file path refers to usuable file"""
         allow_syn = self.data.get("allow_ai_synthesis")
         if allow_syn is None:
-            raise forms.ValidationError("Allow synthesis information not provided")
+            raise forms.ValidationError("Generate information not provided")
 
         cleaned_bool = coerce_string_int_to_bool(allow_syn)
         if cleaned_bool is not None:
