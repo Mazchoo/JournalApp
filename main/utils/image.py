@@ -3,7 +3,6 @@
 import base64
 from pathlib import Path
 from typing import Union
-from functools import lru_cache
 
 from PIL import Image
 
