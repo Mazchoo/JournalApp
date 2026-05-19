@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GLB Mesh Test</title>
+    <style>
+        body { margin: 20px; font-family: Arial, sans-serif; }
+        canvas { border: 2px solid #333; display: block; margin: 20px 0; }
+        #info { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>GLB Mesh Renderer Test</h1>
+    <input type="file" id="fileInput" accept=".glb">
+    <div id="info">Select a .glb file to test rendering</div>
+    <canvas id="testCanvas" width="800" height="400"></canvas>
+
+    <script src="static/JS/entry.mesh.js"></script>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const info = document.getElementById('info');
+            info.textContent = 'Loading: ' + file.name;
+            
+            const canvas = document.getElementById('testCanvas');
+            
+            // Add console logging
+            console.log('File selected:', file.name, 'Size:', file.size);
+            
+            initializeMeshRenderer(canvas, file, function() {
+                info.textContent = 'Loaded: ' + file.name;
+                console.log('Mesh renderer initialized');
+            });
+        });
+    </script>
+</body>
+</html>

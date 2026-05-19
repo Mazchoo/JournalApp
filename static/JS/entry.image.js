@@ -50,7 +50,7 @@ let appendImageToList = function() {
 }
 
 
-let readImageURL= function(inputFile, contentId) {
+let readImageResource = function(inputFile, contentId) {
     var reader = new FileReader();
 
     reader.onload = function (e) {
@@ -61,15 +61,41 @@ let readImageURL= function(inputFile, contentId) {
     reader.readAsDataURL(inputFile);
 }
 
-let readVideoURL= function(inputFile, contentId) {
+let readVideoResource = function(inputFile, contentId) {
     var reader = new FileReader();
 
-    reader.onload = function (e) {''
-        $('#video' + contentId).css({ visibility: 'visible' , height: 'auto' }); 
+    reader.onload = function (e) {
+        $('#video' + contentId).css({ visibility: 'visible' , height: 'auto' });
         $('#video' + contentId).attr('src', e.target.result);
         enableSaveButton();
     };
     reader.readAsDataURL(inputFile);
+}
+
+let loadMeshResource = function(inputFile, contentId) {
+    // Hide image and video elements
+    $('#image' + contentId).css({ visibility: 'hidden', height: 0 });
+    $('#video' + contentId).css({ visibility: 'hidden', height: 0 });
+    
+    // Show canvas for 3D rendering
+    let canvas = $('#mesh-canvas' + contentId);
+    canvas.css({
+        visibility: 'visible',
+        height: '400px',
+        display: 'block',
+        opacity: '1',
+        position: 'relative',
+        zIndex: '1'
+    });
+    
+    // Initialize mesh renderer using the mesh module
+    if (canvas[0]) {
+        initializeMeshRenderer(canvas[0], inputFile, function() {
+            enableSaveButton();
+        });
+    } else {
+        console.error('Canvas element not found for contentId:', contentId);
+    }
 }
 
 let showFileName = function(inputFile, contentId) {
@@ -88,9 +114,11 @@ let uploadAllMediaFiles = function(contentInd, inputFiles) {
 
         const inputFile = inputFiles[i];
         if (isVideoFile(inputFile.name)) {
-            readVideoURL(inputFile, contentInd);
+            readVideoResource(inputFile, contentInd);
         } else if (isImageFile(inputFile.name)) {
-            readImageURL(inputFile, contentInd);
+            readImageResource(inputFile, contentInd);
+        } else if (isMeshFile(inputFile.name)) {
+            loadMeshResource(inputFile, contentInd);
         } else {
             console.log('Unknown media type')
         }

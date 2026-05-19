@@ -129,3 +129,8 @@ const isImageFile = function(fileName) {
     const fileExtention = fileName.split(".").pop().toLowerCase();
     return ["jpg", "jpeg", "jfif", "png"].includes(fileExtention);
 }
+
+
+const isMeshFile = function(fileName) {
+    return fileName.split(".").pop().toLowerCase() === 'glb';
+}

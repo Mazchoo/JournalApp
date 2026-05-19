@@ -59,6 +59,7 @@
     <script src="{% static 'js/common.utility.js' %}"></script>
     <script src="{% static 'js/tiny.mce.helper.js' %}"></script>
     <script src="{% static 'js/entry.paragraph.js' %}"></script>
+    <script src="{% static 'js/entry.mesh.js' %}"></script>
     <script src="{% static 'js/entry.image.js' %}"></script>
     <script src="{% static 'js/entry.delete.js' %}"></script>
     <script src="{% static 'js/entry.save.js' %}"></script>
@@ -71,6 +72,7 @@
             var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" %}`;
             var IMAGE_TEMPLATE = `{% include "EntryContents/Image.html" %}`;
         {% endwith %}
+        var THREE_JS_URL = '{% static "JS/three.webgpu.full.min.js" %}';
         var DATE_SLUG = '{{date_slug}}';
         var SAVE_URL = '{% url "main:save-entry" %}';
         var DELETE_URL = '{% url "main:delete-entry" %}';

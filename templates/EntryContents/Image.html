@@ -29,7 +29,8 @@
     <form method = 'get' action = '' class = 'card container image-container'>
         <div class="image-area">
             <img id="image{{ item.index }}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-image my-3" data-image-id="{{ item.data.image_id }}">
-            <video id="video{{ item.index }}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video">
+            <video id="video{{ item.index }}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video"></video>
+            <canvas id="mesh-canvas{{ item.index }}" class="rounded shadow-sm mx-auto d-block save-content content-mesh" style="visibility: hidden; height: 0; width: 100%; max-width: 800px;"></canvas>
         </div>
     </form>
 </div>
