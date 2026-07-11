@@ -29,7 +29,7 @@ def extract_entries_to_markdown():
             dir_path = os.path.join(TARGET_PATH, year, month, day)
             os.makedirs(dir_path, exist_ok=True)
 
-            md_content = convert(text).strip()
+            md_content = convert(text).content.strip()
             idx = counts[entry_id]
             counts[entry_id] += 1
 
