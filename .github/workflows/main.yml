@@ -10,7 +10,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [3.12]
+        python-version: [3.14]
     steps:
         - uses: actions/checkout@v1
         - name: Set up Python ${{ matrix.python-version }}
@@ -28,4 +28,4 @@ jobs:
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: testpassword1
             ENTRY_FOLDER: /tmp/journal_test
-          run: tox -e py312,check
+          run: tox -e py314,check
