@@ -9,3 +9,7 @@ security.json
 venv/*
 *-checkpoint.ipynb
 *__pycache__*
+
+frontend/node_modules
+frontend/dist/
+frontend/coverage/

@@ -1,0 +1,30 @@
+{
+  "name": "journal-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript frontend for the Journal Django app. Builds a single bundle that replaces the per-file scripts in static/JS.",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "bootstrap": "4.5.2",
+    "jquery": "3.4.1",
+    "popper.js": "1.16.1",
+    "tinymce": "7.8.0"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.32",
+    "@types/node": "^26.4.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
+  }
+}
