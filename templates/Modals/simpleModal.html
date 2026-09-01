@@ -16,19 +16,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    let showMessageSimpleModal = function(modalTitle, modalMessage) {
-        $('#simple-modal-title')[0].innerText = modalTitle;
-        $('#simple-modal-body')[0].innerHTML = modalMessage;
-        $('#simple-modal').modal('show');
-    }
-
-    $(document).on('keypress', '#simple-modal', function(e) {
-        e = e || window.event;
-        var key = e.which || e.keyCode;
-        if (key === 13) {
-            $('#simple-modal-close')[0].click();
-        }
-    })
-</script>

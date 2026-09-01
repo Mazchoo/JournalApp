@@ -23,10 +23,10 @@ import { installFakeTinyMCE, seedEditor } from './helpers/tinymce';
 import { renderDayPage } from './helpers/dom';
 
 /** Build a click event whose target is the element matching the selector. */
-function clickEventOn(selector: string): JQuery.TriggeredEvent {
+function clickEventOn(selector: string): Event {
   const target = document.querySelector(selector);
   if (target === null) throw new Error(`No element matched ${selector}`);
-  return { target } as unknown as JQuery.TriggeredEvent;
+  return { target } as unknown as Event;
 }
 
 describe('reverseString', () => {
@@ -200,7 +200,7 @@ describe('getParentDivOfObject', () => {
     const orphan = document.createElement('button');
     orphan.setAttribute('name', '.entry-region-99');
 
-    expect(getParentDivOfObject({ target: orphan } as unknown as JQuery.TriggeredEvent))
+    expect(getParentDivOfObject({ target: orphan } as unknown as Event))
       .toBeUndefined();
   });
 });
@@ -234,7 +234,7 @@ describe('insertNewObjectIntoEditArea', () => {
     orphan.setAttribute('name', '.entry-region-99');
 
     const result = insertNewObjectIntoEditArea(
-      { target: orphan } as unknown as JQuery.TriggeredEvent,
+      { target: orphan } as unknown as Event,
       newFunc as () => HTMLElement,
       vi.fn(),
       '2',

@@ -1,6 +1,6 @@
 import { enableSaveButton } from '../entry/save';
 import { resetMCE } from '../tinymce/helper';
-import { bs, jq } from '../runtime/externals';
+import { bs } from '../runtime/externals';
 
 /** Port of static/JS/common.utility.js. */
 
@@ -46,18 +46,19 @@ export function componentFromTemplate(
 /** Set a tooltip's text from an input value plus a suffix. */
 export function changeTooltipTextFromInput(e: Event, idTag: string, suffix: string): void {
   const input = e.target as HTMLInputElement;
-  jq()(idTag)[0].innerHTML = input.value + suffix;
+  const tooltip = document.querySelector(idTag);
+  if (tooltip !== null) tooltip.innerHTML = input.value + suffix;
 }
 
 /** Move named children from one container into another. */
 export function reorderOneDivFromAnother(sourceTag: string, targetTag: string): void {
-  const $ = jq();
-  const targetDiv = $(targetTag)[0];
-  const sourceObjs = $(sourceTag);
+  const targetDiv = document.querySelector(targetTag);
+  if (targetDiv === null) return;
+  const sourceObjs = document.querySelectorAll(sourceTag);
 
   for (let i = 0; i < sourceObjs.length; i++) {
-    const targetItem = $(nameSelector(sourceObjs[i]))[0];
-    targetDiv.appendChild(targetItem);
+    const targetItem = document.querySelector(nameSelector(sourceObjs[i]!));
+    if (targetItem !== null) targetDiv.appendChild(targetItem);
   }
 }
 
@@ -71,19 +72,18 @@ export function refreshScrollSpies(): void {
 
 /** Insert a new content row above the clicked row. */
 export function insertNewObjectIntoEditArea(
-  e: JQuery.TriggeredEvent,
+  e: Event,
   newFunc: () => HTMLElement | undefined,
   initFunc: (contentInd: string) => void,
   contentInd: string,
 ): HTMLElement | undefined {
-  const $ = jq();
-  let parentDiv = $(eventNameSelector(e))[0];
-  if (parentDiv === undefined) return undefined;
+  let parentDiv = document.querySelector(eventNameSelector(e));
+  if (parentDiv === null) return undefined;
   const div = newFunc();
   if (div === undefined) return undefined;
   parentDiv = parentDiv.parentNode as HTMLElement;
 
-  $('#edit-area')[0].insertBefore(div, parentDiv);
+  document.getElementById('edit-area')!.insertBefore(div, parentDiv);
   initFunc(contentInd);
   return div;
 }
@@ -92,46 +92,46 @@ export function insertNewObjectIntoEditArea(
 export function getContentType(key: string): string {
   const contentMatch = key.match(/([a-zA-Z]+)/g);
   if (contentMatch === null) return '';
-  return contentMatch[0];
+  return contentMatch[0]!;
 }
 
 /** Extract the numeric id from an element id. */
 export function getContentId(key: string): string | -1 {
   const contentMatch = key.match(/([0-9]+)/g);
   if (contentMatch === null) return -1;
-  return contentMatch[0];
+  return contentMatch[0]!;
 }
 
 /** Return the parent row of the clicked edit button. */
-export function getParentDivOfObject(e: JQuery.TriggeredEvent): HTMLElement | undefined {
-  const parentDiv = jq()(eventNameSelector(e))[0];
-  if (parentDiv === undefined) return undefined;
+export function getParentDivOfObject(e: Event): HTMLElement | undefined {
+  const parentDiv = document.querySelector(eventNameSelector(e));
+  if (parentDiv === null) return undefined;
   return parentDiv.parentNode as HTMLElement;
 }
 
 /** Move a content row one position earlier in the edit area. */
-export function moveObjectUp(e: JQuery.TriggeredEvent): void {
+export function moveObjectUp(e: Event): void {
   const parentDiv = getParentDivOfObject(e);
-  const editAreaList = jq()('#edit-area')[0];
+  const editAreaList = document.getElementById('edit-area')!;
   const objInd = getIndexInArr(editAreaList.children, parentDiv as Element);
 
   if (objInd === undefined || objInd === 0) return;
 
-  editAreaList.insertBefore(parentDiv as HTMLElement, editAreaList.children[objInd - 1]);
+  editAreaList.insertBefore(parentDiv as HTMLElement, editAreaList.children[objInd - 1]!);
   resetMCE(parentDiv);
   resetMCE(editAreaList.children[objInd]);
   enableSaveButton();
 }
 
 /** Move a content row one position later in the edit area. */
-export function moveObjectDown(e: JQuery.TriggeredEvent): void {
+export function moveObjectDown(e: Event): void {
   const parentDiv = getParentDivOfObject(e);
-  const editAreaList = jq()('#edit-area')[0];
+  const editAreaList = document.getElementById('edit-area')!;
   const objInd = getIndexInArr(editAreaList.children, parentDiv as Element);
 
   if (objInd === undefined || objInd === editAreaList.children.length - 1) return;
 
-  editAreaList.insertBefore(editAreaList.children[objInd + 1], parentDiv as HTMLElement);
+  editAreaList.insertBefore(editAreaList.children[objInd + 1]!, parentDiv as HTMLElement);
   resetMCE(parentDiv);
   resetMCE(editAreaList.children[objInd]);
   enableSaveButton();
@@ -159,7 +159,7 @@ export function nameSelector(element: Element): string {
   return element.getAttribute('name') ?? '';
 }
 
-/** Return the row selector from a jQuery event target. */
-export function eventNameSelector(e: JQuery.TriggeredEvent): string {
+/** Return the row selector from an event target. */
+export function eventNameSelector(e: Event): string {
   return nameSelector(e.target as Element);
 }

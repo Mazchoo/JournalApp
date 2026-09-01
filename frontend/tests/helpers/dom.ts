@@ -1,4 +1,6 @@
-import { vi, type Mock } from 'vitest';
+import { vi, type MockInstance } from 'vitest';
+
+import * as modals from '../../src/runtime/modals';
 
 /**
  * Fixtures mirroring what Django renders for templates/day.html. The two `*_TEMPLATE` strings
@@ -124,8 +126,8 @@ export function installTemplateGlobals(contentIndex: number): void {
   window.CONTENT_INDEX = contentIndex;
   window.PARAGRAPH_TEMPLATE = PARAGRAPH_TEMPLATE;
   window.IMAGE_TEMPLATE = IMAGE_TEMPLATE;
-  window.THREE_JS_URL = '/static/JS/three.webgpu.full.min.js';
   window.DATE_SLUG = '2024-03-15';
+  window.ENTRY_EXISTS = false;
   window.SAVE_URL = '/save-entry/';
   window.DELETE_URL = '/delete-entry/';
   window.IMAGE_URL = '/get-image/';
@@ -136,31 +138,29 @@ export function installTemplateGlobals(contentIndex: number): void {
 }
 
 export interface ModalStubs {
-  showCallbackModal: Mock;
-  showMessageSimpleModal: Mock;
-  showDateCallbackModal: Mock;
+  showCallbackModal: MockInstance;
+  showMessageSimpleModal: MockInstance;
+  showDateCallbackModal: MockInstance;
   /** Run the callback the last `showCallbackModal` / `showDateCallbackModal` was given. */
-  confirmLast(stub: Mock): void;
+  confirmLast(stub: MockInstance): void;
 }
 
-/** Stand in for the helpers defined inline by templates/Modals/*.html. */
+/** Stand in for the real modal helpers so tests can assert they were shown. */
 export function installModalStubs(): ModalStubs {
-  const showCallbackModal = vi.fn();
-  const showMessageSimpleModal = vi.fn();
-  const showDateCallbackModal = vi.fn();
-
-  window.showCallbackModal = showCallbackModal as unknown as Window['showCallbackModal'];
-  window.showMessageSimpleModal =
-    showMessageSimpleModal as unknown as Window['showMessageSimpleModal'];
-  window.showDateCallbackModal =
-    showDateCallbackModal as unknown as Window['showDateCallbackModal'];
+  const showCallbackModal = vi.spyOn(modals, 'showCallbackModal').mockImplementation(() => {});
+  const showMessageSimpleModal = vi
+    .spyOn(modals, 'showMessageSimpleModal')
+    .mockImplementation(() => {});
+  const showDateCallbackModal = vi
+    .spyOn(modals, 'showDateCallbackModal')
+    .mockImplementation(() => {});
 
   return {
     showCallbackModal,
     showMessageSimpleModal,
     showDateCallbackModal,
     /** Run the callback the last confirm or date modal was given. */
-    confirmLast: (stub: Mock) => {
+    confirmLast: (stub: MockInstance) => {
       const call = stub.mock.calls[stub.mock.calls.length - 1];
       if (call === undefined) throw new Error('The modal was never shown.');
       (call[3] as () => void)();

@@ -1,38 +1,26 @@
-import { dateSlug, saveUrl } from '../runtime/config';
-import { csrfToken, jq, tiny, type SynthesisEditor } from '../runtime/externals';
+import { requestSaveEntry } from '../make-request';
+import type { SaveData } from '../request-interface';
+import { dateSlug } from '../runtime/config';
+import { tiny, type SynthesisEditor } from '../runtime/externals';
 import { showMessageSimpleModal } from '../runtime/modals';
 import { getMCEComponentHeight } from '../tinymce/helper';
 import { enableDeleteButton } from './delete';
 import { zoomToImage } from './image';
 
+export type { MediaSavePayload, ParagraphSavePayload, SaveData } from '../request-interface';
+
 /** Port of static/JS/entry.save.js. */
 
-export interface ParagraphSavePayload {
-  text: string;
-  height: number;
-  allow_ai_synthesis: 0 | 1;
-  entry: string;
-}
-
-export interface MediaSavePayload {
-  file_path: string;
-  allow_ai_synthesis: 0 | 1;
-  entry: string;
-}
-
-export type SaveData = Record<string, ParagraphSavePayload | MediaSavePayload>;
-
 /** Build the save payload from the current content elements. */
-export function generateSaveEntry(saveContent: JQuery | null): SaveData | undefined {
+export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveData | undefined {
   if (saveContent === null) return undefined;
-  const $ = jq();
   const saveData: SaveData = {};
 
   for (let i = 0; i < saveContent.length; i++) {
     const content = saveContent[i] as HTMLElement & { src?: string };
     const contentId = content.id;
 
-    if ($(content).hasClass('entry-text')) {
+    if (content.classList.contains('entry-text')) {
       const editor = tiny().get(contentId) as SynthesisEditor;
       const textContent = editor.getContent();
       const height = getMCEComponentHeight(contentId);
@@ -43,20 +31,24 @@ export function generateSaveEntry(saveContent: JQuery | null): SaveData | undefi
         allow_ai_synthesis: allowSynthesis ? 1 : 0,
         entry: dateSlug(),
       };
-    } else if ($(content).hasClass('content-image') && content.src) {
+    } else if (content.classList.contains('content-image') && content.src) {
       const ind = contentId.replace('image', '');
-      const allowSynthesis = $('#allow-syn' + ind).hasClass('btn-primary');
-      const fileName = $('#upload-label' + ind)[0].textContent!;
+      const allowSynthesis = document
+        .getElementById('allow-syn' + ind)
+        ?.classList.contains('btn-primary');
+      const fileName = document.getElementById('upload-label' + ind)!.textContent!;
       saveData[contentId] = {
         file_path: fileName,
         allow_ai_synthesis: allowSynthesis ? 1 : 0,
         entry: dateSlug(),
       };
-    } else if ($(content).hasClass('content-video') && content.src) {
+    } else if (content.classList.contains('content-video') && content.src) {
       // Can be a video or an image
       const ind = contentId.replace('video', '').replace('image', '');
-      const allowSynthesis = $('#allow-syn' + ind).hasClass('btn-primary');
-      const fileName = $('#upload-label' + ind)[0].textContent!;
+      const allowSynthesis = document
+        .getElementById('allow-syn' + ind)
+        ?.classList.contains('btn-primary');
+      const fileName = document.getElementById('upload-label' + ind)!.textContent!;
       saveData[`video${ind}`] = {
         file_path: fileName,
         allow_ai_synthesis: allowSynthesis ? 1 : 0,
@@ -71,45 +63,46 @@ export function generateSaveEntry(saveContent: JQuery | null): SaveData | undefi
 /** POST the save payload and report the result. */
 export function saveEntryToDatabase(saveData: SaveData | null | undefined): void {
   if (saveData === null) return;
-  const $ = jq();
-  const csrftoken = csrfToken();
 
-  $.ajax({
-    type: 'POST',
-    url: saveUrl(),
-    data: {
+  requestSaveEntry(
+    {
       content: saveData,
-      csrfmiddlewaretoken: csrftoken,
       name: dateSlug(),
     },
-    success: (response: Record<string, string>) => {
-      if ('success' in response) showMessageSimpleModal('Save Success', response['success']);
-      if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
-      enableDeleteButton();
-      $('.image-area').on('click', zoomToImage);
+    {
+      success: (response) => {
+        if ('success' in response) showMessageSimpleModal('Save Success', response['success']);
+        if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
+        enableDeleteButton();
+        document.querySelectorAll('.image-area').forEach((area) => {
+          area.addEventListener('click', zoomToImage);
+        });
+      },
+      error: (_jqXhr, _textStatus, errorThrown) => {
+        showMessageSimpleModal('Unknown Error', errorThrown);
+      },
+      complete: () => {
+        document.getElementById('spinner-save')?.classList.add('invisible');
+      },
     },
-    error: (_jqXhr, _textStatus, errorThrown) => {
-      showMessageSimpleModal('Unknown Error', errorThrown);
-    },
-    complete: () => {
-      $('#spinner-save').addClass('invisible');
-    },
-  });
+  );
 }
 
 /** Collect the save payload from every `.save-content` element. */
 export function getSaveData(): SaveData | undefined {
-  const saveContent = jq()('.save-content');
-  return generateSaveEntry(saveContent);
+  return generateSaveEntry(document.querySelectorAll('.save-content'));
 }
 
 /** Disable the save button, show the spinner, and POST the entry. */
 export function saveToDatabase(): void {
-  const $ = jq();
-  if ($('#btn-save').hasClass('disabled') || !$('#spinner-save').hasClass('invisible')) return;
+  const saveButton = document.getElementById('btn-save');
+  const spinner = document.getElementById('spinner-save');
+  if (saveButton?.classList.contains('disabled') || !spinner?.classList.contains('invisible')) {
+    return;
+  }
 
   disableSaveButton();
-  $('#spinner-save').removeClass('invisible');
+  spinner.classList.remove('invisible');
   const saveData = getSaveData();
   window.scrollTo(0, document.body.scrollHeight);
   saveEntryToDatabase(saveData);
@@ -117,18 +110,20 @@ export function saveToDatabase(): void {
 
 /** Enable the save button and nav link. */
 export function enableSaveButton(): void {
-  const $ = jq();
-  $('#btn-save').removeClass('disabled');
-  $('#btn-save').removeClass('btn-outline-success');
-  $('#btn-save').addClass('btn-success');
-  $('#save-nav-button').removeClass('disabled');
+  const button = document.getElementById('btn-save');
+  if (button === null) return;
+  button.classList.remove('disabled');
+  button.classList.remove('btn-outline-success');
+  button.classList.add('btn-success');
+  document.getElementById('save-nav-button')?.classList.remove('disabled');
 }
 
 /** Disable the save button and nav link. */
 export function disableSaveButton(): void {
-  const $ = jq();
-  $('#btn-save').removeClass('btn-success');
-  $('#btn-save').addClass('disabled');
-  $('#btn-save').addClass('btn-outline-success');
-  $('#save-nav-button').addClass('disabled');
+  const button = document.getElementById('btn-save');
+  if (button === null) return;
+  button.classList.remove('btn-success');
+  button.classList.add('disabled');
+  button.classList.add('btn-outline-success');
+  document.getElementById('save-nav-button')?.classList.add('disabled');
 }

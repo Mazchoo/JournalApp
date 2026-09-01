@@ -1,7 +1,7 @@
 import type { Editor, RawEditorOptions } from 'tinymce';
 
 import { enableSaveButton } from '../entry/save';
-import { jq, tiny, type SynthesisEditor } from '../runtime/externals';
+import { tiny, type SynthesisEditor } from '../runtime/externals';
 
 /** Port of static/JS/tiny.mce.helper.js. */
 
@@ -65,12 +65,11 @@ export function getMCEComponentHeight(name: string): number {
 
 /** Recreate a paragraph editor at its current height and synthesis state. */
 export function resetMCE(div: Element | null | undefined): void {
-  const $ = jq();
-  if (!$(div as Element).hasClass('paragraph-entry')) {
+  if (div == null || !div.classList.contains('paragraph-entry')) {
     return;
   }
 
-  const divName = div!.children[0].getAttribute('name')!;
+  const divName = div.children[0]!.getAttribute('name')!;
   const currentHeight = getMCEComponentHeight(divName);
   const editor = tiny().get(divName) as SynthesisEditor | null;
   const allowSynthesis = editor?.synthesisEnabled ?? true;

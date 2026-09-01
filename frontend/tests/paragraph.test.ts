@@ -21,9 +21,9 @@ import { installFakeTinyMCE, seedEditor, type FakeTinyMCE } from './helpers/tiny
 let tinymce: FakeTinyMCE;
 let modals: ModalStubs;
 
-/** Build a jQuery event whose target is the element matching the selector. */
-function eventFrom(selector: string): JQuery.TriggeredEvent {
-  return { target: document.querySelector(selector)! } as unknown as JQuery.TriggeredEvent;
+/** Build a click event whose target is the element matching the selector. */
+function eventFrom(selector: string): Event {
+  return { target: document.querySelector(selector)! } as unknown as Event;
 }
 
 /** Attach a TinyMCE-like iframe so the delete guard can read its innerText. */
@@ -124,7 +124,7 @@ describe('initializeNewParagraph', () => {
     initializeNewParagraph(0);
     attachEditorIframe(0, 'not empty');
 
-    window.jQuery!('#delete-content0').trigger('click');
+    document.getElementById('delete-content0')!.click();
 
     expect(modals.showCallbackModal).toHaveBeenCalledTimes(1);
   });
@@ -135,7 +135,7 @@ describe('initializeNewParagraph', () => {
     initializeNewParagraph(0);
     initializeNewParagraph(1);
 
-    window.jQuery!('#move-content-up1').trigger('click');
+    document.getElementById('move-content-up1')!.click();
 
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children[0]!.querySelector('#paragraph1')).not.toBeNull();
@@ -215,10 +215,10 @@ describe('appendParagraphToList', () => {
     expect(window.CONTENT_INDEX).toBe(2);
   });
 
-  it('tolerates being used directly as a jQuery click handler', () => {
-    window.jQuery!('#btn-new-para').on('click', appendParagraphToList);
+  it('tolerates being used directly as a click handler', () => {
+    document.getElementById('btn-new-para')!.addEventListener('click', appendParagraphToList);
 
-    window.jQuery!('#btn-new-para').trigger('click');
+    document.getElementById('btn-new-para')!.click();
 
     expect(document.getElementById('edit-area')!.children).toHaveLength(2);
     expect(tinymce.initOptions[0]!['height']).toBe(220);
@@ -237,7 +237,7 @@ describe('paragraph edit buttons after a fresh insert', () => {
     const div = appendParagraphToList()!;
     const deleteButton = div.querySelector('#delete-content2')!;
 
-    deleteParagraph({ target: deleteButton } as unknown as JQuery.TriggeredEvent);
+    deleteParagraph({ target: deleteButton } as unknown as Event);
 
     expect(modals.showCallbackModal).toHaveBeenCalledTimes(1);
     modals.confirmLast(modals.showCallbackModal);

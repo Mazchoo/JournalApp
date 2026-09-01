@@ -1,10 +1,9 @@
 import { vi, type Mock } from 'vitest';
 
-export type AjaxSettings = JQuery.AjaxSettings & {
-  success?: (response: unknown, textStatus?: string, jqXhr?: unknown) => void;
-  error?: (jqXhr: unknown, textStatus?: string, errorThrown?: string) => void;
-  complete?: (jqXhr: unknown, textStatus?: string) => void;
-};
+import { setRequestTransport } from '../../src/make-request';
+import type { RequestError, TransportSettings } from '../../src/request-interface';
+
+export type AjaxSettings = TransportSettings;
 
 export interface AjaxStub {
   calls: AjaxSettings[];
@@ -14,19 +13,18 @@ export interface AjaxStub {
   fail(errorThrown: string, jqXhr?: unknown): void;
 }
 
-/** Replace `$.ajax` so requests can be inspected and answered synchronously. */
+/** Replace the request transport so requests can be inspected and answered synchronously. */
 export function stubAjax(): AjaxStub {
   const calls: AjaxSettings[] = [];
   const mock = vi.fn((settings: AjaxSettings) => {
     calls.push(settings);
-    return undefined;
   });
-  (window.jQuery as unknown as { ajax: unknown }).ajax = mock;
+  setRequestTransport(mock as (settings: TransportSettings) => void);
 
-  /** Return the most recent `$.ajax` settings, or throw if none exist. */
+  /** Return the most recent request settings, or throw if none exist. */
   const last = (): AjaxSettings => {
     const settings = calls[calls.length - 1];
-    if (settings === undefined) throw new Error('No $.ajax call was made.');
+    if (settings === undefined) throw new Error('No request was made.');
     return settings;
   };
 
@@ -37,14 +35,14 @@ export function stubAjax(): AjaxStub {
     /** Invoke the last request's success and complete callbacks. */
     succeed: (response: unknown) => {
       const settings = last();
-      settings.success?.(response, 'success', {});
-      settings.complete?.({}, 'success');
+      settings.success?.(response);
+      settings.complete?.();
     },
     /** Invoke the last request's error and complete callbacks. */
     fail: (errorThrown: string, jqXhr: unknown = {}) => {
       const settings = last();
-      settings.error?.(jqXhr, 'error', errorThrown);
-      settings.complete?.(jqXhr, 'error');
+      settings.error?.(jqXhr as RequestError, 'error', errorThrown);
+      settings.complete?.();
     },
   };
 }

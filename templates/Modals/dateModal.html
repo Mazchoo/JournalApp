@@ -48,25 +48,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    let showDateCallbackModal = function(modalTitle, modalMessage, actionTitle, callback) {
-        var modal = $('#date-modal')[0];
-        var clonedModal = modal.cloneNode(true);
-        modal.parentNode.replaceChild(clonedModal, modal);
-
-        $('#date-modal-title')[0].innerText = modalTitle;
-        $('#date-modal-body')[0].innerText = modalMessage;
-        $('#date-modal-action')[0].innerText = actionTitle;
-        $('#date-modal-action').click(callback);
-        $('#date-modal').modal('show');
-    }
-
-    $(document).on('keypress', '#date-modal', function(e) {
-        e = e || window.event;
-        var key = e.which || e.keyCode;
-        if (key === 13) {
-            $('#date-modal-action')[0].click();
-        }
-    });
-</script>

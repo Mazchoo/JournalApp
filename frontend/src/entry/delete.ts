@@ -1,5 +1,5 @@
-import { dateSlug, deleteUrl } from '../runtime/config';
-import { csrfToken, jq } from '../runtime/externals';
+import { requestDeleteEntry } from '../make-request';
+import { dateSlug } from '../runtime/config';
 import { showCallbackModal, showMessageSimpleModal } from '../runtime/modals';
 import { reloadPage } from '../runtime/navigation';
 
@@ -7,50 +7,46 @@ import { reloadPage } from '../runtime/navigation';
 
 /** Enable the delete button. */
 export function enableDeleteButton(): void {
-  const $ = jq();
-  $('#btn-delete').removeClass('disabled');
-  $('#btn-delete').removeClass('btn-outline-danger');
-  $('#btn-delete').addClass('btn-danger');
+  const button = document.getElementById('btn-delete');
+  if (button === null) return;
+  button.classList.remove('disabled');
+  button.classList.remove('btn-outline-danger');
+  button.classList.add('btn-danger');
 }
 
 /** Disable the delete button. */
 export function disableDeleteButton(): void {
-  const $ = jq();
-  $('#btn-delete').removeClass('btn-danger');
-  $('#btn-delete').addClass('disabled');
-  $('#btn-delete').addClass('btn-outline-danger');
+  const button = document.getElementById('btn-delete');
+  if (button === null) return;
+  button.classList.remove('btn-danger');
+  button.classList.add('disabled');
+  button.classList.add('btn-outline-danger');
 }
 
 /** POST a delete request for the current date slug. */
 export function deleteFromDatabase(): void {
-  const $ = jq();
-  const csrftoken = csrfToken();
-
-  $.ajax({
-    type: 'POST',
-    url: deleteUrl(),
-    data: {
-      csrfmiddlewaretoken: csrftoken,
-      name: dateSlug(),
+  requestDeleteEntry(
+    { name: dateSlug() },
+    {
+      success: (response) => {
+        // Forwards the whole response, matching the original entry.delete.js behaviour.
+        if ('error' in response) showMessageSimpleModal('Delete Error', response);
+        if ('success' in response) reloadPage();
+      },
+      error: (_jqXhr, _textStatus, errorThrown) => {
+        showMessageSimpleModal('Unknown Error', errorThrown);
+      },
+      complete: () => {
+        document.getElementById('spinner-save')?.classList.add('invisible');
+        disableDeleteButton();
+      },
     },
-    success: (response: Record<string, string>) => {
-      // Forwards the whole response, matching the original entry.delete.js behaviour.
-      if ('error' in response) showMessageSimpleModal('Delete Error', response);
-      if ('success' in response) reloadPage();
-    },
-    error: (_jqXhr, _textStatus, errorThrown) => {
-      showMessageSimpleModal('Unknown Error', errorThrown);
-    },
-    complete: () => {
-      $('#spinner-save').addClass('invisible');
-      disableDeleteButton();
-    },
-  });
+  );
 }
 
 /** Confirm, then delete the current entry from the database. */
 export function deleteContent(): void {
-  if (jq()('#btn-delete').hasClass('disabled')) return;
+  if (document.getElementById('btn-delete')?.classList.contains('disabled')) return;
 
   showCallbackModal(
     'Are you sure?',

@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest';
 import * as journal from '../src/index';
 
 /**
- * templates/day.html calls these names directly from its inline `<script>`. Until that block
- * moves into this project, the bundle has to keep publishing them on `window` under exactly
- * the names the old static/JS files created.
+ * The IIFE still publishes the old static/JS names on `window` for standalone
+ * pages such as test_mesh.html. templates/day.html no longer calls them; boot()
+ * does that job.
  */
-const NAMES_USED_BY_DAY_HTML = [
+const NAMES_USED_BY_BOOT = [
   'initializeServerRenderedContent',
   'appendParagraphToList',
   'appendImageToList',
@@ -16,6 +16,8 @@ const NAMES_USED_BY_DAY_HTML = [
   'moveEntry',
   'zoomToImage',
   'enableDeleteButton',
+  'boot',
+  'bindDayPageHandlers',
 ] as const;
 
 /** Every function the old static/JS files leaked into the global scope. */
@@ -98,13 +100,18 @@ describe('public API', () => {
   it.each([...new Set(NAMES_FROM_STATIC_JS)])('exports %s', (name) => {
     expect(typeof (journal as Record<string, unknown>)[name]).toBe('function');
   });
+
+  it('exports boot and bindDayPageHandlers', () => {
+    expect(typeof journal.boot).toBe('function');
+    expect(typeof journal.bindDayPageHandlers).toBe('function');
+  });
 });
 
 describe('main entry point', () => {
-  it('publishes every name the inline day.html script calls', async () => {
+  it('publishes every name boot and standalone pages still call', async () => {
     await import('../src/main');
 
-    for (const name of NAMES_USED_BY_DAY_HTML) {
+    for (const name of [...NAMES_FROM_STATIC_JS, ...NAMES_USED_BY_BOOT]) {
       expect(typeof (window as unknown as Record<string, unknown>)[name]).toBe('function');
     }
   });

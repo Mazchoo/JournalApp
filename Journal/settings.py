@@ -48,7 +48,7 @@ MISSING_ICON_IMAGE = STATIC_DIR / "Image/missing_icon.png"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "testserver"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
 
 
 # Application definition
@@ -179,8 +179,12 @@ USE_TZ = False
 
 STATIC_URL = "/static/"
 
+# Vite writes the IIFE into frontend/dist, so {% static 'journal.bundle.js' %}
+# resolves there.
+FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
+
 if DEBUG:
-    STATICFILES_DIRS = (STATIC_DIR,)
+    STATICFILES_DIRS = (STATIC_DIR, FRONTEND_DIST)
 else:
     STATIC_ROOT = STATIC_DIR
 

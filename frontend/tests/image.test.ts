@@ -27,9 +27,9 @@ vi.mock('../src/entry/mesh');
 
 let ajax: AjaxStub;
 
-/** Build a jQuery event whose target is the element matching the selector. */
-function eventFrom(selector: string): JQuery.TriggeredEvent {
-  return { target: document.querySelector(selector)! } as unknown as JQuery.TriggeredEvent;
+/** Build a click event whose target is the element matching the selector. */
+function eventFrom(selector: string): Event {
+  return { target: document.querySelector(selector)! } as unknown as Event;
 }
 
 /** Wait until the given element has a non-empty `src`. */
@@ -89,11 +89,11 @@ describe('initializeNewImage', () => {
     initializeNewImage(0);
     const button = document.getElementById('allow-syn0')!;
 
-    window.jQuery!('#allow-syn0').trigger('click');
+    document.getElementById('allow-syn0')!.click();
     expect(button.classList.contains('btn-primary')).toBe(true);
     expect(button.classList.contains('btn-outline-secondary')).toBe(false);
 
-    window.jQuery!('#allow-syn0').trigger('click');
+    document.getElementById('allow-syn0')!.click();
     expect(button.classList.contains('btn-primary')).toBe(false);
     expect(button.classList.contains('btn-outline-secondary')).toBe(true);
   });
@@ -101,7 +101,7 @@ describe('initializeNewImage', () => {
   it('enables saving when the Generate button is toggled', () => {
     initializeNewImage(0);
 
-    window.jQuery!('#allow-syn0').trigger('click');
+    document.getElementById('allow-syn0')!.click();
 
     expect(document.getElementById('btn-save')!.classList.contains('btn-success')).toBe(true);
   });
@@ -109,7 +109,7 @@ describe('initializeNewImage', () => {
   it('wires the delete button of the row', () => {
     initializeNewImage(0);
 
-    window.jQuery!('#delete-content0').trigger('click');
+    document.getElementById('delete-content0')!.click();
 
     expect(document.getElementById('edit-area')!.children).toHaveLength(0);
   });
@@ -136,7 +136,7 @@ describe('appendImageToList', () => {
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children[editArea.children.length - 1]).toBe(div);
 
-    window.jQuery!('#allow-syn2').trigger('click');
+    document.getElementById('allow-syn2')!.click();
     expect(document.getElementById('allow-syn2')!.classList.contains('btn-primary')).toBe(true);
   });
 });
@@ -254,8 +254,8 @@ describe('showImageUpload', () => {
   // jsdom rejects assignment to `HTMLInputElement.files`, so the event target is a stand-in
   // carrying only the two properties the handler reads.
   /** Build a change event whose target stands in for a file input. */
-  function changeEvent(id: string, files: File[] | undefined): JQuery.TriggeredEvent {
-    return { target: { id, files } } as unknown as JQuery.TriggeredEvent;
+  function changeEvent(id: string, files: File[] | undefined): Event {
+    return { target: { id, files } } as unknown as Event;
   }
 
   it('derives the row index from the input id and uploads its files', () => {
@@ -350,7 +350,7 @@ describe('zoomToImage', () => {
   /** Click the first image area as `zoomToImage` expects. */
   function clickImageArea(): void {
     const imageArea = document.querySelector('.image-area') as HTMLElement;
-    zoomToImage.call(imageArea);
+    zoomToImage({ currentTarget: imageArea } as unknown as Event);
   }
 
   /** Stub `URL.createObjectURL`, which jsdom does not implement. */

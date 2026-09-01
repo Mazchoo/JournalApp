@@ -17,11 +17,7 @@
     <link rel="stylesheet" href="{% static 'font-awesome-4.3.0/css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/shakey.css' %}">
   
-    <!-- JS -->
-    <!-- jQuery and Bootstrap stay as globals: inline scripts in templates/Modals/*.html and
-         templates/day.html use `$` directly, and Bootstrap registers `$.fn.modal` on the
-         global jQuery instance. -->
+    <!-- JS: defer so Django-filled `var`s in the page body exist before boot() runs. -->
     <script src="{% static 'tinymce/js/prism.js' %}"></script> 
-    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script defer src="{% static 'journal.bundle.js' %}"></script>
 </head>

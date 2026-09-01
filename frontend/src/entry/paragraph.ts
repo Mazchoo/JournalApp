@@ -7,7 +7,7 @@ import {
   moveObjectUp,
 } from '../common/utility';
 import { contentIndex, paragraphTemplate, setContentIndex } from '../runtime/config';
-import { jq, tiny } from '../runtime/externals';
+import { tiny } from '../runtime/externals';
 import { showCallbackModal } from '../runtime/modals';
 import { createTinyMCE } from '../tinymce/helper';
 import { insertNewImageToPosition } from './image';
@@ -21,19 +21,16 @@ export function generateParagraphTemplate(contentInd: string | number): string {
 }
 
 /** Delete an empty paragraph immediately, or confirm before deleting text. */
-export function deleteParagraph(e: JQuery.TriggeredEvent): void {
-  const $ = jq();
-  const paragraphDivs = $(eventNameSelector(e));
+export function deleteParagraph(e: Event): void {
+  const paragraphDiv = document.querySelector(eventNameSelector(e));
   /** Remove the paragraph row and enable saving. */
   const deleteParagraphs = (): void => {
-    deleteParentDiv(paragraphDivs[0]);
+    deleteParentDiv(paragraphDiv);
     enableSaveButton();
   };
 
-  const paragraphText = paragraphDivs.find('.tox-edit-area__iframe')[0] as
-    | HTMLIFrameElement
-    | undefined;
-  if (paragraphText !== undefined) {
+  const paragraphText = paragraphDiv?.querySelector<HTMLIFrameElement>('.tox-edit-area__iframe');
+  if (paragraphText !== undefined && paragraphText !== null) {
     const paragraphContent = paragraphText.contentDocument!.body;
     if (paragraphContent.innerText.trim().length === 0) {
       deleteParagraphs();
@@ -92,19 +89,24 @@ export function initializeNewParagraph(
   paragraphText = '',
   allowSynthesis = true,
 ): void {
-  const $ = jq();
   const initFunction = createInitFunction(lastestId, paragraphText);
   createTinyMCE('#paragraph' + lastestId, height, allowSynthesis, initFunction);
 
-  $('#delete-content' + lastestId).on('click', deleteParagraph);
-  $('#insert-paragraph' + lastestId).on('click', insertNewParagraphToPosition);
-  $('#insert-image' + lastestId).on('click', insertNewImageToPosition);
-  $('#move-content-up' + lastestId).on('click', moveObjectUp);
-  $('#move-content-down' + lastestId).on('click', moveObjectDown);
+  document.getElementById('delete-content' + lastestId)?.addEventListener('click', deleteParagraph);
+  document
+    .getElementById('insert-paragraph' + lastestId)
+    ?.addEventListener('click', insertNewParagraphToPosition);
+  document
+    .getElementById('insert-image' + lastestId)
+    ?.addEventListener('click', insertNewImageToPosition);
+  document.getElementById('move-content-up' + lastestId)?.addEventListener('click', moveObjectUp);
+  document
+    .getElementById('move-content-down' + lastestId)
+    ?.addEventListener('click', moveObjectDown);
 }
 
 /** Insert a new paragraph row above the clicked row. */
-export function insertNewParagraphToPosition(e: JQuery.TriggeredEvent): HTMLElement | undefined {
+export function insertNewParagraphToPosition(e: Event): HTMLElement | undefined {
   const contendInd = String(contentIndex() + 1);
   enableSaveButton();
   return insertNewObjectIntoEditArea(e, createNewParagraph, initializeNewParagraph, contendInd);
@@ -112,13 +114,13 @@ export function insertNewParagraphToPosition(e: JQuery.TriggeredEvent): HTMLElem
 
 /** Append a new paragraph row to the edit area. */
 export function appendParagraphToList(
-  _e?: JQuery.TriggeredEvent,
+  _e?: Event,
   height = 220,
   paragraphText = '',
 ): HTMLElement {
   const div = createNewParagraph();
 
-  jq()('#edit-area')[0].appendChild(div);
+  document.getElementById('edit-area')!.appendChild(div);
   initializeNewParagraph(String(contentIndex()), height, paragraphText);
 
   return div;

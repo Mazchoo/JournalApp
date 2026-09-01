@@ -1,15 +1,15 @@
-import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'node:path';
+
+const distDir = resolve(import.meta.dirname, 'dist');
 
 export default defineConfig({
   build: {
-    // Django already serves static/JS, so the IIFE lands where the templates can load it
-    // with {% static 'JS/dist/journal.bundle.js' %}. emptyOutDir only wipes this dist
-    // folder, not jquery/bootstrap sitting next to it.
-    outDir: resolve(import.meta.dirname, '../static/JS/dist'),
+    // Django serves this folder via STATICFILES_DIRS, so templates load the IIFE
+    // with {% static 'journal.bundle.js' %}.
+    outDir: distDir,
     emptyOutDir: true,
     sourcemap: true,
-    // static/JS already shipped String.prototype.replaceAll, so nothing older is supportable.
     target: 'es2021',
     lib: {
       entry: resolve(import.meta.dirname, 'src/main.ts'),

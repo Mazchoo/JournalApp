@@ -43,7 +43,7 @@ describe('generateSaveEntry', () => {
       synthesisEnabled: false,
     });
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect(saveData['paragraph0']).toEqual<ParagraphSavePayload>({
       text: '<p>A day in the life</p>',
@@ -56,7 +56,7 @@ describe('generateSaveEntry', () => {
   it('defaults the paragraph synthesis flag to enabled', () => {
     seedEditor(tinymce, 'paragraph0', { content: 'text' });
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect((saveData['paragraph0'] as ParagraphSavePayload).allow_ai_synthesis).toBe(1);
   });
@@ -67,7 +67,7 @@ describe('generateSaveEntry', () => {
     setUploadLabel(1, 'sunrise.png');
     document.getElementById('allow-syn1')!.classList.add('btn-primary');
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect(saveData['image1']).toEqual<MediaSavePayload>({
       file_path: 'sunrise.png',
@@ -79,7 +79,7 @@ describe('generateSaveEntry', () => {
   it('skips media elements that have no source', () => {
     seedEditor(tinymce, 'paragraph0');
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect(Object.keys(saveData)).toEqual(['paragraph0']);
   });
@@ -89,7 +89,7 @@ describe('generateSaveEntry', () => {
     setSrc('image1', 'data:image/png;base64,AAA');
     setUploadLabel(1, 'sunrise.png');
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect((saveData['image1'] as MediaSavePayload).allow_ai_synthesis).toBe(0);
   });
@@ -101,7 +101,7 @@ describe('generateSaveEntry', () => {
     setUploadLabel(0, 'holiday.mp4');
     document.getElementById('allow-syn0')!.classList.add('btn-primary');
 
-    const saveData = generateSaveEntry(window.jQuery!('.save-content'))!;
+    const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
     expect(saveData['video0']).toEqual<MediaSavePayload>({
       file_path: 'holiday.mp4',

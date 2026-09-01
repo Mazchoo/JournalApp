@@ -56,14 +56,9 @@
        {% csrf_token %}
     </div>
     
-    <script src="{% static 'js/dist/journal.bundle.js' %}"></script>
-
     <!--
-      frontend/src reads these values off `window` and calls the handlers below by their
-      global names. Everything from `initializeServerRenderedContent()` down can move into
-      frontend/src/main.ts once the templated values above it are exposed some other way
-      (a json_script block or data attributes); the `var` declarations have to stay here
-      because only Django can fill them in.
+      Only Django can fill these values. frontend/src/boot.ts reads them off `window`
+      after this block runs (journal.bundle.js is deferred from the header).
     -->
     <script>
         var CONTENT_INDEX = {{ content_list|length }};
@@ -71,8 +66,8 @@
             var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" %}`;
             var IMAGE_TEMPLATE = `{% include "EntryContents/Image.html" %}`;
         {% endwith %}
-        var THREE_JS_URL = '{% static "JS/three.webgpu.full.min.js" %}';
         var DATE_SLUG = '{{date_slug}}';
+        var ENTRY_EXISTS = {{ entry_exists|yesno:"true,false" }};
         var SAVE_URL = '{% url "main:save-entry" %}';
         var DELETE_URL = '{% url "main:delete-entry" %}';
         var IMAGE_URL = '{% url "main:get-image" %}';
@@ -80,19 +75,5 @@
         var VIDEO_URL = '{% url "main:get-video" %}';
         var DOWNSIZED_VIDEO_IMAGE_URL = '{% url "main:get-downsized-video-image" %}';
         var MOVE_URL = '{% url "main:move-date" %}';
-
-        initializeServerRenderedContent();
-
-        $('#btn-new-para').click(appendParagraphToList);
-        $('#btn-new-image').click(appendImageToList);
-        $('#btn-delete').click(deleteContent);
-        $('#btn-save').click(saveToDatabase);
-        $('#save-nav-button').click(saveToDatabase);
-        $('#btn-move').click(moveEntry);
-
-        $('.image-area').click(zoomToImage);
-        {% if entry_exists %}
-            enableDeleteButton();
-        {% endif %}
     </script>
 </body>

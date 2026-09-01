@@ -1,48 +1,51 @@
-import { dateSlug, moveUrl } from '../runtime/config';
-import { csrfToken, jq } from '../runtime/externals';
+import { requestMoveEntry } from '../make-request';
+import { dateSlug } from '../runtime/config';
 import { showDateCallbackModal, showMessageSimpleModal } from '../runtime/modals';
 import { replaceLocation } from '../runtime/navigation';
 
 /** Port of static/JS/entry.move.js. */
 
+/** Return the selected option value of a `<select>`, or an empty string. */
+function selectedValue(selectId: string): string {
+  const select = document.getElementById(selectId) as HTMLSelectElement | null;
+  return select?.value ?? '';
+}
+
 /** Build a YYYY-MM-DD slug from the date modal selects. */
 export function getDestinationSlug(): string {
-  const $ = jq();
-  let destDay = String($('#date-modal-day').children('option:selected').val());
+  let destDay = selectedValue('date-modal-day');
   if (destDay.length === 1) destDay = '0' + destDay;
-  let destMonth = String(($('#date-modal-month').prop('selectedIndex') as number) + 1);
+  const monthSelect = document.getElementById('date-modal-month') as HTMLSelectElement | null;
+  let destMonth = String((monthSelect?.selectedIndex ?? 0) + 1);
   if (destMonth.length === 1) destMonth = '0' + destMonth;
-  const destYear = String($('#date-modal-year').children('option:selected').val());
+  const destYear = selectedValue('date-modal-year');
 
   return `${destYear}-${destMonth}-${destDay}`;
 }
 
 /** POST a move from the current date to the chosen destination. */
 export function makeMoveRequest(): void {
-  const $ = jq();
-  const csrftoken = csrfToken();
   const destinationSlug = getDestinationSlug();
 
-  $('#spinner-save').removeClass('invisible');
-  $.ajax({
-    type: 'POST',
-    url: moveUrl(),
-    data: {
-      csrfmiddlewaretoken: csrftoken,
+  document.getElementById('spinner-save')?.classList.remove('invisible');
+  requestMoveEntry(
+    {
       move_from: dateSlug(),
       move_to: destinationSlug,
     },
-    success: (response: Record<string, string>) => {
-      if ('error' in response) showMessageSimpleModal('Move Status', response['error']);
-      if ('new_date' in response) replaceLocation(response['new_date']);
+    {
+      success: (response) => {
+        if (response.error !== undefined) showMessageSimpleModal('Move Status', response.error);
+        if (response.new_date !== undefined) replaceLocation(response.new_date);
+      },
+      error: (_jqXhr, _textStatus, errorThrown) => {
+        showMessageSimpleModal('Unknown Error', errorThrown);
+      },
+      complete: () => {
+        document.getElementById('spinner-save')?.classList.add('invisible');
+      },
     },
-    error: (_jqXhr, _textStatus, errorThrown) => {
-      showMessageSimpleModal('Unknown Error', errorThrown);
-    },
-    complete: () => {
-      $('#spinner-save').addClass('invisible');
-    },
-  });
+  );
 }
 
 /** Open the date modal and move the entry once confirmed. */

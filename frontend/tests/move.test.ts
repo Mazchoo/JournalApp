@@ -12,7 +12,8 @@ let modals: ModalStubs;
 
 /** Select an option on a date-modal `<select>` by value. */
 function selectOption(selectId: string, value: string): void {
-  window.jQuery!(`#${selectId}`).val(value);
+  const select = document.getElementById(selectId) as HTMLSelectElement;
+  select.value = value;
 }
 
 beforeEach(() => {

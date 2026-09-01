@@ -1,14 +1,12 @@
 import * as journal from './index';
+import { boot } from './boot';
 
 /**
  * Bundle entry point.
  *
- * The old static/JS files declared everything at top-level script scope, which made each
- * function a property of `window`. The inline `<script>` at the bottom of templates/day.html
- * still calls those names directly, so the bundle re-publishes them under the same names.
- * Once that inline block is moved into this project, this file can shrink to a single
- * bootstrap call and the globals can go away.
+ * The IIFE still publishes the public API on `window` so pages like test_mesh.html
+ * can call `initializeMeshRenderer` by name. Page wiring (day editor, carousel,
+ * modals) runs here; templates no longer contain jQuery or inline handlers.
  */
 Object.assign(window, journal);
-
-export {};
+boot();

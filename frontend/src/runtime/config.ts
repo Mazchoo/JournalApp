@@ -2,7 +2,7 @@
  * Accessors for the values templates/day.html declares as `var` globals.
  *
  * They are read on every access because the inline `<script>` that defines them runs after
- * the bundle is evaluated, and `CONTENT_INDEX` is mutated as content rows are added.
+ * the deferred bundle is fetched, and `CONTENT_INDEX` is mutated as content rows are added.
  */
 
 /** Return the current CONTENT_INDEX global. */
@@ -28,6 +28,11 @@ export function imageTemplate(): string {
 /** Return the current date slug global. */
 export function dateSlug(): string {
   return window.DATE_SLUG;
+}
+
+/** Return whether this date already has a saved entry. */
+export function entryExists(): boolean {
+  return window.ENTRY_EXISTS;
 }
 
 /** Return the save endpoint URL. */

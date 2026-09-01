@@ -1,9 +1,12 @@
 /**
  * Public surface of the frontend project.
  *
- * Every name exported here was a global in static/JS, so the export names must stay in sync
- * with what templates/day.html calls from its inline `<script>`.
+ * The IIFE copies these names onto `window` so standalone pages (test_mesh.html)
+ * can still call them. templates/day.html no longer calls them itself; `boot()`
+ * wires the editor, carousel, and modals.
  */
+
+export { boot, bindDayPageHandlers } from './boot';
 
 export {
   changeTooltipTextFromInput,
@@ -84,5 +87,5 @@ export {
 export { getDestinationSlug, makeMoveRequest, moveEntry } from './entry/move';
 
 export type { ImageContent } from './entry/image';
-export type { MediaSavePayload, ParagraphSavePayload, SaveData } from './entry/save';
+export type { MediaSavePayload, ParagraphSavePayload, SaveData } from './request-interface';
 export type { SynthesisEditor } from './runtime/externals';

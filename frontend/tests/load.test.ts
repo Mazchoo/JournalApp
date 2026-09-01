@@ -135,7 +135,7 @@ describe('initializeServerRenderedContent', () => {
   it('wires the edit buttons of the media rows', () => {
     initializeServerRenderedContent();
 
-    window.jQuery!('#allow-syn1').trigger('click');
+    document.getElementById('allow-syn1')!.click();
 
     expect(document.getElementById('allow-syn1')!.classList.contains('btn-primary')).toBe(true);
   });

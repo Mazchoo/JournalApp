@@ -10,8 +10,10 @@ import {
   moveObjectDown,
   moveObjectUp,
 } from '../common/utility';
-import { contentIndex, dateSlug, imageTemplate, imageUrl, setContentIndex, videoUrl } from '../runtime/config';
-import { csrfToken, jq } from '../runtime/externals';
+import { requestFullImage, requestFullVideo } from '../make-request';
+import type { JsonErrorResponse } from '../request-interface';
+import { contentIndex, dateSlug, imageTemplate, setContentIndex } from '../runtime/config';
+import { showModal } from '../runtime/modals';
 import { initializeMeshRenderer } from './mesh';
 import { insertNewParagraphToPosition } from './paragraph';
 import { enableSaveButton } from './save';
@@ -23,6 +25,19 @@ export interface ImageContent {
   base64?: string;
   file_name?: string;
   allow_ai_synthesis?: number;
+}
+
+/** Apply or remove the two Generate-button classes according to the synthesis flag. */
+function setSynthesisButtonState(button: HTMLElement, isActive: boolean): void {
+  button.classList.toggle('btn-primary', isActive);
+  button.classList.toggle('btn-outline-secondary', !isActive);
+}
+
+/** Hide an element without removing it from layout calculations. */
+function hideMedia(element: HTMLElement | null): void {
+  if (element === null) return;
+  element.style.visibility = 'hidden';
+  element.style.height = '0px';
 }
 
 /** Fill the image row template for the given content index. */
@@ -41,30 +56,37 @@ export function createNewImage(): HTMLElement {
 }
 
 /** Remove the clicked image row and enable saving. */
-export function deleteImage(e: JQuery.TriggeredEvent): void {
-  const imageDivs = jq()(eventNameSelector(e));
-  deleteParentDiv(imageDivs[0]);
+export function deleteImage(e: Event): void {
+  const imageDiv = document.querySelector(eventNameSelector(e));
+  deleteParentDiv(imageDiv);
   enableSaveButton();
 }
 
 /** Bind edit, upload, and synthesis handlers on an image row. */
 export function initializeNewImage(lastestId: string | number): void {
-  const $ = jq();
-  $('#upload' + lastestId).on('change', showImageUpload);
+  document.getElementById('upload' + lastestId)?.addEventListener('change', showImageUpload);
 
-  $('#delete-content' + lastestId).on('click', deleteImage);
-  $('#insert-paragraph' + lastestId).on('click', insertNewParagraphToPosition);
-  $('#insert-image' + lastestId).on('click', insertNewImageToPosition);
-  $('#move-content-up' + lastestId).on('click', moveObjectUp);
-  $('#move-content-down' + lastestId).on('click', moveObjectDown);
-  $('#allow-syn' + lastestId).on('click', function (this: HTMLElement) {
-    $(this).toggleClass('btn-primary btn-outline-secondary');
+  document.getElementById('delete-content' + lastestId)?.addEventListener('click', deleteImage);
+  document
+    .getElementById('insert-paragraph' + lastestId)
+    ?.addEventListener('click', insertNewParagraphToPosition);
+  document
+    .getElementById('insert-image' + lastestId)
+    ?.addEventListener('click', insertNewImageToPosition);
+  document.getElementById('move-content-up' + lastestId)?.addEventListener('click', moveObjectUp);
+  document
+    .getElementById('move-content-down' + lastestId)
+    ?.addEventListener('click', moveObjectDown);
+  document.getElementById('allow-syn' + lastestId)?.addEventListener('click', (event) => {
+    const button = event.currentTarget as HTMLElement;
+    button.classList.toggle('btn-primary');
+    button.classList.toggle('btn-outline-secondary');
     enableSaveButton();
   });
 }
 
 /** Insert a new image row above the clicked row. */
-export function insertNewImageToPosition(e: JQuery.TriggeredEvent): HTMLElement | undefined {
+export function insertNewImageToPosition(e: Event): HTMLElement | undefined {
   const contendInd = String(contentIndex() + 1);
   enableSaveButton();
   return insertNewObjectIntoEditArea(e, createNewImage, initializeNewImage, contendInd);
@@ -74,7 +96,7 @@ export function insertNewImageToPosition(e: JQuery.TriggeredEvent): HTMLElement 
 export function appendImageToList(): HTMLElement {
   const div = createNewImage();
 
-  jq()('#edit-area')[0].appendChild(div);
+  document.getElementById('edit-area')!.appendChild(div);
   initializeNewImage(String(contentIndex()));
 
   return div;
@@ -82,12 +104,12 @@ export function appendImageToList(): HTMLElement {
 
 /** Preview an image file as a data URL. */
 export function readImageResource(inputFile: File, contentId: string | number): void {
-  const $ = jq();
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    $('#video' + contentId).css({ visibility: 'hidden', height: 0 });
-    $('#image' + contentId).attr('src', e.target!.result as string);
+    hideMedia(document.getElementById('video' + contentId));
+    const image = document.getElementById('image' + contentId);
+    if (image !== null) image.setAttribute('src', e.target!.result as string);
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
@@ -95,12 +117,15 @@ export function readImageResource(inputFile: File, contentId: string | number): 
 
 /** Preview a video file as a data URL. */
 export function readVideoResource(inputFile: File, contentId: string | number): void {
-  const $ = jq();
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    $('#video' + contentId).css({ visibility: 'visible', height: 'auto' });
-    $('#video' + contentId).attr('src', e.target!.result as string);
+    const video = document.getElementById('video' + contentId);
+    if (video !== null) {
+      video.style.visibility = 'visible';
+      video.style.height = 'auto';
+      video.setAttribute('src', e.target!.result as string);
+    }
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
@@ -108,25 +133,20 @@ export function readVideoResource(inputFile: File, contentId: string | number): 
 
 /** Hide 2D media and start a GLB preview on the canvas. */
 export function loadMeshResource(inputFile: File, contentId: string | number): void {
-  const $ = jq();
-  // Hide image and video elements
-  $('#image' + contentId).css({ visibility: 'hidden', height: 0 });
-  $('#video' + contentId).css({ visibility: 'hidden', height: 0 });
+  hideMedia(document.getElementById('image' + contentId));
+  hideMedia(document.getElementById('video' + contentId));
 
-  // Show canvas for 3D rendering
-  const canvas = $('#mesh-canvas' + contentId);
-  canvas.css({
-    visibility: 'visible',
-    height: '400px',
-    display: 'block',
-    opacity: '1',
-    position: 'relative',
-    zIndex: '1',
-  });
-
-  // Initialize mesh renderer using the mesh module
-  if (canvas[0]) {
-    initializeMeshRenderer(canvas[0] as HTMLCanvasElement, inputFile, () => {
+  const canvas = document.getElementById('mesh-canvas' + contentId) as HTMLCanvasElement | null;
+  if (canvas !== null) {
+    Object.assign(canvas.style, {
+      visibility: 'visible',
+      height: '400px',
+      display: 'block',
+      opacity: '1',
+      position: 'relative',
+      zIndex: '1',
+    });
+    initializeMeshRenderer(canvas, inputFile, () => {
       enableSaveButton();
     });
   } else {
@@ -136,9 +156,8 @@ export function loadMeshResource(inputFile: File, contentId: string | number): v
 
 /** Write the uploaded file name into the row label. */
 export function showFileName(inputFile: File, contentId: string | number): void {
-  const infoArea = jq()('#upload-label' + contentId)[0];
-  const fileName = inputFile.name;
-  infoArea.textContent = fileName;
+  const infoArea = document.getElementById('upload-label' + contentId);
+  if (infoArea !== null) infoArea.textContent = inputFile.name;
 }
 
 /** Route each selected file to the matching media preview. */
@@ -146,14 +165,13 @@ export function uploadAllMediaFiles(
   contentInd: string | number,
   inputFiles: FileList | File[],
 ): void {
-  const $ = jq();
   for (let i = inputFiles.length - 1; i >= 0; i--) {
     if (i < inputFiles.length - 1) {
-      $('#insert-image' + contentInd).trigger('click');
+      document.getElementById('insert-image' + contentInd)?.click();
       contentInd = contentIndex();
     }
 
-    const inputFile = inputFiles[i];
+    const inputFile = inputFiles[i]!;
     if (isVideoFile(inputFile.name)) {
       readVideoResource(inputFile, contentInd);
     } else if (isImageFile(inputFile.name)) {
@@ -169,7 +187,7 @@ export function uploadAllMediaFiles(
 }
 
 /** Upload the files chosen on a row's file input. */
-export function showImageUpload(self: JQuery.TriggeredEvent): void {
+export function showImageUpload(self: Event): void {
   const input = self.target as HTMLInputElement;
   if (!(input.id && input.files)) return;
 
@@ -182,18 +200,16 @@ export function editImageContent(
   updateInd: string | number,
   imageContent: ImageContent,
 ): boolean | undefined {
-  const $ = jq();
-  const imageArea = $('#image' + updateInd);
-  const infoArea = $('#upload-label' + updateInd);
-  const allowSynthesis = $('#allow-syn' + updateInd);
-  if (imageArea[0] == undefined || infoArea[0] == undefined || allowSynthesis[0] == undefined) {
+  const imageArea = document.getElementById('image' + updateInd);
+  const infoArea = document.getElementById('upload-label' + updateInd);
+  const allowSynthesis = document.getElementById('allow-syn' + updateInd);
+  if (imageArea == null || infoArea == null || allowSynthesis == null) {
     return undefined;
   }
 
-  imageArea.attr('src', imageContent['base64']!);
-  const isActive = imageContent['allow_ai_synthesis'] === 1;
-  allowSynthesis.toggleClass('btn-primary', isActive).toggleClass('btn-outline-secondary', !isActive);
-  infoArea.text(imageContent['file_name']!);
+  imageArea.setAttribute('src', imageContent['base64']!);
+  setSynthesisButtonState(allowSynthesis, imageContent['allow_ai_synthesis'] === 1);
+  infoArea.textContent = imageContent['file_name']!;
   return true;
 }
 
@@ -202,99 +218,90 @@ export function editImageMeta(
   updateInd: string | number,
   imageContent: ImageContent,
 ): boolean | undefined {
-  const $ = jq();
-  const infoArea = $('#upload-label' + updateInd);
-  const originalCheck = $('#allow-syn' + updateInd);
-  if (infoArea[0] == undefined || originalCheck[0] == undefined) {
+  const infoArea = document.getElementById('upload-label' + updateInd);
+  const originalCheck = document.getElementById('allow-syn' + updateInd);
+  if (infoArea == null || originalCheck == null) {
     return undefined;
   }
 
-  const isActiveMeta = imageContent['allow_ai_synthesis'] === 1;
-  originalCheck
-    .toggleClass('btn-primary', isActiveMeta)
-    .toggleClass('btn-outline-secondary', !isActiveMeta);
-  infoArea.text(imageContent['file_name']!);
+  setSynthesisButtonState(originalCheck, imageContent['allow_ai_synthesis'] === 1);
+  infoArea.textContent = imageContent['file_name']!;
   return true;
 }
 
 /** Treat the media element as a video thumbnail. */
 export function changeImageToVideoClass(updateInd: string | number): boolean | undefined {
-  const imageArea = jq()('#image' + updateInd);
-  if (imageArea[0] == undefined) {
+  const imageArea = document.getElementById('image' + updateInd);
+  if (imageArea == null) {
     return undefined;
   }
 
-  imageArea.removeClass('content-image');
-  imageArea.addClass('content-video');
-  imageArea.css({ visibility: 'visible', height: 'auto' });
+  imageArea.classList.remove('content-image');
+  imageArea.classList.add('content-video');
+  imageArea.style.visibility = 'visible';
+  imageArea.style.height = 'auto';
   return true;
 }
 
 /** Open the full image or video in a modal. */
-export function zoomToImage(this: HTMLElement): void {
-  const $ = jq();
-  const imageId = $(this).find('img').attr('id')!;
-  const contentId = getContentId(imageId);
+export function zoomToImage(event: Event): void {
+  const area = event.currentTarget as HTMLElement;
+  const image = area.querySelector('img');
+  if (image === null) return;
+
+  const contentId = getContentId(image.id);
 
   if (contentId === -1) return;
-  const imageName = $('#upload-label' + contentId).html();
-  const csrftoken = csrfToken();
+  const imageName = document.getElementById('upload-label' + contentId)?.innerHTML ?? '';
 
-  const image = $(this).find('img');
-  let imageSource = image.attr('src');
+  let imageSource = image.getAttribute('src');
 
-  if ($(image).hasClass('content-image')) {
-    $.ajax({
-      type: 'POST',
-      url: imageUrl(),
-      data: {
+  if (image.classList.contains('content-image')) {
+    requestFullImage(
+      {
         file: imageName,
-        csrfmiddlewaretoken: csrftoken,
         name: dateSlug(),
       },
-      success: (response: Record<string, string>) => {
-        if ('base64' in response) imageSource = response['base64'];
-        if ('error' in response) console.log(`Image error : ${response['error']}`);
-      },
-      error: (_jqXhr, _textStatus, errorThrown) => {
-        console.log(`Unknown error : ${errorThrown}`);
-      },
-      complete: () => {
-        $('#image-preview').attr('src', imageSource!);
-        $('#image-modal').modal('show');
-      },
-    });
-  } else if ($(image).hasClass('content-video')) {
-    $.ajax({
-      type: 'POST',
-      url: videoUrl(),
-      data: {
-        file: imageName,
-        csrfmiddlewaretoken: csrftoken,
-        name: dateSlug(),
-      },
-      xhrFields: {
-        responseType: 'blob',
-      },
-      success: (response: BlobPart) => {
-        // Create a blob URL from the streaming video response
-        const videoBlob = new Blob([response], { type: 'video/mp4' });
-        imageSource = URL.createObjectURL(videoBlob);
-      },
-      error: (jqXhr, _textStatus, errorThrown) => {
-        // Check if response is JSON error
-        const responseJSON = jqXhr.responseJSON as Record<string, string> | undefined;
-        if (responseJSON && 'error' in responseJSON) {
-          console.log(`Video error : ${responseJSON['error']}`);
-        } else {
+      {
+        success: (response) => {
+          if (response.base64 !== undefined) imageSource = response.base64;
+          if ('error' in response) console.log(`Image error : ${response['error']}`);
+        },
+        error: (_jqXhr, _textStatus, errorThrown) => {
           console.log(`Unknown error : ${errorThrown}`);
-        }
+        },
+        complete: () => {
+          const preview = document.getElementById('image-preview');
+          if (preview !== null) preview.setAttribute('src', imageSource!);
+          showModal('image-modal');
+        },
       },
-      complete: () => {
-        // Use the dedicated video modal
-        $('#video-preview').attr('src', imageSource!);
-        $('#video-modal').modal('show');
+    );
+  } else if (image.classList.contains('content-video')) {
+    requestFullVideo(
+      {
+        file: imageName,
+        name: dateSlug(),
       },
-    });
+      {
+        success: (response) => {
+          const videoBlob = new Blob([response], { type: 'video/mp4' });
+          imageSource = URL.createObjectURL(videoBlob);
+        },
+        error: (jqXhr, _textStatus, errorThrown) => {
+          const responseJSON = jqXhr.responseJSON as JsonErrorResponse | undefined;
+          if (responseJSON && 'error' in responseJSON) {
+            console.log(`Video error : ${responseJSON['error']}`);
+          } else {
+            console.log(`Unknown error : ${errorThrown}`);
+          }
+        },
+        complete: () => {
+          const preview = document.getElementById('video-preview');
+          if (preview !== null) preview.setAttribute('src', imageSource!);
+          showModal('video-modal');
+        },
+      },
+    );
   }
 }
