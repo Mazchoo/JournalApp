@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "TypeScript frontend for the Journal Django app. Builds a single bundle that replaces the per-file scripts in static/JS.",
+  "description": "TypeScript frontend for the Journal Django app. Builds static/JS/dist/journal.bundle.js.",
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch",

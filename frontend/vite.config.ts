@@ -3,9 +3,10 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   build: {
-    // Stays inside frontend/. Wiring the bundle up to Django is a separate, deliberate step:
-    // see the switchover notes in README.md.
-    outDir: 'dist',
+    // Django already serves static/JS, so the IIFE lands where the templates can load it
+    // with {% static 'JS/dist/journal.bundle.js' %}. emptyOutDir only wipes this dist
+    // folder, not jquery/bootstrap sitting next to it.
+    outDir: resolve(import.meta.dirname, '../static/JS/dist'),
     emptyOutDir: true,
     sourcemap: true,
     // static/JS already shipped String.prototype.replaceAll, so nothing older is supportable.
@@ -14,6 +15,7 @@ export default defineConfig({
       entry: resolve(import.meta.dirname, 'src/main.ts'),
       name: 'Journal',
       formats: ['iife'],
+      /** Return the IIFE bundle file name Django templates load. */
       fileName: () => 'journal.bundle.js',
     },
   },

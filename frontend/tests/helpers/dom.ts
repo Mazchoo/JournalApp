@@ -51,6 +51,7 @@ export const CSRF_TOKEN = 'test-csrf-token';
 
 export type RowKind = 'paragraph' | 'image' | 'video';
 
+/** Render one content row of the given kind at the given index. */
 function renderRow(kind: RowKind, index: number): string {
   if (kind === 'paragraph') {
     return `<div class="row mt-3 paragraph-entry">${PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', String(index))}</div>`;
@@ -71,7 +72,7 @@ export interface DayPageOptions {
   contentIndex?: number;
 }
 
-/** Renders the parts of templates/day.html (and the modals it includes) that the JS touches. */
+/** Render the parts of templates/day.html that the JS touches. */
 export function renderDayPage(options: DayPageOptions = {}): void {
   const rows = options.rows ?? [];
 
@@ -118,7 +119,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
   installTemplateGlobals(options.contentIndex ?? rows.length);
 }
 
-/** Mirrors the `var` declarations in the inline script at the bottom of templates/day.html. */
+/** Mirror the var declarations from templates/day.html. */
 export function installTemplateGlobals(contentIndex: number): void {
   window.CONTENT_INDEX = contentIndex;
   window.PARAGRAPH_TEMPLATE = PARAGRAPH_TEMPLATE;
@@ -138,11 +139,11 @@ export interface ModalStubs {
   showCallbackModal: Mock;
   showMessageSimpleModal: Mock;
   showDateCallbackModal: Mock;
-  /** Runs the callback the last `showCallbackModal` / `showDateCallbackModal` was given. */
+  /** Run the callback the last `showCallbackModal` / `showDateCallbackModal` was given. */
   confirmLast(stub: Mock): void;
 }
 
-/** Stands in for the helpers defined inline by templates/Modals/*.html. */
+/** Stand in for the helpers defined inline by templates/Modals/*.html. */
 export function installModalStubs(): ModalStubs {
   const showCallbackModal = vi.fn();
   const showMessageSimpleModal = vi.fn();
@@ -158,6 +159,7 @@ export function installModalStubs(): ModalStubs {
     showCallbackModal,
     showMessageSimpleModal,
     showDateCallbackModal,
+    /** Run the callback the last confirm or date modal was given. */
     confirmLast: (stub: Mock) => {
       const call = stub.mock.calls[stub.mock.calls.length - 1];
       if (call === undefined) throw new Error('The modal was never shown.');
@@ -166,12 +168,12 @@ export function installModalStubs(): ModalStubs {
   };
 }
 
-/** Builds a `File` with a name whose extension drives the media-type branching. */
+/** Build a File whose extension drives media-type branching. */
 export function fileNamed(name: string, contents = 'x', type = ''): File {
   return new File([contents], name, { type });
 }
 
-/** jsdom does not implement `innerText`; the paragraph delete guard reads it. */
+/** Define innerText on an element, which jsdom does not implement. */
 export function defineInnerText(element: HTMLElement, value: string): void {
   Object.defineProperty(element, 'innerText', { value, configurable: true });
 }

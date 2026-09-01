@@ -50,6 +50,7 @@ export interface FakeTinyMCE {
 
 const DEFAULT_CONTAINER_HEIGHT = 300;
 
+/** Build a TinyMCE editor stand-in owned by the given fake. */
 function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
   const editor: FakeEditor = {
     id,
@@ -59,26 +60,34 @@ function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
     buttons: {},
     toggleButtons: {},
     handlers: {},
+    /** Return the current editor HTML. */
     getContent: () => editor.content,
+    /** Replace the editor HTML. */
     setContent: (value: string) => {
       editor.content = value;
     },
+    /** Return the fake editor container. */
     getContainer: () => ({ clientHeight: editor.containerHeight }),
+    /** Mark the editor removed and drop it from the owner. */
     remove: () => {
       editor.removed = true;
       owner.editors.delete(id);
     },
+    /** Register an event handler. */
     on: (name: string, handler: () => void) => {
       (editor.handlers[name] ??= []).push(handler);
     },
+    /** Fire every handler registered for an event. */
     fire: (name: string) => {
       (editor.handlers[name] ?? []).forEach((handler) => handler());
     },
     ui: {
       registry: {
+        /** Register a toolbar button spec. */
         addButton: (name: string, spec: FakeButtonSpec) => {
           editor.buttons[name] = spec;
         },
+        /** Register a toolbar toggle-button spec. */
         addToggleButton: (name: string, spec: FakeToggleButtonSpec) => {
           editor.toggleButtons[name] = spec;
         },
@@ -88,12 +97,14 @@ function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
   return editor;
 }
 
-/** Replaces `window.tinymce` / `window.tinyMCE` with the fake and returns it. */
+/** Replace `window.tinymce` / `window.tinyMCE` with the fake and return it. */
 export function installFakeTinyMCE(): FakeTinyMCE {
   const fake: FakeTinyMCE = {
     editors: new Map<string, FakeEditor>(),
     initOptions: [],
+    /** Return the editor registered under the given id, if any. */
     get: (id: string) => fake.editors.get(id) ?? null,
+    /** Create an editor for the selector, run setup, and fire init. */
     init: (options: RawEditorOptions) => {
       fake.initOptions.push(options);
       const selector = String(options['selector'] ?? '');
@@ -113,7 +124,7 @@ export function installFakeTinyMCE(): FakeTinyMCE {
   return fake;
 }
 
-/** Registers an already-initialised editor, as if the page had been loaded with content. */
+/** Register an already-initialised editor as if the page had loaded content. */
 export function seedEditor(
   tinymce: FakeTinyMCE,
   id: string,
@@ -125,10 +136,11 @@ export function seedEditor(
   return editor;
 }
 
-/** Creates a toggle-button API object of the shape TinyMCE hands to `onAction` / `onSetup`. */
+/** Create a toggle-button API of the shape TinyMCE hands to `onAction` / `onSetup`. */
 export function toggleButtonApi(): FakeToggleButtonApi {
   const api: FakeToggleButtonApi = {
     active: false,
+    /** Record the toggle button's active state. */
     setActive: (state: boolean) => {
       api.active = state;
     },
@@ -136,6 +148,7 @@ export function toggleButtonApi(): FakeToggleButtonApi {
   return api;
 }
 
+/** Cast a fake editor to the synthesis-enabled editor type. */
 export function asSynthesisEditor(editor: FakeEditor): SynthesisEditor {
   return editor as unknown as SynthesisEditor;
 }

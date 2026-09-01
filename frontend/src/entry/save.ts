@@ -22,6 +22,7 @@ export interface MediaSavePayload {
 
 export type SaveData = Record<string, ParagraphSavePayload | MediaSavePayload>;
 
+/** Build the save payload from the current content elements. */
 export function generateSaveEntry(saveContent: JQuery | null): SaveData | undefined {
   if (saveContent === null) return undefined;
   const $ = jq();
@@ -67,6 +68,7 @@ export function generateSaveEntry(saveContent: JQuery | null): SaveData | undefi
   return saveData;
 }
 
+/** POST the save payload and report the result. */
 export function saveEntryToDatabase(saveData: SaveData | null | undefined): void {
   if (saveData === null) return;
   const $ = jq();
@@ -95,11 +97,13 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
   });
 }
 
+/** Collect the save payload from every `.save-content` element. */
 export function getSaveData(): SaveData | undefined {
   const saveContent = jq()('.save-content');
   return generateSaveEntry(saveContent);
 }
 
+/** Disable the save button, show the spinner, and POST the entry. */
 export function saveToDatabase(): void {
   const $ = jq();
   if ($('#btn-save').hasClass('disabled') || !$('#spinner-save').hasClass('invisible')) return;
@@ -111,6 +115,7 @@ export function saveToDatabase(): void {
   saveEntryToDatabase(saveData);
 }
 
+/** Enable the save button and nav link. */
 export function enableSaveButton(): void {
   const $ = jq();
   $('#btn-save').removeClass('disabled');
@@ -119,6 +124,7 @@ export function enableSaveButton(): void {
   $('#save-nav-button').removeClass('disabled');
 }
 
+/** Disable the save button and nav link. */
 export function disableSaveButton(): void {
   const $ = jq();
   $('#btn-save').removeClass('btn-success');

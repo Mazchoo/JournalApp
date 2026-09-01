@@ -5,6 +5,7 @@ import { jq, tiny, type SynthesisEditor } from '../runtime/externals';
 
 /** Port of static/JS/tiny.mce.helper.js. */
 
+/** Initialise a TinyMCE editor with the journal toolbar. */
 export function createTinyMCE(
   componentName: string,
   height: number,
@@ -57,10 +58,12 @@ export function createTinyMCE(
   tiny().init(options);
 }
 
+/** Return the editor container height plus two pixels. */
 export function getMCEComponentHeight(name: string): number {
   return tiny().get(name)!.getContainer().clientHeight + 2;
 }
 
+/** Recreate a paragraph editor at its current height and synthesis state. */
 export function resetMCE(div: Element | null | undefined): void {
   const $ = jq();
   if (!$(div as Element).hasClass('paragraph-entry')) {

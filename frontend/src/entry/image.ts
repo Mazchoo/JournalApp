@@ -25,10 +25,12 @@ export interface ImageContent {
   allow_ai_synthesis?: number;
 }
 
+/** Fill the image row template for the given content index. */
 export function generateImageTemplate(contentInd: string | number): string {
   return imageTemplate().replaceAll('__INDEX__', String(contentInd));
 }
 
+/** Allocate the next content index and build an image row. */
 export function createNewImage(): HTMLElement {
   setContentIndex(contentIndex() + 1);
   return componentFromTemplate(
@@ -38,12 +40,14 @@ export function createNewImage(): HTMLElement {
   );
 }
 
+/** Remove the clicked image row and enable saving. */
 export function deleteImage(e: JQuery.TriggeredEvent): void {
   const imageDivs = jq()(eventNameSelector(e));
   deleteParentDiv(imageDivs[0]);
   enableSaveButton();
 }
 
+/** Bind edit, upload, and synthesis handlers on an image row. */
 export function initializeNewImage(lastestId: string | number): void {
   const $ = jq();
   $('#upload' + lastestId).on('change', showImageUpload);
@@ -59,12 +63,14 @@ export function initializeNewImage(lastestId: string | number): void {
   });
 }
 
+/** Insert a new image row above the clicked row. */
 export function insertNewImageToPosition(e: JQuery.TriggeredEvent): HTMLElement | undefined {
   const contendInd = String(contentIndex() + 1);
   enableSaveButton();
   return insertNewObjectIntoEditArea(e, createNewImage, initializeNewImage, contendInd);
 }
 
+/** Append a new image row to the edit area. */
 export function appendImageToList(): HTMLElement {
   const div = createNewImage();
 
@@ -74,6 +80,7 @@ export function appendImageToList(): HTMLElement {
   return div;
 }
 
+/** Preview an image file as a data URL. */
 export function readImageResource(inputFile: File, contentId: string | number): void {
   const $ = jq();
   const reader = new FileReader();
@@ -86,6 +93,7 @@ export function readImageResource(inputFile: File, contentId: string | number): 
   reader.readAsDataURL(inputFile);
 }
 
+/** Preview a video file as a data URL. */
 export function readVideoResource(inputFile: File, contentId: string | number): void {
   const $ = jq();
   const reader = new FileReader();
@@ -98,6 +106,7 @@ export function readVideoResource(inputFile: File, contentId: string | number): 
   reader.readAsDataURL(inputFile);
 }
 
+/** Hide 2D media and start a GLB preview on the canvas. */
 export function loadMeshResource(inputFile: File, contentId: string | number): void {
   const $ = jq();
   // Hide image and video elements
@@ -125,12 +134,14 @@ export function loadMeshResource(inputFile: File, contentId: string | number): v
   }
 }
 
+/** Write the uploaded file name into the row label. */
 export function showFileName(inputFile: File, contentId: string | number): void {
   const infoArea = jq()('#upload-label' + contentId)[0];
   const fileName = inputFile.name;
   infoArea.textContent = fileName;
 }
 
+/** Route each selected file to the matching media preview. */
 export function uploadAllMediaFiles(
   contentInd: string | number,
   inputFiles: FileList | File[],
@@ -157,6 +168,7 @@ export function uploadAllMediaFiles(
   }
 }
 
+/** Upload the files chosen on a row's file input. */
 export function showImageUpload(self: JQuery.TriggeredEvent): void {
   const input = self.target as HTMLInputElement;
   if (!(input.id && input.files)) return;
@@ -165,6 +177,7 @@ export function showImageUpload(self: JQuery.TriggeredEvent): void {
   uploadAllMediaFiles(contentInd, input.files);
 }
 
+/** Apply loaded image source, file name, and synthesis state. */
 export function editImageContent(
   updateInd: string | number,
   imageContent: ImageContent,
@@ -184,6 +197,7 @@ export function editImageContent(
   return true;
 }
 
+/** Apply loaded file name and synthesis state without changing the source. */
 export function editImageMeta(
   updateInd: string | number,
   imageContent: ImageContent,
@@ -203,6 +217,7 @@ export function editImageMeta(
   return true;
 }
 
+/** Treat the media element as a video thumbnail. */
 export function changeImageToVideoClass(updateInd: string | number): boolean | undefined {
   const imageArea = jq()('#image' + updateInd);
   if (imageArea[0] == undefined) {
@@ -215,6 +230,7 @@ export function changeImageToVideoClass(updateInd: string | number): boolean | u
   return true;
 }
 
+/** Open the full image or video in a modal. */
 export function zoomToImage(this: HTMLElement): void {
   const $ = jq();
   const imageId = $(this).find('img').attr('id')!;

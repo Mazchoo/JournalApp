@@ -21,14 +21,12 @@ import { installFakeTinyMCE, seedEditor, type FakeTinyMCE } from './helpers/tiny
 let tinymce: FakeTinyMCE;
 let modals: ModalStubs;
 
+/** Build a jQuery event whose target is the element matching the selector. */
 function eventFrom(selector: string): JQuery.TriggeredEvent {
   return { target: document.querySelector(selector)! } as unknown as JQuery.TriggeredEvent;
 }
 
-/**
- * Fakes the iframe TinyMCE injects in place of the textarea. The delete guard looks for it
- * inside the entry-region the button names, so it has to live in the same div.
- */
+/** Attach a TinyMCE-like iframe so the delete guard can read its innerText. */
 function attachEditorIframe(index: number, text: string): void {
   const region = document.querySelector(`[name='paragraph${index}']`)!;
   const iframe = document.createElement('iframe');

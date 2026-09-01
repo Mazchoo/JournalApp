@@ -5,6 +5,7 @@ import { reloadPage } from '../runtime/navigation';
 
 /** Port of static/JS/entry.delete.js. */
 
+/** Enable the delete button. */
 export function enableDeleteButton(): void {
   const $ = jq();
   $('#btn-delete').removeClass('disabled');
@@ -12,6 +13,7 @@ export function enableDeleteButton(): void {
   $('#btn-delete').addClass('btn-danger');
 }
 
+/** Disable the delete button. */
 export function disableDeleteButton(): void {
   const $ = jq();
   $('#btn-delete').removeClass('btn-danger');
@@ -19,6 +21,7 @@ export function disableDeleteButton(): void {
   $('#btn-delete').addClass('btn-outline-danger');
 }
 
+/** POST a delete request for the current date slug. */
 export function deleteFromDatabase(): void {
   const $ = jq();
   const csrftoken = csrfToken();
@@ -45,6 +48,7 @@ export function deleteFromDatabase(): void {
   });
 }
 
+/** Confirm, then delete the current entry from the database. */
 export function deleteContent(): void {
   if (jq()('#btn-delete').hasClass('disabled')) return;
 

@@ -27,11 +27,12 @@ vi.mock('../src/entry/mesh');
 
 let ajax: AjaxStub;
 
+/** Build a jQuery event whose target is the element matching the selector. */
 function eventFrom(selector: string): JQuery.TriggeredEvent {
   return { target: document.querySelector(selector)! } as unknown as JQuery.TriggeredEvent;
 }
 
-/** FileReader resolves on its own task queue, so poll rather than guessing a tick count. */
+/** Wait until the given element has a non-empty `src`. */
 function waitForSrc(elementId: string): Promise<string> {
   return vi.waitFor(() => {
     const src = document.getElementById(elementId)!.getAttribute('src');
@@ -40,6 +41,7 @@ function waitForSrc(elementId: string): Promise<string> {
   });
 }
 
+/** Wait until an upload label shows the expected file name. */
 function waitForLabel(index: number, expected: string): Promise<void> {
   return vi.waitFor(() => {
     expect(document.getElementById(`upload-label${index}`)!.textContent).toBe(expected);
@@ -251,6 +253,7 @@ describe('uploadAllMediaFiles', () => {
 describe('showImageUpload', () => {
   // jsdom rejects assignment to `HTMLInputElement.files`, so the event target is a stand-in
   // carrying only the two properties the handler reads.
+  /** Build a change event whose target stands in for a file input. */
   function changeEvent(id: string, files: File[] | undefined): JQuery.TriggeredEvent {
     return { target: { id, files } } as unknown as JQuery.TriggeredEvent;
   }
@@ -344,12 +347,13 @@ describe('changeImageToVideoClass', () => {
 });
 
 describe('zoomToImage', () => {
+  /** Click the first image area as `zoomToImage` expects. */
   function clickImageArea(): void {
     const imageArea = document.querySelector('.image-area') as HTMLElement;
     zoomToImage.call(imageArea);
   }
 
-  /** jsdom implements no blob URLs at all, so the whole method has to be supplied. */
+  /** Stub `URL.createObjectURL`, which jsdom does not implement. */
   function stubCreateObjectURL(url: string): Mock {
     const createObjectURL = vi.fn(() => url);
     (URL as unknown as { createObjectURL: unknown }).createObjectURL = createObjectURL;

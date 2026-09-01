@@ -6,7 +6,7 @@ import { buildGlb, buildTriangleGlb, prepareCanvas } from './helpers/glb';
 let canvas: HTMLCanvasElement;
 let consoleError: MockInstance<typeof console.error>;
 
-/** FileReader resolves on its own task queue, so poll rather than guessing a tick count. */
+/** Wait until `console.error` is called with the given message. */
 function waitForConsoleError(message: string): Promise<void> {
   return vi.waitFor(() => {
     const seen = consoleError.mock.calls.some((call) => call[0] === message);
@@ -198,7 +198,7 @@ describe('initializeMeshRenderer', () => {
   });
 });
 
-/** Rewrites the JSON chunk of a GLB while keeping its binary chunk intact. */
+/** Rewrite the JSON chunk of a GLB while keeping its binary chunk intact. */
 function replaceGltf(
   buffer: ArrayBuffer,
   edit: (gltf: Record<string, unknown>) => Record<string, unknown>,

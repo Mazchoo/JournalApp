@@ -4,10 +4,12 @@
  * the browser does.
  */
 
+/** Replace the current location with the given URL. */
 export function replaceLocation(url: string): void {
   window.location.replace(url);
 }
 
+/** Reload the current page. */
 export function reloadPage(): void {
   window.location.reload();
 }

@@ -40,6 +40,7 @@ interface Gltf {
   images?: GltfImage[];
 }
 
+/** Read a GLB file and start the WebGL preview on the canvas. */
 export function initializeMeshRenderer(
   canvasElement: HTMLCanvasElement,
   inputFile: File,
@@ -57,6 +58,7 @@ export function initializeMeshRenderer(
   reader.readAsArrayBuffer(inputFile);
 }
 
+/** Parse a GLB buffer and draw a rotating mesh preview. */
 export function renderGLB(
   canvas: HTMLCanvasElement,
   buffer: ArrayBuffer,
@@ -85,6 +87,7 @@ export function renderGLB(
 
   const prim = gltf.meshes[0].primitives[0];
 
+  /** Slice one glTF accessor out of the binary chunk. */
   function sliceAccessor(index: number): {
     raw: ArrayBuffer;
     acc: GltfAccessor;
@@ -100,11 +103,13 @@ export function renderGLB(
     return { raw: bin.slice(start, start + bytes), acc, typeSize, compSize };
   }
 
+  /** Read a float accessor as a Float32Array. */
   function floatArray(index: number): Float32Array {
     const { raw, acc, typeSize } = sliceAccessor(index);
     return new Float32Array(raw, 0, acc.count * typeSize);
   }
 
+  /** Read an index accessor as the matching typed array. */
   function indexArray(index: number): Uint8Array | Uint16Array | Uint32Array {
     const { raw, acc } = sliceAccessor(index);
     if (acc.componentType === 5121) return new Uint8Array(raw);
@@ -231,6 +236,7 @@ export function renderGLB(
         }
     `;
 
+  /** Compile a WebGL shader and log compile errors. */
   function mkShader(type: number, src: string): WebGLShader {
     const s = gl!.createShader(type)!;
     gl!.shaderSource(s, src);
@@ -251,6 +257,7 @@ export function renderGLB(
   }
   gl.useProgram(prog);
 
+  /** Upload vertex data into a new ARRAY_BUFFER. */
   function upload(data: Float32Array): WebGLBuffer {
     const buf = gl!.createBuffer()!;
     gl!.bindBuffer(gl!.ARRAY_BUFFER, buf);
@@ -350,6 +357,7 @@ export function renderGLB(
 
   let angle = 0;
 
+  /** Build a rotating model-view-projection matrix. */
   function mvpMatrix(a: number): Float32Array {
     const c = Math.cos(a);
     const s = Math.sin(a);
@@ -373,6 +381,7 @@ export function renderGLB(
   }
 
   let firstFrame = true;
+  /** Draw one frame of the rotating mesh preview. */
   function draw(): void {
     angle += 0.01;
     gl!.clear(gl!.COLOR_BUFFER_BIT | gl!.DEPTH_BUFFER_BIT);
@@ -404,6 +413,7 @@ export function renderGLB(
   draw();
 }
 
+/** Compute per-vertex normals from triangle positions. */
 export function computeNormals(
   positions: Float32Array,
   indices: Uint8Array | Uint16Array | Uint32Array | null,

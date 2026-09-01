@@ -56,28 +56,12 @@
        {% csrf_token %}
     </div>
     
-    <!--
-      SWITCHOVER: the nine script tags below are ported to TypeScript in frontend/src, which
-      `npm run build` bundles into frontend/dist/journal.bundle.js. Replacing them means
-      deciding how Django should serve that bundle (adding frontend/dist to STATICFILES_DIRS,
-      or building into a static subdirectory) and then dropping the nine lines for one script
-      tag pointing at it. The bundle republishes the same function names on `window`, so the
-      inline script further down keeps working unchanged. See frontend/README.md.
-    -->
-    <script src="{% static 'js/common.utility.js' %}"></script>
-    <script src="{% static 'js/tiny.mce.helper.js' %}"></script>
-    <script src="{% static 'js/entry.paragraph.js' %}"></script>
-    <script src="{% static 'js/entry.mesh.js' %}"></script>
-    <script src="{% static 'js/entry.image.js' %}"></script>
-    <script src="{% static 'js/entry.delete.js' %}"></script>
-    <script src="{% static 'js/entry.save.js' %}"></script>
-    <script src="{% static 'js/entry.load.js' %}"></script>
-    <script src="{% static 'js/entry.move.js' %}"></script>
+    <script src="{% static 'js/dist/journal.bundle.js' %}"></script>
 
     <!--
-      SWITCHOVER: frontend/src reads these values off `window` and calls the handlers below by
-      their global names. Everything from `initializeServerRenderedContent()` down can move
-      into frontend/src/main.ts once the templated values above it are exposed some other way
+      frontend/src reads these values off `window` and calls the handlers below by their
+      global names. Everything from `initializeServerRenderedContent()` down can move into
+      frontend/src/main.ts once the templated values above it are exposed some other way
       (a json_script block or data attributes); the `var` declarations have to stay here
       because only Django can fill them in.
     -->

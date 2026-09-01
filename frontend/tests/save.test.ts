@@ -18,10 +18,12 @@ let tinymce: FakeTinyMCE;
 let ajax: AjaxStub;
 let modals: ModalStubs;
 
+/** Set the `src` attribute of the element with the given id. */
 function setSrc(id: string, src: string): void {
   document.getElementById(id)!.setAttribute('src', src);
 }
 
+/** Write a file name into the upload label for the given row. */
 function setUploadLabel(index: number, fileName: string): void {
   document.getElementById(`upload-label${index}`)!.textContent = fileName;
 }

@@ -5,6 +5,7 @@ import { replaceLocation } from '../runtime/navigation';
 
 /** Port of static/JS/entry.move.js. */
 
+/** Build a YYYY-MM-DD slug from the date modal selects. */
 export function getDestinationSlug(): string {
   const $ = jq();
   let destDay = String($('#date-modal-day').children('option:selected').val());
@@ -16,6 +17,7 @@ export function getDestinationSlug(): string {
   return `${destYear}-${destMonth}-${destDay}`;
 }
 
+/** POST a move from the current date to the chosen destination. */
 export function makeMoveRequest(): void {
   const $ = jq();
   const csrftoken = csrfToken();
@@ -43,6 +45,7 @@ export function makeMoveRequest(): void {
   });
 }
 
+/** Open the date modal and move the entry once confirmed. */
 export function moveEntry(): void {
   showDateCallbackModal(
     'Move Date',

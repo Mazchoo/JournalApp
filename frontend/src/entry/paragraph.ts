@@ -15,13 +15,16 @@ import { enableSaveButton } from './save';
 
 /** Port of static/JS/entry.paragraph.js. */
 
+/** Fill the paragraph row template for the given content index. */
 export function generateParagraphTemplate(contentInd: string | number): string {
   return paragraphTemplate().replaceAll('__INDEX__', String(contentInd));
 }
 
+/** Delete an empty paragraph immediately, or confirm before deleting text. */
 export function deleteParagraph(e: JQuery.TriggeredEvent): void {
   const $ = jq();
   const paragraphDivs = $(eventNameSelector(e));
+  /** Remove the paragraph row and enable saving. */
   const deleteParagraphs = (): void => {
     deleteParentDiv(paragraphDivs[0]);
     enableSaveButton();
@@ -46,6 +49,7 @@ export function deleteParagraph(e: JQuery.TriggeredEvent): void {
   );
 }
 
+/** Allocate the next content index and build a paragraph row. */
 export function createNewParagraph(): HTMLElement {
   setContentIndex(contentIndex() + 1);
   return componentFromTemplate(
@@ -55,6 +59,7 @@ export function createNewParagraph(): HTMLElement {
   );
 }
 
+/** Write text into the TinyMCE editor for the given index. */
 export function editParagraphContent(
   updateInd: string | number | undefined,
   paragraphText: string | undefined,
@@ -69,6 +74,7 @@ export function editParagraphContent(
   return true;
 }
 
+/** Return an init callback that restores paragraph text, if any. */
 export function createInitFunction(
   updateInd: string | number,
   paragraphText: string,
@@ -79,6 +85,7 @@ export function createInitFunction(
   };
 }
 
+/** Create the editor and bind the row's edit buttons. */
 export function initializeNewParagraph(
   lastestId: string | number,
   height = 220,
@@ -96,12 +103,14 @@ export function initializeNewParagraph(
   $('#move-content-down' + lastestId).on('click', moveObjectDown);
 }
 
+/** Insert a new paragraph row above the clicked row. */
 export function insertNewParagraphToPosition(e: JQuery.TriggeredEvent): HTMLElement | undefined {
   const contendInd = String(contentIndex() + 1);
   enableSaveButton();
   return insertNewObjectIntoEditArea(e, createNewParagraph, initializeNewParagraph, contendInd);
 }
 
+/** Append a new paragraph row to the edit area. */
 export function appendParagraphToList(
   _e?: JQuery.TriggeredEvent,
   height = 220,

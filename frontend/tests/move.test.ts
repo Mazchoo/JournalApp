@@ -10,6 +10,7 @@ vi.mock('../src/runtime/navigation');
 let ajax: AjaxStub;
 let modals: ModalStubs;
 
+/** Select an option on a date-modal `<select>` by value. */
 function selectOption(selectId: string, value: string): void {
   window.jQuery!(`#${selectId}`).val(value);
 }

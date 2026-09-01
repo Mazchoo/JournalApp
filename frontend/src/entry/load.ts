@@ -5,6 +5,7 @@ import { initializeNewParagraph } from './paragraph';
 
 /** Port of static/JS/entry.load.js. */
 
+/** Fetch the downsized image for a server-rendered media row. */
 export function loadServerRenderedImage(index: string | number, imageId: string): void {
   const $ = jq();
   const csrftoken = csrfToken();
@@ -29,6 +30,7 @@ export function loadServerRenderedImage(index: string | number, imageId: string)
   });
 }
 
+/** Fetch the downsized poster frame for a server-rendered video row. */
 export function loadServerRenderedVideo(index: string | number, videoId: string): void {
   const $ = jq();
   const csrftoken = csrfToken();
@@ -53,6 +55,7 @@ export function loadServerRenderedVideo(index: string | number, videoId: string)
   });
 }
 
+/** Wire editors, handlers, and async loads for server-rendered rows. */
 export function initializeServerRenderedContent(): void {
   const $ = jq();
 

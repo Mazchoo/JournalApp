@@ -6,11 +6,12 @@ const GLB_MAGIC = 0x46546c67;
 const JSON_CHUNK = 0x4e4f534a;
 const BIN_CHUNK = 0x004e4942;
 
+/** Pad a byte length up to the next 4-byte GLB alignment. */
 function padTo4(length: number): number {
   return (4 - (length % 4)) % 4;
 }
 
-/** Packs a glTF JSON document and its binary buffer into a GLB container. */
+/** Pack a glTF JSON document and its binary buffer into a GLB container. */
 export function buildGlb(gltf: unknown, bin: Uint8Array = new Uint8Array(0)): ArrayBuffer {
   const jsonBytes = new TextEncoder().encode(JSON.stringify(gltf));
   const jsonPad = padTo4(jsonBytes.length);
@@ -46,7 +47,7 @@ export interface TriangleGlb {
   indices: number[];
 }
 
-/** A GLB holding one untextured, un-normalled triangle. */
+/** Build a GLB holding one untextured, un-normalled triangle. */
 export function buildTriangleGlb(): TriangleGlb {
   const positions = [0, 0, 0, 1, 0, 0, 0, 1, 0];
   const indices = [0, 1, 2];
@@ -95,11 +96,7 @@ const RETURN_VALUES: Record<string, () => unknown> = {
   getError: () => 0,
 };
 
-/**
- * A recording stand-in for a WebGL context. Anything upper-case is treated as a GL constant
- * and anything else as a method, which keeps the fake to the handful of meaningful returns
- * above rather than the whole WebGL surface.
- */
+/** Return a recording stand-in for a WebGL context. */
 export function fakeWebGLContext(): FakeGl {
   const calls: Record<string, unknown[][]> = {};
   const overrides: Record<string, () => unknown> = {};
@@ -107,6 +104,7 @@ export function fakeWebGLContext(): FakeGl {
 
   const target = {} as Record<string, unknown>;
   const context = new Proxy(target, {
+    /** Resolve a GL constant or record a method call. */
     get(_target, property: string) {
       if (/^[A-Z0-9_]+$/.test(property)) {
         if (property === 'NO_ERROR') return 0;
@@ -125,11 +123,12 @@ export function fakeWebGLContext(): FakeGl {
     context,
     calls,
     overrides,
+    /** Return recorded argument lists for a WebGL method. */
     callsTo: (name: string) => calls[name] ?? [],
   };
 }
 
-/** Gives the canvas a fake WebGL context and stops the render loop after one frame. */
+/** Give the canvas a fake WebGL context and stop the render loop after one frame. */
 export function prepareCanvas(canvas: HTMLCanvasElement): FakeGl {
   const gl = fakeWebGLContext();
   vi.spyOn(canvas, 'getContext').mockReturnValue(gl.context as unknown as null);

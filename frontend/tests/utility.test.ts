@@ -22,6 +22,7 @@ import {
 import { installFakeTinyMCE, seedEditor } from './helpers/tinymce';
 import { renderDayPage } from './helpers/dom';
 
+/** Build a click event whose target is the element matching the selector. */
 function clickEventOn(selector: string): JQuery.TriggeredEvent {
   const target = document.querySelector(selector);
   if (target === null) throw new Error(`No element matched ${selector}`);
@@ -260,6 +261,7 @@ describe('insertNewObjectIntoEditArea', () => {
 });
 
 describe('moveObjectUp / moveObjectDown', () => {
+  /** Return the name of each row currently in the edit area. */
   function rowIds(): string[] {
     return Array.from(document.getElementById('edit-area')!.children).map(
       (row) => row.children[0].getAttribute('name') ?? row.className,

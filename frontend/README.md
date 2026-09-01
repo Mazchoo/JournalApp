@@ -1,10 +1,10 @@
 # Journal frontend
 
-TypeScript port of the browser code that currently lives in `static/JS/*.js`. It builds a single
-IIFE bundle that can eventually replace the nine per-file script tags in `templates/day.html`.
+TypeScript port of the browser code that used to live as nine files in `static/JS/*.js`. It
+builds a single IIFE bundle that `templates/day.html` loads as `{% static 'JS/dist/journal.bundle.js' %}`.
 
-Everything this project produces stays inside `frontend/`. Nothing writes into `static/`, and
-`static/JS/*.js` is still what the running app loads — the port is not wired up yet.
+`npm run build` writes that file into `static/JS/dist/` so Django can serve it without extra
+`STATICFILES_DIRS` entries. jQuery and Bootstrap still load from `templates/Common/header.html`.
 
 ## Commands
 
@@ -13,7 +13,7 @@ Run these from this directory.
 | Command | What it does |
 | --- | --- |
 | `npm install` | Installs dependencies. |
-| `npm run build` | Writes `dist/journal.bundle.js` (plus a source map). |
+| `npm run build` | Writes `static/JS/dist/journal.bundle.js` (plus a source map). |
 | `npm run watch` | Same, rebuilding on change. |
 | `npm test` | Runs the Vitest suite in jsdom. |
 | `npm run coverage` | Test run with a V8 coverage report. |
@@ -54,10 +54,8 @@ runs against the real jQuery and Bootstrap builds.
 
 ## Migration order
 
-1. **First** — decide how Django serves `dist/journal.bundle.js` (add `frontend/dist` to
-   `STATICFILES_DIRS`, or point the build somewhere already served) and swap the nine script
-   tags in `templates/day.html` for one tag pointing at it. `main.ts` republishes every former
-   global, so nothing else has to change. Both switchover points are commented in the templates.
+1. **Done** — `templates/day.html` loads `static/JS/dist/journal.bundle.js`. `main.ts`
+   republishes every former global, so the inline script in that template is unchanged.
 2. **Next** — move the handler wiring at the bottom of `day.html` into `main.ts`, and pass the
    templated values (`CONTENT_INDEX`, `DATE_SLUG`, the URLs, the two row templates) through a
    `{{ ...|json_script }}` block instead of `var` declarations. Then `src/runtime/config.ts`

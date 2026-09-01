@@ -18,14 +18,9 @@
     <link rel="stylesheet" href="{% static 'css/shakey.css' %}">
   
     <!-- JS -->
-    <!--
-      SWITCHOVER: jQuery 3.4.1 and Bootstrap 4.5.2 are also npm dependencies of frontend/, but
-      they must keep loading here as globals for now. The inline scripts in templates/Modals/*.html
-      and templates/day.html use `$` directly, and Bootstrap registers `$.fn.modal` on whichever
-      jQuery instance is global. Move these into the bundle only once those inline scripts have
-      moved too, otherwise there will be two jQuery instances and only one of them will have the
-      Bootstrap plugins.
-    -->
+    <!-- jQuery and Bootstrap stay as globals: inline scripts in templates/Modals/*.html and
+         templates/day.html use `$` directly, and Bootstrap registers `$.fn.modal` on the
+         global jQuery instance. -->
     <script src="{% static 'tinymce/js/prism.js' %}"></script> 
     <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
