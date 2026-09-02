@@ -6,6 +6,7 @@ import {
   moveObjectDown,
   moveObjectUp,
 } from '../common/utility';
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import {
   contentIndex,
   contentIndexStr,
@@ -91,7 +92,7 @@ export function createInitFunction(
 /** Create the editor and bind the row's edit buttons. */
 export function initializeNewParagraph(
   lastestId: string,
-  height = 220,
+  height = PARAGRAPH_EDITOR_HEIGHT_PX,
   paragraphText = '',
   allowSynthesis = true,
 ): void {
@@ -120,7 +121,7 @@ export function insertNewParagraphToPosition(e: Event): HTMLElement | undefined 
 /** Append a new paragraph row to the edit area. */
 export function appendParagraphToList(
   _e?: Event,
-  height = 220,
+  height = PARAGRAPH_EDITOR_HEIGHT_PX,
   paragraphText = '',
 ): HTMLElement {
   const div = createNewParagraph();

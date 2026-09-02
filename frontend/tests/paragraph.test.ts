@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../src/display-config';
 import {
   appendParagraphToList,
   createInitFunction,
@@ -108,10 +109,10 @@ describe('initializeNewParagraph', () => {
     expect(options['height']).toBe(320);
   });
 
-  it('defaults to a height of 220', () => {
+  it('defaults to the configured editor height', () => {
     initializeNewParagraph('0');
 
-    expect(tinymce.initOptions[0]!['height']).toBe(220);
+    expect(tinymce.initOptions[0]!['height']).toBe(PARAGRAPH_EDITOR_HEIGHT_PX);
   });
 
   it('restores existing text through the init callback', () => {
@@ -221,7 +222,7 @@ describe('appendParagraphToList', () => {
     document.getElementById('btn-new-para')!.click();
 
     expect(document.getElementById('edit-area')!.children).toHaveLength(2);
-    expect(tinymce.initOptions[0]!['height']).toBe(220);
+    expect(tinymce.initOptions[0]!['height']).toBe(PARAGRAPH_EDITOR_HEIGHT_PX);
   });
 
   it('passes an explicit height and text through to the editor', () => {

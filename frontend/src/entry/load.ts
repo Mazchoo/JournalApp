@@ -1,6 +1,7 @@
 import { ImageEntry } from '../components/image-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea } from '../components/globals';
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import { requestDownsizedImage, requestDownsizedVideoImage } from '../make-request';
 import { initializeNewImage } from './image';
 import { initializeNewParagraph } from './paragraph';
@@ -54,7 +55,7 @@ export function initializeServerRenderedContent(): void {
   editArea.paragraphRows().forEach((row) => {
     const paragraph = ParagraphEntry.fromRow(row as HTMLElement);
     if (paragraph === null || paragraph.textarea === null) return;
-    const height = parseInt(paragraph.textarea.getAttribute('data-height')!) || 220;
+    const height = parseInt(paragraph.textarea.getAttribute('data-height')!) || PARAGRAPH_EDITOR_HEIGHT_PX;
     const allowSynthesis = paragraph.textarea.getAttribute('data-allow-ai-synthesis') !== '0';
     initializeNewParagraph(paragraph.index, height, '', allowSynthesis);
   });

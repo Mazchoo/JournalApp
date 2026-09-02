@@ -1,3 +1,8 @@
+import {
+  MESH_CANVAS_FALLBACK_WIDTH_PX,
+  MESH_CANVAS_HEIGHT_PX,
+  MESH_CANVAS_REVEAL_STYLE,
+} from '../display-config';
 import { parseGlb, computeNormals } from '../rendering-3d/glb-parsing';
 import { startRenderingLoop } from '../rendering-3d/rendering-loop';
 
@@ -5,15 +10,10 @@ export { computeNormals };
 
 /** Reveal the canvas and return a WebGL context, or null if WebGL is unavailable. */
 function prepareMeshCanvas(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
-  canvas.style.visibility = 'visible';
-  canvas.style.height = '400px';
-  canvas.style.display = 'block';
-  canvas.style.opacity = '1';
-  canvas.style.position = 'relative';
-  canvas.style.zIndex = '10';
+  Object.assign(canvas.style, MESH_CANVAS_REVEAL_STYLE);
 
-  canvas.width = canvas.clientWidth || 800;
-  canvas.height = 400;
+  canvas.width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
+  canvas.height = MESH_CANVAS_HEIGHT_PX;
 
   const gl = (canvas.getContext('webgl') ??
     canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;

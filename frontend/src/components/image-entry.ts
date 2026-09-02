@@ -1,3 +1,4 @@
+import { MESH_CANVAS_REVEAL_STYLE } from '../display-config';
 import type { ImageContent } from '../response-interface';
 import { ContentRow } from './content-row';
 
@@ -115,14 +116,7 @@ export class ImageEntry extends ContentRow {
       console.error('Canvas element not found for contentId:', image.index);
       return false;
     }
-    Object.assign(image.canvas.style, {
-      visibility: 'visible',
-      height: '400px',
-      display: 'block',
-      opacity: '1',
-      position: 'relative',
-      zIndex: '1',
-    });
+    Object.assign(image.canvas.style, MESH_CANVAS_REVEAL_STYLE);
     return true;
   }
 

@@ -3,7 +3,7 @@
  * The home page is the only template that uses a carousel.
  */
 
-const AUTO_CYCLE_MS = 5000;
+import { AUTO_CYCLE_MS } from '../display-config';
 
 /** Advance the carousel by `delta` items, wrapping at both ends. */
 function go(root: HTMLElement, delta: number): void {

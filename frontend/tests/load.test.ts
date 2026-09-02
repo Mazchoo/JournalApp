@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../src/display-config';
 import {
   initializeServerRenderedContent,
   loadServerRenderedImage,
@@ -115,12 +116,12 @@ describe('initializeServerRenderedContent', () => {
     expect(tinymce.initOptions[0]!['height']).toBe(512);
   });
 
-  it('falls back to a height of 220 for an unparsable data-height', () => {
+  it('falls back to the configured editor height for an unparsable data-height', () => {
     document.getElementById('paragraph0')!.setAttribute('data-height', 'None');
 
     initializeServerRenderedContent();
 
-    expect(tinymce.initOptions[0]!['height']).toBe(220);
+    expect(tinymce.initOptions[0]!['height']).toBe(PARAGRAPH_EDITOR_HEIGHT_PX);
   });
 
   it('kicks off a downsized request for each image and video row', () => {

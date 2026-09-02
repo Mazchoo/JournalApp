@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
+import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
 import {
   appendImageToList,
   changeImageToVideoClass,
@@ -172,8 +173,8 @@ describe('loadMeshResource', () => {
     expect(document.getElementById('video0')!.style.visibility).toBe('hidden');
 
     const canvas = document.getElementById('mesh-canvas0')!;
-    expect(canvas.style.visibility).toBe('visible');
-    expect(canvas.style.height).toBe('400px');
+    expect(canvas.style.visibility).toBe(MESH_CANVAS_REVEAL_STYLE.visibility);
+    expect(canvas.style.height).toBe(MESH_CANVAS_REVEAL_STYLE.height);
     expect(vi.mocked(initializeMeshRenderer)).toHaveBeenCalledWith(
       canvas,
       file,

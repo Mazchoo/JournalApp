@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
+import {
+  MESH_CANVAS_FALLBACK_WIDTH_PX,
+  MESH_CANVAS_HEIGHT_PX,
+  MESH_CANVAS_REVEAL_STYLE,
+} from '../src/display-config';
 import { computeNormals, initializeMeshRenderer, renderGLB } from '../src/entry/mesh';
 import { buildGlb, buildTriangleGlb, prepareCanvas } from './helpers/glb';
 
@@ -96,11 +101,11 @@ describe('renderGLB', () => {
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(canvas.style.visibility).toBe('visible');
-    expect(canvas.style.height).toBe('400px');
-    expect(canvas.style.display).toBe('block');
-    expect(canvas.width).toBe(800);
-    expect(canvas.height).toBe(400);
+    expect(canvas.style.visibility).toBe(MESH_CANVAS_REVEAL_STYLE.visibility);
+    expect(canvas.style.height).toBe(MESH_CANVAS_REVEAL_STYLE.height);
+    expect(canvas.style.display).toBe(MESH_CANVAS_REVEAL_STYLE.display);
+    expect(canvas.width).toBe(MESH_CANVAS_FALLBACK_WIDTH_PX);
+    expect(canvas.height).toBe(MESH_CANVAS_HEIGHT_PX);
   });
 
   it('uploads the geometry and draws the indexed triangle', () => {
@@ -176,7 +181,7 @@ describe('initializeMeshRenderer', () => {
     initializeMeshRenderer(canvas, file, onComplete);
     await vi.waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
 
-    expect(canvas.width).toBe(800);
+    expect(canvas.width).toBe(MESH_CANVAS_FALLBACK_WIDTH_PX);
     expect(consoleError).not.toHaveBeenCalled();
   });
 
