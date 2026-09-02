@@ -11,6 +11,11 @@ export class ContentRow {
   readonly moveUpButton: HTMLElement | null;
   readonly moveDownButton: HTMLElement | null;
 
+  /** Same as `index`; the id the object already knows. */
+  get id(): string {
+    return this.index;
+  }
+
   constructor(index: string, row: HTMLElement) {
     this.index = index;
     this.row = row;

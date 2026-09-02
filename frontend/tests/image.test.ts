@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
 import {
   appendImageToList,
-  changeImageToVideoClass,
   createNewImage,
   deleteImage,
   editImageContent,
@@ -13,12 +12,12 @@ import {
   insertNewImageToPosition,
   loadMeshResource,
   readImageResource,
-  readVideoResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
   zoomToImage,
 } from '../src/entry/image';
+import { changeImageToVideoClass, readVideoResource } from '../src/entry/video';
 import { initializeMeshRenderer } from '../src/entry/mesh';
 import { stubAjax, type AjaxStub } from './helpers/ajax';
 import { CSRF_TOKEN, fileNamed, renderDayPage } from './helpers/dom';

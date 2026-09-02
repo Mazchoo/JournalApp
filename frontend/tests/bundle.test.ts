@@ -64,15 +64,16 @@ const NAMES_FROM_STATIC_JS = [
   'insertNewImageToPosition',
   'appendImageToList',
   'readImageResource',
-  'readVideoResource',
   'loadMeshResource',
   'showFileName',
   'uploadAllMediaFiles',
   'showImageUpload',
   'editImageContent',
   'editImageMeta',
-  'changeImageToVideoClass',
   'zoomToImage',
+  // entry.video.js
+  'readVideoResource',
+  'changeImageToVideoClass',
   // entry.delete.js
   'enableDeleteButton',
   'disableDeleteButton',

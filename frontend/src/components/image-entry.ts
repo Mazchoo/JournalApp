@@ -1,9 +1,13 @@
+import { ContentType } from '../common/content-types';
 import { MESH_CANVAS_REVEAL_STYLE } from '../display-config';
+import type { MediaSavePayload } from '../request-interface';
 import type { ImageContent } from '../response-interface';
+import { dateSlug } from '../runtime/backend-variables';
+import { type IContent, type IImage, type IVideo, hasMediaSrc } from './content';
 import { ContentRow } from './content-row';
 
 /** One image/video/mesh row and the DOM nodes it owns. */
-export class ImageEntry extends ContentRow {
+export class ImageEntry extends ContentRow implements IContent {
   /** Rows keyed by content index. */
   static readonly byIndex: Record<string, ImageEntry> = {};
 
@@ -14,6 +18,7 @@ export class ImageEntry extends ContentRow {
   readonly uploadLabel: HTMLElement | null;
   readonly allowSyn: HTMLElement | null;
   readonly imageArea: HTMLElement | null;
+  private derivedType: ContentType.Image | ContentType.Video = ContentType.Image;
 
   constructor(index: string, row: HTMLElement) {
     super(index, row);
@@ -190,6 +195,43 @@ export class ImageEntry extends ContentRow {
       return;
     }
     image.insertImageButton.click();
+  }
+
+  get contentType(): ContentType.Image | ContentType.Video {
+    return this.derivedType;
+  }
+
+  saveId(): string {
+    return `${this.contentType}${this.id}`;
+  }
+
+  /** View this row as image content when the save element has a source. */
+  asImage(element: HTMLElement): IImage | null {
+    if (!hasMediaSrc(element)) return null;
+    this.derivedType = ContentType.Image;
+    return this as IImage;
+  }
+
+  /** View this row as video content when the save element has a source. */
+  asVideo(element: HTMLElement): IVideo | null {
+    if (!hasMediaSrc(element)) return null;
+    this.derivedType = ContentType.Video;
+    return this as IVideo;
+  }
+
+  serialize(): MediaSavePayload {
+    return {
+      file_path: this.fileName(),
+      allow_ai_synthesis: this.isSynthesisActive() ? 1 : 0,
+      entry: dateSlug(),
+    };
+  }
+
+  /** Resolve the image row that owns a save-content element. */
+  static fromSaveElement(element: HTMLElement): ImageEntry | null {
+    const row = element.closest('.image-entry') as HTMLElement | null;
+    if (row === null) return null;
+    return ImageEntry.fromRow(row);
   }
 
   fileName(): string {

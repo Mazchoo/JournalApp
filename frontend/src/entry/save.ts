@@ -1,11 +1,12 @@
+import { contentTypeFromElement } from '../components/content';
 import { ImageEntry } from '../components/image-entry';
+import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
+import { ContentType } from '../common/content-types';
 import { requestSaveEntry } from '../make-request';
 import type { SaveData } from '../request-interface';
 import { dateSlug } from '../runtime/backend-variables';
-import { tiny, type SynthesisEditor } from '../runtime/externals';
 import { showMessageSimpleModal } from '../runtime/modals';
-import { getMCEComponentHeight } from '../tinymce/helper';
 import { enableDeleteButton } from './delete';
 import { zoomToImage } from './image';
 
@@ -19,39 +20,29 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
   const saveData: SaveData = {};
 
   for (let i = 0; i < saveContent.length; i++) {
-    const content = saveContent[i] as HTMLElement & { src?: string };
-    const contentId = content.id;
+    const element = saveContent[i] as HTMLElement;
+    const contentType = contentTypeFromElement(element);
+    if (contentType === undefined) continue;
 
-    if (content.classList.contains('entry-text')) {
-      const editor = tiny().get(contentId) as SynthesisEditor;
-      const textContent = editor.getContent();
-      const height = getMCEComponentHeight(contentId);
-      const allowSynthesis = editor.synthesisEnabled ?? true;
-      saveData[contentId] = {
-        text: textContent,
-        height: height,
-        allow_ai_synthesis: allowSynthesis ? 1 : 0,
-        entry: dateSlug(),
-      };
-    } else if (content.classList.contains('content-image') && content.src) {
-      const ind = contentId.replace('image', '');
-      const image = ImageEntry.fromIndex(ind);
-      if (image === null) continue;
-      saveData[contentId] = {
-        file_path: image.fileName(),
-        allow_ai_synthesis: image.isSynthesisActive() ? 1 : 0,
-        entry: dateSlug(),
-      };
-    } else if (content.classList.contains('content-video') && content.src) {
-      // Can be a video or an image
-      const ind = contentId.replace('video', '').replace('image', '');
-      const image = ImageEntry.fromIndex(ind);
-      if (image === null) continue;
-      saveData[`video${ind}`] = {
-        file_path: image.fileName(),
-        allow_ai_synthesis: image.isSynthesisActive() ? 1 : 0,
-        entry: dateSlug(),
-      };
+    switch (contentType) {
+      case ContentType.Paragraph: {
+        const paragraph = ParagraphEntry.fromSaveElement(element)?.asParagraph();
+        if (paragraph === undefined) continue;
+        saveData[paragraph.saveId()] = paragraph.serialize();
+        break;
+      }
+      case ContentType.Image: {
+        const image = ImageEntry.fromSaveElement(element)?.asImage(element);
+        if (image == null) continue;
+        saveData[image.saveId()] = image.serialize();
+        break;
+      }
+      case ContentType.Video: {
+        const video = ImageEntry.fromSaveElement(element)?.asVideo(element);
+        if (video == null) continue;
+        saveData[video.saveId()] = video.serialize();
+        break;
+      }
     }
   }
 

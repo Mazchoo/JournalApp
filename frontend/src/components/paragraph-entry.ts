@@ -1,10 +1,16 @@
+import { ContentType } from '../common/content-types';
+import type { ParagraphSavePayload } from '../request-interface';
+import { dateSlug } from '../runtime/backend-variables';
+import { tiny, type SynthesisEditor } from '../runtime/externals';
+import { type IParagraph } from './content';
 import { ContentRow } from './content-row';
 
 /** One paragraph row and the DOM nodes it owns. */
-export class ParagraphEntry extends ContentRow {
+export class ParagraphEntry extends ContentRow implements IParagraph {
   /** Rows keyed by content index. */
   static readonly byIndex: Record<string, ParagraphEntry> = {};
 
+  readonly contentType = ContentType.Paragraph;
   readonly textarea: HTMLTextAreaElement | null;
 
   constructor(index: string, row: HTMLElement) {
@@ -57,6 +63,34 @@ export class ParagraphEntry extends ContentRow {
       return null;
     }
     return ParagraphEntry.fromIndex(textarea.id.replace('paragraph', ''));
+  }
+
+  saveId(): string {
+    return `${this.contentType}${this.id}`;
+  }
+
+  /** This row is paragraph content. */
+  asParagraph(): IParagraph {
+    return this;
+  }
+
+  serialize(): ParagraphSavePayload {
+    const editorId = this.saveId();
+    const editor = tiny().get(editorId) as SynthesisEditor;
+    const allowSynthesis = editor.synthesisEnabled ?? true;
+    return {
+      text: editor.getContent(),
+      height: editor.getContainer().clientHeight + 2,
+      allow_ai_synthesis: allowSynthesis ? 1 : 0,
+      entry: dateSlug(),
+    };
+  }
+
+  /** Resolve the paragraph row that owns a save-content element. */
+  static fromSaveElement(element: HTMLElement): ParagraphEntry | null {
+    const row = element.closest('.paragraph-entry') as HTMLElement | null;
+    if (row === null) return null;
+    return ParagraphEntry.fromRow(row);
   }
 
   /**

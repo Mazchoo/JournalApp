@@ -44,7 +44,6 @@ export { computeNormals, initializeMeshRenderer, renderGLB } from './entry/mesh'
 
 export {
   appendImageToList,
-  changeImageToVideoClass,
   createNewImage,
   deleteImage,
   editImageContent,
@@ -54,12 +53,16 @@ export {
   insertNewImageToPosition,
   loadMeshResource,
   readImageResource,
-  readVideoResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
   zoomToImage,
 } from './entry/image';
+
+export {
+  changeImageToVideoClass,
+  readVideoResource,
+} from './entry/video';
 
 export {
   deleteContent,
