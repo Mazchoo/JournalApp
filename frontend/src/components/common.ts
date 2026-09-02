@@ -9,13 +9,19 @@ export function csrfToken(): string {
 
 /** Remove an element's parent node from the grandparent. */
 export function deleteParentDiv(obj: Element | null | undefined): void {
-  if (obj == null || obj.parentNode == null || obj.parentNode.parentNode == null) return;
+  if (obj == null || obj.parentNode == null || obj.parentNode.parentNode == null) {
+    console.error('deleteParentDiv: element or ancestor is missing');
+    return;
+  }
   obj.parentNode.parentNode.removeChild(obj.parentNode);
 }
 
 /** Remove an element from its parent. */
 export function removeItem(obj: Element | null | undefined): void {
-  if (obj == null || obj.parentNode == null) return;
+  if (obj == null || obj.parentNode == null) {
+    console.error('removeItem: element or parent is missing');
+    return;
+  }
   obj.parentNode.removeChild(obj);
 }
 
@@ -37,18 +43,30 @@ export function componentFromTemplate(
 export function changeTooltipTextFromInput(e: Event, idTag: string, suffix: string): void {
   const input = e.target as HTMLInputElement;
   const tooltip = document.querySelector(idTag);
-  if (tooltip !== null) tooltip.innerHTML = input.value + suffix;
+  if (tooltip === null) {
+    console.error(`changeTooltipTextFromInput: ${idTag} does not exist`);
+    return;
+  }
+  tooltip.innerHTML = input.value + suffix;
 }
 
 /** Move named children from one container into another. */
 export function reorderOneDivFromAnother(sourceTag: string, targetTag: string): void {
   const targetDiv = document.querySelector(targetTag);
-  if (targetDiv === null) return;
+  if (targetDiv === null) {
+    console.error(`reorderOneDivFromAnother: ${targetTag} does not exist`);
+    return;
+  }
   const sourceObjs = document.querySelectorAll(sourceTag);
 
   for (let i = 0; i < sourceObjs.length; i++) {
-    const targetItem = document.querySelector(nameSelector(sourceObjs[i]!));
-    if (targetItem !== null) targetDiv.appendChild(targetItem);
+    const selector = nameSelector(sourceObjs[i]!);
+    const targetItem = document.querySelector(selector);
+    if (targetItem === null) {
+      console.error(`reorderOneDivFromAnother: ${selector || 'named element'} does not exist`);
+      continue;
+    }
+    targetDiv.appendChild(targetItem);
   }
 }
 
@@ -73,8 +91,12 @@ export function insertNewObjectIntoEditArea(
 
 /** Return the parent row of the clicked edit button. */
 export function getParentDivOfObject(e: Event): HTMLElement | undefined {
-  const parentDiv = document.querySelector(eventNameSelector(e));
-  if (parentDiv === null) return undefined;
+  const selector = eventNameSelector(e);
+  const parentDiv = document.querySelector(selector);
+  if (parentDiv === null) {
+    console.error(`getParentDivOfObject: ${selector || 'row selector'} does not exist`);
+    return undefined;
+  }
   return parentDiv.parentNode as HTMLElement;
 }
 

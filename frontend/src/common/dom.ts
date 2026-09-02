@@ -41,7 +41,11 @@ export function moveObjectUp(e: Event): void {
   if (children === null || parentDiv === undefined) return;
   const objInd = getIndexInArr(children, parentDiv as Element);
 
-  if (objInd === undefined || objInd === 0) return;
+  if (objInd === undefined) {
+    console.error('moveObjectUp: row is not a child of the edit area');
+    return;
+  }
+  if (objInd === 0) return;
 
   editArea.insertBefore(parentDiv as HTMLElement, children[objInd - 1]!);
   resetMCE(parentDiv);
@@ -56,7 +60,11 @@ export function moveObjectDown(e: Event): void {
   if (children === null || parentDiv === undefined) return;
   const objInd = getIndexInArr(children, parentDiv as Element);
 
-  if (objInd === undefined || objInd === children.length - 1) return;
+  if (objInd === undefined) {
+    console.error('moveObjectDown: row is not a child of the edit area');
+    return;
+  }
+  if (objInd === children.length - 1) return;
 
   editArea.insertBefore(children[objInd + 1]!, parentDiv as HTMLElement);
   resetMCE(parentDiv);

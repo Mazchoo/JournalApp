@@ -8,7 +8,10 @@ import { AUTO_CYCLE_MS } from '../display-config';
 /** Advance the carousel by `delta` items, wrapping at both ends. */
 function go(root: HTMLElement, delta: number): void {
   const items = Array.from(root.querySelectorAll('.carousel-item'));
-  if (items.length === 0) return;
+  if (items.length === 0) {
+    console.error('carousel: #carousel has no .carousel-item elements');
+    return;
+  }
   const current = items.findIndex((item) => item.classList.contains('active'));
   const from = current === -1 ? 0 : current;
   items[from]!.classList.remove('active');

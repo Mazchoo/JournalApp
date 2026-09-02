@@ -87,8 +87,11 @@ export class MediaEntry extends ContentRow implements IContent {
   }
 
   /** Hide an element without removing it from layout calculations. */
-  static hideMedia(element: HTMLElement | null): void {
-    if (element === null) return;
+  static hideMedia(element: HTMLElement | null, label: string): void {
+    if (element === null) {
+      console.error(`MediaEntry: ${label} does not exist`);
+      return;
+    }
     element.style.visibility = 'hidden';
     element.style.height = '0px';
   }
@@ -104,12 +107,12 @@ export class MediaEntry extends ContentRow implements IContent {
 
   /** Hide the video element of this row. */
   static hideVideo(media: MediaEntry): void {
-    MediaEntry.hideMedia(media.video);
+    MediaEntry.hideMedia(media.video, `#video${media.index}`);
   }
 
   /** Hide the `<img>` of this row. */
   static hideImage(media: MediaEntry): void {
-    MediaEntry.hideMedia(media.image);
+    MediaEntry.hideMedia(media.image, `#image${media.index}`);
   }
 
   /** Reveal the video element and set its source. */
@@ -178,6 +181,15 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Fill image source, file name, and synthesis state from loaded content. */
   static applyContent(media: MediaEntry, content: MediaContentThumbnail): boolean | undefined {
     if (media.image == null || media.uploadLabel == null || media.allowSyn == null) {
+      if (media.image == null) {
+        console.error(`MediaEntry: #image${media.index} does not exist`);
+      }
+      if (media.uploadLabel == null) {
+        console.error(`MediaEntry: #upload-label${media.index} does not exist`);
+      }
+      if (media.allowSyn == null) {
+        console.error(`MediaEntry: #allow-syn${media.index} does not exist`);
+      }
       return undefined;
     }
     MediaEntry.setSrc(media, content['base64']!);
@@ -189,6 +201,12 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Fill file name and synthesis state without changing the source. */
   static applyMeta(media: MediaEntry, mediaContent: MediaContentThumbnail): boolean | undefined {
     if (media.uploadLabel == null || media.allowSyn == null) {
+      if (media.uploadLabel == null) {
+        console.error(`MediaEntry: #upload-label${media.index} does not exist`);
+      }
+      if (media.allowSyn == null) {
+        console.error(`MediaEntry: #allow-syn${media.index} does not exist`);
+      }
       return undefined;
     }
     MediaEntry.setSynthesisActive(media, mediaContent['allow_ai_synthesis'] === 1);
@@ -229,7 +247,10 @@ export class MediaEntry extends ContentRow implements IContent {
       return null;
     }
     const row = element.closest('.image-entry') as HTMLElement | null;
-    if (row === null) return null;
+    if (row === null) {
+      console.error('MediaEntry: save-content element is not inside a media row');
+      return null;
+    }
     const media = MediaEntry.fromRow(row);
     if (media === null) return null;
     media.derivedType = contentType;
@@ -265,7 +286,10 @@ export class MediaEntry extends ContentRow implements IContent {
    */
   static uploadFromEvent(event: Event): { index: string; files: FileList | File[] } | null {
     const target = event.target as { id?: string; files?: FileList | File[] } | null;
-    if (!target?.id || !target.files) return null;
+    if (!target?.id || !target.files) {
+      console.error('MediaEntry: upload event has no file input');
+      return null;
+    }
     return { index: target.id.replace('upload', ''), files: target.files };
   }
 

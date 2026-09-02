@@ -111,7 +111,11 @@ export class Modal extends PageElement {
   /** Replace this node with a clone so previous action listeners are discarded. */
   replaceWithClone(): void {
     const modal = this.resolve();
-    if (modal === null || modal.parentNode === null) return;
+    if (modal === null) return;
+    if (modal.parentNode === null) {
+      console.error(`${this.constructor.name}: #${this.elementId} has no parent`);
+      return;
+    }
     const cloned = modal.cloneNode(true) as HTMLElement;
     modal.parentNode.replaceChild(cloned, modal);
     this.node = cloned;

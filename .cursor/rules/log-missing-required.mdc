@@ -1,0 +1,33 @@
+---
+description: Log console.error when bailing because a required value is missing
+globs: frontend/**/*.ts
+alwaysApply: false
+---
+
+# Log missing required values
+
+When a function returns early because a required DOM node, lookup result, or
+argument is null/undefined, call `console.error` first. Silent
+`if (x === null) return` hides broken markup and wiring.
+
+```typescript
+// ❌ BAD
+if (element === null) return;
+
+// ✅ GOOD
+if (element === null) {
+  console.error(`MediaEntry: #video${media.index} does not exist`);
+  return;
+}
+```
+
+Match existing messages: `` `${ClassName}: #${id} does not exist` ``.
+
+Do not log again at a caller that already received null from a function that
+logged (for example `PageElement.resolve()`, `Modal.child()`,
+`MediaEntry.fromIndex()`).
+
+Do not log expected control flow: type dispatch (`fromSaveElement` on the wrong
+row kind), optional page features (`#carousel` on the day page), form values
+that are allowed to be absent, or "already at the boundary" cases (move up
+when the row is first).

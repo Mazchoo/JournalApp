@@ -15,7 +15,10 @@ export type { MediaSavePayload, ParagraphSavePayload, SaveData } from '../reques
 
 /** Build the save payload from the current content elements. */
 export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveData | undefined {
-  if (saveContent === null) return undefined;
+  if (saveContent === null) {
+    console.error('generateSaveEntry: save content is missing');
+    return undefined;
+  }
   const saveData: SaveData = {};
 
   for (let i = 0; i < saveContent.length; i++) {
@@ -31,7 +34,10 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
 
 /** POST the save payload and report the result. */
 export function saveEntryToDatabase(saveData: SaveData | null | undefined): void {
-  if (saveData === null) return;
+  if (saveData == null) {
+    console.error('saveEntryToDatabase: save data is missing');
+    return;
+  }
 
   requestSaveEntry(
     {

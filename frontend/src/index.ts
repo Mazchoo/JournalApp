@@ -50,12 +50,13 @@ export {
   generateMediaTemplate,
   initializeNewMedia,
   insertNewMediaToPosition,
-  readMediaResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
   zoomToMedia,
 } from './entry/media/media';
+
+export { readImageResource as readMediaResource } from './entry/media/image';
 
 export {
   changeImageToVideoClass,

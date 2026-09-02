@@ -16,7 +16,7 @@ import {
 } from '../../runtime/backend-variables';
 import { insertNewParagraphToPosition } from '../paragraph';
 import { enableSaveButton } from '../save';
-import { openFullImage } from './image';
+import { openFullImage, readImageResource } from './image';
 import { loadMeshResource } from './mesh';
 import { readVideoResource, zoomToVideo } from './video';
 
@@ -83,20 +83,6 @@ export function appendImageToList(): HTMLElement {
   return div;
 }
 
-/** Preview an image file as a data URL. */
-export function readMediaResource(inputFile: File, contentId: string): void {
-  const media = MediaEntry.fromIndex(contentId);
-  if (media === null) return;
-  const reader = new FileReader();
-
-  reader.onload = (e) => {
-    MediaEntry.hideVideo(media);
-    MediaEntry.setSrc(media, e.target!.result as string);
-    enableSaveButton();
-  };
-  reader.readAsDataURL(inputFile);
-}
-
 /** Write the uploaded file name into the row label. */
 export function showFileName(inputFile: File, contentId: string): void {
   const media = MediaEntry.fromIndex(contentId);
@@ -120,7 +106,7 @@ export function uploadAllMediaFiles(
     if (isVideoFile(inputFile.name)) {
       readVideoResource(inputFile, contentInd);
     } else if (isImageFile(inputFile.name)) {
-      readMediaResource(inputFile, contentInd);
+      readImageResource(inputFile, contentInd);
     } else if (isMeshFile(inputFile.name)) {
       loadMeshResource(inputFile, contentInd);
     } else {

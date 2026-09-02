@@ -67,7 +67,10 @@ export function editParagraphContent(
   updateInd: string | undefined,
   paragraphText: string | undefined,
 ): boolean {
-  if (updateInd === undefined || paragraphText === undefined) return false;
+  if (updateInd === undefined || paragraphText === undefined) {
+    console.error('editParagraphContent: update index or paragraph text is missing');
+    return false;
+  }
   const paragraph = ParagraphEntry.fromIndex(updateInd);
   if (paragraph === null) return false;
   return paragraph.setContent(paragraphText);

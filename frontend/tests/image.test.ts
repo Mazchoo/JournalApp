@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
+import { readImageResource } from '../src/entry/media/image';
 import {
   appendImageToList,
   createNewMedia,
@@ -10,7 +11,6 @@ import {
   generateMediaTemplate,
   initializeNewMedia,
   insertNewMediaToPosition,
-  readMediaResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
@@ -144,7 +144,7 @@ describe('appendImageToList', () => {
 
 describe('readMediaResource', () => {
   it('puts the data URL on the image and hides the video element', async () => {
-    readMediaResource(fileNamed('sunrise.png', 'binary', 'image/png'), '0');
+    readImageResource(fileNamed('sunrise.png', 'binary', 'image/png'), '0');
 
     expect(await waitForSrc('image0')).toMatch(/^data:image\/png;base64,/);
     expect(document.getElementById('video0')!.style.visibility).toBe('hidden');

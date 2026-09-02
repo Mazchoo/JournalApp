@@ -63,7 +63,11 @@ export function getMCEComponentHeight(name: string): number {
 
 /** Recreate a paragraph editor at its current height and synthesis state. */
 export function resetMCE(div: Element | null | undefined, onDirty: () => void = () => {}): void {
-  if (div == null || !div.classList.contains('paragraph-entry')) {
+  if (div == null) {
+    console.error('resetMCE: element is missing');
+    return;
+  }
+  if (!div.classList.contains('paragraph-entry')) {
     return;
   }
 
