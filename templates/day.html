@@ -31,7 +31,7 @@
                         </div>
                     {% elif item.type == "image" %}
                         <div class="row mt-4 image-entry">
-                            {% include "EntryContents/Image.html" %}
+                            {% include "EntryContents/Media.html" %}
                         </div>
                     {% elif item.type == "video" %}
                         <div class="row mt-4 image-entry">
@@ -64,7 +64,7 @@
         var CONTENT_INDEX = {{ content_list|length }};
         {% with item=js_placeholder %}
             var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" %}`;
-            var IMAGE_TEMPLATE = `{% include "EntryContents/Image.html" %}`;
+            var MEDIA_TEMPLATE = `{% include "EntryContents/Media.html" %}`;
         {% endwith %}
         var DATE_SLUG = '{{date_slug}}';
         var ENTRY_EXISTS = {{ entry_exists|yesno:"true,false" }};

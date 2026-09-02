@@ -58,9 +58,9 @@ const NAMES_FROM_STATIC_JS = [
   'computeNormals',
   'loadMeshResource',
   // entry.media
-  'generateImageTemplate',
-  'createNewImage',
-  'deleteImage',
+  'generateMediaTemplate',
+  'createNewMedia',
+  'deleteMedia',
   'initializeNewMedia',
   'insertNewMediaToPosition',
   'appendImageToList',
@@ -68,7 +68,7 @@ const NAMES_FROM_STATIC_JS = [
   'showFileName',
   'uploadAllMediaFiles',
   'showImageUpload',
-  'editImageContent',
+  'editMediaContent',
   'editMediaMeta',
   'zoomToMedia',
   // entry.video.js

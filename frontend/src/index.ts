@@ -25,7 +25,7 @@ export {
   removeItem,
   reorderOneDivFromAnother,
   reverseString,
-} from './common/utility';
+} from './common/dom';
 
 export { createTinyMCE, getMCEComponentHeight, resetMCE } from './tinymce/helper';
 
@@ -43,15 +43,12 @@ export {
 export { computeNormals, initializeMeshRenderer, loadMeshResource, renderGLB } from './entry/media/mesh';
 
 export {
-  createNewImage,
-  deleteImage,
-  editImageContent,
-  generateImageTemplate,
-} from './entry/media/image';
-
-export {
   appendImageToList,
+  createNewMedia,
+  deleteMedia,
+  editMediaContent,
   editMediaMeta,
+  generateMediaTemplate,
   initializeNewMedia,
   insertNewMediaToPosition,
   readMediaResource,

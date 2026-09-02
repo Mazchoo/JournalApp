@@ -2,14 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 
 import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
 import {
-  createNewImage,
-  deleteImage,
-  editImageContent,
-  generateImageTemplate,
-} from '../src/entry/media/image';
-import {
   appendImageToList,
+  createNewMedia,
+  deleteMedia,
+  editMediaContent,
   editMediaMeta,
+  generateMediaTemplate,
   initializeNewMedia,
   insertNewMediaToPosition,
   readMediaResource,
@@ -58,9 +56,9 @@ afterEach(() => {
   vi.mocked(meshPreview.initialize).mockRestore();
 });
 
-describe('generateImageTemplate', () => {
+describe('generateMediaTemplate', () => {
   it('substitutes every index placeholder', () => {
-    const markup = generateImageTemplate('4');
+    const markup = generateMediaTemplate('4');
 
     expect(markup).not.toContain('__INDEX__');
     expect(markup).toContain(`id='image4'`);
@@ -68,9 +66,9 @@ describe('generateImageTemplate', () => {
   });
 });
 
-describe('createNewImage', () => {
-  it('advances CONTENT_INDEX and builds an image row', () => {
-    const div = createNewImage();
+describe('createNewMedia', () => {
+  it('advances CONTENT_INDEX and builds a media row', () => {
+    const div = createNewMedia();
 
     expect(window.CONTENT_INDEX).toBe(2);
     expect(div.className).toBe('row mt-4 image-entry');
@@ -78,9 +76,9 @@ describe('createNewImage', () => {
   });
 });
 
-describe('deleteImage', () => {
+describe('deleteMedia', () => {
   it('removes the whole row and enables saving', () => {
-    deleteImage(eventFrom('#delete-content0'));
+    deleteMedia(eventFrom('#delete-content0'));
 
     expect(document.getElementById('edit-area')!.children).toHaveLength(0);
     expect(document.getElementById('btn-save')!.classList.contains('btn-success')).toBe(true);
@@ -283,9 +281,9 @@ describe('showImageUpload', () => {
   });
 });
 
-describe('editImageContent', () => {
+describe('editMediaContent', () => {
   it('applies the base64 source, file name and an active Generate button', () => {
-    const applied = editImageContent('0', {
+    const applied = editMediaContent('0', {
       base64: 'data:image/png;base64,AAA',
       file_name: 'sunrise.png',
       allow_ai_synthesis: 1,
@@ -303,7 +301,7 @@ describe('editImageContent', () => {
   });
 
   it('leaves the Generate button inactive when synthesis is off', () => {
-    editImageContent('0', { base64: 'x', file_name: 'a.png', allow_ai_synthesis: 0 });
+    editMediaContent('0', { base64: 'x', file_name: 'a.png', allow_ai_synthesis: 0 });
 
     const button = document.getElementById('allow-syn0')!;
     expect(button.classList.contains('btn-primary')).toBe(false);
@@ -311,7 +309,7 @@ describe('editImageContent', () => {
   });
 
   it('returns undefined when the row is missing', () => {
-    expect(editImageContent('99', { base64: 'x', file_name: 'a.png' })).toBeUndefined();
+    expect(editMediaContent('99', { base64: 'x', file_name: 'a.png' })).toBeUndefined();
   });
 });
 

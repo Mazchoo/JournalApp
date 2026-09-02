@@ -5,7 +5,7 @@ import {
   insertNewObjectIntoEditArea,
   moveObjectDown,
   moveObjectUp,
-} from '../common/utility';
+} from '../common/dom';
 import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import {
   contentIndex,

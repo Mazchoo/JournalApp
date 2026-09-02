@@ -25,9 +25,9 @@ export function paragraphTemplate(): string {
   return window.PARAGRAPH_TEMPLATE;
 }
 
-/** Return the image HTML template global. */
-export function imageTemplate(): string {
-  return window.IMAGE_TEMPLATE;
+/** Return the media HTML template global. */
+export function mediaTemplate(): string {
+  return window.MEDIA_TEMPLATE;
 }
 
 /** Return the current date slug global. */

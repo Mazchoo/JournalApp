@@ -23,7 +23,7 @@ export const PARAGRAPH_TEMPLATE = `
     <button id='move-content-down__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
 </div>`;
 
-export const IMAGE_TEMPLATE = `
+export const MEDIA_TEMPLATE = `
 <div class='row mx-auto entry-region-__INDEX__'>
     <div class='col col-md-11 upload-box input-group'>
         <input id='upload__INDEX__' type='file' multiple='multiple' class='upload-image'>
@@ -60,7 +60,7 @@ function renderRow(kind: RowKind, index: string): string {
     return `<div class="row mt-3 paragraph-entry">${PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', index)}</div>`;
   }
 
-  const markup = IMAGE_TEMPLATE.replaceAll('__INDEX__', index);
+  const markup = MEDIA_TEMPLATE.replaceAll('__INDEX__', index);
   if (kind === 'video') {
     return `<div class="row mt-4 image-entry">${markup
       .replace(`class='save-content content-image' data-image-id=''`, `class='save-content content-video' data-video-id='v${index}'`)}</div>`;
@@ -127,7 +127,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
 export function installTemplateGlobals(contentIndex: number): void {
   window.CONTENT_INDEX = contentIndex;
   window.PARAGRAPH_TEMPLATE = PARAGRAPH_TEMPLATE;
-  window.IMAGE_TEMPLATE = IMAGE_TEMPLATE;
+  window.MEDIA_TEMPLATE = MEDIA_TEMPLATE;
   window.DATE_SLUG = '2024-03-15';
   window.ENTRY_EXISTS = false;
   window.SAVE_URL = '/save-entry/';

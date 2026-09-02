@@ -22,7 +22,7 @@ declare global {
   interface Window {
     CONTENT_INDEX: number;
     PARAGRAPH_TEMPLATE: string;
-    IMAGE_TEMPLATE: string;
+    MEDIA_TEMPLATE: string;
     DATE_SLUG: string;
     ENTRY_EXISTS: boolean;
     SAVE_URL: string;

@@ -17,7 +17,7 @@ import {
   removeItem,
   reorderOneDivFromAnother,
   reverseString,
-} from '../src/common/utility';
+} from '../src/common/dom';
 import { installFakeTinyMCE, seedEditor } from './helpers/tinymce';
 import { renderDayPage } from './helpers/dom';
 
