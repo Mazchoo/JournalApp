@@ -2,7 +2,7 @@ import { ImageEntry } from '../components/image-entry';
 import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
 import { requestSaveEntry } from '../make-request';
 import type { SaveData } from '../request-interface';
-import { dateSlug } from '../runtime/config';
+import { dateSlug } from '../runtime/backend-variables';
 import { tiny, type SynthesisEditor } from '../runtime/externals';
 import { showMessageSimpleModal } from '../runtime/modals';
 import { getMCEComponentHeight } from '../tinymce/helper';

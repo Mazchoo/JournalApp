@@ -20,7 +20,7 @@ beforeEach(() => {
 
 describe('loadServerRenderedImage', () => {
   it('posts the image id with the CSRF token', () => {
-    loadServerRenderedImage(1, 'i1');
+    loadServerRenderedImage('1', 'i1');
 
     const settings = ajax.last();
     expect(settings.type).toBe('POST');
@@ -29,7 +29,7 @@ describe('loadServerRenderedImage', () => {
   });
 
   it('sets the returned base64 on the matching image', async () => {
-    loadServerRenderedImage(1, 'i1');
+    loadServerRenderedImage('1', 'i1');
     await ajax.succeed({ base64: 'data:image/png;base64,THUMB' });
 
     expect(document.getElementById('image1')!.getAttribute('src')).toBe(
@@ -40,7 +40,7 @@ describe('loadServerRenderedImage', () => {
   it('logs a server-reported error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    loadServerRenderedImage(1, 'i1');
+    loadServerRenderedImage('1', 'i1');
     await ajax.succeed({ error: 'Cache miss' });
 
     expect(log).toHaveBeenCalledWith('Image load error:', 'Cache miss');
@@ -50,7 +50,7 @@ describe('loadServerRenderedImage', () => {
   it('logs a transport error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    loadServerRenderedImage(1, 'i1');
+    loadServerRenderedImage('1', 'i1');
     await ajax.fail('Not Found');
 
     expect(log).toHaveBeenCalledWith('Failed to load image:', 'Not Found');
@@ -60,7 +60,7 @@ describe('loadServerRenderedImage', () => {
 
 describe('loadServerRenderedVideo', () => {
   it('posts the video id to the downsized video endpoint', () => {
-    loadServerRenderedVideo(2, 'v2');
+    loadServerRenderedVideo('2', 'v2');
 
     const settings = ajax.last();
     expect(settings.url).toBe('/get-downsized-video-image/');
@@ -68,7 +68,7 @@ describe('loadServerRenderedVideo', () => {
   });
 
   it('sets the returned poster frame on the matching image', async () => {
-    loadServerRenderedVideo(2, 'v2');
+    loadServerRenderedVideo('2', 'v2');
     await ajax.succeed({ base64: 'data:image/png;base64,POSTER' });
 
     expect(document.getElementById('image2')!.getAttribute('src')).toBe(
@@ -79,7 +79,7 @@ describe('loadServerRenderedVideo', () => {
   it('logs a server-reported error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    loadServerRenderedVideo(2, 'v2');
+    loadServerRenderedVideo('2', 'v2');
     await ajax.succeed({ error: 'No frames' });
 
     expect(log).toHaveBeenCalledWith('Video image load error:', 'No frames');
@@ -89,7 +89,7 @@ describe('loadServerRenderedVideo', () => {
   it('logs a transport error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    loadServerRenderedVideo(2, 'v2');
+    loadServerRenderedVideo('2', 'v2');
     await ajax.fail('Gone');
 
     expect(log).toHaveBeenCalledWith('Failed to load video image:', 'Gone');

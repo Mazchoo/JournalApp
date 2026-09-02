@@ -27,7 +27,7 @@ function eventFrom(selector: string): Event {
 }
 
 /** Attach a TinyMCE-like iframe so the delete guard can read its innerText. */
-function attachEditorIframe(index: number, text: string): void {
+function attachEditorIframe(index: string, text: string): void {
   const region = document.querySelector(`[name='paragraph${index}']`)!;
   const iframe = document.createElement('iframe');
   iframe.className = 'tox-edit-area__iframe';
@@ -43,7 +43,7 @@ beforeEach(() => {
 
 describe('generateParagraphTemplate', () => {
   it('substitutes every index placeholder', () => {
-    const markup = generateParagraphTemplate(7);
+    const markup = generateParagraphTemplate('7');
 
     expect(markup).not.toContain('__INDEX__');
     expect(markup).toContain(`name='paragraph7'`);
@@ -65,17 +65,17 @@ describe('editParagraphContent', () => {
   it('writes the text into the matching editor', () => {
     const editor = seedEditor(tinymce, 'paragraph0');
 
-    expect(editParagraphContent(0, '<p>Hello</p>')).toBe(true);
+    expect(editParagraphContent('0', '<p>Hello</p>')).toBe(true);
     expect(editor.content).toBe('<p>Hello</p>');
   });
 
   it('reports failure when the editor does not exist', () => {
-    expect(editParagraphContent(9, 'text')).toBe(false);
+    expect(editParagraphContent('9', 'text')).toBe(false);
   });
 
   it.each([
     ['a missing index', undefined, 'text'],
-    ['missing text', 0, undefined],
+    ['missing text', '0', undefined],
   ])('reports failure for %s', (_label, index, text) => {
     expect(editParagraphContent(index, text)).toBe(false);
   });
@@ -85,7 +85,7 @@ describe('createInitFunction', () => {
   it('returns a no-op when there is no text to restore', () => {
     const editor = seedEditor(tinymce, 'paragraph0', { content: 'untouched' });
 
-    createInitFunction(0, '')();
+    createInitFunction('0', '')();
 
     expect(editor.content).toBe('untouched');
   });
@@ -93,7 +93,7 @@ describe('createInitFunction', () => {
   it('returns a function that restores the text', () => {
     const editor = seedEditor(tinymce, 'paragraph0');
 
-    createInitFunction(0, '<p>Restored</p>')();
+    createInitFunction('0', '<p>Restored</p>')();
 
     expect(editor.content).toBe('<p>Restored</p>');
   });
@@ -101,7 +101,7 @@ describe('createInitFunction', () => {
 
 describe('initializeNewParagraph', () => {
   it('creates the editor at the requested height and synthesis state', () => {
-    initializeNewParagraph(0, 320, '', false);
+    initializeNewParagraph('0', 320, '', false);
 
     const options = tinymce.initOptions[0]!;
     expect(options['selector']).toBe('#paragraph0');
@@ -109,20 +109,20 @@ describe('initializeNewParagraph', () => {
   });
 
   it('defaults to a height of 220', () => {
-    initializeNewParagraph(0);
+    initializeNewParagraph('0');
 
     expect(tinymce.initOptions[0]!['height']).toBe(220);
   });
 
   it('restores existing text through the init callback', () => {
-    initializeNewParagraph(0, 220, '<p>From the database</p>');
+    initializeNewParagraph('0', 220, '<p>From the database</p>');
 
     expect(tinymce.get('paragraph0')!.content).toBe('<p>From the database</p>');
   });
 
   it('wires the five edit buttons of the row', () => {
-    initializeNewParagraph(0);
-    attachEditorIframe(0, 'not empty');
+    initializeNewParagraph('0');
+    attachEditorIframe('0', 'not empty');
 
     document.getElementById('delete-content0')!.click();
 
@@ -132,8 +132,8 @@ describe('initializeNewParagraph', () => {
   it('moves the row when the move buttons are clicked', () => {
     renderDayPage({ rows: ['paragraph', 'paragraph'] });
     tinymce = installFakeTinyMCE();
-    initializeNewParagraph(0);
-    initializeNewParagraph(1);
+    initializeNewParagraph('0');
+    initializeNewParagraph('1');
 
     document.getElementById('move-content-up1')!.click();
 
@@ -144,7 +144,7 @@ describe('initializeNewParagraph', () => {
 
 describe('deleteParagraph', () => {
   it('deletes an empty paragraph without asking', () => {
-    attachEditorIframe(0, '   \n  ');
+    attachEditorIframe('0', '   \n  ');
 
     deleteParagraph(eventFrom('#delete-content0'));
 
@@ -154,7 +154,7 @@ describe('deleteParagraph', () => {
   });
 
   it('asks before deleting a paragraph that has text', () => {
-    attachEditorIframe(0, 'Something worth keeping');
+    attachEditorIframe('0', 'Something worth keeping');
 
     deleteParagraph(eventFrom('#delete-content0'));
 
@@ -168,7 +168,7 @@ describe('deleteParagraph', () => {
   });
 
   it('deletes once the confirmation callback runs', () => {
-    attachEditorIframe(0, 'Something worth keeping');
+    attachEditorIframe('0', 'Something worth keeping');
 
     deleteParagraph(eventFrom('#delete-content0'));
     modals.confirmLast(modals.showCallbackModal);

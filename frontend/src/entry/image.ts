@@ -12,7 +12,13 @@ import { editArea, imagePreview, videoPreview } from '../components/globals';
 import { ImageEntry } from '../components/image-entry';
 import { requestFullImage, requestFullVideo } from '../make-request';
 import type { JsonErrorResponse } from '../request-interface';
-import { contentIndex, dateSlug, imageTemplate, setContentIndex } from '../runtime/config';
+import {
+  contentIndex,
+  contentIndexStr,
+  dateSlug,
+  imageTemplate,
+  setContentIndex,
+} from '../runtime/backend-variables';
 import { showModal } from '../runtime/modals';
 import type { ImageContent } from './content-types';
 import { initializeMeshRenderer } from './mesh';
@@ -24,19 +30,20 @@ export type { ImageContent } from './content-types';
 /** Port of static/JS/entry.image.js. */
 
 /** Fill the image row template for the given content index. */
-export function generateImageTemplate(contentInd: string | number): string {
-  return imageTemplate().replaceAll('__INDEX__', String(contentInd));
+export function generateImageTemplate(contentInd: string): string {
+  return imageTemplate().replaceAll('__INDEX__', contentInd);
 }
 
 /** Allocate the next content index and build an image row. */
 export function createNewImage(): HTMLElement {
   setContentIndex(contentIndex() + 1);
+  const index = contentIndexStr();
   const div = componentFromTemplate(
-    generateImageTemplate(contentIndex()),
+    generateImageTemplate(index),
     'div',
     'row mt-4 image-entry',
   );
-  new ImageEntry(String(contentIndex()), div);
+  new ImageEntry(index, div);
   return div;
 }
 
@@ -49,7 +56,7 @@ export function deleteImage(e: Event): void {
 }
 
 /** Bind edit, upload, and synthesis handlers on an image row. */
-export function initializeNewImage(lastestId: string | number): void {
+export function initializeNewImage(lastestId: string): void {
   const image = ImageEntry.fromIndex(lastestId);
   if (image === null) return;
   image.bindHandlers({
@@ -77,12 +84,12 @@ export function insertNewImageToPosition(e: Event): HTMLElement | undefined {
 export function appendImageToList(): HTMLElement {
   const div = createNewImage();
   editArea.append(div);
-  initializeNewImage(String(contentIndex()));
+  initializeNewImage(contentIndexStr());
   return div;
 }
 
 /** Preview an image file as a data URL. */
-export function readImageResource(inputFile: File, contentId: string | number): void {
+export function readImageResource(inputFile: File, contentId: string): void {
   const image = ImageEntry.fromIndex(contentId);
   if (image === null) return;
   const reader = new FileReader();
@@ -96,7 +103,7 @@ export function readImageResource(inputFile: File, contentId: string | number): 
 }
 
 /** Preview a video file as a data URL. */
-export function readVideoResource(inputFile: File, contentId: string | number): void {
+export function readVideoResource(inputFile: File, contentId: string): void {
   const image = ImageEntry.fromIndex(contentId);
   if (image === null) return;
   const reader = new FileReader();
@@ -109,7 +116,7 @@ export function readVideoResource(inputFile: File, contentId: string | number): 
 }
 
 /** Hide 2D media and start a GLB preview on the canvas. */
-export function loadMeshResource(inputFile: File, contentId: string | number): void {
+export function loadMeshResource(inputFile: File, contentId: string): void {
   const image = ImageEntry.fromIndex(contentId);
   if (image === null || image.canvas === null) {
     console.error('Canvas element not found for contentId:', contentId);
@@ -126,7 +133,7 @@ export function loadMeshResource(inputFile: File, contentId: string | number): v
 }
 
 /** Write the uploaded file name into the row label. */
-export function showFileName(inputFile: File, contentId: string | number): void {
+export function showFileName(inputFile: File, contentId: string): void {
   const image = ImageEntry.fromIndex(contentId);
   if (image === null) return;
   ImageEntry.setFileName(image, inputFile.name);
@@ -134,14 +141,14 @@ export function showFileName(inputFile: File, contentId: string | number): void 
 
 /** Route each selected file to the matching media preview. */
 export function uploadAllMediaFiles(
-  contentInd: string | number,
+  contentInd: string,
   inputFiles: FileList | File[],
 ): void {
   for (let i = inputFiles.length - 1; i >= 0; i--) {
     if (i < inputFiles.length - 1) {
       const current = ImageEntry.fromIndex(contentInd);
       if (current !== null) ImageEntry.clickInsertImage(current);
-      contentInd = contentIndex();
+      contentInd = contentIndexStr();
     }
 
     const inputFile = inputFiles[i]!;
@@ -170,7 +177,7 @@ export function showImageUpload(self: Event): void {
 
 /** Apply loaded image source, file name, and synthesis state. */
 export function editImageContent(
-  updateInd: string | number,
+  updateInd: string,
   imageContent: ImageContent,
 ): boolean | undefined {
   const image = ImageEntry.fromIndex(updateInd);
@@ -180,7 +187,7 @@ export function editImageContent(
 
 /** Apply loaded file name and synthesis state without changing the source. */
 export function editImageMeta(
-  updateInd: string | number,
+  updateInd: string,
   imageContent: ImageContent,
 ): boolean | undefined {
   const image = ImageEntry.fromIndex(updateInd);
@@ -189,7 +196,7 @@ export function editImageMeta(
 }
 
 /** Treat the media element as a video thumbnail. */
-export function changeImageToVideoClass(updateInd: string | number): boolean | undefined {
+export function changeImageToVideoClass(updateInd: string): boolean | undefined {
   const image = ImageEntry.fromIndex(updateInd);
   if (image === null) return undefined;
   return ImageEntry.changeToVideoClass(image) ? true : undefined;

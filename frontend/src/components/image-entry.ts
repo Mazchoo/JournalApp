@@ -30,24 +30,23 @@ export class ImageEntry extends ContentRow {
    * Return the stored row for `index`, building one from the document if needed.
    * Logs when neither the dict nor the DOM has a matching row.
    */
-  static fromIndex(index: string | number): ImageEntry | null {
-    const key = String(index);
-    let entry = ImageEntry.byIndex[key];
+  static fromIndex(index: string): ImageEntry | null {
+    let entry = ImageEntry.byIndex[index];
 
     if (entry !== undefined && !entry.row.isConnected) {
-      const replacement = ImageEntry.lookupRow(key);
+      const replacement = ImageEntry.lookupRow(index);
       if (replacement !== null) {
-        entry = new ImageEntry(key, replacement);
+        entry = new ImageEntry(index, replacement);
       }
     }
 
     if (entry === undefined) {
-      const row = ImageEntry.lookupRow(key);
+      const row = ImageEntry.lookupRow(index);
       if (row === null) {
-        console.error(`ImageEntry: #image${key} does not exist`);
+        console.error(`ImageEntry: #image${index} does not exist`);
         return null;
       }
-      entry = new ImageEntry(key, row);
+      entry = new ImageEntry(index, row);
     }
     return entry;
   }

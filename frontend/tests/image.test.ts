@@ -42,7 +42,7 @@ function waitForSrc(elementId: string): Promise<string> {
 }
 
 /** Wait until an upload label shows the expected file name. */
-function waitForLabel(index: number, expected: string): Promise<void> {
+function waitForLabel(index: string, expected: string): Promise<void> {
   return vi.waitFor(() => {
     expect(document.getElementById(`upload-label${index}`)!.textContent).toBe(expected);
   });
@@ -57,7 +57,7 @@ beforeEach(() => {
 
 describe('generateImageTemplate', () => {
   it('substitutes every index placeholder', () => {
-    const markup = generateImageTemplate(4);
+    const markup = generateImageTemplate('4');
 
     expect(markup).not.toContain('__INDEX__');
     expect(markup).toContain(`id='image4'`);
@@ -86,7 +86,7 @@ describe('deleteImage', () => {
 
 describe('initializeNewImage', () => {
   it('toggles the Generate button between primary and outline', () => {
-    initializeNewImage(0);
+    initializeNewImage('0');
     const button = document.getElementById('allow-syn0')!;
 
     document.getElementById('allow-syn0')!.click();
@@ -99,7 +99,7 @@ describe('initializeNewImage', () => {
   });
 
   it('enables saving when the Generate button is toggled', () => {
-    initializeNewImage(0);
+    initializeNewImage('0');
 
     document.getElementById('allow-syn0')!.click();
 
@@ -107,7 +107,7 @@ describe('initializeNewImage', () => {
   });
 
   it('wires the delete button of the row', () => {
-    initializeNewImage(0);
+    initializeNewImage('0');
 
     document.getElementById('delete-content0')!.click();
 
@@ -143,7 +143,7 @@ describe('appendImageToList', () => {
 
 describe('readImageResource', () => {
   it('puts the data URL on the image and hides the video element', async () => {
-    readImageResource(fileNamed('sunrise.png', 'binary', 'image/png'), 0);
+    readImageResource(fileNamed('sunrise.png', 'binary', 'image/png'), '0');
 
     expect(await waitForSrc('image0')).toMatch(/^data:image\/png;base64,/);
     expect(document.getElementById('video0')!.style.visibility).toBe('hidden');
@@ -153,7 +153,7 @@ describe('readImageResource', () => {
 
 describe('readVideoResource', () => {
   it('puts the data URL on the video element and reveals it', async () => {
-    readVideoResource(fileNamed('holiday.mp4', 'binary', 'video/mp4'), 0);
+    readVideoResource(fileNamed('holiday.mp4', 'binary', 'video/mp4'), '0');
 
     expect(await waitForSrc('video0')).toMatch(/^data:video\/mp4;base64,/);
     const video = document.getElementById('video0')!;
@@ -166,7 +166,7 @@ describe('loadMeshResource', () => {
   it('hides the image and video, reveals the canvas and starts the renderer', () => {
     const file = fileNamed('scan.glb');
 
-    loadMeshResource(file, 0);
+    loadMeshResource(file, '0');
 
     expect(document.getElementById('image0')!.style.visibility).toBe('hidden');
     expect(document.getElementById('video0')!.style.visibility).toBe('hidden');
@@ -182,7 +182,7 @@ describe('loadMeshResource', () => {
   });
 
   it('enables saving through the renderer completion callback', () => {
-    loadMeshResource(fileNamed('scan.glb'), 0);
+    loadMeshResource(fileNamed('scan.glb'), '0');
 
     const onComplete = vi.mocked(initializeMeshRenderer).mock.calls[0]![2]!;
     onComplete();
@@ -193,9 +193,9 @@ describe('loadMeshResource', () => {
   it('logs when there is no canvas for the row', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    loadMeshResource(fileNamed('scan.glb'), 99);
+    loadMeshResource(fileNamed('scan.glb'), '99');
 
-    expect(error).toHaveBeenCalledWith('Canvas element not found for contentId:', 99);
+    expect(error).toHaveBeenCalledWith('Canvas element not found for contentId:', '99');
     expect(vi.mocked(initializeMeshRenderer)).not.toHaveBeenCalled();
     error.mockRestore();
   });
@@ -203,7 +203,7 @@ describe('loadMeshResource', () => {
 
 describe('showFileName', () => {
   it('writes the file name into the upload label', () => {
-    showFileName(fileNamed('holiday snap.jpeg'), 0);
+    showFileName(fileNamed('holiday snap.jpeg'), '0');
 
     expect(document.getElementById('upload-label0')!.textContent).toBe('holiday snap.jpeg');
   });
@@ -211,14 +211,14 @@ describe('showFileName', () => {
 
 describe('uploadAllMediaFiles', () => {
   it('routes a single image to the image reader', async () => {
-    uploadAllMediaFiles(0, [fileNamed('a.png', 'x', 'image/png')]);
+    uploadAllMediaFiles('0', [fileNamed('a.png', 'x', 'image/png')]);
 
     expect(await waitForSrc('image0')).toMatch(/^data:/);
     expect(document.getElementById('upload-label0')!.textContent).toBe('a.png');
   });
 
   it('routes a mesh to the mesh renderer', () => {
-    uploadAllMediaFiles(0, [fileNamed('scan.glb')]);
+    uploadAllMediaFiles('0', [fileNamed('scan.glb')]);
 
     expect(vi.mocked(initializeMeshRenderer)).toHaveBeenCalledTimes(1);
   });
@@ -226,7 +226,7 @@ describe('uploadAllMediaFiles', () => {
   it('logs unknown media types but still records the file name', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    uploadAllMediaFiles(0, [fileNamed('notes.txt')]);
+    uploadAllMediaFiles('0', [fileNamed('notes.txt')]);
 
     expect(log).toHaveBeenCalledWith('Unknown media type');
     expect(document.getElementById('upload-label0')!.textContent).toBe('notes.txt');
@@ -234,18 +234,18 @@ describe('uploadAllMediaFiles', () => {
   });
 
   it('creates one extra row per additional file and fills them back to front', async () => {
-    initializeNewImage(0);
+    initializeNewImage('0');
 
-    uploadAllMediaFiles(0, [
+    uploadAllMediaFiles('0', [
       fileNamed('first.png', 'x', 'image/png'),
       fileNamed('second.png', 'x', 'image/png'),
       fileNamed('third.png', 'x', 'image/png'),
     ]);
 
     expect(document.getElementById('edit-area')!.children).toHaveLength(3);
-    await waitForLabel(0, 'third.png');
-    await waitForLabel(2, 'second.png');
-    await waitForLabel(3, 'first.png');
+    await waitForLabel('0', 'third.png');
+    await waitForLabel('2', 'second.png');
+    await waitForLabel('3', 'first.png');
     expect(await waitForSrc('image3')).toMatch(/^data:/);
   });
 });
@@ -259,7 +259,7 @@ describe('showImageUpload', () => {
   }
 
   it('derives the row index from the input id and uploads its files', () => {
-    initializeNewImage(0);
+    initializeNewImage('0');
 
     showImageUpload(changeEvent('upload0', [fileNamed('scan.glb')]));
 
@@ -282,7 +282,7 @@ describe('showImageUpload', () => {
 
 describe('editImageContent', () => {
   it('applies the base64 source, file name and an active Generate button', () => {
-    const applied = editImageContent(0, {
+    const applied = editImageContent('0', {
       base64: 'data:image/png;base64,AAA',
       file_name: 'sunrise.png',
       allow_ai_synthesis: 1,
@@ -300,7 +300,7 @@ describe('editImageContent', () => {
   });
 
   it('leaves the Generate button inactive when synthesis is off', () => {
-    editImageContent(0, { base64: 'x', file_name: 'a.png', allow_ai_synthesis: 0 });
+    editImageContent('0', { base64: 'x', file_name: 'a.png', allow_ai_synthesis: 0 });
 
     const button = document.getElementById('allow-syn0')!;
     expect(button.classList.contains('btn-primary')).toBe(false);
@@ -308,7 +308,7 @@ describe('editImageContent', () => {
   });
 
   it('returns undefined when the row is missing', () => {
-    expect(editImageContent(99, { base64: 'x', file_name: 'a.png' })).toBeUndefined();
+    expect(editImageContent('99', { base64: 'x', file_name: 'a.png' })).toBeUndefined();
   });
 });
 
@@ -316,7 +316,7 @@ describe('editImageMeta', () => {
   it('updates the file name and Generate button without touching the source', () => {
     document.getElementById('image0')!.setAttribute('src', 'keep-me');
 
-    const applied = editImageMeta(0, { file_name: 'holiday.mp4', allow_ai_synthesis: 1 });
+    const applied = editImageMeta('0', { file_name: 'holiday.mp4', allow_ai_synthesis: 1 });
 
     expect(applied).toBe(true);
     expect(document.getElementById('image0')!.getAttribute('src')).toBe('keep-me');
@@ -325,13 +325,13 @@ describe('editImageMeta', () => {
   });
 
   it('returns undefined when the row is missing', () => {
-    expect(editImageMeta(99, { file_name: 'a.png' })).toBeUndefined();
+    expect(editImageMeta('99', { file_name: 'a.png' })).toBeUndefined();
   });
 });
 
 describe('changeImageToVideoClass', () => {
   it('swaps the content class and reveals the element', () => {
-    const applied = changeImageToVideoClass(0);
+    const applied = changeImageToVideoClass('0');
 
     const image = document.getElementById('image0')!;
     expect(applied).toBe(true);
@@ -342,7 +342,7 @@ describe('changeImageToVideoClass', () => {
   });
 
   it('returns undefined when the row is missing', () => {
-    expect(changeImageToVideoClass(99)).toBeUndefined();
+    expect(changeImageToVideoClass('99')).toBeUndefined();
   });
 });
 

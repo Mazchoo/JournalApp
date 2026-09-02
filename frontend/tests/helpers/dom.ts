@@ -55,12 +55,12 @@ export const CSRF_TOKEN = 'test-csrf-token';
 export type RowKind = 'paragraph' | 'image' | 'video';
 
 /** Render one content row of the given kind at the given index. */
-function renderRow(kind: RowKind, index: number): string {
+function renderRow(kind: RowKind, index: string): string {
   if (kind === 'paragraph') {
-    return `<div class="row mt-3 paragraph-entry">${PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', String(index))}</div>`;
+    return `<div class="row mt-3 paragraph-entry">${PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', index)}</div>`;
   }
 
-  const markup = IMAGE_TEMPLATE.replaceAll('__INDEX__', String(index));
+  const markup = IMAGE_TEMPLATE.replaceAll('__INDEX__', index);
   if (kind === 'video') {
     return `<div class="row mt-4 image-entry">${markup
       .replace(`class='save-content content-image' data-image-id=''`, `class='save-content content-video' data-video-id='v${index}'`)}</div>`;
@@ -82,7 +82,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
   document.body.innerHTML = `
     <div class="container">
         <div id="edit-area" data-spy="scroll">
-            ${rows.map((kind, index) => renderRow(kind, index)).join('\n')}
+            ${rows.map((kind, index) => renderRow(kind, String(index))).join('\n')}
         </div>
         <div class="row mt-3 px-5">
             <button class="btn btn-dark" id="btn-new-para">New Paragraph</button>

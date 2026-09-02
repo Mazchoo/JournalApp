@@ -1,6 +1,6 @@
 import { dateModal, saveSpinner } from '../components/globals';
 import { requestMoveEntry } from '../make-request';
-import { dateSlug } from '../runtime/config';
+import { dateSlug } from '../runtime/backend-variables';
 import { showDateCallbackModal, showMessageSimpleModal } from '../runtime/modals';
 import { replaceLocation } from '../runtime/navigation';
 

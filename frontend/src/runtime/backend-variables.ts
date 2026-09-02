@@ -10,6 +10,11 @@ export function contentIndex(): number {
   return window.CONTENT_INDEX;
 }
 
+/** Return the current CONTENT_INDEX global as a string. */
+export function contentIndexStr(): string {
+  return String(contentIndex());
+}
+
 /** Set the CONTENT_INDEX global. */
 export function setContentIndex(value: number): void {
   window.CONTENT_INDEX = value;

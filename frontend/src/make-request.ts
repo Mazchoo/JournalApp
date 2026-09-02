@@ -23,7 +23,7 @@ import {
   moveUrl,
   saveUrl,
   videoUrl,
-} from './runtime/config';
+} from './runtime/backend-variables';
 import { csrfToken } from './runtime/externals';
 
 /**

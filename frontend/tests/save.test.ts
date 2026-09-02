@@ -24,7 +24,7 @@ function setSrc(id: string, src: string): void {
 }
 
 /** Write a file name into the upload label for the given row. */
-function setUploadLabel(index: number, fileName: string): void {
+function setUploadLabel(index: string, fileName: string): void {
   document.getElementById(`upload-label${index}`)!.textContent = fileName;
 }
 
@@ -64,7 +64,7 @@ describe('generateSaveEntry', () => {
   it('collects images that have a source, keyed by the image id', () => {
     seedEditor(tinymce, 'paragraph0');
     setSrc('image1', 'data:image/png;base64,AAA');
-    setUploadLabel(1, 'sunrise.png');
+    setUploadLabel('1', 'sunrise.png');
     document.getElementById('allow-syn1')!.classList.add('btn-primary');
 
     const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
@@ -87,7 +87,7 @@ describe('generateSaveEntry', () => {
   it('reads the synthesis flag from the Generate button state', () => {
     seedEditor(tinymce, 'paragraph0');
     setSrc('image1', 'data:image/png;base64,AAA');
-    setUploadLabel(1, 'sunrise.png');
+    setUploadLabel('1', 'sunrise.png');
 
     const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;
 
@@ -98,7 +98,7 @@ describe('generateSaveEntry', () => {
     renderDayPage({ rows: ['video'] });
     tinymce = installFakeTinyMCE();
     setSrc('image0', 'data:video/mp4;base64,AAA');
-    setUploadLabel(0, 'holiday.mp4');
+    setUploadLabel('0', 'holiday.mp4');
     document.getElementById('allow-syn0')!.classList.add('btn-primary');
 
     const saveData = generateSaveEntry(document.querySelectorAll('.save-content'))!;

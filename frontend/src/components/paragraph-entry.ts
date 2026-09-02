@@ -17,24 +17,23 @@ export class ParagraphEntry extends ContentRow {
    * Return the stored row for `index`, building one from the document if needed.
    * Logs when neither the dict nor the DOM has a matching row.
    */
-  static fromIndex(index: string | number): ParagraphEntry | null {
-    const key = String(index);
-    let entry = ParagraphEntry.byIndex[key];
+  static fromIndex(index: string): ParagraphEntry | null {
+    let entry = ParagraphEntry.byIndex[index];
 
     if (entry !== undefined && !entry.row.isConnected) {
-      const replacement = ParagraphEntry.lookupRow(key);
+      const replacement = ParagraphEntry.lookupRow(index);
       if (replacement !== null) {
-        entry = new ParagraphEntry(key, replacement);
+        entry = new ParagraphEntry(index, replacement);
       }
     }
 
     if (entry === undefined) {
-      const row = ParagraphEntry.lookupRow(key);
+      const row = ParagraphEntry.lookupRow(index);
       if (row === null) {
-        console.error(`ParagraphEntry: #paragraph${key} does not exist`);
+        console.error(`ParagraphEntry: #paragraph${index} does not exist`);
         return null;
       }
-      entry = new ParagraphEntry(key, row);
+      entry = new ParagraphEntry(index, row);
     }
     return entry;
   }

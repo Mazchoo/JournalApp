@@ -4,7 +4,7 @@ import { appendParagraphToList } from './entry/paragraph';
 import { deleteContent, enableDeleteButton } from './entry/delete';
 import { moveEntry } from './entry/move';
 import { saveToDatabase } from './entry/save';
-import { entryExists } from './runtime/config';
+import { entryExists } from './runtime/backend-variables';
 import { initializeCarousel } from './runtime/carousel';
 import { bindModalBehaviors } from './runtime/modals';
 import {

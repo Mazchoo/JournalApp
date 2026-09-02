@@ -6,7 +6,12 @@ import {
   moveObjectDown,
   moveObjectUp,
 } from '../common/utility';
-import { contentIndex, paragraphTemplate, setContentIndex } from '../runtime/config';
+import {
+  contentIndex,
+  contentIndexStr,
+  paragraphTemplate,
+  setContentIndex,
+} from '../runtime/backend-variables';
 import { tiny } from '../runtime/externals';
 import { showCallbackModal } from '../runtime/modals';
 import { createTinyMCE } from '../tinymce/helper';
@@ -16,8 +21,8 @@ import { enableSaveButton } from './save';
 /** Port of static/JS/entry.paragraph.js. */
 
 /** Fill the paragraph row template for the given content index. */
-export function generateParagraphTemplate(contentInd: string | number): string {
-  return paragraphTemplate().replaceAll('__INDEX__', String(contentInd));
+export function generateParagraphTemplate(contentInd: string): string {
+  return paragraphTemplate().replaceAll('__INDEX__', contentInd);
 }
 
 /** Delete an empty paragraph immediately, or confirm before deleting text. */
@@ -47,18 +52,19 @@ export function deleteParagraph(e: Event): void {
 /** Allocate the next content index and build a paragraph row. */
 export function createNewParagraph(): HTMLElement {
   setContentIndex(contentIndex() + 1);
+  const index = contentIndexStr();
   const div = componentFromTemplate(
-    generateParagraphTemplate(contentIndex()),
+    generateParagraphTemplate(index),
     'div',
     'row mt-3 paragraph-entry',
   );
-  new ParagraphEntry(String(contentIndex()), div);
+  new ParagraphEntry(index, div);
   return div;
 }
 
 /** Write text into the TinyMCE editor for the given index. */
 export function editParagraphContent(
-  updateInd: string | number | undefined,
+  updateInd: string | undefined,
   paragraphText: string | undefined,
 ): boolean {
   if (updateInd === undefined || paragraphText === undefined) return false;
@@ -73,7 +79,7 @@ export function editParagraphContent(
 
 /** Return an init callback that restores paragraph text, if any. */
 export function createInitFunction(
-  updateInd: string | number,
+  updateInd: string,
   paragraphText: string,
 ): () => void {
   if (paragraphText.length === 0) return () => {};
@@ -84,7 +90,7 @@ export function createInitFunction(
 
 /** Create the editor and bind the row's edit buttons. */
 export function initializeNewParagraph(
-  lastestId: string | number,
+  lastestId: string,
   height = 220,
   paragraphText = '',
   allowSynthesis = true,
@@ -119,6 +125,6 @@ export function appendParagraphToList(
 ): HTMLElement {
   const div = createNewParagraph();
   editArea.append(div);
-  initializeNewParagraph(String(contentIndex()), height, paragraphText);
+  initializeNewParagraph(contentIndexStr(), height, paragraphText);
   return div;
 }

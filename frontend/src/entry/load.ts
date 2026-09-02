@@ -8,7 +8,7 @@ import { initializeNewParagraph } from './paragraph';
 /** Port of static/JS/entry.load.js. */
 
 /** Fetch the downsized image for a server-rendered media row. */
-export function loadServerRenderedImage(index: string | number, imageId: string): void {
+export function loadServerRenderedImage(index: string, imageId: string): void {
   requestDownsizedImage(
     { image_id: imageId },
     {
@@ -29,7 +29,7 @@ export function loadServerRenderedImage(index: string | number, imageId: string)
 }
 
 /** Fetch the downsized poster frame for a server-rendered video row. */
-export function loadServerRenderedVideo(index: string | number, videoId: string): void {
+export function loadServerRenderedVideo(index: string, videoId: string): void {
   requestDownsizedVideoImage(
     { video_id: videoId },
     {
