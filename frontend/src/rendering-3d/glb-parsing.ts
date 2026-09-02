@@ -1,64 +1,13 @@
+import type { AccessorSlice, Gltf, GltfPrimitive } from './glb-interface';
+import {
+  FLOAT,
+  GLB_MAGIC,
+  TYPE_SIZE,
+  UNSIGNED_BYTE,
+  UNSIGNED_INT,
+  UNSIGNED_SHORT,
+} from './glb-interface';
 import type { ColorPass, IndexBuffer, MeshRenderData, TexCoordPass } from './render-data-types';
-
-/** glTF component type: FLOAT. */
-const FLOAT = 5126;
-/** glTF component type: UNSIGNED_BYTE. */
-const UNSIGNED_BYTE = 5121;
-/** glTF component type: UNSIGNED_SHORT. */
-const UNSIGNED_SHORT = 5123;
-/** glTF component type: UNSIGNED_INT. */
-const UNSIGNED_INT = 5125;
-
-const GLB_MAGIC = 0x46546c67;
-
-const TYPE_SIZE = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT4: 16 } as const;
-
-interface GltfAccessor {
-  bufferView: number;
-  byteOffset?: number;
-  componentType: number;
-  count: number;
-  type: keyof typeof TYPE_SIZE;
-}
-
-interface GltfBufferView {
-  byteOffset?: number;
-  byteLength: number;
-}
-
-interface GltfPrimitive {
-  attributes: Record<string, number>;
-  indices?: number;
-  material?: number;
-}
-
-interface GltfMaterial {
-  pbrMetallicRoughness?: {
-    baseColorFactor?: number[];
-    baseColorTexture?: { index: number };
-  };
-}
-
-interface GltfImage {
-  bufferView?: number;
-  mimeType?: string;
-}
-
-interface Gltf {
-  accessors: GltfAccessor[];
-  bufferViews: GltfBufferView[];
-  meshes?: { primitives: GltfPrimitive[] }[];
-  materials?: GltfMaterial[];
-  textures?: { source: number }[];
-  images?: GltfImage[];
-}
-
-interface AccessorSlice {
-  raw: ArrayBuffer;
-  acc: GltfAccessor;
-  typeSize: number;
-  compSize: number;
-}
 
 /** Slice one glTF accessor out of the binary chunk. */
 function sliceAccessor(gltf: Gltf, bin: ArrayBuffer, index: number): AccessorSlice {
