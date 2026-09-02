@@ -1,30 +1,9 @@
 import { MediaEntry } from '../../components/media-entry';
-import {
-  MESH_CANVAS_FALLBACK_WIDTH_PX,
-  MESH_CANVAS_HEIGHT_PX,
-  MESH_CANVAS_REVEAL_STYLE,
-} from '../../display-config';
 import { parseGlb, computeNormals } from '../../rendering-3d/glb-parsing';
 import { startRenderingLoop } from '../../rendering-3d/rendering-loop';
 import { enableSaveButton } from '../save';
 
 export { computeNormals };
-
-/** Reveal the canvas and return a WebGL context, or null if WebGL is unavailable. */
-function prepareMeshCanvas(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
-  Object.assign(canvas.style, MESH_CANVAS_REVEAL_STYLE);
-
-  canvas.width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
-  canvas.height = MESH_CANVAS_HEIGHT_PX;
-
-  const gl = (canvas.getContext('webgl') ??
-    canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
-  if (!gl) {
-    console.error('WebGL not supported');
-    return null;
-  }
-  return gl;
-}
 
 /**
  * Parse mesh bytes and start the shared WebGL preview.
@@ -40,7 +19,7 @@ function renderMeshBuffer(
   const mesh = parseGlb(buffer);
   if (mesh === null) return;
 
-  const gl = prepareMeshCanvas(canvas);
+  const gl = MediaEntry.prepareWebGL(canvas);
   if (gl === null) return;
 
   startRenderingLoop(gl, canvas, mesh, onComplete);

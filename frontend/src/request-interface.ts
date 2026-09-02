@@ -1,7 +1,7 @@
 /**
  * Typed POST bodies and callback shapes for every backend endpoint the page
  * talks to. JSON responses live in `response-interface.ts`. Implementations
- * live in `make-request.ts`.
+ * live in `entry/make-request.ts`.
  */
 
 import type { JsonErrorResponse } from './response-interface';

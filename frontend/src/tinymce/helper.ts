@@ -1,78 +1,23 @@
-import type { Editor, RawEditorOptions } from 'tinymce';
-
 import { enableSaveButton } from '../entry/save';
-import { tiny, type SynthesisEditor } from '../runtime/externals';
+import {
+  createTinyMCE as createEditor,
+  getMCEComponentHeight,
+  resetMCE as resetEditor,
+} from '../components/tinymce';
 
-/** Port of static/JS/tiny.mce.helper.js. */
+export { getMCEComponentHeight };
 
-/** Initialise a TinyMCE editor with the journal toolbar. */
+/** Initialise a TinyMCE editor and enable saving when the user edits. */
 export function createTinyMCE(
   componentName: string,
   height: number,
   allowSynthesis: boolean,
   initCallback: () => void = () => {},
 ): void {
-  const options: RawEditorOptions = {
-    selector: componentName,
-    toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis',
-    deprecation_warnings: false,
-    browser_spellcheck: true,
-    height: height,
-    promotion: false,
-    branding: false,
-    license_key: 'gpl',
-    setup: (editor: Editor) => {
-      editor.ui.registry.addButton('import', {
-        text: 'Import Markdown',
-        onAction: () => {
-          console.log('TinyMCE button clicked');
-        },
-      });
-
-      editor.ui.registry.addToggleButton('allowSynthesis', {
-        text: 'Generate',
-        tooltip:
-          "Allow content to create new AI generated content visible in the 'Derived Content' section",
-        onAction: (api) => {
-          allowSynthesis = !allowSynthesis;
-          api.setActive(allowSynthesis);
-          (editor as SynthesisEditor).synthesisEnabled = allowSynthesis;
-          enableSaveButton();
-        },
-        onSetup: (api) => {
-          api.setActive(allowSynthesis);
-          (editor as SynthesisEditor).synthesisEnabled = allowSynthesis;
-          return () => {};
-        },
-      });
-
-      editor.on('input', () => {
-        enableSaveButton();
-      });
-      editor.on('init', () => {
-        initCallback();
-      });
-    },
-  };
-
-  tiny().init(options);
+  createEditor(componentName, height, allowSynthesis, initCallback, enableSaveButton);
 }
 
-/** Return the editor container height plus two pixels. */
-export function getMCEComponentHeight(name: string): number {
-  return tiny().get(name)!.getContainer().clientHeight + 2;
-}
-
-/** Recreate a paragraph editor at its current height and synthesis state. */
+/** Recreate a paragraph editor, wiring dirty-state back to the save button. */
 export function resetMCE(div: Element | null | undefined): void {
-  if (div == null || !div.classList.contains('paragraph-entry')) {
-    return;
-  }
-
-  const divName = div.children[0]!.getAttribute('name')!;
-  const currentHeight = getMCEComponentHeight(divName);
-  const editor = tiny().get(divName) as SynthesisEditor | null;
-  const allowSynthesis = editor?.synthesisEnabled ?? true;
-  editor!.remove();
-  createTinyMCE('#' + divName, currentHeight, allowSynthesis, () => {});
+  resetEditor(div, enableSaveButton);
 }

@@ -1,7 +1,8 @@
 import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
-import { requestSaveEntry } from '../make-request';
+import { scrollToBottom } from '../components/common';
+import { requestSaveEntry } from './make-request';
 import type { SaveData } from '../request-interface';
 import { dateSlug } from '../runtime/backend-variables';
 import { showMessageSimpleModal } from '../runtime/modals';
@@ -42,9 +43,7 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
         if ('success' in response) showMessageSimpleModal('Save Success', response['success']);
         if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
         enableDeleteButton();
-        editArea.imageAreas().forEach((area) => {
-          area.addEventListener('click', zoomToMedia);
-        });
+        editArea.onImageAreaClick(zoomToMedia);
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
         showMessageSimpleModal('Unknown Error', errorThrown);
@@ -70,7 +69,7 @@ export function saveToDatabase(): void {
   disableSaveButton();
   saveSpinner.show();
   const saveData = getSaveData();
-  window.scrollTo(0, document.body.scrollHeight);
+  scrollToBottom();
   saveEntryToDatabase(saveData);
 }
 

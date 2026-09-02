@@ -13,7 +13,6 @@ import {
   paragraphTemplate,
   setContentIndex,
 } from '../runtime/backend-variables';
-import { tiny } from '../runtime/externals';
 import { showCallbackModal } from '../runtime/modals';
 import { createTinyMCE } from '../tinymce/helper';
 import { insertNewMediaToPosition } from './media/media';
@@ -69,13 +68,9 @@ export function editParagraphContent(
   paragraphText: string | undefined,
 ): boolean {
   if (updateInd === undefined || paragraphText === undefined) return false;
-  const paragraphDiv = tiny().get('paragraph' + updateInd);
-  if (paragraphDiv === null) {
-    return false;
-  }
-
-  paragraphDiv.setContent(paragraphText);
-  return true;
+  const paragraph = ParagraphEntry.fromIndex(updateInd);
+  if (paragraph === null) return false;
+  return paragraph.setContent(paragraphText);
 }
 
 /** Return an init callback that restores paragraph text, if any. */

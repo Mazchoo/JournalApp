@@ -1,6 +1,6 @@
 import { videoModal, videoPreview } from '../../components/globals';
 import { MediaEntry } from '../../components/media-entry';
-import { requestFullVideo } from '../../make-request';
+import { requestFullVideo } from '../make-request';
 import type { JsonErrorResponse } from '../../response-interface';
 import { dateSlug } from '../../runtime/backend-variables';
 import { enableSaveButton } from '../save';

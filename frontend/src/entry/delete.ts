@@ -1,5 +1,5 @@
 import { deleteButton, saveSpinner } from '../components/globals';
-import { requestDeleteEntry } from '../make-request';
+import { requestDeleteEntry } from './make-request';
 import { dateSlug } from '../runtime/backend-variables';
 import { showCallbackModal, showMessageSimpleModal } from '../runtime/modals';
 import { reloadPage } from '../runtime/navigation';

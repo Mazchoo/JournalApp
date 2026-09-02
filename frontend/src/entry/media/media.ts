@@ -101,11 +101,9 @@ export function uploadAllMediaFiles(
 
 /** Upload the files chosen on a row's file input. */
 export function showImageUpload(self: Event): void {
-  const input = self.target as HTMLInputElement;
-  if (!(input.id && input.files)) return;
-
-  const contentInd = input.id.replace('upload', '');
-  uploadAllMediaFiles(contentInd, input.files);
+  const upload = MediaEntry.uploadFromEvent(self);
+  if (upload === null) return;
+  uploadAllMediaFiles(upload.index, upload.files);
 }
 
 /** Apply loaded file name and synthesis state without changing the source. */
@@ -123,15 +121,12 @@ export function zoomToMedia(event: Event): void {
   const media = MediaEntry.fromEvent(event);
   if (media === null) return;
 
-  const img = media.image;
-  if (img === null) return;
-
   const fileName = media.fileNameHtml();
-  const source = img.getAttribute('src');
+  const source = media.src();
 
-  if (img.classList.contains('content-image')) {
+  if (media.isImage()) {
     openFullImage(fileName, source);
-  } else if (img.classList.contains('content-video')) {
+  } else if (media.isVideo()) {
     zoomToVideo(media, fileName, source);
   }
 }

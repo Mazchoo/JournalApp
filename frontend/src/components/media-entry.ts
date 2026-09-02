@@ -1,5 +1,9 @@
 import { ContentType } from '../common/content-types';
-import { MESH_CANVAS_REVEAL_STYLE } from '../display-config';
+import {
+  MESH_CANVAS_FALLBACK_WIDTH_PX,
+  MESH_CANVAS_HEIGHT_PX,
+  MESH_CANVAS_REVEAL_STYLE,
+} from '../display-config';
 import type { MediaSavePayload } from '../request-interface';
 import type { MediaContentThumbnail } from '../response-interface';
 import { dateSlug } from '../runtime/backend-variables';
@@ -60,7 +64,11 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Resolve the row that contains the event target. */
   static fromEvent(event: Event): MediaEntry | null {
     const target = event.target as Element | null;
-    const row = target?.closest('.image-entry') as HTMLElement | null;
+    if (target == null || typeof target.closest !== 'function') {
+      console.error('MediaEntry: event target is not inside a media row');
+      return null;
+    }
+    const row = target.closest('.image-entry') as HTMLElement | null;
     if (row === null) {
       console.error('MediaEntry: event target is not inside a media row');
       return null;
@@ -234,6 +242,49 @@ export class MediaEntry extends ContentRow implements IContent {
 
   videoId(): string | null {
     return this.image?.getAttribute('data-video-id') ?? null;
+  }
+
+  /** Preview source currently shown on the `<img>`. */
+  src(): string | null {
+    return this.image?.getAttribute('src') ?? null;
+  }
+
+  /** Whether the thumbnail is tagged as a still image. */
+  isImage(): boolean {
+    return this.image?.classList.contains('content-image') ?? false;
+  }
+
+  /** Whether the thumbnail is tagged as a video poster. */
+  isVideo(): boolean {
+    return this.image?.classList.contains('content-video') ?? false;
+  }
+
+  /**
+   * Index and files from an upload `change` event.
+   * Tests pass a stand-in target because jsdom cannot assign `HTMLInputElement.files`.
+   */
+  static uploadFromEvent(event: Event): { index: string; files: FileList | File[] } | null {
+    const target = event.target as { id?: string; files?: FileList | File[] } | null;
+    if (!target?.id || !target.files) return null;
+    return { index: target.id.replace('upload', ''), files: target.files };
+  }
+
+  /**
+   * Size the canvas and return a WebGL context.
+   * Returns null when WebGL is unavailable. Does not hide sibling media.
+   */
+  static prepareWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
+    Object.assign(canvas.style, MESH_CANVAS_REVEAL_STYLE);
+    canvas.width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
+    canvas.height = MESH_CANVAS_HEIGHT_PX;
+
+    const gl = (canvas.getContext('webgl') ??
+      canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    if (!gl) {
+      console.error('WebGL not supported');
+      return null;
+    }
+    return gl;
   }
 
   fileName(): string {

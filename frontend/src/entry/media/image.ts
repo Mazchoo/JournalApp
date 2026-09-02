@@ -1,7 +1,7 @@
 import { componentFromTemplate } from '../../common/utility';
 import { imageModal, imagePreview } from '../../components/globals';
 import { MediaEntry } from '../../components/media-entry';
-import { requestFullImage } from '../../make-request';
+import { requestFullImage } from '../make-request';
 import type { MediaContentThumbnail } from '../../response-interface';
 import {
   contentIndex,

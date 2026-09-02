@@ -5,7 +5,6 @@ import { deleteContent, enableDeleteButton } from './entry/delete';
 import { moveEntry } from './entry/move';
 import { saveToDatabase } from './entry/save';
 import { entryExists } from './runtime/backend-variables';
-import { initializeCarousel } from './runtime/carousel';
 import { bindModalBehaviors } from './runtime/modals';
 import {
   bindPageComponents,
@@ -30,9 +29,7 @@ export function bindDayPageHandlers(): void {
   });
   moveButton.onClick(moveEntry);
 
-  editArea.imageAreas().forEach((area) => {
-    area.addEventListener('click', zoomToMedia);
-  });
+  editArea.onImageAreaClick(zoomToMedia);
 
   if (entryExists()) enableDeleteButton();
 }
@@ -44,7 +41,6 @@ export function bindDayPageHandlers(): void {
 export function boot(): void {
   bindPageComponents();
   bindModalBehaviors();
-  initializeCarousel();
 
   if (editArea.exists()) {
     initializeServerRenderedContent();

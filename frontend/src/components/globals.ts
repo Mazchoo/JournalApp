@@ -2,6 +2,7 @@
  * Page-level DOM wrappers that do not come and go with content rows.
  * Call `bindPageComponents()` once the document (or a test fixture) is in place.
  */
+import { initializeCarousel } from './carousel';
 import {
   DateModalFields,
   DeleteButton,
@@ -71,4 +72,5 @@ export function bindPageComponents(): void {
   }
   dateModal.bind();
   forgetDetachedEntries();
+  initializeCarousel();
 }

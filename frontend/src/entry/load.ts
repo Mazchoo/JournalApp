@@ -1,7 +1,8 @@
 import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea } from '../components/globals';
-import { requestImageThumbnail, requestVideoThumbnail } from '../make-request';
+import { scrollToTop } from '../components/common';
+import { requestImageThumbnail, requestVideoThumbnail } from './make-request';
 import { initializeNewMedia } from './media/media';
 import { initializeNewParagraph } from './paragraph';
 
@@ -74,5 +75,5 @@ export function initializeServerRenderedContent(): void {
     }
   });
 
-  window.scrollTo(0, 0);
+  scrollToTop();
 }

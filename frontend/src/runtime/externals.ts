@@ -24,9 +24,3 @@ export function tiny(): TinyMCE {
 export function bs(): BootstrapGlobal {
   return window.bootstrap ?? missing('bootstrap');
 }
-
-/** Read the CSRF token Django renders via `{% csrf_token %}`. */
-export function csrfToken(): string {
-  const input = document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
-  return input!.value;
-}

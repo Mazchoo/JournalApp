@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { encodeNestedForm } from '../src/make-request';
+import { encodeNestedForm } from '../src/entry/make-request';
 
 describe('encodeNestedForm', () => {
   it('encodes nested objects as Django-style bracket keys', () => {

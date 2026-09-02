@@ -82,6 +82,14 @@ export class ParagraphEntry extends ContentRow implements IContent {
     };
   }
 
+  /** Write HTML into the TinyMCE editor. Returns false when the editor is missing. */
+  setContent(html: string): boolean {
+    const editor = tiny().get(this.saveId());
+    if (editor === null) return false;
+    editor.setContent(html);
+    return true;
+  }
+
   /** Height and synthesis flag stored on the server-rendered textarea. */
   editorSettings(): { height: number; allowSynthesis: boolean } {
     const height =

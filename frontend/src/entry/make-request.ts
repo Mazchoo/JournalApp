@@ -1,3 +1,4 @@
+import { csrfToken } from '../components/common';
 import type {
   DeleteEntryRequest,
   DownsizedImageRequest as ImageThumbnailRequest,
@@ -9,14 +10,14 @@ import type {
   RequestFields,
   SaveEntryRequest,
   TransportSettings,
-} from './request-interface';
+} from '../request-interface';
 import type {
   Base64MediaResponse,
   DeleteEntryResponse,
   JsonErrorResponse,
   MoveEntryResponse,
   SaveEntryResponse,
-} from './response-interface';
+} from '../response-interface';
 import {
   deleteUrl,
   downsizedImageUrl,
@@ -25,8 +26,7 @@ import {
   moveUrl,
   saveUrl,
   videoUrl,
-} from './runtime/backend-variables';
-import { csrfToken } from './runtime/externals';
+} from '../runtime/backend-variables';
 
 /**
  * HTTP implementations for the backend endpoints declared in

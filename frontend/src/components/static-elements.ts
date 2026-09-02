@@ -171,6 +171,13 @@ export class EditArea extends PageElement {
     return this.resolve()?.querySelectorAll('.image-area') ?? emptyNodeList();
   }
 
+  /** Bind a click listener on every current image-area. */
+  onImageAreaClick(handler: EventListener): void {
+    this.imageAreas().forEach((area) => {
+      area.addEventListener('click', handler);
+    });
+  }
+
   /** Elements that contribute to the save payload. */
   saveContent(): NodeListOf<Element> {
     return this.resolve()?.querySelectorAll('.save-content') ?? emptyNodeList();

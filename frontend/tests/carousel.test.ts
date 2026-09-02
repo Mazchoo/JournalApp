@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AUTO_CYCLE_MS } from '../src/display-config';
-import { initializeCarousel } from '../src/runtime/carousel';
+import { initializeCarousel } from '../src/components/carousel';
 
 /** Render a two-slide carousel matching templates/home.html. */
 function renderCarousel(auto = false): void {

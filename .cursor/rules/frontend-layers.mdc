@@ -1,0 +1,37 @@
+---
+description: Frontend layering — DOM via components, backend via entry
+globs: frontend/**/*.ts
+alwaysApply: false
+---
+
+# Frontend layering
+
+`frontend/src/components/**` is the only production code that may touch the DOM
+(`document`, `querySelector`, `classList`, `innerHTML`, `addEventListener` on
+nodes, `createElement`, layout/scroll, canvas style/size/context). Other
+`frontend/src` modules must go through those interfaces (`editArea.append(...)`,
+`MediaEntry.setSrc(...)`, `csrfToken()`, and so on).
+
+`frontend/src/entry/**` is the only production code that may talk to the
+backend (`fetch`, `requestSaveEntry`, URL-encoded POST bodies, response
+handling). Do not import `entry/make-request` from components, runtime, or
+common helpers.
+
+```typescript
+// ❌ BAD — DOM outside components
+document.getElementById('btn-save')!.classList.add('btn-success');
+
+// ✅ GOOD — component interface
+saveButton.enable();
+
+// ❌ BAD — fetch outside entry
+await fetch(saveUrl(), { method: 'POST', body });
+
+// ✅ GOOD — entry owns the request
+requestSaveEntry({ content, name: dateSlug() }, { success, error });
+```
+
+Allowed exceptions: `frontend/tests/**` (fixtures may use the DOM directly);
+`runtime/backend-variables.ts` and `runtime/externals.ts` (window globals, not
+document queries); `rendering-3d/**` (WebGL on a canvas already obtained from a
+component).
