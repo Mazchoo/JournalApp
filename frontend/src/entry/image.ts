@@ -8,7 +8,7 @@ import {
   moveObjectDown,
   moveObjectUp,
 } from '../common/utility';
-import { editArea, imagePreview, videoPreview } from '../components/globals';
+import { editArea, imageModal, imagePreview, videoModal, videoPreview } from '../components/globals';
 import { ImageEntry } from '../components/image-entry';
 import { requestFullImage, requestFullVideo } from '../make-request';
 import type { ImageContent, JsonErrorResponse } from '../response-interface';
@@ -19,7 +19,6 @@ import {
   imageTemplate,
   setContentIndex,
 } from '../runtime/backend-variables';
-import { showModal } from '../runtime/modals';
 import { initializeMeshRenderer } from './mesh';
 import { insertNewParagraphToPosition } from './paragraph';
 import { enableSaveButton } from './save';
@@ -230,7 +229,7 @@ export function zoomToImage(event: Event): void {
         },
         complete: () => {
           imagePreview.setSrc(imageSource!);
-          showModal('image-modal');
+          imageModal.show();
         },
       },
     );
@@ -255,7 +254,7 @@ export function zoomToImage(event: Event): void {
         },
         complete: () => {
           videoPreview.setSrc(imageSource!);
-          showModal('video-modal');
+          videoModal.show();
         },
       },
     );

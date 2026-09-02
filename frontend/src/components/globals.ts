@@ -16,6 +16,7 @@ import {
   VideoPreview,
 } from './static-elements';
 import { ImageEntry } from './image-entry';
+import { Modal } from './modal';
 import { ParagraphEntry } from './paragraph-entry';
 
 export const deleteButton = new DeleteButton();
@@ -29,6 +30,11 @@ export const editArea = new EditArea();
 export const imagePreview = new ImagePreview();
 export const videoPreview = new VideoPreview();
 export const dateModal = new DateModalFields();
+export const simpleModal = new Modal('simple-modal');
+export const callbackModal = new Modal('callback-modal');
+export const dateCallbackModal = new Modal('date-modal');
+export const imageModal = new Modal('image-modal');
+export const videoModal = new Modal('video-modal', () => videoPreview.reset());
 
 const staticComponents = [
   deleteButton,
@@ -41,6 +47,11 @@ const staticComponents = [
   editArea,
   imagePreview,
   videoPreview,
+  simpleModal,
+  callbackModal,
+  dateCallbackModal,
+  imageModal,
+  videoModal,
 ];
 
 /** Drop dict entries whose rows were replaced with a new document. */
