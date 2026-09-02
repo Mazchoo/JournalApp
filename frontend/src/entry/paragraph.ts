@@ -108,9 +108,11 @@ export function initializeNewParagraph(
 
 /** Insert a new paragraph row above the clicked row. */
 export function insertNewParagraphToPosition(e: Event): HTMLElement | undefined {
-  const contendInd = String(contentIndex() + 1);
   enableSaveButton();
-  return insertNewObjectIntoEditArea(e, createNewParagraph, initializeNewParagraph, contendInd);
+  const div = insertNewObjectIntoEditArea(e, createNewParagraph());
+  if (div === undefined) return undefined;
+  initializeNewParagraph(contentIndexStr());
+  return div;
 }
 
 /** Append a new paragraph row to the edit area. */

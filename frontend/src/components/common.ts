@@ -60,21 +60,14 @@ export function refreshScrollSpies(): void {
   });
 }
 
-/** Insert a new content row above the clicked row. */
+/** Insert a content row above the clicked row. */
 export function insertNewObjectIntoEditArea(
   e: Event,
-  newFunc: () => HTMLElement | undefined,
-  initFunc: (contentInd: string) => void,
-  contentInd: string,
+  div: HTMLElement,
 ): HTMLElement | undefined {
-  let parentDiv = document.querySelector(eventNameSelector(e));
-  if (parentDiv === null) return undefined;
-  const div = newFunc();
-  if (div === undefined) return undefined;
-  parentDiv = parentDiv.parentNode as HTMLElement;
-
+  const parentDiv = getParentDivOfObject(e);
+  if (parentDiv === undefined) return undefined;
   if (!editArea.insertBefore(div, parentDiv)) return undefined;
-  initFunc(contentInd);
   return div;
 }
 

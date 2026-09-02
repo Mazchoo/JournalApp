@@ -68,9 +68,11 @@ export function initializeNewMedia(lastestId: string): void {
 
 /** Insert a new media row above the clicked row. */
 export function insertNewMediaToPosition(e: Event): HTMLElement | undefined {
-  const contendInd = String(contentIndex() + 1);
   enableSaveButton();
-  return insertNewObjectIntoEditArea(e, createNewMedia, initializeNewMedia, contendInd);
+  const div = insertNewObjectIntoEditArea(e, createNewMedia());
+  if (div === undefined) return undefined;
+  initializeNewMedia(contentIndexStr());
+  return div;
 }
 
 /** Append a new media row to the edit area. */

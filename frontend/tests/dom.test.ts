@@ -193,52 +193,26 @@ describe('insertNewObjectIntoEditArea', () => {
     renderDayPage({ rows: ['paragraph', 'paragraph'] });
   });
 
-  it('inserts the new element before the row the event came from and initialises it', () => {
-    const initFunc = vi.fn();
+  it('inserts the element before the row the event came from', () => {
     const div = document.createElement('div');
     div.id = 'inserted';
 
-    const result = insertNewObjectIntoEditArea(
-      clickEventOn('#insert-paragraph1'),
-      () => div,
-      initFunc,
-      '2',
-    );
+    const result = insertNewObjectIntoEditArea(clickEventOn('#insert-paragraph1'), div);
 
     const editArea = document.getElementById('edit-area')!;
     expect(result).toBe(div);
     expect(editArea.children[1]).toBe(div);
-    expect(initFunc).toHaveBeenCalledWith('2');
   });
 
-  it('does not build anything when the event target names no row', () => {
-    const newFunc = vi.fn();
+  it('does not insert when the event target names no row', () => {
+    const div = document.createElement('div');
     const orphan = document.createElement('button');
     orphan.setAttribute('name', '.entry-region-99');
 
-    const result = insertNewObjectIntoEditArea(
-      { target: orphan } as unknown as Event,
-      newFunc as () => HTMLElement,
-      vi.fn(),
-      '2',
-    );
+    const result = insertNewObjectIntoEditArea({ target: orphan } as unknown as Event, div);
 
     expect(result).toBeUndefined();
-    expect(newFunc).not.toHaveBeenCalled();
-  });
-
-  it('skips insertion when the factory returns nothing', () => {
-    const initFunc = vi.fn();
-
-    const result = insertNewObjectIntoEditArea(
-      clickEventOn('#insert-paragraph1'),
-      () => undefined,
-      initFunc,
-      '2',
-    );
-
-    expect(result).toBeUndefined();
-    expect(initFunc).not.toHaveBeenCalled();
+    expect(div.parentNode).toBeNull();
     expect(document.getElementById('edit-area')!.children).toHaveLength(2);
   });
 });
