@@ -1,7 +1,5 @@
 import {
   componentFromTemplate,
-  deleteParentDiv,
-  eventNameSelector,
   getContentId,
   insertNewObjectIntoEditArea,
   isImageFile,
@@ -10,35 +8,20 @@ import {
   moveObjectDown,
   moveObjectUp,
 } from '../common/utility';
+import { editArea, imagePreview, videoPreview } from '../components/globals';
+import { ImageEntry } from '../components/image-entry';
 import { requestFullImage, requestFullVideo } from '../make-request';
 import type { JsonErrorResponse } from '../request-interface';
 import { contentIndex, dateSlug, imageTemplate, setContentIndex } from '../runtime/config';
 import { showModal } from '../runtime/modals';
+import type { ImageContent } from './content-types';
 import { initializeMeshRenderer } from './mesh';
 import { insertNewParagraphToPosition } from './paragraph';
 import { enableSaveButton } from './save';
 
+export type { ImageContent } from './content-types';
+
 /** Port of static/JS/entry.image.js. */
-
-/** Shape of the image/video payloads returned by main.content_generation.load_entry. */
-export interface ImageContent {
-  base64?: string;
-  file_name?: string;
-  allow_ai_synthesis?: number;
-}
-
-/** Apply or remove the two Generate-button classes according to the synthesis flag. */
-function setSynthesisButtonState(button: HTMLElement, isActive: boolean): void {
-  button.classList.toggle('btn-primary', isActive);
-  button.classList.toggle('btn-outline-secondary', !isActive);
-}
-
-/** Hide an element without removing it from layout calculations. */
-function hideMedia(element: HTMLElement | null): void {
-  if (element === null) return;
-  element.style.visibility = 'hidden';
-  element.style.height = '0px';
-}
 
 /** Fill the image row template for the given content index. */
 export function generateImageTemplate(contentInd: string | number): string {
@@ -48,40 +31,38 @@ export function generateImageTemplate(contentInd: string | number): string {
 /** Allocate the next content index and build an image row. */
 export function createNewImage(): HTMLElement {
   setContentIndex(contentIndex() + 1);
-  return componentFromTemplate(
+  const div = componentFromTemplate(
     generateImageTemplate(contentIndex()),
     'div',
     'row mt-4 image-entry',
   );
+  new ImageEntry(String(contentIndex()), div);
+  return div;
 }
 
 /** Remove the clicked image row and enable saving. */
 export function deleteImage(e: Event): void {
-  const imageDiv = document.querySelector(eventNameSelector(e));
-  deleteParentDiv(imageDiv);
+  const image = ImageEntry.fromEvent(e);
+  if (image === null) return;
+  image.remove();
   enableSaveButton();
 }
 
 /** Bind edit, upload, and synthesis handlers on an image row. */
 export function initializeNewImage(lastestId: string | number): void {
-  document.getElementById('upload' + lastestId)?.addEventListener('change', showImageUpload);
-
-  document.getElementById('delete-content' + lastestId)?.addEventListener('click', deleteImage);
-  document
-    .getElementById('insert-paragraph' + lastestId)
-    ?.addEventListener('click', insertNewParagraphToPosition);
-  document
-    .getElementById('insert-image' + lastestId)
-    ?.addEventListener('click', insertNewImageToPosition);
-  document.getElementById('move-content-up' + lastestId)?.addEventListener('click', moveObjectUp);
-  document
-    .getElementById('move-content-down' + lastestId)
-    ?.addEventListener('click', moveObjectDown);
-  document.getElementById('allow-syn' + lastestId)?.addEventListener('click', (event) => {
-    const button = event.currentTarget as HTMLElement;
-    button.classList.toggle('btn-primary');
-    button.classList.toggle('btn-outline-secondary');
-    enableSaveButton();
+  const image = ImageEntry.fromIndex(lastestId);
+  if (image === null) return;
+  image.bindHandlers({
+    onUpload: showImageUpload,
+    onDelete: deleteImage,
+    onInsertParagraph: insertNewParagraphToPosition,
+    onInsertImage: insertNewImageToPosition,
+    onMoveUp: moveObjectUp,
+    onMoveDown: moveObjectDown,
+    onToggleSynthesis: () => {
+      ImageEntry.toggleSynthesis(image);
+      enableSaveButton();
+    },
   });
 }
 
@@ -95,21 +76,20 @@ export function insertNewImageToPosition(e: Event): HTMLElement | undefined {
 /** Append a new image row to the edit area. */
 export function appendImageToList(): HTMLElement {
   const div = createNewImage();
-
-  document.getElementById('edit-area')!.appendChild(div);
+  editArea.append(div);
   initializeNewImage(String(contentIndex()));
-
   return div;
 }
 
 /** Preview an image file as a data URL. */
 export function readImageResource(inputFile: File, contentId: string | number): void {
+  const image = ImageEntry.fromIndex(contentId);
+  if (image === null) return;
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    hideMedia(document.getElementById('video' + contentId));
-    const image = document.getElementById('image' + contentId);
-    if (image !== null) image.setAttribute('src', e.target!.result as string);
+    ImageEntry.hideVideo(image);
+    ImageEntry.setSrc(image, e.target!.result as string);
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
@@ -117,15 +97,12 @@ export function readImageResource(inputFile: File, contentId: string | number): 
 
 /** Preview a video file as a data URL. */
 export function readVideoResource(inputFile: File, contentId: string | number): void {
+  const image = ImageEntry.fromIndex(contentId);
+  if (image === null) return;
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    const video = document.getElementById('video' + contentId);
-    if (video !== null) {
-      video.style.visibility = 'visible';
-      video.style.height = 'auto';
-      video.setAttribute('src', e.target!.result as string);
-    }
+    ImageEntry.showVideo(image, e.target!.result as string);
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
@@ -133,31 +110,26 @@ export function readVideoResource(inputFile: File, contentId: string | number): 
 
 /** Hide 2D media and start a GLB preview on the canvas. */
 export function loadMeshResource(inputFile: File, contentId: string | number): void {
-  hideMedia(document.getElementById('image' + contentId));
-  hideMedia(document.getElementById('video' + contentId));
-
-  const canvas = document.getElementById('mesh-canvas' + contentId) as HTMLCanvasElement | null;
-  if (canvas !== null) {
-    Object.assign(canvas.style, {
-      visibility: 'visible',
-      height: '400px',
-      display: 'block',
-      opacity: '1',
-      position: 'relative',
-      zIndex: '1',
-    });
-    initializeMeshRenderer(canvas, inputFile, () => {
-      enableSaveButton();
-    });
-  } else {
+  const image = ImageEntry.fromIndex(contentId);
+  if (image === null || image.canvas === null) {
     console.error('Canvas element not found for contentId:', contentId);
+    return;
   }
+
+  ImageEntry.hideImage(image);
+  ImageEntry.hideVideo(image);
+
+  if (!ImageEntry.showCanvas(image)) return;
+  initializeMeshRenderer(image.canvas, inputFile, () => {
+    enableSaveButton();
+  });
 }
 
 /** Write the uploaded file name into the row label. */
 export function showFileName(inputFile: File, contentId: string | number): void {
-  const infoArea = document.getElementById('upload-label' + contentId);
-  if (infoArea !== null) infoArea.textContent = inputFile.name;
+  const image = ImageEntry.fromIndex(contentId);
+  if (image === null) return;
+  ImageEntry.setFileName(image, inputFile.name);
 }
 
 /** Route each selected file to the matching media preview. */
@@ -167,7 +139,8 @@ export function uploadAllMediaFiles(
 ): void {
   for (let i = inputFiles.length - 1; i >= 0; i--) {
     if (i < inputFiles.length - 1) {
-      document.getElementById('insert-image' + contentInd)?.click();
+      const current = ImageEntry.fromIndex(contentInd);
+      if (current !== null) ImageEntry.clickInsertImage(current);
       contentInd = contentIndex();
     }
 
@@ -200,17 +173,9 @@ export function editImageContent(
   updateInd: string | number,
   imageContent: ImageContent,
 ): boolean | undefined {
-  const imageArea = document.getElementById('image' + updateInd);
-  const infoArea = document.getElementById('upload-label' + updateInd);
-  const allowSynthesis = document.getElementById('allow-syn' + updateInd);
-  if (imageArea == null || infoArea == null || allowSynthesis == null) {
-    return undefined;
-  }
-
-  imageArea.setAttribute('src', imageContent['base64']!);
-  setSynthesisButtonState(allowSynthesis, imageContent['allow_ai_synthesis'] === 1);
-  infoArea.textContent = imageContent['file_name']!;
-  return true;
+  const image = ImageEntry.fromIndex(updateInd);
+  if (image === null) return undefined;
+  return ImageEntry.applyContent(image, imageContent);
 }
 
 /** Apply loaded file name and synthesis state without changing the source. */
@@ -218,45 +183,34 @@ export function editImageMeta(
   updateInd: string | number,
   imageContent: ImageContent,
 ): boolean | undefined {
-  const infoArea = document.getElementById('upload-label' + updateInd);
-  const originalCheck = document.getElementById('allow-syn' + updateInd);
-  if (infoArea == null || originalCheck == null) {
-    return undefined;
-  }
-
-  setSynthesisButtonState(originalCheck, imageContent['allow_ai_synthesis'] === 1);
-  infoArea.textContent = imageContent['file_name']!;
-  return true;
+  const image = ImageEntry.fromIndex(updateInd);
+  if (image === null) return undefined;
+  return ImageEntry.applyMeta(image, imageContent);
 }
 
 /** Treat the media element as a video thumbnail. */
 export function changeImageToVideoClass(updateInd: string | number): boolean | undefined {
-  const imageArea = document.getElementById('image' + updateInd);
-  if (imageArea == null) {
-    return undefined;
-  }
-
-  imageArea.classList.remove('content-image');
-  imageArea.classList.add('content-video');
-  imageArea.style.visibility = 'visible';
-  imageArea.style.height = 'auto';
-  return true;
+  const image = ImageEntry.fromIndex(updateInd);
+  if (image === null) return undefined;
+  return ImageEntry.changeToVideoClass(image) ? true : undefined;
 }
 
 /** Open the full image or video in a modal. */
 export function zoomToImage(event: Event): void {
   const area = event.currentTarget as HTMLElement;
-  const image = area.querySelector('img');
+  const img = area.querySelector('img');
+  if (img === null) return;
+
+  const contentId = getContentId(img.id);
+  if (contentId === -1) return;
+
+  const image = ImageEntry.fromIndex(contentId);
   if (image === null) return;
 
-  const contentId = getContentId(image.id);
+  const imageName = image.fileNameHtml();
+  let imageSource = img.getAttribute('src');
 
-  if (contentId === -1) return;
-  const imageName = document.getElementById('upload-label' + contentId)?.innerHTML ?? '';
-
-  let imageSource = image.getAttribute('src');
-
-  if (image.classList.contains('content-image')) {
+  if (img.classList.contains('content-image')) {
     requestFullImage(
       {
         file: imageName,
@@ -271,13 +225,12 @@ export function zoomToImage(event: Event): void {
           console.log(`Unknown error : ${errorThrown}`);
         },
         complete: () => {
-          const preview = document.getElementById('image-preview');
-          if (preview !== null) preview.setAttribute('src', imageSource!);
+          imagePreview.setSrc(imageSource!);
           showModal('image-modal');
         },
       },
     );
-  } else if (image.classList.contains('content-video')) {
+  } else if (img.classList.contains('content-video')) {
     requestFullVideo(
       {
         file: imageName,
@@ -297,8 +250,7 @@ export function zoomToImage(event: Event): void {
           }
         },
         complete: () => {
-          const preview = document.getElementById('video-preview');
-          if (preview !== null) preview.setAttribute('src', imageSource!);
+          videoPreview.setSrc(imageSource!);
           showModal('video-modal');
         },
       },

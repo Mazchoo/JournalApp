@@ -1,5 +1,6 @@
 import { vi, type MockInstance } from 'vitest';
 
+import { bindPageComponents } from '../../src/components/globals';
 import * as modals from '../../src/runtime/modals';
 
 /**
@@ -119,6 +120,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
     </div>`;
 
   installTemplateGlobals(options.contentIndex ?? rows.length);
+  bindPageComponents();
 }
 
 /** Mirror the var declarations from templates/day.html. */

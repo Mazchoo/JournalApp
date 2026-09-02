@@ -7,20 +7,30 @@ import { saveToDatabase } from './entry/save';
 import { entryExists } from './runtime/config';
 import { initializeCarousel } from './runtime/carousel';
 import { bindModalBehaviors } from './runtime/modals';
+import {
+  bindPageComponents,
+  deleteButton,
+  editArea,
+  moveButton,
+  newImageButton,
+  newParagraphButton,
+  saveButton,
+  saveNavButton,
+} from './components/globals';
 
 /** Bind the day-page toolbar and image-zoom handlers. */
 export function bindDayPageHandlers(): void {
-  document.getElementById('btn-new-para')?.addEventListener('click', appendParagraphToList);
-  document.getElementById('btn-new-image')?.addEventListener('click', appendImageToList);
-  document.getElementById('btn-delete')?.addEventListener('click', deleteContent);
-  document.getElementById('btn-save')?.addEventListener('click', saveToDatabase);
-  document.getElementById('save-nav-button')?.addEventListener('click', (event) => {
+  newParagraphButton.onClick(appendParagraphToList);
+  newImageButton.onClick(appendImageToList);
+  deleteButton.onClick(deleteContent);
+  saveButton.onClick(saveToDatabase);
+  saveNavButton.onClick((event) => {
     event.preventDefault();
     saveToDatabase();
   });
-  document.getElementById('btn-move')?.addEventListener('click', moveEntry);
+  moveButton.onClick(moveEntry);
 
-  document.querySelectorAll('.image-area').forEach((area) => {
+  editArea.imageAreas().forEach((area) => {
     area.addEventListener('click', zoomToImage);
   });
 
@@ -32,10 +42,11 @@ export function bindDayPageHandlers(): void {
  * modal markup are all optional: each path no-ops when its DOM is absent.
  */
 export function boot(): void {
+  bindPageComponents();
   bindModalBehaviors();
   initializeCarousel();
 
-  if (document.getElementById('edit-area') !== null) {
+  if (editArea.exists()) {
     initializeServerRenderedContent();
     bindDayPageHandlers();
   }

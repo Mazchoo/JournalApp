@@ -1,3 +1,4 @@
+import { deleteButton, saveSpinner } from '../components/globals';
 import { requestDeleteEntry } from '../make-request';
 import { dateSlug } from '../runtime/config';
 import { showCallbackModal, showMessageSimpleModal } from '../runtime/modals';
@@ -7,20 +8,12 @@ import { reloadPage } from '../runtime/navigation';
 
 /** Enable the delete button. */
 export function enableDeleteButton(): void {
-  const button = document.getElementById('btn-delete');
-  if (button === null) return;
-  button.classList.remove('disabled');
-  button.classList.remove('btn-outline-danger');
-  button.classList.add('btn-danger');
+  deleteButton.enable();
 }
 
 /** Disable the delete button. */
 export function disableDeleteButton(): void {
-  const button = document.getElementById('btn-delete');
-  if (button === null) return;
-  button.classList.remove('btn-danger');
-  button.classList.add('disabled');
-  button.classList.add('btn-outline-danger');
+  deleteButton.disable();
 }
 
 /** POST a delete request for the current date slug. */
@@ -37,7 +30,7 @@ export function deleteFromDatabase(): void {
         showMessageSimpleModal('Unknown Error', errorThrown);
       },
       complete: () => {
-        document.getElementById('spinner-save')?.classList.add('invisible');
+        saveSpinner.hide();
         disableDeleteButton();
       },
     },
@@ -46,7 +39,7 @@ export function deleteFromDatabase(): void {
 
 /** Confirm, then delete the current entry from the database. */
 export function deleteContent(): void {
-  if (document.getElementById('btn-delete')?.classList.contains('disabled')) return;
+  if (deleteButton.isDisabled()) return;
 
   showCallbackModal(
     'Are you sure?',

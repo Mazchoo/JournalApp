@@ -1,3 +1,6 @@
+import { ImageEntry } from '../components/image-entry';
+import { ParagraphEntry } from '../components/paragraph-entry';
+import { editArea } from '../components/globals';
 import { requestDownsizedImage, requestDownsizedVideoImage } from '../make-request';
 import { initializeNewImage } from './image';
 import { initializeNewParagraph } from './paragraph';
@@ -11,8 +14,8 @@ export function loadServerRenderedImage(index: string | number, imageId: string)
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = document.getElementById('image' + index);
-          if (image !== null) image.setAttribute('src', response.base64);
+          const image = ImageEntry.fromIndex(index);
+          if (image !== null) ImageEntry.setSrc(image, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Image load error:', response.error);
@@ -32,8 +35,8 @@ export function loadServerRenderedVideo(index: string | number, videoId: string)
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = document.getElementById('image' + index);
-          if (image !== null) image.setAttribute('src', response.base64);
+          const image = ImageEntry.fromIndex(index);
+          if (image !== null) ImageEntry.setSrc(image, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Video image load error:', response.error);
@@ -48,29 +51,27 @@ export function loadServerRenderedVideo(index: string | number, videoId: string)
 
 /** Wire editors, handlers, and async loads for server-rendered rows. */
 export function initializeServerRenderedContent(): void {
-  document.querySelectorAll('.paragraph-entry').forEach((row) => {
-    const textarea = row.querySelector<HTMLTextAreaElement>('textarea.entry-text');
-    if (textarea === null) return;
-    const index = textarea.id.replace('paragraph', '');
-    const height = parseInt(textarea.getAttribute('data-height')!) || 220;
-    const allowSynthesis = textarea.getAttribute('data-allow-ai-synthesis') !== '0';
-    initializeNewParagraph(index, height, '', allowSynthesis);
+  editArea.paragraphRows().forEach((row) => {
+    const paragraph = ParagraphEntry.fromRow(row as HTMLElement);
+    if (paragraph === null || paragraph.textarea === null) return;
+    const height = parseInt(paragraph.textarea.getAttribute('data-height')!) || 220;
+    const allowSynthesis = paragraph.textarea.getAttribute('data-allow-ai-synthesis') !== '0';
+    initializeNewParagraph(paragraph.index, height, '', allowSynthesis);
   });
 
-  document.querySelectorAll('.image-entry').forEach((row) => {
-    const img = row.querySelector('img');
-    if (img === null) return;
-    const index = img.id.replace('image', '');
-    initializeNewImage(index);
+  editArea.imageRows().forEach((row) => {
+    const image = ImageEntry.fromRow(row as HTMLElement);
+    if (image === null) return;
+    initializeNewImage(image.index);
 
-    const imageId = img.getAttribute('data-image-id');
+    const imageId = image.image?.getAttribute('data-image-id');
     if (imageId) {
-      loadServerRenderedImage(index, imageId);
+      loadServerRenderedImage(image.index, imageId);
     }
 
-    const videoId = img.getAttribute('data-video-id');
+    const videoId = image.image?.getAttribute('data-video-id');
     if (videoId) {
-      loadServerRenderedVideo(index, videoId);
+      loadServerRenderedVideo(image.index, videoId);
     }
   });
 

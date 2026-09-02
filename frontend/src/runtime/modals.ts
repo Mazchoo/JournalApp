@@ -1,3 +1,5 @@
+import { videoPreview } from '../components/globals';
+
 /**
  * Bootstrap 4-compatible modal show/hide, plus the three journal modal helpers
  * that used to live as inline scripts in templates/Modals/*.html.
@@ -109,11 +111,7 @@ export function bindModalBehaviors(): void {
   document.addEventListener('hidden.bs.modal', (event) => {
     const modal = event.target;
     if (!(modal instanceof HTMLElement) || modal.id !== 'video-modal') return;
-    const video = document.getElementById('video-preview') as HTMLVideoElement | null;
-    if (video === null) return;
-    video.pause();
-    video.currentTime = 0;
-    video.src = '';
+    videoPreview.reset();
   });
 }
 

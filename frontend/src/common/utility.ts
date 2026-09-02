@@ -1,6 +1,7 @@
+import { editArea } from '../components/globals';
 import { enableSaveButton } from '../entry/save';
-import { resetMCE } from '../tinymce/helper';
 import { bs } from '../runtime/externals';
+import { resetMCE } from '../tinymce/helper';
 
 /** Port of static/JS/common.utility.js. */
 
@@ -83,7 +84,7 @@ export function insertNewObjectIntoEditArea(
   if (div === undefined) return undefined;
   parentDiv = parentDiv.parentNode as HTMLElement;
 
-  document.getElementById('edit-area')!.insertBefore(div, parentDiv);
+  if (!editArea.insertBefore(div, parentDiv)) return undefined;
   initFunc(contentInd);
   return div;
 }
@@ -112,28 +113,30 @@ export function getParentDivOfObject(e: Event): HTMLElement | undefined {
 /** Move a content row one position earlier in the edit area. */
 export function moveObjectUp(e: Event): void {
   const parentDiv = getParentDivOfObject(e);
-  const editAreaList = document.getElementById('edit-area')!;
-  const objInd = getIndexInArr(editAreaList.children, parentDiv as Element);
+  const children = editArea.children();
+  if (children === null || parentDiv === undefined) return;
+  const objInd = getIndexInArr(children, parentDiv as Element);
 
   if (objInd === undefined || objInd === 0) return;
 
-  editAreaList.insertBefore(parentDiv as HTMLElement, editAreaList.children[objInd - 1]!);
+  editArea.insertBefore(parentDiv as HTMLElement, children[objInd - 1]!);
   resetMCE(parentDiv);
-  resetMCE(editAreaList.children[objInd]);
+  resetMCE(children[objInd]);
   enableSaveButton();
 }
 
 /** Move a content row one position later in the edit area. */
 export function moveObjectDown(e: Event): void {
   const parentDiv = getParentDivOfObject(e);
-  const editAreaList = document.getElementById('edit-area')!;
-  const objInd = getIndexInArr(editAreaList.children, parentDiv as Element);
+  const children = editArea.children();
+  if (children === null || parentDiv === undefined) return;
+  const objInd = getIndexInArr(children, parentDiv as Element);
 
-  if (objInd === undefined || objInd === editAreaList.children.length - 1) return;
+  if (objInd === undefined || objInd === children.length - 1) return;
 
-  editAreaList.insertBefore(editAreaList.children[objInd + 1]!, parentDiv as HTMLElement);
+  editArea.insertBefore(children[objInd + 1]!, parentDiv as HTMLElement);
   resetMCE(parentDiv);
-  resetMCE(editAreaList.children[objInd]);
+  resetMCE(children[objInd]);
   enableSaveButton();
 }
 

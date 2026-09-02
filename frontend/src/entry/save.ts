@@ -1,3 +1,5 @@
+import { ImageEntry } from '../components/image-entry';
+import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
 import { requestSaveEntry } from '../make-request';
 import type { SaveData } from '../request-interface';
 import { dateSlug } from '../runtime/config';
@@ -33,25 +35,21 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
       };
     } else if (content.classList.contains('content-image') && content.src) {
       const ind = contentId.replace('image', '');
-      const allowSynthesis = document
-        .getElementById('allow-syn' + ind)
-        ?.classList.contains('btn-primary');
-      const fileName = document.getElementById('upload-label' + ind)!.textContent!;
+      const image = ImageEntry.fromIndex(ind);
+      if (image === null) continue;
       saveData[contentId] = {
-        file_path: fileName,
-        allow_ai_synthesis: allowSynthesis ? 1 : 0,
+        file_path: image.fileName(),
+        allow_ai_synthesis: image.isSynthesisActive() ? 1 : 0,
         entry: dateSlug(),
       };
     } else if (content.classList.contains('content-video') && content.src) {
       // Can be a video or an image
       const ind = contentId.replace('video', '').replace('image', '');
-      const allowSynthesis = document
-        .getElementById('allow-syn' + ind)
-        ?.classList.contains('btn-primary');
-      const fileName = document.getElementById('upload-label' + ind)!.textContent!;
+      const image = ImageEntry.fromIndex(ind);
+      if (image === null) continue;
       saveData[`video${ind}`] = {
-        file_path: fileName,
-        allow_ai_synthesis: allowSynthesis ? 1 : 0,
+        file_path: image.fileName(),
+        allow_ai_synthesis: image.isSynthesisActive() ? 1 : 0,
         entry: dateSlug(),
       };
     }
@@ -74,7 +72,7 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
         if ('success' in response) showMessageSimpleModal('Save Success', response['success']);
         if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
         enableDeleteButton();
-        document.querySelectorAll('.image-area').forEach((area) => {
+        editArea.imageAreas().forEach((area) => {
           area.addEventListener('click', zoomToImage);
         });
       },
@@ -82,7 +80,7 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
         showMessageSimpleModal('Unknown Error', errorThrown);
       },
       complete: () => {
-        document.getElementById('spinner-save')?.classList.add('invisible');
+        saveSpinner.hide();
       },
     },
   );
@@ -90,19 +88,17 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
 
 /** Collect the save payload from every `.save-content` element. */
 export function getSaveData(): SaveData | undefined {
-  return generateSaveEntry(document.querySelectorAll('.save-content'));
+  return generateSaveEntry(editArea.saveContent());
 }
 
 /** Disable the save button, show the spinner, and POST the entry. */
 export function saveToDatabase(): void {
-  const saveButton = document.getElementById('btn-save');
-  const spinner = document.getElementById('spinner-save');
-  if (saveButton?.classList.contains('disabled') || !spinner?.classList.contains('invisible')) {
+  if (saveButton.isDisabled() || saveSpinner.isVisible()) {
     return;
   }
 
   disableSaveButton();
-  spinner.classList.remove('invisible');
+  saveSpinner.show();
   const saveData = getSaveData();
   window.scrollTo(0, document.body.scrollHeight);
   saveEntryToDatabase(saveData);
@@ -110,20 +106,12 @@ export function saveToDatabase(): void {
 
 /** Enable the save button and nav link. */
 export function enableSaveButton(): void {
-  const button = document.getElementById('btn-save');
-  if (button === null) return;
-  button.classList.remove('disabled');
-  button.classList.remove('btn-outline-success');
-  button.classList.add('btn-success');
-  document.getElementById('save-nav-button')?.classList.remove('disabled');
+  if (!saveButton.enable()) return;
+  saveNavButton.enable();
 }
 
 /** Disable the save button and nav link. */
 export function disableSaveButton(): void {
-  const button = document.getElementById('btn-save');
-  if (button === null) return;
-  button.classList.remove('btn-success');
-  button.classList.add('disabled');
-  button.classList.add('btn-outline-success');
-  document.getElementById('save-nav-button')?.classList.add('disabled');
+  if (!saveButton.disable()) return;
+  saveNavButton.disable();
 }

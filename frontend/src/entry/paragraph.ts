@@ -1,7 +1,7 @@
+import { ParagraphEntry } from '../components/paragraph-entry';
+import { editArea } from '../components/globals';
 import {
   componentFromTemplate,
-  deleteParentDiv,
-  eventNameSelector,
   insertNewObjectIntoEditArea,
   moveObjectDown,
   moveObjectUp,
@@ -22,20 +22,18 @@ export function generateParagraphTemplate(contentInd: string | number): string {
 
 /** Delete an empty paragraph immediately, or confirm before deleting text. */
 export function deleteParagraph(e: Event): void {
-  const paragraphDiv = document.querySelector(eventNameSelector(e));
+  const paragraph = ParagraphEntry.fromEvent(e);
+  if (paragraph === null) return;
+
   /** Remove the paragraph row and enable saving. */
   const deleteParagraphs = (): void => {
-    deleteParentDiv(paragraphDiv);
+    paragraph.remove();
     enableSaveButton();
   };
 
-  const paragraphText = paragraphDiv?.querySelector<HTMLIFrameElement>('.tox-edit-area__iframe');
-  if (paragraphText !== undefined && paragraphText !== null) {
-    const paragraphContent = paragraphText.contentDocument!.body;
-    if (paragraphContent.innerText.trim().length === 0) {
-      deleteParagraphs();
-      return;
-    }
+  if (ParagraphEntry.isEmpty(paragraph)) {
+    deleteParagraphs();
+    return;
   }
 
   showCallbackModal(
@@ -49,11 +47,13 @@ export function deleteParagraph(e: Event): void {
 /** Allocate the next content index and build a paragraph row. */
 export function createNewParagraph(): HTMLElement {
   setContentIndex(contentIndex() + 1);
-  return componentFromTemplate(
+  const div = componentFromTemplate(
     generateParagraphTemplate(contentIndex()),
     'div',
     'row mt-3 paragraph-entry',
   );
+  new ParagraphEntry(String(contentIndex()), div);
+  return div;
 }
 
 /** Write text into the TinyMCE editor for the given index. */
@@ -89,20 +89,19 @@ export function initializeNewParagraph(
   paragraphText = '',
   allowSynthesis = true,
 ): void {
+  const paragraph = ParagraphEntry.fromIndex(lastestId);
+  if (paragraph === null) return;
+
   const initFunction = createInitFunction(lastestId, paragraphText);
   createTinyMCE('#paragraph' + lastestId, height, allowSynthesis, initFunction);
 
-  document.getElementById('delete-content' + lastestId)?.addEventListener('click', deleteParagraph);
-  document
-    .getElementById('insert-paragraph' + lastestId)
-    ?.addEventListener('click', insertNewParagraphToPosition);
-  document
-    .getElementById('insert-image' + lastestId)
-    ?.addEventListener('click', insertNewImageToPosition);
-  document.getElementById('move-content-up' + lastestId)?.addEventListener('click', moveObjectUp);
-  document
-    .getElementById('move-content-down' + lastestId)
-    ?.addEventListener('click', moveObjectDown);
+  paragraph.bindHandlers({
+    onDelete: deleteParagraph,
+    onInsertParagraph: insertNewParagraphToPosition,
+    onInsertImage: insertNewImageToPosition,
+    onMoveUp: moveObjectUp,
+    onMoveDown: moveObjectDown,
+  });
 }
 
 /** Insert a new paragraph row above the clicked row. */
@@ -119,9 +118,7 @@ export function appendParagraphToList(
   paragraphText = '',
 ): HTMLElement {
   const div = createNewParagraph();
-
-  document.getElementById('edit-area')!.appendChild(div);
+  editArea.append(div);
   initializeNewParagraph(String(contentIndex()), height, paragraphText);
-
   return div;
 }
