@@ -1,7 +1,7 @@
 import type {
   DeleteEntryRequest,
-  DownsizedImageRequest,
-  DownsizedVideoImageRequest,
+  DownsizedImageRequest as ImageThumbnailRequest,
+  DownsizedVideoImageRequest as VideoThumbnailRequest,
   FullContentRequest,
   MoveEntryRequest,
   RequestCallbacks,
@@ -152,16 +152,16 @@ export function requestMoveEntry(
 }
 
 /** POST an image id to `main:get-downsized-image`. */
-export function requestDownsizedImage(
-  fields: RequestFields<DownsizedImageRequest>,
+export function requestImageThumbnail(
+  fields: RequestFields<ImageThumbnailRequest>,
   callbacks: RequestCallbacks<Base64MediaResponse>,
 ): void {
   postJson(downsizedImageUrl(), fields, callbacks);
 }
 
 /** POST a video id to `main:get-downsized-video-image`. */
-export function requestDownsizedVideoImage(
-  fields: RequestFields<DownsizedVideoImageRequest>,
+export function requestVideoThumbnail(
+  fields: RequestFields<VideoThumbnailRequest>,
   callbacks: RequestCallbacks<Base64MediaResponse>,
 ): void {
   postJson(downsizedVideoImageUrl(), fields, callbacks);

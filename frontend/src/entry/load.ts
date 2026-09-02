@@ -1,7 +1,7 @@
 import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea } from '../components/globals';
-import { requestDownsizedImage, requestDownsizedVideoImage } from '../make-request';
+import { requestImageThumbnail, requestVideoThumbnail } from '../make-request';
 import { initializeNewMedia } from './media/media';
 import { initializeNewParagraph } from './paragraph';
 
@@ -9,7 +9,7 @@ import { initializeNewParagraph } from './paragraph';
 
 /** Fetch the downsized image for a server-rendered media row. */
 export function loadServerRenderedImage(index: string, imageId: string): void {
-  requestDownsizedImage(
+  requestImageThumbnail(
     { image_id: imageId },
     {
       success: (response) => {
@@ -30,7 +30,7 @@ export function loadServerRenderedImage(index: string, imageId: string): void {
 
 /** Fetch the downsized poster frame for a server-rendered video row. */
 export function loadServerRenderedVideo(index: string, videoId: string): void {
-  requestDownsizedVideoImage(
+  requestVideoThumbnail(
     { video_id: videoId },
     {
       success: (response) => {
