@@ -82,16 +82,16 @@ describe('makeMoveRequest', () => {
     });
   });
 
-  it('navigates to the new date on success', () => {
+  it('navigates to the new date on success', async () => {
     makeMoveRequest();
-    ajax.succeed({ new_date: '/2024/April/1/' });
+    await ajax.succeed({ new_date: '/2024/April/1/' });
 
     expect(vi.mocked(replaceLocation)).toHaveBeenCalledWith('/2024/April/1/');
   });
 
-  it('shows the reason and stays put when the server refuses', () => {
+  it('shows the reason and stays put when the server refuses', async () => {
     makeMoveRequest();
-    ajax.succeed({ error: 'Destination already has an entry' });
+    await ajax.succeed({ error: 'Destination already has an entry' });
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith(
       'Move Status',
@@ -100,16 +100,16 @@ describe('makeMoveRequest', () => {
     expect(vi.mocked(replaceLocation)).not.toHaveBeenCalled();
   });
 
-  it('shows a modal on a transport error', () => {
+  it('shows a modal on a transport error', async () => {
     makeMoveRequest();
-    ajax.fail('Bad Gateway');
+    await ajax.fail('Bad Gateway');
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith('Unknown Error', 'Bad Gateway');
   });
 
-  it('hides the spinner once the request settles', () => {
+  it('hides the spinner once the request settles', async () => {
     makeMoveRequest();
-    ajax.succeed({ error: 'nope' });
+    await ajax.succeed({ error: 'nope' });
 
     expect(document.getElementById('spinner-save')!.classList.contains('invisible')).toBe(true);
   });

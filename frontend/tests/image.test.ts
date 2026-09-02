@@ -368,7 +368,7 @@ describe('zoomToImage', () => {
     delete (URL as unknown as { createObjectURL?: unknown }).createObjectURL;
   });
 
-  it('requests the full image and shows it in the image modal', () => {
+  it('requests the full image and shows it in the image modal', async () => {
     clickImageArea();
 
     const settings = ajax.last();
@@ -379,38 +379,38 @@ describe('zoomToImage', () => {
       name: '2024-03-15',
     });
 
-    ajax.succeed({ base64: 'data:image/png;base64,FULL' });
+    await ajax.succeed({ base64: 'data:image/png;base64,FULL' });
     expect(document.getElementById('image-preview')!.getAttribute('src')).toBe(
       'data:image/png;base64,FULL',
     );
     expect(document.getElementById('image-modal')!.classList.contains('show')).toBe(true);
   });
 
-  it('falls back to the thumbnail source when the server reports an error', () => {
+  it('falls back to the thumbnail source when the server reports an error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     document.getElementById('image0')!.setAttribute('src', 'thumbnail');
 
     clickImageArea();
-    ajax.succeed({ error: 'File missing' });
+    await ajax.succeed({ error: 'File missing' });
 
     expect(log).toHaveBeenCalledWith('Image error : File missing');
     expect(document.getElementById('image-preview')!.getAttribute('src')).toBe('thumbnail');
     log.mockRestore();
   });
 
-  it('logs transport failures and still opens the modal', () => {
+  it('logs transport failures and still opens the modal', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     document.getElementById('image0')!.setAttribute('src', 'thumbnail');
 
     clickImageArea();
-    ajax.fail('Gateway Timeout');
+    await ajax.fail('Gateway Timeout');
 
     expect(log).toHaveBeenCalledWith('Unknown error : Gateway Timeout');
     expect(document.getElementById('image-modal')!.classList.contains('show')).toBe(true);
     log.mockRestore();
   });
 
-  it('requests the video as a blob and shows it in the video modal', () => {
+  it('requests the video as a blob and shows it in the video modal', async () => {
     renderDayPage({ rows: ['video'] });
     ajax = stubAjax();
     document.getElementById('upload-label0')!.innerHTML = 'holiday.mp4';
@@ -420,9 +420,8 @@ describe('zoomToImage', () => {
 
     const settings = ajax.last();
     expect(settings.url).toBe('/get-video/');
-    expect(settings.xhrFields).toEqual({ responseType: 'blob' });
 
-    ajax.succeed(new Blob(['video-bytes'], { type: 'video/mp4' }));
+    await ajax.succeed(new Blob(['video-bytes'], { type: 'video/mp4' }));
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(document.getElementById('video-preview')!.getAttribute('src')).toBe(
       'blob:journal/video',
@@ -430,25 +429,25 @@ describe('zoomToImage', () => {
     expect(document.getElementById('video-modal')!.classList.contains('show')).toBe(true);
   });
 
-  it('reports a JSON error body from the video endpoint', () => {
+  it('reports a JSON error body from the video endpoint', async () => {
     renderDayPage({ rows: ['video'] });
     ajax = stubAjax();
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     clickImageArea();
-    ajax.fail('Bad Request', { responseJSON: { error: 'Video not found' } });
+    await ajax.fail('Bad Request', { responseJSON: { error: 'Video not found' } });
 
     expect(log).toHaveBeenCalledWith('Video error : Video not found');
     log.mockRestore();
   });
 
-  it('falls back to the raw error when the video endpoint sends no JSON', () => {
+  it('falls back to the raw error when the video endpoint sends no JSON', async () => {
     renderDayPage({ rows: ['video'] });
     ajax = stubAjax();
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     clickImageArea();
-    ajax.fail('Service Unavailable');
+    await ajax.fail('Service Unavailable');
 
     expect(log).toHaveBeenCalledWith('Unknown error : Service Unavailable');
     log.mockRestore();

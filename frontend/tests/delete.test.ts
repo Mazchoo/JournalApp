@@ -84,16 +84,16 @@ describe('deleteFromDatabase', () => {
     expect(settings.data).toEqual({ csrfmiddlewaretoken: CSRF_TOKEN, name: '2024-03-15' });
   });
 
-  it('reloads the page on success', () => {
+  it('reloads the page on success', async () => {
     deleteFromDatabase();
-    ajax.succeed({ success: 'Deleted' });
+    await ajax.succeed({ success: 'Deleted' });
 
     expect(vi.mocked(reloadPage)).toHaveBeenCalledTimes(1);
   });
 
-  it('shows a modal on a server-reported error without reloading', () => {
+  it('shows a modal on a server-reported error without reloading', async () => {
     deleteFromDatabase();
-    ajax.succeed({ error: 'Entry is locked' });
+    await ajax.succeed({ error: 'Entry is locked' });
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith('Delete Error', {
       error: 'Entry is locked',
@@ -101,19 +101,19 @@ describe('deleteFromDatabase', () => {
     expect(vi.mocked(reloadPage)).not.toHaveBeenCalled();
   });
 
-  it('shows a modal on a transport error', () => {
+  it('shows a modal on a transport error', async () => {
     deleteFromDatabase();
-    ajax.fail('Bad Gateway');
+    await ajax.fail('Bad Gateway');
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith('Unknown Error', 'Bad Gateway');
   });
 
-  it('hides the spinner and re-disables the button once the request settles', () => {
+  it('hides the spinner and re-disables the button once the request settles', async () => {
     enableDeleteButton();
     document.getElementById('spinner-save')!.classList.remove('invisible');
 
     deleteFromDatabase();
-    ajax.succeed({ error: 'nope' });
+    await ajax.succeed({ error: 'nope' });
 
     expect(document.getElementById('spinner-save')!.classList.contains('invisible')).toBe(true);
     expect(document.getElementById('btn-delete')!.classList.contains('disabled')).toBe(true);

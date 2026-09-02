@@ -103,25 +103,6 @@ async function fetchTransport<TResponse>(settings: TransportSettings<TResponse>)
   }
 }
 
-// ToDo - use library for this instead of tests imposing dependency
-type RequestTransport = (settings: TransportSettings) => void;
-
-let requestTransport: RequestTransport = (settings) => {
-  void fetchTransport(settings);
-};
-
-/** Replace the HTTP transport. Used by the test suite to intercept requests. */
-export function setRequestTransport(transport: RequestTransport): void {
-  requestTransport = transport;
-}
-
-/** Restore the production `fetch` transport. */
-export function resetRequestTransport(): void {
-  requestTransport = (settings) => {
-    void fetchTransport(settings);
-  };
-}
-
 /** POST form-urlencoded data to a backend endpoint, always attaching the page CSRF token. */
 function postJson<TResponse>(
   url: string,
@@ -129,7 +110,7 @@ function postJson<TResponse>(
   callbacks: RequestCallbacks<TResponse>,
   extra?: Pick<TransportSettings, 'xhrFields'>,
 ): void {
-  requestTransport({
+  void fetchTransport({
     type: 'POST',
     url,
     data: {

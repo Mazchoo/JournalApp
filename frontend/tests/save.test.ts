@@ -142,26 +142,26 @@ describe('saveEntryToDatabase', () => {
     expect(ajax.calls).toHaveLength(0);
   });
 
-  it('reports success, enables deleting and rearms the image zoom', () => {
+  it('reports success, enables deleting and rearms the image zoom', async () => {
     saveEntryToDatabase({});
-    ajax.succeed({ success: 'Saved 2 items' });
+    await ajax.succeed({ success: 'Saved 2 items' });
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith('Save Success', 'Saved 2 items');
     expect(document.getElementById('btn-delete')!.classList.contains('btn-danger')).toBe(true);
     expect(document.getElementById('spinner-save')!.classList.contains('invisible')).toBe(true);
   });
 
-  it('reports server-side validation errors', () => {
+  it('reports server-side validation errors', async () => {
     saveEntryToDatabase({});
-    ajax.succeed({ error: 'Bad image' });
+    await ajax.succeed({ error: 'Bad image' });
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith('Save Errors', 'Bad image');
   });
 
-  it('reports transport errors and still hides the spinner', () => {
+  it('reports transport errors and still hides the spinner', async () => {
     document.getElementById('spinner-save')!.classList.remove('invisible');
     saveEntryToDatabase({});
-    ajax.fail('Internal Server Error');
+    await ajax.fail('Internal Server Error');
 
     expect(modals.showMessageSimpleModal).toHaveBeenCalledWith(
       'Unknown Error',

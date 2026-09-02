@@ -28,30 +28,30 @@ describe('loadServerRenderedImage', () => {
     expect(settings.data).toEqual({ image_id: 'i1', csrfmiddlewaretoken: CSRF_TOKEN });
   });
 
-  it('sets the returned base64 on the matching image', () => {
+  it('sets the returned base64 on the matching image', async () => {
     loadServerRenderedImage(1, 'i1');
-    ajax.succeed({ base64: 'data:image/png;base64,THUMB' });
+    await ajax.succeed({ base64: 'data:image/png;base64,THUMB' });
 
     expect(document.getElementById('image1')!.getAttribute('src')).toBe(
       'data:image/png;base64,THUMB',
     );
   });
 
-  it('logs a server-reported error', () => {
+  it('logs a server-reported error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     loadServerRenderedImage(1, 'i1');
-    ajax.succeed({ error: 'Cache miss' });
+    await ajax.succeed({ error: 'Cache miss' });
 
     expect(log).toHaveBeenCalledWith('Image load error:', 'Cache miss');
     log.mockRestore();
   });
 
-  it('logs a transport error', () => {
+  it('logs a transport error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     loadServerRenderedImage(1, 'i1');
-    ajax.fail('Not Found');
+    await ajax.fail('Not Found');
 
     expect(log).toHaveBeenCalledWith('Failed to load image:', 'Not Found');
     log.mockRestore();
@@ -67,30 +67,30 @@ describe('loadServerRenderedVideo', () => {
     expect(settings.data).toEqual({ video_id: 'v2', csrfmiddlewaretoken: CSRF_TOKEN });
   });
 
-  it('sets the returned poster frame on the matching image', () => {
+  it('sets the returned poster frame on the matching image', async () => {
     loadServerRenderedVideo(2, 'v2');
-    ajax.succeed({ base64: 'data:image/png;base64,POSTER' });
+    await ajax.succeed({ base64: 'data:image/png;base64,POSTER' });
 
     expect(document.getElementById('image2')!.getAttribute('src')).toBe(
       'data:image/png;base64,POSTER',
     );
   });
 
-  it('logs a server-reported error', () => {
+  it('logs a server-reported error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     loadServerRenderedVideo(2, 'v2');
-    ajax.succeed({ error: 'No frames' });
+    await ajax.succeed({ error: 'No frames' });
 
     expect(log).toHaveBeenCalledWith('Video image load error:', 'No frames');
     log.mockRestore();
   });
 
-  it('logs a transport error', () => {
+  it('logs a transport error', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     loadServerRenderedVideo(2, 'v2');
-    ajax.fail('Gone');
+    await ajax.fail('Gone');
 
     expect(log).toHaveBeenCalledWith('Failed to load video image:', 'Gone');
     log.mockRestore();
