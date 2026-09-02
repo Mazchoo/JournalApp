@@ -4,7 +4,6 @@ import {
   changeTooltipTextFromInput,
   componentFromTemplate,
   deleteParentDiv,
-  getContentId,
   getContentType,
   getIndexInArr,
   getParentDivOfObject,
@@ -168,19 +167,6 @@ describe('getContentType', () => {
 
   it('returns an empty string when there are no letters', () => {
     expect(getContentType('123')).toBe('');
-  });
-});
-
-describe('getContentId', () => {
-  it.each([
-    ['paragraph12', '12'],
-    ['image3', '3'],
-  ])('reads the digits out of %s', (key, expected) => {
-    expect(getContentId(key)).toBe(expected);
-  });
-
-  it('returns -1 when there are no digits', () => {
-    expect(getContentId('image')).toBe(-1);
   });
 });
 

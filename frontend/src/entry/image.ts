@@ -1,6 +1,5 @@
 import {
   componentFromTemplate,
-  getContentId,
   insertNewObjectIntoEditArea,
   isImageFile,
   isMeshFile,
@@ -200,15 +199,11 @@ export function changeImageToVideoClass(updateInd: string): boolean | undefined 
 
 /** Open the full image or video in a modal. */
 export function zoomToImage(event: Event): void {
-  const area = event.currentTarget as HTMLElement;
-  const img = area.querySelector('img');
-  if (img === null) return;
-
-  const contentId = getContentId(img.id);
-  if (contentId === -1) return;
-
-  const image = ImageEntry.fromIndex(contentId);
+  const image = ImageEntry.fromEvent(event);
   if (image === null) return;
+
+  const img = image.image;
+  if (img === null) return;
 
   const imageName = image.fileNameHtml();
   let imageSource = img.getAttribute('src');

@@ -12,7 +12,6 @@ export {
   changeTooltipTextFromInput,
   componentFromTemplate,
   deleteParentDiv,
-  getContentId,
   getContentType,
   getIndexInArr,
   getParentDivOfObject,

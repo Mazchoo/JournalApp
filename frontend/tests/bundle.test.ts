@@ -33,7 +33,6 @@ const NAMES_FROM_STATIC_JS = [
   'refreshScrollSpies',
   'insertNewObjectIntoEditArea',
   'getContentType',
-  'getContentId',
   'getParentDivOfObject',
   'moveObjectUp',
   'moveObjectDown',

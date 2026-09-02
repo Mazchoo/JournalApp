@@ -350,8 +350,7 @@ describe('changeImageToVideoClass', () => {
 describe('zoomToImage', () => {
   /** Click the first image area as `zoomToImage` expects. */
   function clickImageArea(): void {
-    const imageArea = document.querySelector('.image-area') as HTMLElement;
-    zoomToImage({ currentTarget: imageArea } as unknown as Event);
+    zoomToImage(eventFrom('.image-area'));
   }
 
   /** Stub `URL.createObjectURL`, which jsdom does not implement. */
@@ -454,11 +453,15 @@ describe('zoomToImage', () => {
     log.mockRestore();
   });
 
-  it('does nothing for an image id that carries no index', () => {
-    document.getElementById('image0')!.id = 'image';
+  it('does nothing when the click is not inside an image row', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    clickImageArea();
+    zoomToImage({ target: document.body } as unknown as Event);
 
     expect(ajax.calls).toHaveLength(0);
+    expect(error).toHaveBeenCalledWith(
+      'ImageEntry: event target is not inside an image row',
+    );
+    error.mockRestore();
   });
 });

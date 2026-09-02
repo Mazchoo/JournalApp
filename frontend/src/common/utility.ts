@@ -96,13 +96,6 @@ export function getContentType(key: string): string {
   return contentMatch[0]!;
 }
 
-/** Extract the numeric id from an element id. */
-export function getContentId(key: string): string | -1 {
-  const contentMatch = key.match(/([0-9]+)/g);
-  if (contentMatch === null) return -1;
-  return contentMatch[0]!;
-}
-
 /** Return the parent row of the clicked edit button. */
 export function getParentDivOfObject(e: Event): HTMLElement | undefined {
   const parentDiv = document.querySelector(eventNameSelector(e));
