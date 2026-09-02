@@ -33,7 +33,7 @@ export interface Base64MediaResponse {
 }
 
 /** Shape of the image/video payloads returned by main.content_generation.load_entry. */
-export interface ImageContent {
+export interface MediaContentThumbnail {
   base64?: string;
   file_name?: string;
   allow_ai_synthesis?: number;

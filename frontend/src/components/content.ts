@@ -1,30 +1,12 @@
 import { ContentType } from '../common/content-types';
 import type { MediaSavePayload, ParagraphSavePayload } from '../request-interface';
 
-/** One saveable piece of an entry, typed as image, video, or paragraph. */
+/** One saveable piece of an entry. */
 export interface IContent {
   readonly contentType: ContentType;
   readonly id: string;
   saveId(): string;
   serialize(): MediaSavePayload | ParagraphSavePayload;
-}
-
-/** Image media ready to POST to the backend. */
-export interface IImage extends IContent {
-  readonly contentType: ContentType.Image;
-  serialize(): MediaSavePayload;
-}
-
-/** Video media ready to POST to the backend. */
-export interface IVideo extends IContent {
-  readonly contentType: ContentType.Video;
-  serialize(): MediaSavePayload;
-}
-
-/** Paragraph editor ready to POST to the backend. */
-export interface IParagraph extends IContent {
-  readonly contentType: ContentType.Paragraph;
-  serialize(): ParagraphSavePayload;
 }
 
 /** Map a save-content element's CSS class to its content type. */

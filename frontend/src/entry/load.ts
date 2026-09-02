@@ -1,9 +1,9 @@
-import { ImageEntry } from '../components/image-entry';
+import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea } from '../components/globals';
 import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import { requestDownsizedImage, requestDownsizedVideoImage } from '../make-request';
-import { initializeNewImage } from './image';
+import { initializeNewMedia } from './media/media';
 import { initializeNewParagraph } from './paragraph';
 
 /** Port of static/JS/entry.load.js. */
@@ -15,8 +15,8 @@ export function loadServerRenderedImage(index: string, imageId: string): void {
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = ImageEntry.fromIndex(index);
-          if (image !== null) ImageEntry.setSrc(image, response.base64);
+          const image = MediaEntry.fromIndex(index);
+          if (image !== null) MediaEntry.setSrc(image, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Image load error:', response.error);
@@ -36,8 +36,8 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = ImageEntry.fromIndex(index);
-          if (image !== null) ImageEntry.setSrc(image, response.base64);
+          const image = MediaEntry.fromIndex(index);
+          if (image !== null) MediaEntry.setSrc(image, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Video image load error:', response.error);
@@ -61,9 +61,9 @@ export function initializeServerRenderedContent(): void {
   });
 
   editArea.imageRows().forEach((row) => {
-    const image = ImageEntry.fromRow(row as HTMLElement);
+    const image = MediaEntry.fromRow(row as HTMLElement);
     if (image === null) return;
-    initializeNewImage(image.index);
+    initializeNewMedia(image.index);
 
     const imageId = image.image?.getAttribute('data-image-id');
     if (imageId) {

@@ -1,5 +1,5 @@
 import { initializeServerRenderedContent } from './entry/load';
-import { appendImageToList, zoomToImage } from './entry/image';
+import { appendImageToList, zoomToMedia } from './entry/media/media';
 import { appendParagraphToList } from './entry/paragraph';
 import { deleteContent, enableDeleteButton } from './entry/delete';
 import { moveEntry } from './entry/move';
@@ -31,7 +31,7 @@ export function bindDayPageHandlers(): void {
   moveButton.onClick(moveEntry);
 
   editArea.imageAreas().forEach((area) => {
-    area.addEventListener('click', zoomToImage);
+    area.addEventListener('click', zoomToMedia);
   });
 
   if (entryExists()) enableDeleteButton();

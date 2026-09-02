@@ -1,14 +1,12 @@
-import { contentTypeFromElement } from '../components/content';
-import { ImageEntry } from '../components/image-entry';
+import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
-import { ContentType } from '../common/content-types';
 import { requestSaveEntry } from '../make-request';
 import type { SaveData } from '../request-interface';
 import { dateSlug } from '../runtime/backend-variables';
 import { showMessageSimpleModal } from '../runtime/modals';
 import { enableDeleteButton } from './delete';
-import { zoomToImage } from './image';
+import { zoomToMedia } from './media/media';
 
 export type { MediaSavePayload, ParagraphSavePayload, SaveData } from '../request-interface';
 
@@ -21,29 +19,10 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
 
   for (let i = 0; i < saveContent.length; i++) {
     const element = saveContent[i] as HTMLElement;
-    const contentType = contentTypeFromElement(element);
-    if (contentType === undefined) continue;
-
-    switch (contentType) {
-      case ContentType.Paragraph: {
-        const paragraph = ParagraphEntry.fromSaveElement(element)?.asParagraph();
-        if (paragraph === undefined) continue;
-        saveData[paragraph.saveId()] = paragraph.serialize();
-        break;
-      }
-      case ContentType.Image: {
-        const image = ImageEntry.fromSaveElement(element)?.asImage(element);
-        if (image == null) continue;
-        saveData[image.saveId()] = image.serialize();
-        break;
-      }
-      case ContentType.Video: {
-        const video = ImageEntry.fromSaveElement(element)?.asVideo(element);
-        if (video == null) continue;
-        saveData[video.saveId()] = video.serialize();
-        break;
-      }
-    }
+    const entry =
+      ParagraphEntry.fromSaveElement(element) ?? MediaEntry.fromSaveElement(element);
+    if (entry === null) continue;
+    saveData[entry.saveId()] = entry.serialize();
   }
 
   return saveData;
@@ -64,7 +43,7 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
         if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
         enableDeleteButton();
         editArea.imageAreas().forEach((area) => {
-          area.addEventListener('click', zoomToImage);
+          area.addEventListener('click', zoomToMedia);
         });
       },
       error: (_jqXhr, _textStatus, errorThrown) => {

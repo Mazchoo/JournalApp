@@ -15,7 +15,7 @@ import {
   SaveSpinner,
   VideoPreview,
 } from './static-elements';
-import { ImageEntry } from './image-entry';
+import { MediaEntry } from './media-entry';
 import { Modal } from './modal';
 import { ParagraphEntry } from './paragraph-entry';
 
@@ -56,8 +56,8 @@ const staticComponents = [
 
 /** Drop dict entries whose rows were replaced with a new document. */
 function forgetDetachedEntries(): void {
-  for (const [key, entry] of Object.entries(ImageEntry.byIndex)) {
-    if (!entry.row.isConnected) delete ImageEntry.byIndex[key];
+  for (const [key, entry] of Object.entries(MediaEntry.byIndex)) {
+    if (!entry.row.isConnected) delete MediaEntry.byIndex[key];
   }
   for (const [key, entry] of Object.entries(ParagraphEntry.byIndex)) {
     if (!entry.row.isConnected) delete ParagraphEntry.byIndex[key];

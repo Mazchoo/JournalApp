@@ -1,10 +1,12 @@
+import { MediaEntry } from '../../components/media-entry';
 import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
-} from '../display-config';
-import { parseGlb, computeNormals } from '../rendering-3d/glb-parsing';
-import { startRenderingLoop } from '../rendering-3d/rendering-loop';
+} from '../../display-config';
+import { parseGlb, computeNormals } from '../../rendering-3d/glb-parsing';
+import { startRenderingLoop } from '../../rendering-3d/rendering-loop';
+import { enableSaveButton } from '../save';
 
 export { computeNormals };
 
@@ -62,6 +64,14 @@ export function initializeMeshRenderer(
   reader.readAsArrayBuffer(inputFile);
 }
 
+/**
+ * Call target for `loadMeshResource`. Tests stub this to skip WebGL without
+ * mocking the whole module (same-file calls would ignore that mock).
+ */
+export const meshPreview = {
+  initialize: initializeMeshRenderer,
+};
+
 /** Parse a GLB buffer and draw a rotating mesh preview. */
 export function renderGLB(
   canvas: HTMLCanvasElement,
@@ -69,4 +79,21 @@ export function renderGLB(
   onComplete?: () => void,
 ): void {
   renderMeshBuffer(canvas, buffer, onComplete);
+}
+
+/** Hide 2D media and start a GLB preview on the canvas. */
+export function loadMeshResource(inputFile: File, contentId: string): void {
+  const media = MediaEntry.fromIndex(contentId);
+  if (media === null || media.canvas === null) {
+    console.error('Canvas element not found for contentId:', contentId);
+    return;
+  }
+
+  MediaEntry.hideImage(media);
+  MediaEntry.hideVideo(media);
+
+  if (!MediaEntry.showCanvas(media)) return;
+  meshPreview.initialize(media.canvas, inputFile, () => {
+    enableSaveButton();
+  });
 }

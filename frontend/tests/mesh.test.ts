@@ -5,7 +5,7 @@ import {
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
 } from '../src/display-config';
-import { computeNormals, initializeMeshRenderer, renderGLB } from '../src/entry/mesh';
+import { computeNormals, initializeMeshRenderer, renderGLB } from '../src/entry/media/mesh';
 import { buildGlb, buildTriangleGlb, prepareCanvas } from './helpers/glb';
 
 let canvas: HTMLCanvasElement;

@@ -2,28 +2,27 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 
 import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
 import {
-  appendImageToList,
   createNewImage,
   deleteImage,
   editImageContent,
-  editImageMeta,
   generateImageTemplate,
-  initializeNewImage,
-  insertNewImageToPosition,
-  loadMeshResource,
-  readImageResource,
+} from '../src/entry/media/image';
+import {
+  appendImageToList,
+  editMediaMeta,
+  initializeNewMedia,
+  insertNewMediaToPosition,
+  readMediaResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
-  zoomToImage,
-} from '../src/entry/image';
-import { changeImageToVideoClass, readVideoResource } from '../src/entry/video';
-import { initializeMeshRenderer } from '../src/entry/mesh';
+  zoomToMedia,
+} from '../src/entry/media/media';
+import { loadMeshResource, meshPreview } from '../src/entry/media/mesh';
+import { changeImageToVideoClass, readVideoResource } from '../src/entry/media/video';
 import { stubAjax, type AjaxStub } from './helpers/ajax';
 import { CSRF_TOKEN, fileNamed, renderDayPage } from './helpers/dom';
 import { installFakeTinyMCE } from './helpers/tinymce';
-
-vi.mock('../src/entry/mesh');
 
 let ajax: AjaxStub;
 
@@ -49,10 +48,14 @@ function waitForLabel(index: string, expected: string): Promise<void> {
 }
 
 beforeEach(() => {
-  vi.mocked(initializeMeshRenderer).mockClear();
+  vi.spyOn(meshPreview, 'initialize').mockImplementation(() => {});
   renderDayPage({ rows: ['image'] });
   installFakeTinyMCE();
   ajax = stubAjax();
+});
+
+afterEach(() => {
+  vi.mocked(meshPreview.initialize).mockRestore();
 });
 
 describe('generateImageTemplate', () => {
@@ -84,9 +87,9 @@ describe('deleteImage', () => {
   });
 });
 
-describe('initializeNewImage', () => {
+describe('initializeNewMedia', () => {
   it('toggles the Generate button between primary and outline', () => {
-    initializeNewImage('0');
+    initializeNewMedia('0');
     const button = document.getElementById('allow-syn0')!;
 
     document.getElementById('allow-syn0')!.click();
@@ -99,7 +102,7 @@ describe('initializeNewImage', () => {
   });
 
   it('enables saving when the Generate button is toggled', () => {
-    initializeNewImage('0');
+    initializeNewMedia('0');
 
     document.getElementById('allow-syn0')!.click();
 
@@ -107,7 +110,7 @@ describe('initializeNewImage', () => {
   });
 
   it('wires the delete button of the row', () => {
-    initializeNewImage('0');
+    initializeNewMedia('0');
 
     document.getElementById('delete-content0')!.click();
 
@@ -115,12 +118,12 @@ describe('initializeNewImage', () => {
   });
 });
 
-describe('insertNewImageToPosition', () => {
+describe('insertNewMediaToPosition', () => {
   it('inserts a new image row above the clicked one', () => {
     renderDayPage({ rows: ['image', 'image'] });
     installFakeTinyMCE();
 
-    const div = insertNewImageToPosition(eventFrom('#insert-image1'));
+    const div = insertNewMediaToPosition(eventFrom('#insert-image1'));
 
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children).toHaveLength(3);
@@ -141,9 +144,9 @@ describe('appendImageToList', () => {
   });
 });
 
-describe('readImageResource', () => {
+describe('readMediaResource', () => {
   it('puts the data URL on the image and hides the video element', async () => {
-    readImageResource(fileNamed('sunrise.png', 'binary', 'image/png'), '0');
+    readMediaResource(fileNamed('sunrise.png', 'binary', 'image/png'), '0');
 
     expect(await waitForSrc('image0')).toMatch(/^data:image\/png;base64,/);
     expect(document.getElementById('video0')!.style.visibility).toBe('hidden');
@@ -174,7 +177,7 @@ describe('loadMeshResource', () => {
     const canvas = document.getElementById('mesh-canvas0')!;
     expect(canvas.style.visibility).toBe(MESH_CANVAS_REVEAL_STYLE.visibility);
     expect(canvas.style.height).toBe(MESH_CANVAS_REVEAL_STYLE.height);
-    expect(vi.mocked(initializeMeshRenderer)).toHaveBeenCalledWith(
+    expect(vi.mocked(meshPreview.initialize)).toHaveBeenCalledWith(
       canvas,
       file,
       expect.any(Function),
@@ -184,7 +187,7 @@ describe('loadMeshResource', () => {
   it('enables saving through the renderer completion callback', () => {
     loadMeshResource(fileNamed('scan.glb'), '0');
 
-    const onComplete = vi.mocked(initializeMeshRenderer).mock.calls[0]![2]!;
+    const onComplete = vi.mocked(meshPreview.initialize).mock.calls[0]![2]!;
     onComplete();
 
     expect(document.getElementById('btn-save')!.classList.contains('btn-success')).toBe(true);
@@ -196,7 +199,7 @@ describe('loadMeshResource', () => {
     loadMeshResource(fileNamed('scan.glb'), '99');
 
     expect(error).toHaveBeenCalledWith('Canvas element not found for contentId:', '99');
-    expect(vi.mocked(initializeMeshRenderer)).not.toHaveBeenCalled();
+    expect(vi.mocked(meshPreview.initialize)).not.toHaveBeenCalled();
     error.mockRestore();
   });
 });
@@ -220,7 +223,7 @@ describe('uploadAllMediaFiles', () => {
   it('routes a mesh to the mesh renderer', () => {
     uploadAllMediaFiles('0', [fileNamed('scan.glb')]);
 
-    expect(vi.mocked(initializeMeshRenderer)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(meshPreview.initialize)).toHaveBeenCalledTimes(1);
   });
 
   it('logs unknown media types but still records the file name', () => {
@@ -234,7 +237,7 @@ describe('uploadAllMediaFiles', () => {
   });
 
   it('creates one extra row per additional file and fills them back to front', async () => {
-    initializeNewImage('0');
+    initializeNewMedia('0');
 
     uploadAllMediaFiles('0', [
       fileNamed('first.png', 'x', 'image/png'),
@@ -259,11 +262,11 @@ describe('showImageUpload', () => {
   }
 
   it('derives the row index from the input id and uploads its files', () => {
-    initializeNewImage('0');
+    initializeNewMedia('0');
 
     showImageUpload(changeEvent('upload0', [fileNamed('scan.glb')]));
 
-    expect(vi.mocked(initializeMeshRenderer)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(meshPreview.initialize)).toHaveBeenCalledTimes(1);
     expect(document.getElementById('upload-label0')!.textContent).toBe('scan.glb');
   });
 
@@ -276,7 +279,7 @@ describe('showImageUpload', () => {
   it('ignores inputs with no id', () => {
     showImageUpload(changeEvent('', [fileNamed('scan.glb')]));
 
-    expect(vi.mocked(initializeMeshRenderer)).not.toHaveBeenCalled();
+    expect(vi.mocked(meshPreview.initialize)).not.toHaveBeenCalled();
   });
 });
 
@@ -312,11 +315,11 @@ describe('editImageContent', () => {
   });
 });
 
-describe('editImageMeta', () => {
+describe('editMediaMeta', () => {
   it('updates the file name and Generate button without touching the source', () => {
     document.getElementById('image0')!.setAttribute('src', 'keep-me');
 
-    const applied = editImageMeta('0', { file_name: 'holiday.mp4', allow_ai_synthesis: 1 });
+    const applied = editMediaMeta('0', { file_name: 'holiday.mp4', allow_ai_synthesis: 1 });
 
     expect(applied).toBe(true);
     expect(document.getElementById('image0')!.getAttribute('src')).toBe('keep-me');
@@ -325,7 +328,7 @@ describe('editImageMeta', () => {
   });
 
   it('returns undefined when the row is missing', () => {
-    expect(editImageMeta('99', { file_name: 'a.png' })).toBeUndefined();
+    expect(editMediaMeta('99', { file_name: 'a.png' })).toBeUndefined();
   });
 });
 
@@ -346,10 +349,10 @@ describe('changeImageToVideoClass', () => {
   });
 });
 
-describe('zoomToImage', () => {
-  /** Click the first image area as `zoomToImage` expects. */
+describe('zoomToMedia', () => {
+  /** Click the first image area as `zoomToMedia` expects. */
   function clickImageArea(): void {
-    zoomToImage(eventFrom('.image-area'));
+    zoomToMedia(eventFrom('.image-area'));
   }
 
   /** Stub `URL.createObjectURL`, which jsdom does not implement. */
@@ -455,11 +458,11 @@ describe('zoomToImage', () => {
   it('does nothing when the click is not inside an image row', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    zoomToImage({ target: document.body } as unknown as Event);
+    zoomToMedia({ target: document.body } as unknown as Event);
 
     expect(ajax.calls).toHaveLength(0);
     expect(error).toHaveBeenCalledWith(
-      'ImageEntry: event target is not inside an image row',
+      'MediaEntry: event target is not inside a media row',
     );
     error.mockRestore();
   });

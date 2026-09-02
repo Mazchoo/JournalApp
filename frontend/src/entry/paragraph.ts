@@ -16,7 +16,7 @@ import {
 import { tiny } from '../runtime/externals';
 import { showCallbackModal } from '../runtime/modals';
 import { createTinyMCE } from '../tinymce/helper';
-import { insertNewImageToPosition } from './image';
+import { insertNewMediaToPosition } from './media/media';
 import { enableSaveButton } from './save';
 
 /** Port of static/JS/entry.paragraph.js. */
@@ -105,7 +105,7 @@ export function initializeNewParagraph(
   paragraph.bindHandlers({
     onDelete: deleteParagraph,
     onInsertParagraph: insertNewParagraphToPosition,
-    onInsertImage: insertNewImageToPosition,
+    onInsertImage: insertNewMediaToPosition,
     onMoveUp: moveObjectUp,
     onMoveDown: moveObjectDown,
   });

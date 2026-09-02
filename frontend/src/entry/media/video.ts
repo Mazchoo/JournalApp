@@ -1,18 +1,18 @@
-import { videoModal, videoPreview } from '../components/globals';
-import { ImageEntry } from '../components/image-entry';
-import { requestFullVideo } from '../make-request';
-import type { JsonErrorResponse } from '../response-interface';
-import { dateSlug } from '../runtime/backend-variables';
-import { enableSaveButton } from './save';
+import { videoModal, videoPreview } from '../../components/globals';
+import { MediaEntry } from '../../components/media-entry';
+import { requestFullVideo } from '../../make-request';
+import type { JsonErrorResponse } from '../../response-interface';
+import { dateSlug } from '../../runtime/backend-variables';
+import { enableSaveButton } from '../save';
 
 /** Preview a video file as a data URL. */
 export function readVideoResource(inputFile: File, contentId: string): void {
-  const image = ImageEntry.fromIndex(contentId);
-  if (image === null) return;
+  const media = MediaEntry.fromIndex(contentId);
+  if (media === null) return;
   const reader = new FileReader();
 
   reader.onload = (e) => {
-    ImageEntry.showVideo(image, e.target!.result as string);
+    MediaEntry.showVideo(media, e.target!.result as string);
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
@@ -20,13 +20,13 @@ export function readVideoResource(inputFile: File, contentId: string): void {
 
 /** Treat the media element as a video thumbnail. */
 export function changeImageToVideoClass(updateInd: string): boolean | undefined {
-  const image = ImageEntry.fromIndex(updateInd);
-  if (image === null) return undefined;
-  return ImageEntry.changeToVideoClass(image) ? true : undefined;
+  const media = MediaEntry.fromIndex(updateInd);
+  if (media === null) return undefined;
+  return MediaEntry.changeToVideoClass(media) ? true : undefined;
 }
 
 /** Open the full video in a modal. */
-export function zoomToVideo(image: ImageEntry, fileName: string, source: string | null): void {
+export function zoomToVideo(media: MediaEntry, fileName: string, source: string | null): void {
   let videoSource = source;
 
   requestFullVideo(

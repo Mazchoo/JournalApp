@@ -40,29 +40,31 @@ export {
   insertNewParagraphToPosition,
 } from './entry/paragraph';
 
-export { computeNormals, initializeMeshRenderer, renderGLB } from './entry/mesh';
+export { computeNormals, initializeMeshRenderer, loadMeshResource, renderGLB } from './entry/media/mesh';
 
 export {
-  appendImageToList,
   createNewImage,
   deleteImage,
   editImageContent,
-  editImageMeta,
   generateImageTemplate,
-  initializeNewImage,
-  insertNewImageToPosition,
-  loadMeshResource,
-  readImageResource,
+} from './entry/media/image';
+
+export {
+  appendImageToList,
+  editMediaMeta,
+  initializeNewMedia,
+  insertNewMediaToPosition,
+  readMediaResource,
   showFileName,
   showImageUpload,
   uploadAllMediaFiles,
-  zoomToImage,
-} from './entry/image';
+  zoomToMedia,
+} from './entry/media/media';
 
 export {
   changeImageToVideoClass,
   readVideoResource,
-} from './entry/video';
+} from './entry/media/video';
 
 export {
   deleteContent,
@@ -89,5 +91,5 @@ export {
 export { getDestinationSlug, makeMoveRequest, moveEntry } from './entry/move';
 
 export type { MediaSavePayload, ParagraphSavePayload, SaveData } from './request-interface';
-export type { ImageContent } from './response-interface';
+export type { MediaContentThumbnail as ImageContent } from './response-interface';
 export type { SynthesisEditor } from './runtime/externals';
