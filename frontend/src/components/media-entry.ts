@@ -37,24 +37,24 @@ export class MediaEntry extends ContentRow implements IContent {
    * Logs when neither the dict nor the DOM has a matching row.
    */
   static fromIndex(index: string): MediaEntry | null {
-    let entry = MediaEntry.byIndex[index];
+    let media = MediaEntry.byIndex[index];
 
-    if (entry !== undefined && !entry.row.isConnected) {
+    if (media !== undefined && !media.row.isConnected) {
       const replacement = MediaEntry.lookupRow(index);
       if (replacement !== null) {
-        entry = new MediaEntry(index, replacement);
+        media = new MediaEntry(index, replacement);
       }
     }
 
-    if (entry === undefined) {
+    if (media === undefined) {
       const row = MediaEntry.lookupRow(index);
       if (row === null) {
         console.error(`MediaEntry: #image${index} does not exist`);
         return null;
       }
-      entry = new MediaEntry(index, row);
+      media = new MediaEntry(index, row);
     }
-    return entry;
+    return media;
   }
 
   /** Resolve the row that contains the event target. */
@@ -222,10 +222,18 @@ export class MediaEntry extends ContentRow implements IContent {
     }
     const row = element.closest('.image-entry') as HTMLElement | null;
     if (row === null) return null;
-    const entry = MediaEntry.fromRow(row);
-    if (entry === null) return null;
-    entry.derivedType = contentType;
-    return entry;
+    const media = MediaEntry.fromRow(row);
+    if (media === null) return null;
+    media.derivedType = contentType;
+    return media;
+  }
+
+  imageId(): string | null {
+    return this.image?.getAttribute('data-image-id') ?? null;
+  }
+
+  videoId(): string | null {
+    return this.image?.getAttribute('data-video-id') ?? null;
   }
 
   fileName(): string {

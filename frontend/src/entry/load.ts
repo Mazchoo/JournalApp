@@ -1,7 +1,6 @@
 import { MediaEntry } from '../components/media-entry';
 import { ParagraphEntry } from '../components/paragraph-entry';
 import { editArea } from '../components/globals';
-import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import { requestDownsizedImage, requestDownsizedVideoImage } from '../make-request';
 import { initializeNewMedia } from './media/media';
 import { initializeNewParagraph } from './paragraph';
@@ -15,8 +14,8 @@ export function loadServerRenderedImage(index: string, imageId: string): void {
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = MediaEntry.fromIndex(index);
-          if (image !== null) MediaEntry.setSrc(image, response.base64);
+          const media = MediaEntry.fromIndex(index);
+          if (media !== null) MediaEntry.setSrc(media, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Image load error:', response.error);
@@ -36,8 +35,8 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
     {
       success: (response) => {
         if (response.base64 !== undefined) {
-          const image = MediaEntry.fromIndex(index);
-          if (image !== null) MediaEntry.setSrc(image, response.base64);
+          const media = MediaEntry.fromIndex(index);
+          if (media !== null) MediaEntry.setSrc(media, response.base64);
         }
         if (response.error !== undefined) {
           console.log('Video image load error:', response.error);
@@ -54,25 +53,24 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
 export function initializeServerRenderedContent(): void {
   editArea.paragraphRows().forEach((row) => {
     const paragraph = ParagraphEntry.fromRow(row as HTMLElement);
-    if (paragraph === null || paragraph.textarea === null) return;
-    const height = parseInt(paragraph.textarea.getAttribute('data-height')!) || PARAGRAPH_EDITOR_HEIGHT_PX;
-    const allowSynthesis = paragraph.textarea.getAttribute('data-allow-ai-synthesis') !== '0';
+    if (paragraph === null) return;
+    const { height, allowSynthesis } = paragraph.editorSettings();
     initializeNewParagraph(paragraph.index, height, '', allowSynthesis);
   });
 
   editArea.imageRows().forEach((row) => {
-    const image = MediaEntry.fromRow(row as HTMLElement);
-    if (image === null) return;
-    initializeNewMedia(image.index);
+    const media = MediaEntry.fromRow(row as HTMLElement);
+    if (media === null) return;
+    initializeNewMedia(media.index);
 
-    const imageId = image.image?.getAttribute('data-image-id');
+    const imageId = media.imageId();
     if (imageId) {
-      loadServerRenderedImage(image.index, imageId);
+      loadServerRenderedImage(media.index, imageId);
     }
 
-    const videoId = image.image?.getAttribute('data-video-id');
+    const videoId = media.videoId();
     if (videoId) {
-      loadServerRenderedVideo(image.index, videoId);
+      loadServerRenderedVideo(media.index, videoId);
     }
   });
 

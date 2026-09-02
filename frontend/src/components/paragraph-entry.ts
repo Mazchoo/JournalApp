@@ -1,4 +1,5 @@
 import { ContentType } from '../common/content-types';
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
 import type { ParagraphSavePayload } from '../request-interface';
 import { dateSlug } from '../runtime/backend-variables';
 import { tiny, type SynthesisEditor } from '../runtime/externals';
@@ -79,6 +80,14 @@ export class ParagraphEntry extends ContentRow implements IContent {
       allow_ai_synthesis: allowSynthesis ? 1 : 0,
       entry: dateSlug(),
     };
+  }
+
+  /** Height and synthesis flag stored on the server-rendered textarea. */
+  editorSettings(): { height: number; allowSynthesis: boolean } {
+    const height =
+      parseInt(this.textarea?.getAttribute('data-height') ?? '') || PARAGRAPH_EDITOR_HEIGHT_PX;
+    const allowSynthesis = this.textarea?.getAttribute('data-allow-ai-synthesis') !== '0';
+    return { height, allowSynthesis };
   }
 
   /** Resolve the paragraph row that owns a save-content element. */
