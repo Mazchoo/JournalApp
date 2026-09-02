@@ -11,7 +11,7 @@ import {
 import { editArea, imagePreview, videoPreview } from '../components/globals';
 import { ImageEntry } from '../components/image-entry';
 import { requestFullImage, requestFullVideo } from '../make-request';
-import type { JsonErrorResponse } from '../request-interface';
+import type { ImageContent, JsonErrorResponse } from '../response-interface';
 import {
   contentIndex,
   contentIndexStr,
@@ -20,12 +20,9 @@ import {
   setContentIndex,
 } from '../runtime/backend-variables';
 import { showModal } from '../runtime/modals';
-import type { ImageContent } from './content-types';
 import { initializeMeshRenderer } from './mesh';
 import { insertNewParagraphToPosition } from './paragraph';
 import { enableSaveButton } from './save';
-
-export type { ImageContent } from './content-types';
 
 /** Port of static/JS/entry.image.js. */
 

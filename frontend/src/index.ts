@@ -86,6 +86,6 @@ export {
 
 export { getDestinationSlug, makeMoveRequest, moveEntry } from './entry/move';
 
-export type { ImageContent } from './entry/image';
 export type { MediaSavePayload, ParagraphSavePayload, SaveData } from './request-interface';
+export type { ImageContent } from './response-interface';
 export type { SynthesisEditor } from './runtime/externals';

@@ -1,20 +1,22 @@
 import type {
-  Base64MediaResponse,
   DeleteEntryRequest,
-  DeleteEntryResponse,
   DownsizedImageRequest,
   DownsizedVideoImageRequest,
   FullContentRequest,
-  JsonErrorResponse,
   MoveEntryRequest,
-  MoveEntryResponse,
   RequestCallbacks,
   RequestError,
   RequestFields,
   SaveEntryRequest,
-  SaveEntryResponse,
   TransportSettings,
 } from './request-interface';
+import type {
+  Base64MediaResponse,
+  DeleteEntryResponse,
+  JsonErrorResponse,
+  MoveEntryResponse,
+  SaveEntryResponse,
+} from './response-interface';
 import {
   deleteUrl,
   downsizedImageUrl,
@@ -27,7 +29,8 @@ import {
 import { csrfToken } from './runtime/externals';
 
 /**
- * HTTP implementations for the backend endpoints declared in `request-interface.ts`.
+ * HTTP implementations for the backend endpoints declared in
+ * `request-interface.ts` and `response-interface.ts`.
  *
  * Bodies are `application/x-www-form-urlencoded` with nested keys
  * (`content[paragraph0][text]=...`) because Django's `convert_query_into_nested_dict`

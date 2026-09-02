@@ -1,12 +1,10 @@
 /**
- * Typed POST bodies, JSON responses, and callback shapes for every backend
- * endpoint the page talks to. Implementations live in `make-request.ts`.
+ * Typed POST bodies and callback shapes for every backend endpoint the page
+ * talks to. JSON responses live in `response-interface.ts`. Implementations
+ * live in `make-request.ts`.
  */
 
-/** JSON error body some endpoints return instead of a 2xx payload. */
-export interface JsonErrorResponse {
-  error?: string;
-}
+import type { JsonErrorResponse } from './response-interface';
 
 /** Error object passed to request `error` callbacks. */
 export interface RequestError {
@@ -64,22 +62,10 @@ export interface SaveEntryRequest {
   csrfmiddlewaretoken: string;
 }
 
-/** JSON body from `main:save-entry`. */
-export interface SaveEntryResponse {
-  success?: string;
-  error?: string;
-}
-
 /** POST body for `main:delete-entry`. */
 export interface DeleteEntryRequest {
   name: string;
   csrfmiddlewaretoken: string;
-}
-
-/** JSON body from `main:delete-entry`. */
-export interface DeleteEntryResponse {
-  success?: string;
-  error?: string;
 }
 
 /** POST body for `main:move-date`. */
@@ -87,12 +73,6 @@ export interface MoveEntryRequest {
   move_from: string;
   move_to: string;
   csrfmiddlewaretoken: string;
-}
-
-/** JSON body from `main:move-date`. */
-export interface MoveEntryResponse {
-  new_date?: string;
-  error?: string;
 }
 
 /** POST body for `main:get-downsized-image`. */
@@ -105,12 +85,6 @@ export interface DownsizedImageRequest {
 export interface DownsizedVideoImageRequest {
   video_id: string;
   csrfmiddlewaretoken: string;
-}
-
-/** JSON body from the downsized-image and full-image endpoints. */
-export interface Base64MediaResponse {
-  base64?: string;
-  error?: string;
 }
 
 /** POST body matching `FullContentPath` (`main:get-image` and `main:get-video`). */

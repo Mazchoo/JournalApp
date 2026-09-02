@@ -1,4 +1,4 @@
-import type { ImageContent } from '../entry/content-types';
+import type { ImageContent } from '../response-interface';
 import { ContentRow } from './content-row';
 
 /** One image/video/mesh row and the DOM nodes it owns. */
