@@ -1,12 +1,10 @@
 import {
   componentFromTemplate,
   insertNewObjectIntoEditArea,
-  isImageFile,
-  isMeshFile,
-  isVideoFile,
   moveObjectDown,
   moveObjectUp,
 } from '../../common/dom';
+import { isImageFile, isMeshFile, isVideoFile } from '../../common/file-io';
 import { editArea } from '../../components/globals';
 import { MediaEntry } from '../../components/media-entry';
 import type { MediaContentThumbnail } from '../../response-interface';

@@ -36,6 +36,7 @@ const NAMES_FROM_STATIC_JS = [
   'getParentDivOfObject',
   'moveObjectUp',
   'moveObjectDown',
+  // common/file-io.ts
   'isVideoFile',
   'isImageFile',
   'isMeshFile',

@@ -16,9 +16,6 @@ export {
   getIndexInArr,
   getParentDivOfObject,
   insertNewObjectIntoEditArea,
-  isImageFile,
-  isMeshFile,
-  isVideoFile,
   moveObjectDown,
   moveObjectUp,
   refreshScrollSpies,
@@ -26,6 +23,8 @@ export {
   reorderOneDivFromAnother,
   reverseString,
 } from './common/dom';
+
+export { isImageFile, isMeshFile, isVideoFile } from './common/file-io';
 
 export { createTinyMCE, getMCEComponentHeight, resetMCE } from './tinymce/helper';
 
