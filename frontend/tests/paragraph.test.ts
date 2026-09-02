@@ -46,7 +46,7 @@ describe('generateParagraphTemplate', () => {
   it('substitutes every index placeholder', () => {
     const markup = generateParagraphTemplate('7');
 
-    expect(markup).not.toContain('__INDEX__');
+    expect(markup).not.toContain('{{ item.index }}');
     expect(markup).toContain(`name='paragraph7'`);
     expect(markup).toContain(`id='move-content-down7'`);
   });

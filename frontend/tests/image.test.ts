@@ -60,9 +60,9 @@ describe('generateMediaTemplate', () => {
   it('substitutes every index placeholder', () => {
     const markup = generateMediaTemplate('4');
 
-    expect(markup).not.toContain('__INDEX__');
-    expect(markup).toContain(`id='image4'`);
-    expect(markup).toContain(`id='mesh-canvas4'`);
+    expect(markup).not.toContain('{{ item.index }}');
+    expect(markup).toContain('id="image4"');
+    expect(markup).toContain('id="mesh-canvas4"');
   });
 });
 
@@ -271,7 +271,7 @@ describe('showImageUpload', () => {
   it('ignores inputs with no files', () => {
     showImageUpload(changeEvent('upload0', undefined));
 
-    expect(document.getElementById('upload-label0')!.textContent).toBe('');
+    expect(document.getElementById('upload-label0')!.textContent!.trim()).toBe('');
   });
 
   it('ignores inputs with no id', () => {

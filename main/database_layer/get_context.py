@@ -82,17 +82,3 @@ def get_month_page_context(
         **month_info,
         **days_info,
     }
-
-
-def javascript_placeholder_context() -> dict:
-    """Return default parameters for paragraph and image templates"""
-    return {
-        "index": "__INDEX__",
-        "data": {
-            "text": "",
-            "height": 300,
-            "file_name": "",
-            "image_id": "",
-            "allow_ai_synthesis": 1,
-        },
-    }

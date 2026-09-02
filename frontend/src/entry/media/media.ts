@@ -24,7 +24,7 @@ import { readVideoResource, zoomToVideo } from './video';
 
 /** Fill the media row template for the given content index. */
 export function generateMediaTemplate(contentInd: string): string {
-  return mediaTemplate().replaceAll('__INDEX__', contentInd);
+  return mediaTemplate().replaceAll('{{ item.index }}', contentInd);
 }
 
 /** Allocate the next content index and build a media row. */

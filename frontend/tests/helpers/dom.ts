@@ -1,71 +1,52 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { vi, type MockInstance } from 'vitest';
 
 import { bindPageComponents } from '../../src/components/globals';
 import * as modals from '../../src/runtime/modals';
 
-/**
- * Fixtures mirroring what Django renders for templates/day.html. The two `*_TEMPLATE` strings
- * are the same `__INDEX__` placeholders day.html injects, so server-rendered rows and
- * client-created rows come from one source here as well.
- */
+const entryContents = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../templates/EntryContents',
+);
 
-export const PARAGRAPH_TEMPLATE = `
-<div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-__INDEX__' name='paragraph__INDEX__'>
-    <form method='get' action='' class='card container'>
-        <textarea class='entry-text save-content' name='message' id='paragraph__INDEX__' data-height='220' data-allow-ai-synthesis='1'></textarea>
-    </form>
-</div>
-<div class='col col-md-1 py-2 entry-region-__INDEX__'>
-    <button id='delete-content__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='insert-paragraph__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='insert-image__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='move-content-up__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='move-content-down__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-</div>`;
-
-export const MEDIA_TEMPLATE = `
-<div class='row mx-auto entry-region-__INDEX__'>
-    <div class='col col-md-11 upload-box input-group'>
-        <input id='upload__INDEX__' type='file' multiple='multiple' class='upload-image'>
-        <label id='upload-label__INDEX__' for='upload__INDEX__' class='upload-label'></label>
-    </div>
-    <div class='col col-md-1 py-2'>
-        <button id='allow-syn__INDEX__' type='button' class='btn btn-sm btn-outline-secondary allow-syn'>Generate</button>
-    </div>
-</div>
-<div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-__INDEX__' name='image__INDEX__'>
-    <form method='get' action='' class='card container image-container'>
-        <div class='image-area'>
-            <img id='image__INDEX__' alt='' class='save-content content-image' data-image-id=''>
-            <video id='video__INDEX__' controls='controls' class='save-content content-video'></video>
-            <canvas id='mesh-canvas__INDEX__' class='save-content content-mesh' style='visibility: hidden; height: 0;'></canvas>
-        </div>
-    </form>
-</div>
-<div class='col col-md-1 py-2 entry-region-__INDEX__'>
-    <button id='delete-content__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='insert-paragraph__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='insert-image__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='move-content-up__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-    <button id='move-content-down__INDEX__' class='edit-button' name='.entry-region-__INDEX__'></button>
-</div>`;
+export const PARAGRAPH_TEMPLATE = readFileSync(resolve(entryContents, 'Paragraph.html'), 'utf8');
+export const MEDIA_TEMPLATE = readFileSync(resolve(entryContents, 'Media.html'), 'utf8');
+const VIDEO_TEMPLATE = readFileSync(resolve(entryContents, 'Video.html'), 'utf8');
 
 export const CSRF_TOKEN = 'test-csrf-token';
 
 export type RowKind = 'paragraph' | 'image' | 'video';
 
+/** Fill `{{ item.index }}` the same way generateParagraphTemplate / generateMediaTemplate do. */
+function fillIndex(template: string, index: string): string {
+  return template.replaceAll('{{ item.index }}', index);
+}
+
+/** Drop leftover `{{ item.data.* }}` tags after filling the index, as Django does for empty data. */
+function withoutItemData(template: string): string {
+  return template.replaceAll(/\{\{\s*item\.data\.[^}]+\}\}/g, '');
+}
+
 /** Render one content row of the given kind at the given index. */
 function renderRow(kind: RowKind, index: string): string {
   if (kind === 'paragraph') {
-    return `<div class="row mt-3 paragraph-entry">${PARAGRAPH_TEMPLATE.replaceAll('__INDEX__', index)}</div>`;
+    return `<div class="row mt-3 paragraph-entry">${withoutItemData(fillIndex(PARAGRAPH_TEMPLATE, index))}</div>`;
   }
 
-  const markup = MEDIA_TEMPLATE.replaceAll('__INDEX__', index);
   if (kind === 'video') {
-    return `<div class="row mt-4 image-entry">${markup
-      .replace(`class='save-content content-image' data-image-id=''`, `class='save-content content-video' data-video-id='v${index}'`)}</div>`;
+    return `<div class="row mt-4 image-entry">${withoutItemData(
+      fillIndex(VIDEO_TEMPLATE, index).replaceAll('{{ item.data.video_id }}', `v${index}`),
+    ).replaceAll('{% if item.data.allow_ai_synthesis %}checked{% endif %}', '')}</div>`;
   }
-  return `<div class="row mt-4 image-entry">${markup.replace(`data-image-id=''`, `data-image-id='i${index}'`)}</div>`;
+
+  return `<div class="row mt-4 image-entry">${withoutItemData(
+    fillIndex(MEDIA_TEMPLATE, index).replaceAll('{{ item.data.image_id }}', `i${index}`),
+  ).replaceAll(
+    '{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}',
+    'btn-outline-secondary',
+  )}</div>`;
 }
 
 export interface DayPageOptions {

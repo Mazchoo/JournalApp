@@ -22,7 +22,7 @@ import { enableSaveButton } from './save';
 
 /** Fill the paragraph row template for the given content index. */
 export function generateParagraphTemplate(contentInd: string): string {
-  return paragraphTemplate().replaceAll('__INDEX__', contentInd);
+  return paragraphTemplate().replaceAll('{{ item.index }}', contentInd);
 }
 
 /** Delete an empty paragraph immediately, or confirm before deleting text. */
