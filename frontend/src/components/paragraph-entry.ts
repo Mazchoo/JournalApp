@@ -1,10 +1,10 @@
-import { ContentType } from '../common/content-types';
-import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
-import type { ParagraphSavePayload } from '../request-interface';
-import { dateSlug } from '../runtime/backend-variables';
-import { tiny, type SynthesisEditor } from '../runtime/externals';
-import { type IContent } from './content';
-import { ContentRow } from './content-row';
+import { ContentType } from "../common/content-types";
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../display-config";
+import type { ParagraphSavePayload } from "../request-interface";
+import { dateSlug } from "../runtime/backend-variables";
+import { tiny, type SynthesisEditor } from "../runtime/externals";
+import { type IContent } from "./content";
+import { ContentRow } from "./content-row";
 
 /** One paragraph row and the DOM nodes it owns. */
 export class ParagraphEntry extends ContentRow implements IContent {
@@ -48,9 +48,11 @@ export class ParagraphEntry extends ContentRow implements IContent {
   /** Resolve the row that contains the event target. */
   static fromEvent(event: Event): ParagraphEntry | null {
     const target = event.target as Element | null;
-    const row = target?.closest('.paragraph-entry') as HTMLElement | null;
+    const row = target?.closest(".paragraph-entry") as HTMLElement | null;
     if (row === null) {
-      console.error('ParagraphEntry: event target is not inside a paragraph row');
+      console.error(
+        "ParagraphEntry: event target is not inside a paragraph row",
+      );
       return null;
     }
     return ParagraphEntry.fromRow(row);
@@ -58,12 +60,14 @@ export class ParagraphEntry extends ContentRow implements IContent {
 
   /** Build or reuse the wrapper for a `.paragraph-entry` element. */
   static fromRow(row: HTMLElement): ParagraphEntry | null {
-    const textarea = row.querySelector<HTMLTextAreaElement>('textarea.entry-text');
+    const textarea = row.querySelector<HTMLTextAreaElement>(
+      "textarea.entry-text",
+    );
     if (textarea === null) {
-      console.error('ParagraphEntry: paragraph row has no textarea');
+      console.error("ParagraphEntry: paragraph row has no textarea");
       return null;
     }
-    return ParagraphEntry.fromIndex(textarea.id.replace('paragraph', ''));
+    return ParagraphEntry.fromIndex(textarea.id.replace("paragraph", ""));
   }
 
   saveId(): string {
@@ -86,7 +90,9 @@ export class ParagraphEntry extends ContentRow implements IContent {
   setContent(html: string): boolean {
     const editor = tiny().get(this.saveId());
     if (editor == null) {
-      console.error(`ParagraphEntry: TinyMCE editor ${this.saveId()} does not exist`);
+      console.error(
+        `ParagraphEntry: TinyMCE editor ${this.saveId()} does not exist`,
+      );
       return false;
     }
     editor.setContent(html);
@@ -96,14 +102,16 @@ export class ParagraphEntry extends ContentRow implements IContent {
   /** Height and synthesis flag stored on the server-rendered textarea. */
   editorSettings(): { height: number; allowSynthesis: boolean } {
     const height =
-      parseInt(this.textarea?.getAttribute('data-height') ?? '') || PARAGRAPH_EDITOR_HEIGHT_PX;
-    const allowSynthesis = this.textarea?.getAttribute('data-allow-ai-synthesis') !== '0';
+      parseInt(this.textarea?.getAttribute("data-height") ?? "") ||
+      PARAGRAPH_EDITOR_HEIGHT_PX;
+    const allowSynthesis =
+      this.textarea?.getAttribute("data-allow-ai-synthesis") !== "0";
     return { height, allowSynthesis };
   }
 
   /** Resolve the paragraph row that owns a save-content element. */
   static fromSaveElement(element: HTMLElement): ParagraphEntry | null {
-    const row = element.closest('.paragraph-entry') as HTMLElement | null;
+    const row = element.closest(".paragraph-entry") as HTMLElement | null;
     if (row === null) return null;
     return ParagraphEntry.fromRow(row);
   }
@@ -113,30 +121,42 @@ export class ParagraphEntry extends ContentRow implements IContent {
    * Returns false when no iframe is present so callers still confirm before deleting.
    */
   static isEmpty(paragraph: ParagraphEntry): boolean {
-    const iframe = paragraph.row.querySelector<HTMLIFrameElement>('.tox-edit-area__iframe');
+    const iframe = paragraph.row.querySelector<HTMLIFrameElement>(
+      ".tox-edit-area__iframe",
+    );
     if (iframe === null) return false;
     return iframe.contentDocument!.body.innerText.trim().length === 0;
   }
 
   /** Bind the five edit buttons on this row. */
   bindHandlers(handlers: ParagraphEntryHandlers): void {
-    this.listen(this.deleteButton, 'click', handlers.onDelete, `#delete-content${this.index}`);
+    this.listen(
+      this.deleteButton,
+      "click",
+      handlers.onDelete,
+      `#delete-content${this.index}`,
+    );
     this.listen(
       this.insertParagraphButton,
-      'click',
+      "click",
       handlers.onInsertParagraph,
       `#insert-paragraph${this.index}`,
     );
     this.listen(
       this.insertMediaButton,
-      'click',
+      "click",
       handlers.onInsertMedia,
       `#insert-media${this.index}`,
     );
-    this.listen(this.moveUpButton, 'click', handlers.onMoveUp, `#move-content-up${this.index}`);
+    this.listen(
+      this.moveUpButton,
+      "click",
+      handlers.onMoveUp,
+      `#move-content-up${this.index}`,
+    );
     this.listen(
       this.moveDownButton,
-      'click',
+      "click",
       handlers.onMoveDown,
       `#move-content-down${this.index}`,
     );
@@ -150,7 +170,9 @@ export class ParagraphEntry extends ContentRow implements IContent {
   /** Find the `.paragraph-entry` that owns `#paragraph{index}`. */
   private static lookupRow(index: string): HTMLElement | null {
     const textarea = document.getElementById(`paragraph${index}`);
-    return (textarea?.closest('.paragraph-entry') as HTMLElement | null) ?? null;
+    return (
+      (textarea?.closest(".paragraph-entry") as HTMLElement | null) ?? null
+    );
   }
 }
 

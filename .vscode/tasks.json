@@ -83,6 +83,20 @@
             }
         },
         {
+            "label": "Frontend: Format",
+            "type": "shell",
+            "command": "npm run format",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        },
+        {
             "label": "Run All: Format, Lint, Test",
             "dependsOn": [
                 "Ruff: Format",

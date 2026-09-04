@@ -3,28 +3,28 @@ import {
   insertNewObjectIntoEditArea,
   moveObjectDown,
   moveObjectUp,
-} from '../../common/dom';
-import { isImageFile, isMeshFile, isVideoFile } from '../../common/file-io';
-import { editArea } from '../../components/globals';
-import { MediaEntry } from '../../components/media-entry';
-import type { MediaContentThumbnail } from '../../response-interface';
+} from "../../common/dom";
+import { isImageFile, isMeshFile, isVideoFile } from "../../common/file-io";
+import { editArea } from "../../components/globals";
+import { MediaEntry } from "../../components/media-entry";
+import type { MediaContentThumbnail } from "../../response-interface";
 import {
   contentIndex,
   contentIndexStr,
   mediaTemplate,
   setContentIndex,
-} from '../../runtime/backend-variables';
-import { insertNewParagraphToPosition } from '../paragraph';
-import { enableSaveButton } from '../save';
-import { openFullImage, readImageResource } from './image';
-import { loadMeshResource } from './mesh';
-import { readVideoResource, zoomToVideo } from './video';
+} from "../../runtime/backend-variables";
+import { insertNewParagraphToPosition } from "../paragraph";
+import { enableSaveButton } from "../save";
+import { openFullImage, readImageResource } from "./image";
+import { loadMeshResource } from "./mesh";
+import { readVideoResource, zoomToVideo } from "./video";
 
 /** Generic media-row behavior shared by image, video, and mesh. */
 
 /** Fill the media row template for the given content index. */
 export function generateMediaTemplate(contentInd: string): string {
-  return mediaTemplate().replaceAll('{{ item.index }}', contentInd);
+  return mediaTemplate().replaceAll("{{ item.index }}", contentInd);
 }
 
 /** Allocate the next content index and build a media row. */
@@ -33,8 +33,8 @@ export function createNewMedia(): HTMLElement {
   const index = contentIndexStr();
   const div = componentFromTemplate(
     generateMediaTemplate(index),
-    'div',
-    'row mt-4 media-entry',
+    "div",
+    "row mt-4 media-entry",
   );
   const media = new MediaEntry(index, div);
   MediaEntry.setSynthesisActive(media, true);
@@ -111,7 +111,7 @@ export function uploadAllMediaFiles(
     } else if (isMeshFile(inputFile.name)) {
       loadMeshResource(inputFile, contentInd);
     } else {
-      console.log('Unknown media type');
+      console.log("Unknown media type");
     }
 
     showFileName(inputFile, contentInd);

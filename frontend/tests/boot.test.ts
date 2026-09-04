@@ -1,45 +1,49 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { bindDayPageHandlers, boot } from '../src/boot';
-import { installFakeTinyMCE } from './helpers/tinymce';
-import { installModalStubs, renderDayPage } from './helpers/dom';
+import { bindDayPageHandlers, boot } from "../src/boot";
+import { installFakeTinyMCE } from "./helpers/tinymce";
+import { installModalStubs, renderDayPage } from "./helpers/dom";
 
-describe('boot', () => {
+describe("boot", () => {
   beforeEach(() => {
-    renderDayPage({ rows: ['paragraph'] });
+    renderDayPage({ rows: ["paragraph"] });
     installFakeTinyMCE();
     installModalStubs();
   });
 
-  it('initialises server-rendered paragraphs and wires the toolbar', () => {
+  it("initialises server-rendered paragraphs and wires the toolbar", () => {
     boot();
 
     expect(window.tinymce).toBeDefined();
-    document.getElementById('btn-new-para')!.click();
+    document.getElementById("btn-new-para")!.click();
 
-    expect(document.getElementById('edit-area')!.children).toHaveLength(2);
+    expect(document.getElementById("edit-area")!.children).toHaveLength(2);
   });
 });
 
-describe('bindDayPageHandlers', () => {
+describe("bindDayPageHandlers", () => {
   beforeEach(() => {
     renderDayPage({ rows: [] });
     installFakeTinyMCE();
   });
 
-  it('appends a media row from the toolbar button', () => {
+  it("appends a media row from the toolbar button", () => {
     bindDayPageHandlers();
 
-    document.getElementById('btn-new-media')!.click();
+    document.getElementById("btn-new-media")!.click();
 
-    expect(document.getElementById('edit-area')!.querySelector('.media-entry')).not.toBeNull();
+    expect(
+      document.getElementById("edit-area")!.querySelector(".media-entry"),
+    ).not.toBeNull();
   });
 
-  it('enables delete when ENTRY_EXISTS is set', () => {
+  it("enables delete when ENTRY_EXISTS is set", () => {
     window.ENTRY_EXISTS = true;
 
     bindDayPageHandlers();
 
-    expect(document.getElementById('btn-delete')!.classList.contains('btn-danger')).toBe(true);
+    expect(
+      document.getElementById("btn-delete")!.classList.contains("btn-danger"),
+    ).toBe(true);
   });
 });

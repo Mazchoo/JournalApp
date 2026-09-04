@@ -2,8 +2,8 @@ import {
   callbackModal,
   dateCallbackModal,
   simpleModal,
-} from '../components/globals';
-import { Modal } from '../components/modal';
+} from "../components/globals";
+import { Modal } from "../components/modal";
 
 /**
  * Journal modal helpers. DOM work lives on `Modal`; these functions keep the
@@ -36,7 +36,10 @@ export function showCallbackModal(
 }
 
 /** Show a simple message modal. */
-export function showMessageSimpleModal(modalTitle: string, modalMessage: unknown): void {
+export function showMessageSimpleModal(
+  modalTitle: string,
+  modalMessage: unknown,
+): void {
   simpleModal.showMessage(modalTitle, modalMessage);
 }
 
@@ -47,5 +50,10 @@ export function showDateCallbackModal(
   actionTitle: string,
   callback: () => void,
 ): void {
-  dateCallbackModal.showCallback(modalTitle, modalMessage, actionTitle, callback);
+  dateCallbackModal.showCallback(
+    modalTitle,
+    modalMessage,
+    actionTitle,
+    callback,
+  );
 }

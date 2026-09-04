@@ -4,7 +4,7 @@
  * live in `entry/make-request.ts`.
  */
 
-import type { JsonErrorResponse } from './response-interface';
+import type { JsonErrorResponse } from "./response-interface";
 
 /** Error object passed to request `error` callbacks. */
 export interface RequestError {
@@ -16,25 +16,33 @@ export interface RequestError {
 /** Callbacks invoked after the CSRF token is attached. */
 export interface RequestCallbacks<TResponse> {
   success?: (response: TResponse) => void;
-  error?: (jqXhr: RequestError, textStatus: string, errorThrown: string) => void;
+  error?: (
+    jqXhr: RequestError,
+    textStatus: string,
+    errorThrown: string,
+  ) => void;
   complete?: () => void;
 }
 
 /** Settings handed to the request transport, including the callbacks. */
 export interface TransportSettings<TResponse = unknown> {
-  type: 'POST';
+  type: "POST";
   url: string;
   data: Record<string, unknown>;
-  xhrFields?: { responseType: 'blob' };
+  xhrFields?: { responseType: "blob" };
   success?: (response: TResponse) => void;
-  error?: (jqXhr: RequestError, textStatus: string, errorThrown: string) => void;
+  error?: (
+    jqXhr: RequestError,
+    textStatus: string,
+    errorThrown: string,
+  ) => void;
   complete?: () => void;
 }
 
 /** POST body fields excluding the CSRF token, which the transport always attaches. */
 export type RequestFields<T extends { csrfmiddlewaretoken: string }> = Omit<
   T,
-  'csrfmiddlewaretoken'
+  "csrfmiddlewaretoken"
 >;
 
 /** Paragraph row in a save-entry `content` map. */

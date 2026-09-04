@@ -1,11 +1,11 @@
-import { initializeServerRenderedContent } from './entry/load';
-import { appendMediaToList, zoomToMedia } from './entry/media/media';
-import { appendParagraphToList } from './entry/paragraph';
-import { deleteContent, enableDeleteButton } from './entry/delete';
-import { moveEntry } from './entry/move';
-import { saveToDatabase } from './entry/save';
-import { entryExists } from './runtime/backend-variables';
-import { bindModalBehaviors } from './runtime/modals';
+import { initializeServerRenderedContent } from "./entry/load";
+import { appendMediaToList, zoomToMedia } from "./entry/media/media";
+import { appendParagraphToList } from "./entry/paragraph";
+import { deleteContent, enableDeleteButton } from "./entry/delete";
+import { moveEntry } from "./entry/move";
+import { saveToDatabase } from "./entry/save";
+import { entryExists } from "./runtime/backend-variables";
+import { bindModalBehaviors } from "./runtime/modals";
 import {
   bindPageComponents,
   deleteButton,
@@ -15,7 +15,7 @@ import {
   newParagraphButton,
   saveButton,
   saveNavButton,
-} from './components/globals';
+} from "./components/globals";
 
 /** Bind the day-page toolbar and image-zoom handlers. */
 export function bindDayPageHandlers(): void {

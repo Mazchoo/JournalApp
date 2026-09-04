@@ -1,8 +1,8 @@
-import { MediaEntry } from '../../components/media-entry';
-import { parseGlb } from '../../rendering-3d/glb-parsing';
-import { computeNormals } from '../../rendering-3d/vertex-operations';
-import { startRenderingLoop } from '../../rendering-3d/rendering-loop';
-import { enableSaveButton } from '../save';
+import { MediaEntry } from "../../components/media-entry";
+import { parseGlb } from "../../rendering-3d/glb-parsing";
+import { computeNormals } from "../../rendering-3d/vertex-operations";
+import { startRenderingLoop } from "../../rendering-3d/rendering-loop";
+import { enableSaveButton } from "../save";
 
 export { computeNormals };
 
@@ -35,9 +35,13 @@ export function initializeMeshRenderer(
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
-      renderMeshBuffer(canvasElement, e.target!.result as ArrayBuffer, onComplete);
+      renderMeshBuffer(
+        canvasElement,
+        e.target!.result as ArrayBuffer,
+        onComplete,
+      );
     } catch (err) {
-      console.error('GLB render error:', err);
+      console.error("GLB render error:", err);
       if (onComplete) onComplete();
     }
   };
@@ -65,7 +69,7 @@ export function renderGLB(
 export function loadMeshResource(inputFile: File, contentId: string): void {
   const media = MediaEntry.fromIndex(contentId);
   if (media === null || media.canvas === null) {
-    console.error('Canvas element not found for contentId:', contentId);
+    console.error("Canvas element not found for contentId:", contentId);
     return;
   }
 

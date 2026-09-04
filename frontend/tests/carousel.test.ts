@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AUTO_CYCLE_MS } from '../src/display-config';
-import { initializeCarousel } from '../src/components/carousel';
+import { AUTO_CYCLE_MS } from "../src/display-config";
+import { initializeCarousel } from "../src/components/carousel";
 
 /** Render a two-slide carousel matching templates/home.html. */
 function renderCarousel(auto = false): void {
   document.body.innerHTML = `
-    <div id="carousel" class="carousel slide"${auto ? ' data-ride="carousel"' : ''}>
+    <div id="carousel" class="carousel slide"${auto ? ' data-ride="carousel"' : ""}>
       <div class="carousel-inner">
         <div class="carousel-item active" id="slide-a"></div>
         <div class="carousel-item" id="slide-b"></div>
@@ -16,7 +16,7 @@ function renderCarousel(auto = false): void {
     </div>`;
 }
 
-describe('initializeCarousel', () => {
+describe("initializeCarousel", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -26,32 +26,42 @@ describe('initializeCarousel', () => {
     vi.useRealTimers();
   });
 
-  it('advances on next and wraps on prev', () => {
+  it("advances on next and wraps on prev", () => {
     renderCarousel();
     initializeCarousel();
 
-    document.getElementById('next')!.click();
-    expect(document.getElementById('slide-a')!.classList.contains('active')).toBe(false);
-    expect(document.getElementById('slide-b')!.classList.contains('active')).toBe(true);
+    document.getElementById("next")!.click();
+    expect(
+      document.getElementById("slide-a")!.classList.contains("active"),
+    ).toBe(false);
+    expect(
+      document.getElementById("slide-b")!.classList.contains("active"),
+    ).toBe(true);
 
-    document.getElementById('next')!.click();
-    expect(document.getElementById('slide-a')!.classList.contains('active')).toBe(true);
+    document.getElementById("next")!.click();
+    expect(
+      document.getElementById("slide-a")!.classList.contains("active"),
+    ).toBe(true);
 
-    document.getElementById('prev')!.click();
-    expect(document.getElementById('slide-b')!.classList.contains('active')).toBe(true);
+    document.getElementById("prev")!.click();
+    expect(
+      document.getElementById("slide-b")!.classList.contains("active"),
+    ).toBe(true);
   });
 
-  it('auto-cycles when data-ride is set', () => {
+  it("auto-cycles when data-ride is set", () => {
     renderCarousel(true);
     initializeCarousel();
 
     vi.advanceTimersByTime(AUTO_CYCLE_MS);
 
-    expect(document.getElementById('slide-b')!.classList.contains('active')).toBe(true);
+    expect(
+      document.getElementById("slide-b")!.classList.contains("active"),
+    ).toBe(true);
   });
 
-  it('is a no-op when the page has no carousel', () => {
-    document.body.innerHTML = '<div></div>';
+  it("is a no-op when the page has no carousel", () => {
+    document.body.innerHTML = "<div></div>";
     expect(() => initializeCarousel()).not.toThrow();
   });
 });

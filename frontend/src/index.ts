@@ -6,7 +6,7 @@
  * wires the editor, carousel, and modals.
  */
 
-export { boot, bindDayPageHandlers } from './boot';
+export { boot, bindDayPageHandlers } from "./boot";
 
 export {
   changeTooltipTextFromInput,
@@ -22,11 +22,15 @@ export {
   removeItem,
   reorderOneDivFromAnother,
   reverseString,
-} from './common/dom';
+} from "./common/dom";
 
-export { isImageFile, isMeshFile, isVideoFile } from './common/file-io';
+export { isImageFile, isMeshFile, isVideoFile } from "./common/file-io";
 
-export { createTinyMCE, getMCEComponentHeight, resetMCE } from './tinymce/helper';
+export {
+  createTinyMCE,
+  getMCEComponentHeight,
+  resetMCE,
+} from "./tinymce/helper";
 
 export {
   appendParagraphToList,
@@ -37,9 +41,14 @@ export {
   generateParagraphTemplate,
   initializeNewParagraph,
   insertNewParagraphToPosition,
-} from './entry/paragraph';
+} from "./entry/paragraph";
 
-export { computeNormals, initializeMeshRenderer, loadMeshResource, renderGLB } from './entry/media/mesh';
+export {
+  computeNormals,
+  initializeMeshRenderer,
+  loadMeshResource,
+  renderGLB,
+} from "./entry/media/mesh";
 
 export {
   appendMediaToList,
@@ -54,21 +63,21 @@ export {
   showImageUpload,
   uploadAllMediaFiles,
   zoomToMedia,
-} from './entry/media/media';
+} from "./entry/media/media";
 
-export { readImageResource as readMediaResource } from './entry/media/image';
+export { readImageResource as readMediaResource } from "./entry/media/image";
 
 export {
   changeImageToVideoClass,
   readVideoResource,
-} from './entry/media/video';
+} from "./entry/media/video";
 
 export {
   deleteContent,
   deleteFromDatabase,
   disableDeleteButton,
   enableDeleteButton,
-} from './entry/delete';
+} from "./entry/delete";
 
 export {
   disableSaveButton,
@@ -77,16 +86,20 @@ export {
   getSaveData,
   saveEntryToDatabase,
   saveToDatabase,
-} from './entry/save';
+} from "./entry/save";
 
 export {
   initializeServerRenderedContent,
   loadServerRenderedImage,
   loadServerRenderedVideo,
-} from './entry/load';
+} from "./entry/load";
 
-export { getDestinationSlug, makeMoveRequest, moveEntry } from './entry/move';
+export { getDestinationSlug, makeMoveRequest, moveEntry } from "./entry/move";
 
-export type { MediaSavePayload, ParagraphSavePayload, SaveData } from './request-interface';
-export type { MediaContentThumbnail as ImageContent } from './response-interface';
-export type { SynthesisEditor } from './runtime/externals';
+export type {
+  MediaSavePayload,
+  ParagraphSavePayload,
+  SaveData,
+} from "./request-interface";
+export type { MediaContentThumbnail as ImageContent } from "./response-interface";
+export type { SynthesisEditor } from "./runtime/externals";

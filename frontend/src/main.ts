@@ -1,5 +1,5 @@
-import * as journal from './index';
-import { boot } from './boot';
+import * as journal from "./index";
+import { boot } from "./boot";
 
 /**
  * Bundle entry point.

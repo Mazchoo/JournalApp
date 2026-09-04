@@ -1,28 +1,28 @@
-import { ParagraphEntry } from '../components/paragraph-entry';
-import { editArea } from '../components/globals';
+import { ParagraphEntry } from "../components/paragraph-entry";
+import { editArea } from "../components/globals";
 import {
   componentFromTemplate,
   insertNewObjectIntoEditArea,
   moveObjectDown,
   moveObjectUp,
-} from '../common/dom';
-import { PARAGRAPH_EDITOR_HEIGHT_PX } from '../display-config';
+} from "../common/dom";
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../display-config";
 import {
   contentIndex,
   contentIndexStr,
   paragraphTemplate,
   setContentIndex,
-} from '../runtime/backend-variables';
-import { showCallbackModal } from '../runtime/modals';
-import { createTinyMCE } from '../tinymce/helper';
-import { insertNewMediaToPosition } from './media/media';
-import { enableSaveButton } from './save';
+} from "../runtime/backend-variables";
+import { showCallbackModal } from "../runtime/modals";
+import { createTinyMCE } from "../tinymce/helper";
+import { insertNewMediaToPosition } from "./media/media";
+import { enableSaveButton } from "./save";
 
 /** Port of static/JS/entry.paragraph.js. */
 
 /** Fill the paragraph row template for the given content index. */
 export function generateParagraphTemplate(contentInd: string): string {
-  return paragraphTemplate().replaceAll('{{ item.index }}', contentInd);
+  return paragraphTemplate().replaceAll("{{ item.index }}", contentInd);
 }
 
 /** Delete an empty paragraph immediately, or confirm before deleting text. */
@@ -42,9 +42,9 @@ export function deleteParagraph(e: Event): void {
   }
 
   showCallbackModal(
-    'Are you sure?',
-    'Are you sure you want to delete this non-empty paragraph? There is no way to undo this.',
-    'Confirm',
+    "Are you sure?",
+    "Are you sure you want to delete this non-empty paragraph? There is no way to undo this.",
+    "Confirm",
     deleteParagraphs,
   );
 }
@@ -55,8 +55,8 @@ export function createNewParagraph(): HTMLElement {
   const index = contentIndexStr();
   const div = componentFromTemplate(
     generateParagraphTemplate(index),
-    'div',
-    'row mt-3 paragraph-entry',
+    "div",
+    "row mt-3 paragraph-entry",
   );
   new ParagraphEntry(index, div);
   return div;
@@ -68,7 +68,9 @@ export function editParagraphContent(
   paragraphText: string | undefined,
 ): boolean {
   if (updateInd === undefined || paragraphText === undefined) {
-    console.error('editParagraphContent: update index or paragraph text is missing');
+    console.error(
+      "editParagraphContent: update index or paragraph text is missing",
+    );
     return false;
   }
   const paragraph = ParagraphEntry.fromIndex(updateInd);
@@ -91,14 +93,14 @@ export function createInitFunction(
 export function initializeNewParagraph(
   lastestId: string,
   height = PARAGRAPH_EDITOR_HEIGHT_PX,
-  paragraphText = '',
+  paragraphText = "",
   allowSynthesis = true,
 ): void {
   const paragraph = ParagraphEntry.fromIndex(lastestId);
   if (paragraph === null) return;
 
   const initFunction = createInitFunction(lastestId, paragraphText);
-  createTinyMCE('#paragraph' + lastestId, height, allowSynthesis, initFunction);
+  createTinyMCE("#paragraph" + lastestId, height, allowSynthesis, initFunction);
 
   paragraph.bindHandlers({
     onDelete: deleteParagraph,
@@ -110,7 +112,9 @@ export function initializeNewParagraph(
 }
 
 /** Insert a new paragraph row above the clicked row. */
-export function insertNewParagraphToPosition(e: Event): HTMLElement | undefined {
+export function insertNewParagraphToPosition(
+  e: Event,
+): HTMLElement | undefined {
   enableSaveButton();
   const div = insertNewObjectIntoEditArea(e, createNewParagraph());
   if (div === undefined) return undefined;
@@ -122,7 +126,7 @@ export function insertNewParagraphToPosition(e: Event): HTMLElement | undefined 
 export function appendParagraphToList(
   _e?: Event,
   height = PARAGRAPH_EDITOR_HEIGHT_PX,
-  paragraphText = '',
+  paragraphText = "",
 ): HTMLElement {
   const div = createNewParagraph();
   editArea.append(div);

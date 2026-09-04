@@ -1,4 +1,4 @@
-import type { Editor, TinyMCE } from 'tinymce';
+import type { Editor, TinyMCE } from "tinymce";
 
 /**
  * TinyMCE is resolved from `window` at call time rather than imported, because the page
@@ -12,15 +12,17 @@ export type SynthesisEditor = Editor & { synthesisEnabled?: boolean };
 
 /** Throw if a required window global is absent. */
 function missing(name: string): never {
-  throw new Error(`${name} is not available on window; it must be loaded before the Journal bundle.`);
+  throw new Error(
+    `${name} is not available on window; it must be loaded before the Journal bundle.`,
+  );
 }
 
 /** Return the page's TinyMCE instance. */
 export function tiny(): TinyMCE {
-  return window.tinymce ?? window.tinyMCE ?? missing('tinymce');
+  return window.tinymce ?? window.tinyMCE ?? missing("tinymce");
 }
 
 /** Return the page's Bootstrap instance, if any. */
 export function bs(): BootstrapGlobal {
-  return window.bootstrap ?? missing('bootstrap');
+  return window.bootstrap ?? missing("bootstrap");
 }

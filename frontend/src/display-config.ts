@@ -20,11 +20,11 @@ export const MESH_CANVAS_Z_INDEX = 10;
 
 /** Inline styles applied when revealing the mesh canvas. */
 export const MESH_CANVAS_REVEAL_STYLE = {
-  visibility: 'visible',
+  visibility: "visible",
   height: `${MESH_CANVAS_HEIGHT_PX}px`,
-  display: 'block',
-  opacity: '1',
-  position: 'relative',
+  display: "block",
+  opacity: "1",
+  position: "relative",
   zIndex: String(MESH_CANVAS_Z_INDEX),
 };
 

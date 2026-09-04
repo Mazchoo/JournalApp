@@ -1,8 +1,8 @@
-import { deleteButton, saveSpinner } from '../components/globals';
-import { requestDeleteEntry } from './make-request';
-import { dateSlug } from '../runtime/backend-variables';
-import { showCallbackModal, showMessageSimpleModal } from '../runtime/modals';
-import { reloadPage } from '../runtime/navigation';
+import { deleteButton, saveSpinner } from "../components/globals";
+import { requestDeleteEntry } from "./make-request";
+import { dateSlug } from "../runtime/backend-variables";
+import { showCallbackModal, showMessageSimpleModal } from "../runtime/modals";
+import { reloadPage } from "../runtime/navigation";
 
 /** Port of static/JS/entry.delete.js. */
 
@@ -23,11 +23,12 @@ export function deleteFromDatabase(): void {
     {
       success: (response) => {
         // Forwards the whole response, matching the original entry.delete.js behaviour.
-        if ('error' in response) showMessageSimpleModal('Delete Error', response);
-        if ('success' in response) reloadPage();
+        if ("error" in response)
+          showMessageSimpleModal("Delete Error", response);
+        if ("success" in response) reloadPage();
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
-        showMessageSimpleModal('Unknown Error', errorThrown);
+        showMessageSimpleModal("Unknown Error", errorThrown);
       },
       complete: () => {
         saveSpinner.hide();
@@ -42,9 +43,9 @@ export function deleteContent(): void {
   if (deleteButton.isDisabled()) return;
 
   showCallbackModal(
-    'Are you sure?',
-    'Delete this entry from database?',
-    'Delete',
+    "Are you sure?",
+    "Delete this entry from database?",
+    "Delete",
     deleteFromDatabase,
   );
 }

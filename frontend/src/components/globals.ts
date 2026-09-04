@@ -2,7 +2,7 @@
  * Page-level DOM wrappers that do not come and go with content rows.
  * Call `bindPageComponents()` once the document (or a test fixture) is in place.
  */
-import { initializeCarousel } from './carousel';
+import { initializeCarousel } from "./carousel";
 import {
   DateModalFields,
   DeleteButton,
@@ -15,10 +15,10 @@ import {
   SaveNavButton,
   SaveSpinner,
   VideoPreview,
-} from './static-elements';
-import { MediaEntry } from './media-entry';
-import { Modal } from './modal';
-import { ParagraphEntry } from './paragraph-entry';
+} from "./static-elements";
+import { MediaEntry } from "./media-entry";
+import { Modal } from "./modal";
+import { ParagraphEntry } from "./paragraph-entry";
 
 export const deleteButton = new DeleteButton();
 export const saveButton = new SaveButton();
@@ -31,11 +31,11 @@ export const editArea = new EditArea();
 export const imagePreview = new ImagePreview();
 export const videoPreview = new VideoPreview();
 export const dateModal = new DateModalFields();
-export const simpleModal = new Modal('simple-modal');
-export const callbackModal = new Modal('callback-modal');
-export const dateCallbackModal = new Modal('date-modal');
-export const imageModal = new Modal('image-modal');
-export const videoModal = new Modal('video-modal', () => videoPreview.reset());
+export const simpleModal = new Modal("simple-modal");
+export const callbackModal = new Modal("callback-modal");
+export const dateCallbackModal = new Modal("date-modal");
+export const imageModal = new Modal("image-modal");
+export const videoModal = new Modal("video-modal", () => videoPreview.reset());
 
 const staticComponents = [
   deleteButton,

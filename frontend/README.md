@@ -13,14 +13,14 @@ day page.
 
 Run these from this directory.
 
-| Command | What it does |
-| --- | --- |
-| `npm install` | Installs dependencies. |
-| `npm run build` | Writes `frontend/dist/journal.bundle.js` plus a source map. |
-| `npm run watch` | Same, rebuilding on change. |
-| `npm test` | Runs the Vitest suite in jsdom. |
-| `npm run coverage` | Test run with a V8 coverage report. |
-| `npm run typecheck` | `tsc --noEmit` over `src` and `tests`. |
+| Command             | What it does                                                |
+| ------------------- | ----------------------------------------------------------- |
+| `npm install`       | Installs dependencies.                                      |
+| `npm run build`     | Writes `frontend/dist/journal.bundle.js` plus a source map. |
+| `npm run watch`     | Same, rebuilding on change.                                 |
+| `npm test`          | Runs the Vitest suite in jsdom.                             |
+| `npm run coverage`  | Test run with a V8 coverage report.                         |
+| `npm run typecheck` | `tsc --noEmit` over `src` and `tests`.                      |
 
 ## Layout
 

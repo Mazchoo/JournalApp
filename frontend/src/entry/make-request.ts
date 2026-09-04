@@ -1,4 +1,4 @@
-import { csrfToken } from '../components/common';
+import { csrfToken } from "../components/common";
 import type {
   DeleteEntryRequest,
   DownsizedImageRequest as ImageThumbnailRequest,
@@ -10,14 +10,14 @@ import type {
   RequestFields,
   SaveEntryRequest,
   TransportSettings,
-} from '../request-interface';
+} from "../request-interface";
 import type {
   Base64MediaResponse,
   DeleteEntryResponse,
   JsonErrorResponse,
   MoveEntryResponse,
   SaveEntryResponse,
-} from '../response-interface';
+} from "../response-interface";
 import {
   deleteUrl,
   downsizedImageUrl,
@@ -26,7 +26,7 @@ import {
   moveUrl,
   saveUrl,
   videoUrl,
-} from '../runtime/backend-variables';
+} from "../runtime/backend-variables";
 
 /**
  * HTTP implementations for the backend endpoints declared in
@@ -48,8 +48,10 @@ export function encodeNestedForm(data: Record<string, unknown>): string {
   /** Append one value, descending into plain objects as bracketed keys. */
   const append = (key: string, value: unknown): void => {
     if (value === undefined || value === null) return;
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      for (const [child, childValue] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof value === "object" && !Array.isArray(value)) {
+      for (const [child, childValue] of Object.entries(
+        value as Record<string, unknown>,
+      )) {
         append(`${key}[${child}]`, childValue);
       }
       return;
@@ -64,16 +66,18 @@ export function encodeNestedForm(data: Record<string, unknown>): string {
 }
 
 /** POST form-urlencoded data with the ajax header Django's `is_ajax` checks. */
-async function fetchTransport<TResponse>(settings: TransportSettings<TResponse>): Promise<void> {
+async function fetchTransport<TResponse>(
+  settings: TransportSettings<TResponse>,
+): Promise<void> {
   try {
     const response = await fetch(settings.url, {
       method: settings.type,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'X-Requested-With': 'XMLHttpRequest',
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
       },
       body: encodeNestedForm(settings.data),
-      credentials: 'same-origin',
+      credentials: "same-origin",
     });
 
     if (!response.ok) {
@@ -88,20 +92,21 @@ async function fetchTransport<TResponse>(settings: TransportSettings<TResponse>)
         statusText: response.statusText,
         responseJSON,
       };
-      settings.error?.(error, 'error', response.statusText);
+      settings.error?.(error, "error", response.statusText);
       settings.complete?.();
       return;
     }
 
     const payload =
-      settings.xhrFields?.responseType === 'blob'
+      settings.xhrFields?.responseType === "blob"
         ? ((await response.blob()) as TResponse)
         : ((await response.json()) as TResponse);
     settings.success?.(payload);
     settings.complete?.();
   } catch (caught) {
-    const errorThrown = caught instanceof Error ? caught.message : String(caught);
-    settings.error?.({ statusText: errorThrown }, 'error', errorThrown);
+    const errorThrown =
+      caught instanceof Error ? caught.message : String(caught);
+    settings.error?.({ statusText: errorThrown }, "error", errorThrown);
     settings.complete?.();
   }
 }
@@ -111,17 +116,17 @@ function postJson<TResponse>(
   url: string,
   data: object,
   callbacks: RequestCallbacks<TResponse>,
-  extra?: Pick<TransportSettings, 'xhrFields'>,
+  extra?: Pick<TransportSettings, "xhrFields">,
 ): void {
   void fetchTransport({
-    type: 'POST',
+    type: "POST",
     url,
     data: {
       ...data,
       csrfmiddlewaretoken: csrfToken(),
     },
     ...extra,
-    success: callbacks.success as TransportSettings['success'],
+    success: callbacks.success as TransportSettings["success"],
     error: callbacks.error,
     complete: callbacks.complete,
   });
@@ -182,7 +187,7 @@ export function requestFullVideo(
 ): void {
   postJson(videoUrl(), fields, callbacks, {
     xhrFields: {
-      responseType: 'blob',
+      responseType: "blob",
     },
   });
 }

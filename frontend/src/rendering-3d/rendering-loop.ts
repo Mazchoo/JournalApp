@@ -3,14 +3,17 @@ import {
   createMvpMatrix,
   createOrbitCamera,
   createProjectionMatrix,
-} from './create-camera-matrix';
-import { bindCameraControls } from './event-handling';
-import { createShaders } from './create-shaders';
-import type { MeshRenderData } from './render-data-types';
-import { computeCenterOfGravity } from './vertex-operations';
+} from "./create-camera-matrix";
+import { bindCameraControls } from "./event-handling";
+import { createShaders } from "./create-shaders";
+import type { MeshRenderData } from "./render-data-types";
+import { computeCenterOfGravity } from "./vertex-operations";
 
 /** WebGL type constant for an index buffer. */
-function indexComponentType(gl: WebGLRenderingContext, indices: Uint8Array | Uint16Array | Uint32Array): number {
+function indexComponentType(
+  gl: WebGLRenderingContext,
+  indices: Uint8Array | Uint16Array | Uint32Array,
+): number {
   if (indices instanceof Uint16Array) return gl.UNSIGNED_SHORT;
   if (indices instanceof Uint8Array) return gl.UNSIGNED_BYTE;
   return gl.UNSIGNED_INT;
@@ -66,7 +69,7 @@ export function startRenderingLoop(
       firstFrame = false;
       const err = gl.getError();
       if (err !== gl.NO_ERROR) {
-        console.error('WebGL error after first draw:', err);
+        console.error("WebGL error after first draw:", err);
       }
       if (onComplete) onComplete();
     }

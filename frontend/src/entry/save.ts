@@ -1,22 +1,33 @@
-import { MediaEntry } from '../components/media-entry';
-import { ParagraphEntry } from '../components/paragraph-entry';
-import { editArea, saveButton, saveNavButton, saveSpinner } from '../components/globals';
-import { scrollToBottom } from '../components/common';
-import { requestSaveEntry } from './make-request';
-import type { SaveData } from '../request-interface';
-import { dateSlug } from '../runtime/backend-variables';
-import { showMessageSimpleModal } from '../runtime/modals';
-import { enableDeleteButton } from './delete';
-import { zoomToMedia } from './media/media';
+import { MediaEntry } from "../components/media-entry";
+import { ParagraphEntry } from "../components/paragraph-entry";
+import {
+  editArea,
+  saveButton,
+  saveNavButton,
+  saveSpinner,
+} from "../components/globals";
+import { scrollToBottom } from "../components/common";
+import { requestSaveEntry } from "./make-request";
+import type { SaveData } from "../request-interface";
+import { dateSlug } from "../runtime/backend-variables";
+import { showMessageSimpleModal } from "../runtime/modals";
+import { enableDeleteButton } from "./delete";
+import { zoomToMedia } from "./media/media";
 
-export type { MediaSavePayload, ParagraphSavePayload, SaveData } from '../request-interface';
+export type {
+  MediaSavePayload,
+  ParagraphSavePayload,
+  SaveData,
+} from "../request-interface";
 
 /** Port of static/JS/entry.save.js. */
 
 /** Build the save payload from the current content elements. */
-export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveData | undefined {
+export function generateSaveEntry(
+  saveContent: ArrayLike<Element> | null,
+): SaveData | undefined {
   if (saveContent === null) {
-    console.error('generateSaveEntry: save content is missing');
+    console.error("generateSaveEntry: save content is missing");
     return undefined;
   }
   const saveData: SaveData = {};
@@ -24,7 +35,8 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
   for (let i = 0; i < saveContent.length; i++) {
     const element = saveContent[i] as HTMLElement;
     const entry =
-      ParagraphEntry.fromSaveElement(element) ?? MediaEntry.fromSaveElement(element);
+      ParagraphEntry.fromSaveElement(element) ??
+      MediaEntry.fromSaveElement(element);
     if (entry === null) continue;
     saveData[entry.saveId()] = entry.serialize();
   }
@@ -33,9 +45,11 @@ export function generateSaveEntry(saveContent: ArrayLike<Element> | null): SaveD
 }
 
 /** POST the save payload and report the result. */
-export function saveEntryToDatabase(saveData: SaveData | null | undefined): void {
+export function saveEntryToDatabase(
+  saveData: SaveData | null | undefined,
+): void {
   if (saveData == null) {
-    console.error('saveEntryToDatabase: save data is missing');
+    console.error("saveEntryToDatabase: save data is missing");
     return;
   }
 
@@ -46,13 +60,15 @@ export function saveEntryToDatabase(saveData: SaveData | null | undefined): void
     },
     {
       success: (response) => {
-        if ('success' in response) showMessageSimpleModal('Save Success', response['success']);
-        if ('error' in response) showMessageSimpleModal('Save Errors', response['error']);
+        if ("success" in response)
+          showMessageSimpleModal("Save Success", response["success"]);
+        if ("error" in response)
+          showMessageSimpleModal("Save Errors", response["error"]);
         enableDeleteButton();
         editArea.onImageAreaClick(zoomToMedia);
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
-        showMessageSimpleModal('Unknown Error', errorThrown);
+        showMessageSimpleModal("Unknown Error", errorThrown);
       },
       complete: () => {
         saveSpinner.hide();

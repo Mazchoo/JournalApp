@@ -1,5 +1,5 @@
-import type { RawEditorOptions, TinyMCE } from 'tinymce';
-import type { SynthesisEditor } from '../../src/runtime/externals';
+import type { RawEditorOptions, TinyMCE } from "tinymce";
+import type { SynthesisEditor } from "../../src/runtime/externals";
 
 /**
  * A stand-in for the TinyMCE global. Only the handful of APIs the ported code touches are
@@ -54,7 +54,7 @@ const DEFAULT_CONTAINER_HEIGHT = 300;
 function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
   const editor: FakeEditor = {
     id,
-    content: '',
+    content: "",
     containerHeight: DEFAULT_CONTAINER_HEIGHT,
     removed: false,
     buttons: {},
@@ -107,14 +107,14 @@ export function installFakeTinyMCE(): FakeTinyMCE {
     /** Create an editor for the selector, run setup, and fire init. */
     init: (options: RawEditorOptions) => {
       fake.initOptions.push(options);
-      const selector = String(options['selector'] ?? '');
-      const id = selector.startsWith('#') ? selector.slice(1) : selector;
+      const selector = String(options["selector"] ?? "");
+      const id = selector.startsWith("#") ? selector.slice(1) : selector;
       const editor = createEditor(fake, id);
       fake.editors.set(id, editor);
 
-      const setup = options['setup'] as ((editor: unknown) => void) | undefined;
+      const setup = options["setup"] as ((editor: unknown) => void) | undefined;
       setup?.(editor);
-      editor.fire('init');
+      editor.fire("init");
     },
   };
 
@@ -128,7 +128,9 @@ export function installFakeTinyMCE(): FakeTinyMCE {
 export function seedEditor(
   tinymce: FakeTinyMCE,
   id: string,
-  overrides: Partial<Pick<FakeEditor, 'content' | 'containerHeight' | 'synthesisEnabled'>> = {},
+  overrides: Partial<
+    Pick<FakeEditor, "content" | "containerHeight" | "synthesisEnabled">
+  > = {},
 ): FakeEditor {
   const editor = createEditor(tinymce, id);
   Object.assign(editor, overrides);

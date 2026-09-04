@@ -1,14 +1,14 @@
-import { ContentType } from '../common/content-types';
+import { ContentType } from "../common/content-types";
 import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
-} from '../display-config';
-import type { MediaSavePayload } from '../request-interface';
-import type { MediaContentThumbnail } from '../response-interface';
-import { dateSlug } from '../runtime/backend-variables';
-import { type IContent, contentTypeFromElement, hasMediaSrc } from './content';
-import { ContentRow } from './content-row';
+} from "../display-config";
+import type { MediaSavePayload } from "../request-interface";
+import type { MediaContentThumbnail } from "../response-interface";
+import { dateSlug } from "../runtime/backend-variables";
+import { type IContent, contentTypeFromElement, hasMediaSrc } from "./content";
+import { ContentRow } from "./content-row";
 
 /** One image/video/mesh row and the DOM nodes it owns. */
 export class MediaEntry extends ContentRow implements IContent {
@@ -22,7 +22,8 @@ export class MediaEntry extends ContentRow implements IContent {
   readonly uploadLabel: HTMLElement | null;
   readonly allowSyn: HTMLElement | null;
   readonly imageArea: HTMLElement | null;
-  private derivedType: ContentType.Image | ContentType.Video = ContentType.Image;
+  private derivedType: ContentType.Image | ContentType.Video =
+    ContentType.Image;
 
   constructor(index: string, row: HTMLElement) {
     super(index, row);
@@ -32,7 +33,7 @@ export class MediaEntry extends ContentRow implements IContent {
     this.upload = row.querySelector(`#upload${index}`);
     this.uploadLabel = row.querySelector(`#upload-label${index}`);
     this.allowSyn = row.querySelector(`#allow-syn${index}`);
-    this.imageArea = row.querySelector('.image-area');
+    this.imageArea = row.querySelector(".image-area");
     MediaEntry.byIndex[index] = this;
   }
 
@@ -64,13 +65,13 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Resolve the row that contains the event target. */
   static fromEvent(event: Event): MediaEntry | null {
     const target = event.target as Element | null;
-    if (target == null || typeof target.closest !== 'function') {
-      console.error('MediaEntry: event target is not inside a media row');
+    if (target == null || typeof target.closest !== "function") {
+      console.error("MediaEntry: event target is not inside a media row");
       return null;
     }
-    const row = target.closest('.media-entry') as HTMLElement | null;
+    const row = target.closest(".media-entry") as HTMLElement | null;
     if (row === null) {
-      console.error('MediaEntry: event target is not inside a media row');
+      console.error("MediaEntry: event target is not inside a media row");
       return null;
     }
     return MediaEntry.fromRow(row);
@@ -78,12 +79,12 @@ export class MediaEntry extends ContentRow implements IContent {
 
   /** Build or reuse the wrapper for a `.media-entry` element. */
   static fromRow(row: HTMLElement): MediaEntry | null {
-    const img = row.querySelector('img');
+    const img = row.querySelector("img");
     if (img === null) {
-      console.error('MediaEntry: media row has no img');
+      console.error("MediaEntry: media row has no img");
       return null;
     }
-    return MediaEntry.fromIndex(img.id.replace('image', ''));
+    return MediaEntry.fromIndex(img.id.replace("image", ""));
   }
 
   /** Hide an element without removing it from layout calculations. */
@@ -92,8 +93,8 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: ${label} does not exist`);
       return;
     }
-    element.style.visibility = 'hidden';
-    element.style.height = '0px';
+    element.style.visibility = "hidden";
+    element.style.height = "0px";
   }
 
   /** Write a data URL (or remote src) onto the `<img>`. */
@@ -102,7 +103,7 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: #image${media.index} does not exist`);
       return;
     }
-    media.image.setAttribute('src', src);
+    media.image.setAttribute("src", src);
   }
 
   /** Hide the video element of this row. */
@@ -121,15 +122,15 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: #video${media.index} does not exist`);
       return;
     }
-    media.video.style.visibility = 'visible';
-    media.video.style.height = 'auto';
-    media.video.setAttribute('src', src);
+    media.video.style.visibility = "visible";
+    media.video.style.height = "auto";
+    media.video.setAttribute("src", src);
   }
 
   /** Reveal the mesh canvas. Returns false when the canvas is missing. */
   static showCanvas(media: MediaEntry): boolean {
     if (media.canvas === null) {
-      console.error('Canvas element not found for contentId:', media.index);
+      console.error("Canvas element not found for contentId:", media.index);
       return false;
     }
     Object.assign(media.canvas.style, MESH_CANVAS_REVEAL_STYLE);
@@ -151,8 +152,8 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: #allow-syn${media.index} does not exist`);
       return;
     }
-    media.allowSyn.classList.toggle('btn-primary', isActive);
-    media.allowSyn.classList.toggle('btn-outline-secondary', !isActive);
+    media.allowSyn.classList.toggle("btn-primary", isActive);
+    media.allowSyn.classList.toggle("btn-outline-secondary", !isActive);
   }
 
   /** Toggle the Generate button between primary and outline. */
@@ -161,8 +162,8 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: #allow-syn${media.index} does not exist`);
       return;
     }
-    media.allowSyn.classList.toggle('btn-primary');
-    media.allowSyn.classList.toggle('btn-outline-secondary');
+    media.allowSyn.classList.toggle("btn-primary");
+    media.allowSyn.classList.toggle("btn-outline-secondary");
   }
 
   /** Treat the media element as a video thumbnail. */
@@ -171,16 +172,23 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error(`MediaEntry: #image${media.index} does not exist`);
       return false;
     }
-    media.image.classList.remove('content-image');
-    media.image.classList.add('content-video');
-    media.image.style.visibility = 'visible';
-    media.image.style.height = 'auto';
+    media.image.classList.remove("content-image");
+    media.image.classList.add("content-video");
+    media.image.style.visibility = "visible";
+    media.image.style.height = "auto";
     return true;
   }
 
   /** Fill image source, file name, and synthesis state from loaded content. */
-  static applyContent(media: MediaEntry, content: MediaContentThumbnail): boolean | undefined {
-    if (media.image == null || media.uploadLabel == null || media.allowSyn == null) {
+  static applyContent(
+    media: MediaEntry,
+    content: MediaContentThumbnail,
+  ): boolean | undefined {
+    if (
+      media.image == null ||
+      media.uploadLabel == null ||
+      media.allowSyn == null
+    ) {
       if (media.image == null) {
         console.error(`MediaEntry: #image${media.index} does not exist`);
       }
@@ -192,14 +200,17 @@ export class MediaEntry extends ContentRow implements IContent {
       }
       return undefined;
     }
-    MediaEntry.setSrc(media, content['base64']!);
-    MediaEntry.setSynthesisActive(media, content['allow_ai_synthesis'] === 1);
-    MediaEntry.setFileName(media, content['file_name']!);
+    MediaEntry.setSrc(media, content["base64"]!);
+    MediaEntry.setSynthesisActive(media, content["allow_ai_synthesis"] === 1);
+    MediaEntry.setFileName(media, content["file_name"]!);
     return true;
   }
 
   /** Fill file name and synthesis state without changing the source. */
-  static applyMeta(media: MediaEntry, mediaContent: MediaContentThumbnail): boolean | undefined {
+  static applyMeta(
+    media: MediaEntry,
+    mediaContent: MediaContentThumbnail,
+  ): boolean | undefined {
     if (media.uploadLabel == null || media.allowSyn == null) {
       if (media.uploadLabel == null) {
         console.error(`MediaEntry: #upload-label${media.index} does not exist`);
@@ -209,8 +220,11 @@ export class MediaEntry extends ContentRow implements IContent {
       }
       return undefined;
     }
-    MediaEntry.setSynthesisActive(media, mediaContent['allow_ai_synthesis'] === 1);
-    MediaEntry.setFileName(media, mediaContent['file_name']!);
+    MediaEntry.setSynthesisActive(
+      media,
+      mediaContent["allow_ai_synthesis"] === 1,
+    );
+    MediaEntry.setFileName(media, mediaContent["file_name"]!);
     return true;
   }
 
@@ -243,12 +257,17 @@ export class MediaEntry extends ContentRow implements IContent {
   static fromSaveElement(element: HTMLElement): MediaEntry | null {
     if (!hasMediaSrc(element)) return null;
     const contentType = contentTypeFromElement(element);
-    if (contentType !== ContentType.Image && contentType !== ContentType.Video) {
+    if (
+      contentType !== ContentType.Image &&
+      contentType !== ContentType.Video
+    ) {
       return null;
     }
-    const row = element.closest('.media-entry') as HTMLElement | null;
+    const row = element.closest(".media-entry") as HTMLElement | null;
     if (row === null) {
-      console.error('MediaEntry: save-content element is not inside a media row');
+      console.error(
+        "MediaEntry: save-content element is not inside a media row",
+      );
       return null;
     }
     const media = MediaEntry.fromRow(row);
@@ -258,39 +277,44 @@ export class MediaEntry extends ContentRow implements IContent {
   }
 
   imageId(): string | null {
-    return this.image?.getAttribute('data-image-id') ?? null;
+    return this.image?.getAttribute("data-image-id") ?? null;
   }
 
   videoId(): string | null {
-    return this.image?.getAttribute('data-video-id') ?? null;
+    return this.image?.getAttribute("data-video-id") ?? null;
   }
 
   /** Preview source currently shown on the `<img>`. */
   src(): string | null {
-    return this.image?.getAttribute('src') ?? null;
+    return this.image?.getAttribute("src") ?? null;
   }
 
   /** Whether the thumbnail is tagged as a still image. */
   isImage(): boolean {
-    return this.image?.classList.contains('content-image') ?? false;
+    return this.image?.classList.contains("content-image") ?? false;
   }
 
   /** Whether the thumbnail is tagged as a video poster. */
   isVideo(): boolean {
-    return this.image?.classList.contains('content-video') ?? false;
+    return this.image?.classList.contains("content-video") ?? false;
   }
 
   /**
    * Index and files from an upload `change` event.
    * Tests pass a stand-in target because jsdom cannot assign `HTMLInputElement.files`.
    */
-  static uploadFromEvent(event: Event): { index: string; files: FileList | File[] } | null {
-    const target = event.target as { id?: string; files?: FileList | File[] } | null;
+  static uploadFromEvent(
+    event: Event,
+  ): { index: string; files: FileList | File[] } | null {
+    const target = event.target as {
+      id?: string;
+      files?: FileList | File[];
+    } | null;
     if (!target?.id || !target.files) {
-      console.error('MediaEntry: upload event has no file input');
+      console.error("MediaEntry: upload event has no file input");
       return null;
     }
-    return { index: target.id.replace('upload', ''), files: target.files };
+    return { index: target.id.replace("upload", ""), files: target.files };
   }
 
   /**
@@ -302,53 +326,68 @@ export class MediaEntry extends ContentRow implements IContent {
     canvas.width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
     canvas.height = MESH_CANVAS_HEIGHT_PX;
 
-    const gl = (canvas.getContext('webgl') ??
-      canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    const gl = (canvas.getContext("webgl") ??
+      canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
     if (!gl) {
-      console.error('WebGL not supported');
+      console.error("WebGL not supported");
       return null;
     }
     return gl;
   }
 
   fileName(): string {
-    return this.uploadLabel?.textContent ?? '';
+    return this.uploadLabel?.textContent ?? "";
   }
 
   fileNameHtml(): string {
-    return this.uploadLabel?.innerHTML ?? '';
+    return this.uploadLabel?.innerHTML ?? "";
   }
 
   isSynthesisActive(): boolean {
-    return this.allowSyn?.classList.contains('btn-primary') ?? false;
+    return this.allowSyn?.classList.contains("btn-primary") ?? false;
   }
 
   /** Bind edit, upload, and synthesis handlers on this row. */
   bindHandlers(handlers: MediaEntryHandlers): void {
-    this.listen(this.upload, 'change', handlers.onUpload, `#upload${this.index}`);
-    this.listen(this.deleteButton, 'click', handlers.onDelete, `#delete-content${this.index}`);
+    this.listen(
+      this.upload,
+      "change",
+      handlers.onUpload,
+      `#upload${this.index}`,
+    );
+    this.listen(
+      this.deleteButton,
+      "click",
+      handlers.onDelete,
+      `#delete-content${this.index}`,
+    );
     this.listen(
       this.insertParagraphButton,
-      'click',
+      "click",
       handlers.onInsertParagraph,
       `#insert-paragraph${this.index}`,
     );
     this.listen(
       this.insertMediaButton,
-      'click',
+      "click",
       handlers.onInsertMedia,
       `#insert-media${this.index}`,
     );
-    this.listen(this.moveUpButton, 'click', handlers.onMoveUp, `#move-content-up${this.index}`);
+    this.listen(
+      this.moveUpButton,
+      "click",
+      handlers.onMoveUp,
+      `#move-content-up${this.index}`,
+    );
     this.listen(
       this.moveDownButton,
-      'click',
+      "click",
       handlers.onMoveDown,
       `#move-content-down${this.index}`,
     );
     this.listen(
       this.allowSyn,
-      'click',
+      "click",
       handlers.onToggleSynthesis,
       `#allow-syn${this.index}`,
     );
@@ -362,7 +401,7 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Find the `.media-entry` that owns `#image{index}`. */
   private static lookupRow(index: string): HTMLElement | null {
     const image = document.getElementById(`image${index}`);
-    return (image?.closest('.media-entry') as HTMLElement | null) ?? null;
+    return (image?.closest(".media-entry") as HTMLElement | null) ?? null;
   }
 }
 

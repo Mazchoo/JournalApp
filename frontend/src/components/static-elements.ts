@@ -1,18 +1,18 @@
-import { PageElement } from './page-element';
+import { PageElement } from "./page-element";
 
 /** Toolbar delete control (`#btn-delete`). */
 export class DeleteButton extends PageElement {
   constructor() {
-    super('btn-delete');
+    super("btn-delete");
   }
 
   /** Turn the outline button into an enabled danger button. */
   enable(): boolean {
     const button = this.resolve();
     if (button === null) return false;
-    button.classList.remove('disabled');
-    button.classList.remove('btn-outline-danger');
-    button.classList.add('btn-danger');
+    button.classList.remove("disabled");
+    button.classList.remove("btn-outline-danger");
+    button.classList.add("btn-danger");
     return true;
   }
 
@@ -20,32 +20,32 @@ export class DeleteButton extends PageElement {
   disable(): void {
     const button = this.resolve();
     if (button === null) return;
-    button.classList.remove('btn-danger');
-    button.classList.add('disabled');
-    button.classList.add('btn-outline-danger');
+    button.classList.remove("btn-danger");
+    button.classList.add("disabled");
+    button.classList.add("btn-outline-danger");
   }
 
   /** Whether the button is currently disabled (true if missing). */
   isDisabled(): boolean {
     const button = this.resolve();
     if (button === null) return true;
-    return button.classList.contains('disabled');
+    return button.classList.contains("disabled");
   }
 }
 
 /** Day-page save button (`#btn-save`). */
 export class SaveButton extends PageElement {
   constructor() {
-    super('btn-save');
+    super("btn-save");
   }
 
   /** Enable the solid success style. Returns false if the button is missing. */
   enable(): boolean {
     const button = this.resolve();
     if (button === null) return false;
-    button.classList.remove('disabled');
-    button.classList.remove('btn-outline-success');
-    button.classList.add('btn-success');
+    button.classList.remove("disabled");
+    button.classList.remove("btn-outline-success");
+    button.classList.add("btn-success");
     return true;
   }
 
@@ -53,9 +53,9 @@ export class SaveButton extends PageElement {
   disable(): boolean {
     const button = this.resolve();
     if (button === null) return false;
-    button.classList.remove('btn-success');
-    button.classList.add('disabled');
-    button.classList.add('btn-outline-success');
+    button.classList.remove("btn-success");
+    button.classList.add("disabled");
+    button.classList.add("btn-outline-success");
     return true;
   }
 
@@ -63,24 +63,24 @@ export class SaveButton extends PageElement {
   isDisabled(): boolean {
     const button = this.resolve();
     if (button === null) return true;
-    return button.classList.contains('disabled');
+    return button.classList.contains("disabled");
   }
 }
 
 /** In-progress spinner shown next to the save button (`#spinner-save`). */
 export class SaveSpinner extends PageElement {
   constructor() {
-    super('spinner-save');
+    super("spinner-save");
   }
 
   /** Hide the spinner. */
   hide(): void {
-    this.resolve()?.classList.add('invisible');
+    this.resolve()?.classList.add("invisible");
   }
 
   /** Show the spinner. */
   show(): void {
-    this.resolve()?.classList.remove('invisible');
+    this.resolve()?.classList.remove("invisible");
   }
 
   /**
@@ -90,52 +90,52 @@ export class SaveSpinner extends PageElement {
   isVisible(): boolean {
     const spinner = this.resolve();
     if (spinner === null) return true;
-    return !spinner.classList.contains('invisible');
+    return !spinner.classList.contains("invisible");
   }
 }
 
 /** Nav-bar save link (`#save-nav-button`). */
 export class SaveNavButton extends PageElement {
   constructor() {
-    super('save-nav-button');
+    super("save-nav-button");
   }
 
   /** Make the nav link clickable. */
   enable(): void {
-    this.resolve()?.classList.remove('disabled');
+    this.resolve()?.classList.remove("disabled");
   }
 
   /** Grey out the nav link. */
   disable(): void {
-    this.resolve()?.classList.add('disabled');
+    this.resolve()?.classList.add("disabled");
   }
 }
 
 /** "New Paragraph" toolbar button. */
 export class NewParagraphButton extends PageElement {
   constructor() {
-    super('btn-new-para');
+    super("btn-new-para");
   }
 }
 
 /** "New Media" toolbar button. */
 export class NewMediaButton extends PageElement {
   constructor() {
-    super('btn-new-media');
+    super("btn-new-media");
   }
 }
 
 /** "Move" toolbar button. */
 export class MoveButton extends PageElement {
   constructor() {
-    super('btn-move');
+    super("btn-move");
   }
 }
 
 /** The scrollable content list (`#edit-area`). */
 export class EditArea extends PageElement {
   constructor() {
-    super('edit-area');
+    super("edit-area");
   }
 
   /** Append a content row. */
@@ -158,53 +158,55 @@ export class EditArea extends PageElement {
 
   /** Server- or client-created paragraph rows. */
   paragraphRows(): NodeListOf<Element> {
-    return this.resolve()?.querySelectorAll('.paragraph-entry') ?? emptyNodeList();
+    return (
+      this.resolve()?.querySelectorAll(".paragraph-entry") ?? emptyNodeList()
+    );
   }
 
   /** Server- or client-created image/video/mesh rows. */
   mediaRows(): NodeListOf<Element> {
-    return this.resolve()?.querySelectorAll('.media-entry') ?? emptyNodeList();
+    return this.resolve()?.querySelectorAll(".media-entry") ?? emptyNodeList();
   }
 
   /** Clickable media frames used for zoom. */
   imageAreas(): NodeListOf<Element> {
-    return this.resolve()?.querySelectorAll('.image-area') ?? emptyNodeList();
+    return this.resolve()?.querySelectorAll(".image-area") ?? emptyNodeList();
   }
 
   /** Bind a click listener on every current image-area. */
   onImageAreaClick(handler: EventListener): void {
     this.imageAreas().forEach((area) => {
-      area.addEventListener('click', handler);
+      area.addEventListener("click", handler);
     });
   }
 
   /** Elements that contribute to the save payload. */
   saveContent(): NodeListOf<Element> {
-    return this.resolve()?.querySelectorAll('.save-content') ?? emptyNodeList();
+    return this.resolve()?.querySelectorAll(".save-content") ?? emptyNodeList();
   }
 }
 
 /** Full-size image shown in the image modal (`#image-preview`). */
 export class ImagePreview extends PageElement<HTMLImageElement> {
   constructor() {
-    super('image-preview');
+    super("image-preview");
   }
 
   /** Set the preview source. */
   setSrc(src: string): void {
-    this.resolve()?.setAttribute('src', src);
+    this.resolve()?.setAttribute("src", src);
   }
 }
 
 /** Full-size video shown in the video modal (`#video-preview`). */
 export class VideoPreview extends PageElement<HTMLVideoElement> {
   constructor() {
-    super('video-preview');
+    super("video-preview");
   }
 
   /** Set the preview source. */
   setSrc(src: string): void {
-    this.resolve()?.setAttribute('src', src);
+    this.resolve()?.setAttribute("src", src);
   }
 
   /** Pause, rewind, and clear the source when the video modal closes. */
@@ -213,7 +215,7 @@ export class VideoPreview extends PageElement<HTMLVideoElement> {
     if (video === null) return;
     video.pause();
     video.currentTime = 0;
-    video.src = '';
+    video.src = "";
   }
 }
 
@@ -225,22 +227,28 @@ export class DateModalFields {
 
   /** Query the three date selects. */
   bind(): void {
-    this.day = document.getElementById('date-modal-day') as HTMLSelectElement | null;
-    this.month = document.getElementById('date-modal-month') as HTMLSelectElement | null;
-    this.year = document.getElementById('date-modal-year') as HTMLSelectElement | null;
+    this.day = document.getElementById(
+      "date-modal-day",
+    ) as HTMLSelectElement | null;
+    this.month = document.getElementById(
+      "date-modal-month",
+    ) as HTMLSelectElement | null;
+    this.year = document.getElementById(
+      "date-modal-year",
+    ) as HTMLSelectElement | null;
   }
 
   /** Build a YYYY-MM-DD slug from the current select values. */
   destinationSlug(): string {
     this.ensureBound();
-    let destDay = selectValue(this.day, 'date-modal-day');
-    if (destDay.length === 1) destDay = '0' + destDay;
+    let destDay = selectValue(this.day, "date-modal-day");
+    if (destDay.length === 1) destDay = "0" + destDay;
     let destMonth = String((this.month?.selectedIndex ?? 0) + 1);
     if (this.month === null) {
-      console.error('DateModalFields: #date-modal-month does not exist');
+      console.error("DateModalFields: #date-modal-month does not exist");
     }
-    if (destMonth.length === 1) destMonth = '0' + destMonth;
-    const destYear = selectValue(this.year, 'date-modal-year');
+    if (destMonth.length === 1) destMonth = "0" + destMonth;
+    const destYear = selectValue(this.year, "date-modal-year");
     return `${destYear}-${destMonth}-${destDay}`;
   }
 
@@ -260,15 +268,18 @@ export class DateModalFields {
 }
 
 /** Return a select's value, logging if the node is missing. */
-function selectValue(select: HTMLSelectElement | null, elementId: string): string {
+function selectValue(
+  select: HTMLSelectElement | null,
+  elementId: string,
+): string {
   if (select === null) {
     console.error(`DateModalFields: #${elementId} does not exist`);
-    return '';
+    return "";
   }
   return select.value;
 }
 
 /** Empty NodeList used when `#edit-area` is missing. */
 function emptyNodeList(): NodeListOf<Element> {
-  return document.querySelectorAll('.__journal-empty__');
+  return document.querySelectorAll(".__journal-empty__");
 }

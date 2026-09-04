@@ -1,6 +1,6 @@
-import type { Editor, RawEditorOptions } from 'tinymce';
+import type { Editor, RawEditorOptions } from "tinymce";
 
-import { tiny, type SynthesisEditor } from '../runtime/externals';
+import { tiny, type SynthesisEditor } from "../runtime/externals";
 
 /** Initialise a TinyMCE editor with the journal toolbar. */
 export function createTinyMCE(
@@ -12,23 +12,24 @@ export function createTinyMCE(
 ): void {
   const options: RawEditorOptions = {
     selector: componentName,
-    toolbar: 'bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis',
+    toolbar:
+      "bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis",
     deprecation_warnings: false,
     browser_spellcheck: true,
     height: height,
     promotion: false,
     branding: false,
-    license_key: 'gpl',
+    license_key: "gpl",
     setup: (editor: Editor) => {
-      editor.ui.registry.addButton('import', {
-        text: 'Import Markdown',
+      editor.ui.registry.addButton("import", {
+        text: "Import Markdown",
         onAction: () => {
-          console.log('TinyMCE button clicked');
+          console.log("TinyMCE button clicked");
         },
       });
 
-      editor.ui.registry.addToggleButton('allowSynthesis', {
-        text: 'Generate',
+      editor.ui.registry.addToggleButton("allowSynthesis", {
+        text: "Generate",
         tooltip:
           "Allow content to create new AI generated content visible in the 'Derived Content' section",
         onAction: (api) => {
@@ -44,10 +45,10 @@ export function createTinyMCE(
         },
       });
 
-      editor.on('input', () => {
+      editor.on("input", () => {
         onDirty();
       });
-      editor.on('init', () => {
+      editor.on("init", () => {
         initCallback();
       });
     },
@@ -62,19 +63,28 @@ export function getMCEComponentHeight(name: string): number {
 }
 
 /** Recreate a paragraph editor at its current height and synthesis state. */
-export function resetMCE(div: Element | null | undefined, onDirty: () => void = () => {}): void {
+export function resetMCE(
+  div: Element | null | undefined,
+  onDirty: () => void = () => {},
+): void {
   if (div == null) {
-    console.error('resetMCE: element is missing');
+    console.error("resetMCE: element is missing");
     return;
   }
-  if (!div.classList.contains('paragraph-entry')) {
+  if (!div.classList.contains("paragraph-entry")) {
     return;
   }
 
-  const divName = div.children[0]!.getAttribute('name')!;
+  const divName = div.children[0]!.getAttribute("name")!;
   const currentHeight = getMCEComponentHeight(divName);
   const editor = tiny().get(divName) as SynthesisEditor | null;
   const allowSynthesis = editor?.synthesisEnabled ?? true;
   editor!.remove();
-  createTinyMCE('#' + divName, currentHeight, allowSynthesis, () => {}, onDirty);
+  createTinyMCE(
+    "#" + divName,
+    currentHeight,
+    allowSynthesis,
+    () => {},
+    onDirty,
+  );
 }

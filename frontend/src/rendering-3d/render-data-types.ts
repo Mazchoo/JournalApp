@@ -22,8 +22,8 @@ export interface EmbeddedTexture {
  * optional texture).
  */
 export type ColorPass =
-  | { readonly type: 'vertex-color'; readonly colors: Float32Array }
-  | { readonly type: 'none' };
+  | { readonly type: "vertex-color"; readonly colors: Float32Array }
+  | { readonly type: "none" };
 
 /**
  * Optional texture-coordinate pass.
@@ -32,11 +32,11 @@ export type ColorPass =
  */
 export type TexCoordPass =
   | {
-      readonly type: 'texcoords';
+      readonly type: "texcoords";
       readonly texCoords: Float32Array;
       readonly texture: EmbeddedTexture | null;
     }
-  | { readonly type: 'none' };
+  | { readonly type: "none" };
 
 /** Render-ready mesh produced by any file parser. */
 export interface MeshRenderData {

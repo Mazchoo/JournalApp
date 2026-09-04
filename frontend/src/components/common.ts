@@ -1,16 +1,22 @@
-import { editArea } from './globals';
-import { bs } from '../runtime/externals';
+import { editArea } from "./globals";
+import { bs } from "../runtime/externals";
 
 /** Read the CSRF token Django renders via `{% csrf_token %}`. */
 export function csrfToken(): string {
-  const input = document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
+  const input = document.querySelector<HTMLInputElement>(
+    "[name=csrfmiddlewaretoken]",
+  );
   return input!.value;
 }
 
 /** Remove an element's parent node from the grandparent. */
 export function deleteParentDiv(obj: Element | null | undefined): void {
-  if (obj == null || obj.parentNode == null || obj.parentNode.parentNode == null) {
-    console.error('deleteParentDiv: element or ancestor is missing');
+  if (
+    obj == null ||
+    obj.parentNode == null ||
+    obj.parentNode.parentNode == null
+  ) {
+    console.error("deleteParentDiv: element or ancestor is missing");
     return;
   }
   obj.parentNode.parentNode.removeChild(obj.parentNode);
@@ -19,7 +25,7 @@ export function deleteParentDiv(obj: Element | null | undefined): void {
 /** Remove an element from its parent. */
 export function removeItem(obj: Element | null | undefined): void {
   if (obj == null || obj.parentNode == null) {
-    console.error('removeItem: element or parent is missing');
+    console.error("removeItem: element or parent is missing");
     return;
   }
   obj.parentNode.removeChild(obj);
@@ -40,7 +46,11 @@ export function componentFromTemplate(
 }
 
 /** Set a tooltip's text from an input value plus a suffix. */
-export function changeTooltipTextFromInput(e: Event, idTag: string, suffix: string): void {
+export function changeTooltipTextFromInput(
+  e: Event,
+  idTag: string,
+  suffix: string,
+): void {
   const input = e.target as HTMLInputElement;
   const tooltip = document.querySelector(idTag);
   if (tooltip === null) {
@@ -51,7 +61,10 @@ export function changeTooltipTextFromInput(e: Event, idTag: string, suffix: stri
 }
 
 /** Move named children from one container into another. */
-export function reorderOneDivFromAnother(sourceTag: string, targetTag: string): void {
+export function reorderOneDivFromAnother(
+  sourceTag: string,
+  targetTag: string,
+): void {
   const targetDiv = document.querySelector(targetTag);
   if (targetDiv === null) {
     console.error(`reorderOneDivFromAnother: ${targetTag} does not exist`);
@@ -63,7 +76,9 @@ export function reorderOneDivFromAnother(sourceTag: string, targetTag: string): 
     const selector = nameSelector(sourceObjs[i]!);
     const targetItem = document.querySelector(selector);
     if (targetItem === null) {
-      console.error(`reorderOneDivFromAnother: ${selector || 'named element'} does not exist`);
+      console.error(
+        `reorderOneDivFromAnother: ${selector || "named element"} does not exist`,
+      );
       continue;
     }
     targetDiv.appendChild(targetItem);
@@ -72,7 +87,9 @@ export function reorderOneDivFromAnother(sourceTag: string, targetTag: string): 
 
 /** Refresh every Bootstrap scroll spy on the page. */
 export function refreshScrollSpies(): void {
-  const dataSpyList = Array.from(document.querySelectorAll('[data-bs-spy="scroll"]'));
+  const dataSpyList = Array.from(
+    document.querySelectorAll('[data-bs-spy="scroll"]'),
+  );
   dataSpyList.forEach((dataSpyEl) => {
     bs().ScrollSpy.getInstance(dataSpyEl)!.refresh();
   });
@@ -94,7 +111,9 @@ export function getParentDivOfObject(e: Event): HTMLElement | undefined {
   const selector = eventNameSelector(e);
   const parentDiv = document.querySelector(selector);
   if (parentDiv === null) {
-    console.error(`getParentDivOfObject: ${selector || 'row selector'} does not exist`);
+    console.error(
+      `getParentDivOfObject: ${selector || "row selector"} does not exist`,
+    );
     return undefined;
   }
   return parentDiv.parentNode as HTMLElement;
@@ -112,7 +131,7 @@ export function scrollToBottom(): void {
 
 /** Return the row selector stored on an edit button's name attribute. */
 export function nameSelector(element: Element): string {
-  return element.getAttribute('name') ?? '';
+  return element.getAttribute("name") ?? "";
 }
 
 /** Return the row selector from an event target. */

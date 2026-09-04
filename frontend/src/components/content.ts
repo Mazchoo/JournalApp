@@ -1,5 +1,8 @@
-import { ContentType } from '../common/content-types';
-import type { MediaSavePayload, ParagraphSavePayload } from '../request-interface';
+import { ContentType } from "../common/content-types";
+import type {
+  MediaSavePayload,
+  ParagraphSavePayload,
+} from "../request-interface";
 
 /** One saveable piece of an entry. */
 export interface IContent {
@@ -10,10 +13,12 @@ export interface IContent {
 }
 
 /** Map a save-content element's CSS class to its content type. */
-export function contentTypeFromElement(element: HTMLElement): ContentType | undefined {
-  if (element.classList.contains('entry-text')) return ContentType.Paragraph;
-  if (element.classList.contains('content-image')) return ContentType.Image;
-  if (element.classList.contains('content-video')) return ContentType.Video;
+export function contentTypeFromElement(
+  element: HTMLElement,
+): ContentType | undefined {
+  if (element.classList.contains("entry-text")) return ContentType.Paragraph;
+  if (element.classList.contains("content-image")) return ContentType.Image;
+  if (element.classList.contains("content-video")) return ContentType.Video;
   return undefined;
 }
 

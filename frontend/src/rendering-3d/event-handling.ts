@@ -5,8 +5,8 @@
  * Q/E rolls about that same axis; WASD pans in the image plane.
  */
 
-import { CAMERA_FOV_Y } from '../display-config';
-import type { OrbitCamera } from './create-camera-matrix';
+import { CAMERA_FOV_Y } from "../display-config";
+import type { OrbitCamera } from "./create-camera-matrix";
 
 type Vec3 = [number, number, number];
 
@@ -34,7 +34,11 @@ const loopControllers = new WeakMap<HTMLCanvasElement, AbortController>();
  * `dx` rotates about image-plane Y (screen up); `dy` rotates about image-plane X
  * (screen right).
  */
-export function orbitByPixels(camera: OrbitCamera, dx: number, dy: number): void {
+export function orbitByPixels(
+  camera: OrbitCamera,
+  dx: number,
+  dy: number,
+): void {
   const up: Vec3 = [camera.up[0], camera.up[1], camera.up[2]];
   const right: Vec3 = [camera.right[0], camera.right[1], camera.right[2]];
   rotateCamera(camera, up, -dx * ORBIT_SENSITIVITY);
@@ -49,16 +53,16 @@ export function orbitByPixels(camera: OrbitCamera, dx: number, dy: number): void
 export function panCamera(camera: OrbitCamera, key: string): boolean {
   const step = camera.radius * PAN_STEP_FRACTION;
   switch (key.toLowerCase()) {
-    case 'w':
+    case "w":
       camera.panY += step;
       return true;
-    case 's':
+    case "s":
       camera.panY -= step;
       return true;
-    case 'a':
+    case "a":
       camera.panX -= step;
       return true;
-    case 'd':
+    case "d":
       camera.panX += step;
       return true;
     default:
@@ -75,10 +79,10 @@ export function panCamera(camera: OrbitCamera, key: string): boolean {
  */
 export function rollCamera(camera: OrbitCamera, key: string): boolean {
   switch (key.toLowerCase()) {
-    case 'q':
+    case "q":
       rotateCamera(camera, camera.forward, -ROLL_STEP);
       return true;
-    case 'e':
+    case "e":
       rotateCamera(camera, camera.forward, ROLL_STEP);
       return true;
     default:
@@ -99,7 +103,10 @@ export function zoomTowardNdc(
   aspect: number,
   factor: number,
 ): void {
-  const newRadius = Math.min(MAX_RADIUS, Math.max(MIN_RADIUS, camera.radius * factor));
+  const newRadius = Math.min(
+    MAX_RADIUS,
+    Math.max(MIN_RADIUS, camera.radius * factor),
+  );
   const s = newRadius / camera.radius;
   const f = 1 / Math.tan(CAMERA_FOV_Y / 2);
   camera.panX += (1 - s) * ((ndcX * camera.radius * aspect) / f);
@@ -108,7 +115,10 @@ export function zoomTowardNdc(
 }
 
 /** NDC coordinates of a pointer event on the canvas, with Y flipped for clip space. */
-function pointerNdc(canvas: HTMLCanvasElement, event: MouseEvent): [number, number] {
+function pointerNdc(
+  canvas: HTMLCanvasElement,
+  event: MouseEvent,
+): [number, number] {
   const rect = canvas.getBoundingClientRect();
   const width = rect.width || canvas.width || 1;
   const height = rect.height || canvas.height || 1;
@@ -139,18 +149,24 @@ export function bindCameraControls(
   let lastPointerY = 0;
 
   canvas.addEventListener(
-    'wheel',
+    "wheel",
     (event) => {
       event.preventDefault();
       const [ndcX, ndcY] = pointerNdc(canvas, event);
-      zoomTowardNdc(camera, ndcX, ndcY, canvas.width / canvas.height, Math.exp(event.deltaY * 0.001));
+      zoomTowardNdc(
+        camera,
+        ndcX,
+        ndcY,
+        canvas.width / canvas.height,
+        Math.exp(event.deltaY * 0.001),
+      );
       onChange();
     },
     { passive: false, signal },
   );
 
   canvas.addEventListener(
-    'mousedown',
+    "mousedown",
     (event) => {
       canvas.focus();
       if (event.button !== 1) return;
@@ -163,10 +179,14 @@ export function bindCameraControls(
   );
 
   window.addEventListener(
-    'mousemove',
+    "mousemove",
     (event) => {
       if (!orbitDragging) return;
-      orbitByPixels(camera, event.clientX - lastPointerX, event.clientY - lastPointerY);
+      orbitByPixels(
+        camera,
+        event.clientX - lastPointerX,
+        event.clientY - lastPointerY,
+      );
       lastPointerX = event.clientX;
       lastPointerY = event.clientY;
       onChange();
@@ -175,7 +195,7 @@ export function bindCameraControls(
   );
 
   window.addEventListener(
-    'mouseup',
+    "mouseup",
     (event) => {
       if (event.button === 1) orbitDragging = false;
     },
@@ -183,10 +203,11 @@ export function bindCameraControls(
   );
 
   canvas.addEventListener(
-    'keydown',
+    "keydown",
     (event) => {
       if (document.activeElement !== canvas) return;
-      if (!panCamera(camera, event.key) && !rollCamera(camera, event.key)) return;
+      if (!panCamera(camera, event.key) && !rollCamera(camera, event.key))
+        return;
       event.preventDefault();
       onChange();
     },
@@ -219,7 +240,11 @@ function rotateVec(v: Vec3, k: Vec3, angle: number): Vec3 {
 }
 
 function cross(a: Vec3, b: Vec3): Vec3 {
-  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
 }
 
 function dot(a: Vec3, b: Vec3): number {

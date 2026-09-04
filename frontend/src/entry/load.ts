@@ -1,10 +1,10 @@
-import { MediaEntry } from '../components/media-entry';
-import { ParagraphEntry } from '../components/paragraph-entry';
-import { editArea } from '../components/globals';
-import { scrollToTop } from '../components/common';
-import { requestImageThumbnail, requestVideoThumbnail } from './make-request';
-import { initializeNewMedia } from './media/media';
-import { initializeNewParagraph } from './paragraph';
+import { MediaEntry } from "../components/media-entry";
+import { ParagraphEntry } from "../components/paragraph-entry";
+import { editArea } from "../components/globals";
+import { scrollToTop } from "../components/common";
+import { requestImageThumbnail, requestVideoThumbnail } from "./make-request";
+import { initializeNewMedia } from "./media/media";
+import { initializeNewParagraph } from "./paragraph";
 
 /** Port of static/JS/entry.load.js. */
 
@@ -19,11 +19,11 @@ export function loadServerRenderedImage(index: string, imageId: string): void {
           if (media !== null) MediaEntry.setSrc(media, response.base64);
         }
         if (response.error !== undefined) {
-          console.log('Image load error:', response.error);
+          console.log("Image load error:", response.error);
         }
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
-        console.log('Failed to load image:', errorThrown);
+        console.log("Failed to load image:", errorThrown);
       },
     },
   );
@@ -40,11 +40,11 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
           if (media !== null) MediaEntry.setSrc(media, response.base64);
         }
         if (response.error !== undefined) {
-          console.log('Video image load error:', response.error);
+          console.log("Video image load error:", response.error);
         }
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
-        console.log('Failed to load video image:', errorThrown);
+        console.log("Failed to load video image:", errorThrown);
       },
     },
   );
@@ -56,7 +56,7 @@ export function initializeServerRenderedContent(): void {
     const paragraph = ParagraphEntry.fromRow(row as HTMLElement);
     if (paragraph === null) return;
     const { height, allowSynthesis } = paragraph.editorSettings();
-    initializeNewParagraph(paragraph.index, height, '', allowSynthesis);
+    initializeNewParagraph(paragraph.index, height, "", allowSynthesis);
   });
 
   editArea.mediaRows().forEach((row) => {

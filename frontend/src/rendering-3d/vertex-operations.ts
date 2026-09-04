@@ -1,4 +1,4 @@
-import type { IndexBuffer } from './render-data-types';
+import type { IndexBuffer } from "./render-data-types";
 
 /** Per-vertex unit normals accumulated from triangle faces. */
 export function computeNormals(
@@ -35,7 +35,11 @@ export function computeNormals(
   }
 
   for (let i = 0; i < norms.length; i += 3) {
-    const len = Math.sqrt(norms[i]! * norms[i]! + norms[i + 1]! * norms[i + 1]! + norms[i + 2]! * norms[i + 2]!);
+    const len = Math.sqrt(
+      norms[i]! * norms[i]! +
+        norms[i + 1]! * norms[i + 1]! +
+        norms[i + 2]! * norms[i + 2]!,
+    );
     if (len > 0) {
       norms[i] /= len;
       norms[i + 1] /= len;
@@ -51,7 +55,9 @@ export function computeNormals(
  *
  * Returns `[0, 0, 0]` when there are no vertices.
  */
-export function computeCenterOfGravity(positions: Float32Array): [number, number, number] {
+export function computeCenterOfGravity(
+  positions: Float32Array,
+): [number, number, number] {
   const vertexCount = positions.length / 3;
   if (vertexCount === 0) return [0, 0, 0];
 

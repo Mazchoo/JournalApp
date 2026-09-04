@@ -29,13 +29,15 @@ export class PageElement<T extends HTMLElement = HTMLElement> {
       this.bind();
     }
     if (this.node === null) {
-      console.error(`${this.constructor.name}: #${this.elementId} does not exist`);
+      console.error(
+        `${this.constructor.name}: #${this.elementId} does not exist`,
+      );
     }
     return this.node;
   }
 
   /** Bind a click listener if the element exists. */
   onClick(handler: (event: Event) => void): void {
-    this.resolve()?.addEventListener('click', handler);
+    this.resolve()?.addEventListener("click", handler);
   }
 }

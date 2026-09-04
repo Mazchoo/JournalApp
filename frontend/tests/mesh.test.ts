@@ -1,12 +1,24 @@
-import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 
 import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
-} from '../src/display-config';
-import { computeNormals, initializeMeshRenderer, renderGLB } from '../src/entry/media/mesh';
-import { buildGlb, buildTriangleGlb, prepareCanvas } from './helpers/glb';
+} from "../src/display-config";
+import {
+  computeNormals,
+  initializeMeshRenderer,
+  renderGLB,
+} from "../src/entry/media/mesh";
+import { buildGlb, buildTriangleGlb, prepareCanvas } from "./helpers/glb";
 
 let canvas: HTMLCanvasElement;
 let consoleError: MockInstance<typeof console.error>;
@@ -21,16 +33,16 @@ function waitForConsoleError(message: string): Promise<void> {
 
 beforeEach(() => {
   document.body.innerHTML = '<canvas id="mesh-canvas0"></canvas>';
-  canvas = document.getElementById('mesh-canvas0') as HTMLCanvasElement;
-  consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  canvas = document.getElementById("mesh-canvas0") as HTMLCanvasElement;
+  consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('computeNormals', () => {
-  it('produces the unit face normal of an indexed triangle', () => {
+describe("computeNormals", () => {
+  it("produces the unit face normal of an indexed triangle", () => {
     const positions = new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]);
 
     const normals = computeNormals(positions, new Uint16Array([0, 1, 2]));
@@ -38,7 +50,7 @@ describe('computeNormals', () => {
     expect(Array.from(normals)).toEqual([0, 0, 1, 0, 0, 1, 0, 0, 1]);
   });
 
-  it('handles non-indexed geometry by walking vertices in threes', () => {
+  it("handles non-indexed geometry by walking vertices in threes", () => {
     const positions = new Float32Array([0, 0, 0, 0, 0, 1, 0, 1, 0]);
 
     const normals = computeNormals(positions, null);
@@ -49,7 +61,7 @@ describe('computeNormals', () => {
     expect(normals[2]).toBeCloseTo(0);
   });
 
-  it('averages and normalises the normals of shared vertices', () => {
+  it("averages and normalises the normals of shared vertices", () => {
     // Two triangles sharing the edge 1-2, folded around the x axis.
     const positions = new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1]);
     const indices = new Uint16Array([0, 1, 2, 0, 2, 3]);
@@ -62,7 +74,7 @@ describe('computeNormals', () => {
     }
   });
 
-  it('leaves degenerate triangles at zero rather than dividing by zero', () => {
+  it("leaves degenerate triangles at zero rather than dividing by zero", () => {
     const positions = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
     const normals = computeNormals(positions, new Uint16Array([0, 1, 2]));
@@ -71,32 +83,32 @@ describe('computeNormals', () => {
   });
 });
 
-describe('renderGLB', () => {
-  it('rejects a file that does not start with the glTF magic number', () => {
+describe("renderGLB", () => {
+  it("rejects a file that does not start with the glTF magic number", () => {
     const notGlb = new ArrayBuffer(64);
 
     renderGLB(canvas, notGlb);
 
-    expect(consoleError).toHaveBeenCalledWith('Not a valid GLB file');
+    expect(consoleError).toHaveBeenCalledWith("Not a valid GLB file");
   });
 
-  it('rejects a GLB with no meshes', () => {
+  it("rejects a GLB with no meshes", () => {
     const buffer = buildGlb({ accessors: [], bufferViews: [], meshes: [] });
 
     renderGLB(canvas, buffer);
 
-    expect(consoleError).toHaveBeenCalledWith('No meshes found in GLB');
+    expect(consoleError).toHaveBeenCalledWith("No meshes found in GLB");
   });
 
-  it('reports a missing WebGL context', () => {
-    vi.spyOn(canvas, 'getContext').mockReturnValue(null);
+  it("reports a missing WebGL context", () => {
+    vi.spyOn(canvas, "getContext").mockReturnValue(null);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(consoleError).toHaveBeenCalledWith('WebGL not supported');
+    expect(consoleError).toHaveBeenCalledWith("WebGL not supported");
   });
 
-  it('sizes and reveals the canvas before drawing', () => {
+  it("sizes and reveals the canvas before drawing", () => {
     prepareCanvas(canvas);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
@@ -108,51 +120,55 @@ describe('renderGLB', () => {
     expect(canvas.height).toBe(MESH_CANVAS_HEIGHT_PX);
   });
 
-  it('uploads the geometry and draws the indexed triangle', () => {
+  it("uploads the geometry and draws the indexed triangle", () => {
     const gl = prepareCanvas(canvas);
     const { indices } = buildTriangleGlb();
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(gl.callsTo('drawElements')).toHaveLength(1);
-    expect(gl.callsTo('drawElements')[0]![1]).toBe(indices.length);
-    expect(gl.callsTo('drawArrays')).toHaveLength(0);
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
+    expect(gl.callsTo("drawElements")[0]![1]).toBe(indices.length);
+    expect(gl.callsTo("drawArrays")).toHaveLength(0);
   });
 
-  it('uploads a position buffer and a computed normal buffer', () => {
+  it("uploads a position buffer and a computed normal buffer", () => {
     const gl = prepareCanvas(canvas);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    const uploads = gl.callsTo('bufferData').map((args) => args[1]);
+    const uploads = gl.callsTo("bufferData").map((args) => args[1]);
     const floatUploads = uploads.filter((data) => data instanceof Float32Array);
     expect(floatUploads).toHaveLength(2);
     expect((floatUploads[1] as Float32Array).length).toBe(9);
   });
 
-  it('applies the default base colour when the primitive has no material', () => {
+  it("applies the default base colour when the primitive has no material", () => {
     const gl = prepareCanvas(canvas);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(gl.callsTo('uniform4fv')[0]![1]).toEqual([0.8, 0.8, 0.8, 1.0]);
+    expect(gl.callsTo("uniform4fv")[0]![1]).toEqual([0.8, 0.8, 0.8, 1.0]);
   });
 
-  it('applies the material base colour when one is present', () => {
+  it("applies the material base colour when one is present", () => {
     const gl = prepareCanvas(canvas);
     const { buffer } = buildTriangleGlb();
     const withMaterial = replaceGltf(buffer, (gltf) => {
-      gltf['materials'] = [{ pbrMetallicRoughness: { baseColorFactor: [0.1, 0.2, 0.3, 1] } }];
-      (gltf['meshes'] as { primitives: Record<string, unknown>[] }[])[0]!.primitives[0]!['material'] = 0;
+      gltf["materials"] = [
+        { pbrMetallicRoughness: { baseColorFactor: [0.1, 0.2, 0.3, 1] } },
+      ];
+      (
+        gltf["meshes"] as { primitives: Record<string, unknown>[] }[]
+      )[0]!.primitives[0]!["material"] = 0;
       return gltf;
     });
 
     renderGLB(canvas, withMaterial);
 
-    expect(gl.callsTo('uniform4fv')[0]![1]).toEqual([0.1, 0.2, 0.3, 1]);
+    expect(gl.callsTo("uniform4fv")[0]![1]).toEqual([0.1, 0.2, 0.3, 1]);
   });
 
-  it('reports its first frame through the completion callback exactly once', () => {
+  it("reports its first frame through the completion callback exactly once", () => {
     prepareCanvas(canvas);
     const onComplete = vi.fn();
 
@@ -161,85 +177,96 @@ describe('renderGLB', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('aborts when the shader program fails to link', () => {
+  it("aborts when the shader program fails to link", () => {
     const gl = prepareCanvas(canvas);
-    gl.overrides['getProgramParameter'] = () => false;
+    gl.overrides["getProgramParameter"] = () => false;
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(consoleError).toHaveBeenCalledWith('Program link error:', '');
-    expect(gl.callsTo('drawElements')).toHaveLength(0);
+    expect(consoleError).toHaveBeenCalledWith("Program link error:", "");
+    expect(gl.callsTo("drawElements")).toHaveLength(0);
   });
 
-  it('draws a static first frame instead of scheduling a spin loop', () => {
+  it("draws a static first frame instead of scheduling a spin loop", () => {
     const gl = prepareCanvas(canvas);
     const raf = vi.mocked(window.requestAnimationFrame);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
-    expect(gl.callsTo('drawElements')).toHaveLength(1);
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
     expect(raf).not.toHaveBeenCalled();
   });
 
-  it('zooms toward the cursor on wheel and redraws', () => {
+  it("zooms toward the cursor on wheel and redraws", () => {
     const gl = prepareCanvas(canvas);
     renderGLB(canvas, buildTriangleGlb().buffer);
-    const before = gl.callsTo('uniformMatrix4fv')[0]![2];
+    const before = gl.callsTo("uniformMatrix4fv")[0]![2];
 
-    canvas.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, clientX: 600, clientY: 100, cancelable: true }));
+    canvas.dispatchEvent(
+      new WheelEvent("wheel", {
+        deltaY: -120,
+        clientX: 600,
+        clientY: 100,
+        cancelable: true,
+      }),
+    );
 
-    expect(gl.callsTo('drawElements')).toHaveLength(2);
-    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(before);
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+    expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(before);
   });
 
-  it('orbits around the mesh when the middle mouse button is dragged', () => {
+  it("orbits around the mesh when the middle mouse button is dragged", () => {
     const gl = prepareCanvas(canvas);
     renderGLB(canvas, buildTriangleGlb().buffer);
-    const before = gl.callsTo('uniformMatrix4fv')[0]![2];
+    const before = gl.callsTo("uniformMatrix4fv")[0]![2];
 
-    canvas.dispatchEvent(new MouseEvent('mousedown', { button: 1, clientX: 100, clientY: 100 }));
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 160, clientY: 130 }));
+    canvas.dispatchEvent(
+      new MouseEvent("mousedown", { button: 1, clientX: 100, clientY: 100 }),
+    );
+    window.dispatchEvent(
+      new MouseEvent("mousemove", { clientX: 160, clientY: 130 }),
+    );
 
-    expect(gl.callsTo('drawElements')).toHaveLength(2);
-    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(before);
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+    expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(before);
   });
 
-  it('pans with WASD only while the canvas is focused', () => {
+  it("pans with WASD only while the canvas is focused", () => {
     const gl = prepareCanvas(canvas);
     renderGLB(canvas, buildTriangleGlb().buffer);
-    const initial = gl.callsTo('uniformMatrix4fv')[0]![2];
+    const initial = gl.callsTo("uniformMatrix4fv")[0]![2];
 
-    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }));
-    expect(gl.callsTo('drawElements')).toHaveLength(1);
-    expect(gl.callsTo('uniformMatrix4fv')[0]![2]).toEqual(initial);
+    canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "d" }));
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
+    expect(gl.callsTo("uniformMatrix4fv")[0]![2]).toEqual(initial);
 
     canvas.focus();
-    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }));
-    expect(gl.callsTo('drawElements')).toHaveLength(2);
-    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(initial);
+    canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "d" }));
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+    expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(initial);
   });
 
-  it('rolls with Q and E only while the canvas is focused', () => {
+  it("rolls with Q and E only while the canvas is focused", () => {
     const gl = prepareCanvas(canvas);
     renderGLB(canvas, buildTriangleGlb().buffer);
-    const initial = gl.callsTo('uniformMatrix4fv')[0]![2];
+    const initial = gl.callsTo("uniformMatrix4fv")[0]![2];
 
-    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
-    expect(gl.callsTo('drawElements')).toHaveLength(1);
-    expect(gl.callsTo('uniformMatrix4fv')[0]![2]).toEqual(initial);
+    canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "e" }));
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
+    expect(gl.callsTo("uniformMatrix4fv")[0]![2]).toEqual(initial);
 
     canvas.focus();
-    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
-    expect(gl.callsTo('drawElements')).toHaveLength(2);
-    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(initial);
+    canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "e" }));
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+    expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(initial);
   });
 });
 
-describe('initializeMeshRenderer', () => {
-  it('reads the file and renders it', async () => {
+describe("initializeMeshRenderer", () => {
+  it("reads the file and renders it", async () => {
     prepareCanvas(canvas);
     const onComplete = vi.fn();
-    const file = new File([buildTriangleGlb().buffer], 'scan.glb');
+    const file = new File([buildTriangleGlb().buffer], "scan.glb");
 
     initializeMeshRenderer(canvas, file, onComplete);
     await vi.waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
@@ -248,21 +275,25 @@ describe('initializeMeshRenderer', () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 
-  it('reports a parse failure and still signals completion', async () => {
+  it("reports a parse failure and still signals completion", async () => {
     const onComplete = vi.fn();
     const truncated = new Uint8Array([0x67, 0x6c, 0x54, 0x46]);
 
-    initializeMeshRenderer(canvas, new File([truncated], 'scan.glb'), onComplete);
-    await waitForConsoleError('GLB render error:');
+    initializeMeshRenderer(
+      canvas,
+      new File([truncated], "scan.glb"),
+      onComplete,
+    );
+    await waitForConsoleError("GLB render error:");
 
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('does not require a completion callback', async () => {
+  it("does not require a completion callback", async () => {
     const truncated = new Uint8Array([0x67, 0x6c, 0x54, 0x46]);
 
-    initializeMeshRenderer(canvas, new File([truncated], 'scan.glb'));
-    await waitForConsoleError('GLB render error:');
+    initializeMeshRenderer(canvas, new File([truncated], "scan.glb"));
+    await waitForConsoleError("GLB render error:");
   });
 });
 
@@ -273,13 +304,14 @@ function replaceGltf(
 ): ArrayBuffer {
   const view = new DataView(buffer);
   const jsonLen = view.getUint32(12, true);
-  const gltf = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLen))) as Record<
-    string,
-    unknown
-  >;
+  const gltf = JSON.parse(
+    new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLen)),
+  ) as Record<string, unknown>;
   const binChunkStart = 20 + jsonLen;
   const binLen = view.getUint32(binChunkStart, true);
-  const bin = new Uint8Array(buffer.slice(binChunkStart + 8, binChunkStart + 8 + binLen));
+  const bin = new Uint8Array(
+    buffer.slice(binChunkStart + 8, binChunkStart + 8 + binLen),
+  );
 
   return buildGlb(edit(gltf), bin);
 }

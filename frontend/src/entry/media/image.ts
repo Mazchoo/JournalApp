@@ -1,8 +1,8 @@
-import { imageModal, imagePreview } from '../../components/globals';
-import { MediaEntry } from '../../components/media-entry';
-import { requestFullImage } from '../make-request';
-import { dateSlug } from '../../runtime/backend-variables';
-import { enableSaveButton } from '../save';
+import { imageModal, imagePreview } from "../../components/globals";
+import { MediaEntry } from "../../components/media-entry";
+import { requestFullImage } from "../make-request";
+import { dateSlug } from "../../runtime/backend-variables";
+import { enableSaveButton } from "../save";
 
 /** Image-specific media-row helpers. */
 
@@ -32,7 +32,8 @@ export function openFullImage(fileName: string, source: string | null): void {
     {
       success: (response) => {
         if (response.base64 !== undefined) imageSource = response.base64;
-        if ('error' in response) console.log(`Image error : ${response['error']}`);
+        if ("error" in response)
+          console.log(`Image error : ${response["error"]}`);
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
         console.log(`Unknown error : ${errorThrown}`);

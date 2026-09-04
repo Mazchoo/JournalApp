@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 /** Builders and fakes for the GLB preview renderer. */
 
@@ -12,7 +12,10 @@ function padTo4(length: number): number {
 }
 
 /** Pack a glTF JSON document and its binary buffer into a GLB container. */
-export function buildGlb(gltf: unknown, bin: Uint8Array = new Uint8Array(0)): ArrayBuffer {
+export function buildGlb(
+  gltf: unknown,
+  bin: Uint8Array = new Uint8Array(0),
+): ArrayBuffer {
   const jsonBytes = new TextEncoder().encode(JSON.stringify(gltf));
   const jsonPad = padTo4(jsonBytes.length);
   const jsonLen = jsonBytes.length + jsonPad;
@@ -60,8 +63,8 @@ export function buildTriangleGlb(): TriangleGlb {
 
   const gltf = {
     accessors: [
-      { bufferView: 0, componentType: 5126, count: 3, type: 'VEC3' },
-      { bufferView: 1, componentType: 5123, count: 3, type: 'SCALAR' },
+      { bufferView: 0, componentType: 5126, count: 3, type: "VEC3" },
+      { bufferView: 1, componentType: 5123, count: 3, type: "SCALAR" },
     ],
     bufferViews: [
       { byteOffset: 0, byteLength: positionBytes.length },
@@ -90,8 +93,8 @@ const RETURN_VALUES: Record<string, () => unknown> = {
   getProgramParameter: () => true,
   getAttribLocation: () => 0,
   getUniformLocation: () => ({}),
-  getShaderInfoLog: () => '',
-  getProgramInfoLog: () => '',
+  getShaderInfoLog: () => "",
+  getProgramInfoLog: () => "",
   getExtension: () => ({}),
   getError: () => 0,
 };
@@ -107,8 +110,9 @@ export function fakeWebGLContext(): FakeGl {
     /** Resolve a GL constant or record a method call. */
     get(_target, property: string) {
       if (/^[A-Z0-9_]+$/.test(property)) {
-        if (property === 'NO_ERROR') return 0;
-        if (!constants.has(property)) constants.set(property, constants.size + 1);
+        if (property === "NO_ERROR") return 0;
+        if (!constants.has(property))
+          constants.set(property, constants.size + 1);
         return constants.get(property);
       }
       return (...args: unknown[]) => {
@@ -131,7 +135,7 @@ export function fakeWebGLContext(): FakeGl {
 /** Give the canvas a fake WebGL context. */
 export function prepareCanvas(canvas: HTMLCanvasElement): FakeGl {
   const gl = fakeWebGLContext();
-  vi.spyOn(canvas, 'getContext').mockReturnValue(gl.context as unknown as null);
-  vi.spyOn(window, 'requestAnimationFrame').mockReturnValue(0);
+  vi.spyOn(canvas, "getContext").mockReturnValue(gl.context as unknown as null);
+  vi.spyOn(window, "requestAnimationFrame").mockReturnValue(0);
   return gl;
 }

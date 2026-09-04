@@ -1,9 +1,9 @@
-import { enableSaveButton } from '../entry/save';
+import { enableSaveButton } from "../entry/save";
 import {
   createTinyMCE as createEditor,
   getMCEComponentHeight,
   resetMCE as resetEditor,
-} from '../components/tinymce';
+} from "../components/tinymce";
 
 export { getMCEComponentHeight };
 
@@ -14,7 +14,13 @@ export function createTinyMCE(
   allowSynthesis: boolean,
   initCallback: () => void = () => {},
 ): void {
-  createEditor(componentName, height, allowSynthesis, initCallback, enableSaveButton);
+  createEditor(
+    componentName,
+    height,
+    allowSynthesis,
+    initCallback,
+    enableSaveButton,
+  );
 }
 
 /** Recreate a paragraph editor, wiring dirty-state back to the save button. */

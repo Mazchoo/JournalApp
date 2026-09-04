@@ -1,13 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import { CAMERA_FOV_Y, INITIAL_CAMERA_RADIUS } from '../src/display-config';
-import { createOrbitCamera, createViewMatrix } from '../src/rendering-3d/create-camera-matrix';
-import { orbitByPixels, panCamera, rollCamera, zoomTowardNdc } from '../src/rendering-3d/event-handling';
+import { CAMERA_FOV_Y, INITIAL_CAMERA_RADIUS } from "../src/display-config";
+import {
+  createOrbitCamera,
+  createViewMatrix,
+} from "../src/rendering-3d/create-camera-matrix";
+import {
+  orbitByPixels,
+  panCamera,
+  rollCamera,
+  zoomTowardNdc,
+} from "../src/rendering-3d/event-handling";
 
 const ORIGIN: [number, number, number] = [0, 0, 0];
 
-describe('orbitByPixels', () => {
-  it('rotates about the image-plane axes and keeps the center of gravity on screen', () => {
+describe("orbitByPixels", () => {
+  it("rotates about the image-plane axes and keeps the center of gravity on screen", () => {
     const camera = createOrbitCamera();
     const before = createViewMatrix(camera, ORIGIN);
     orbitByPixels(camera, 80, 40);
@@ -20,7 +28,7 @@ describe('orbitByPixels', () => {
     expect(Array.from(after)).not.toEqual(Array.from(before));
   });
 
-  it('orbits vertically around image-plane X without using world-up as a lock', () => {
+  it("orbits vertically around image-plane X without using world-up as a lock", () => {
     const camera = createOrbitCamera();
     orbitByPixels(camera, 0, 80);
 
@@ -31,73 +39,77 @@ describe('orbitByPixels', () => {
   });
 });
 
-describe('panCamera', () => {
-  it('pans right and left on D and A', () => {
+describe("panCamera", () => {
+  it("pans right and left on D and A", () => {
     const camera = createOrbitCamera();
 
-    expect(panCamera(camera, 'd')).toBe(true);
+    expect(panCamera(camera, "d")).toBe(true);
     expect(camera.panX).toBeGreaterThan(0);
     const right = camera.panX;
 
-    expect(panCamera(camera, 'a')).toBe(true);
+    expect(panCamera(camera, "a")).toBe(true);
     expect(camera.panX).toBeLessThan(right);
   });
 
-  it('pans up and down on W and S', () => {
+  it("pans up and down on W and S", () => {
     const camera = createOrbitCamera();
 
-    expect(panCamera(camera, 'W')).toBe(true);
+    expect(panCamera(camera, "W")).toBe(true);
     expect(camera.panY).toBeGreaterThan(0);
 
-    expect(panCamera(camera, 's')).toBe(true);
+    expect(panCamera(camera, "s")).toBe(true);
     expect(camera.panY).toBeCloseTo(0);
   });
 
-  it('ignores keys that are not WASD', () => {
+  it("ignores keys that are not WASD", () => {
     const camera = createOrbitCamera();
 
-    expect(panCamera(camera, 'q')).toBe(false);
+    expect(panCamera(camera, "q")).toBe(false);
     expect(camera.panX).toBe(0);
     expect(camera.panY).toBe(0);
   });
 });
 
-describe('rollCamera', () => {
-  it('rolls about the view axis instead of yawing like a horizontal drag', () => {
+describe("rollCamera", () => {
+  it("rolls about the view axis instead of yawing like a horizontal drag", () => {
     const camera = createOrbitCamera();
     const dragged = createOrbitCamera();
     orbitByPixels(dragged, 80, 0);
 
-    expect(rollCamera(camera, 'e')).toBe(true);
+    expect(rollCamera(camera, "e")).toBe(true);
     expect(camera.forward[0]).toBeCloseTo(0);
     expect(camera.forward[2]).toBeCloseTo(-1);
     expect(camera.right[1]).not.toBeCloseTo(0);
     expect(dragged.forward[0]).toBeGreaterThan(0);
     expect(dragged.right[1]).toBeCloseTo(0);
-    expect(transformPoint(createViewMatrix(camera, ORIGIN), ORIGIN)[0]).toBeCloseTo(0);
-    expect(transformPoint(createViewMatrix(camera, ORIGIN), ORIGIN)[1]).toBeCloseTo(0);
+    expect(
+      transformPoint(createViewMatrix(camera, ORIGIN), ORIGIN)[0],
+    ).toBeCloseTo(0);
+    expect(
+      transformPoint(createViewMatrix(camera, ORIGIN), ORIGIN)[1],
+    ).toBeCloseTo(0);
   });
 
-  it('rolls left on Q, opposite of E', () => {
+  it("rolls left on Q, opposite of E", () => {
     const camera = createOrbitCamera();
-    rollCamera(camera, 'e');
+    rollCamera(camera, "e");
     const rightY = camera.right[1];
 
-    expect(rollCamera(camera, 'Q')).toBe(true);
+    expect(rollCamera(camera, "Q")).toBe(true);
     expect(camera.right[1]).toBeGreaterThan(rightY);
   });
 
-  it('ignores keys that are not Q or E', () => {
+  it("ignores keys that are not Q or E", () => {
     const camera = createOrbitCamera();
 
-    expect(rollCamera(camera, 'd')).toBe(false);
+    expect(rollCamera(camera, "d")).toBe(false);
     expect(camera.right[1]).toBeCloseTo(0);
     expect(camera.up[0]).toBeCloseTo(0);
   });
 });
 
-describe('zoomTowardNdc', () => {
-  it('zooms toward the screen center without panning', () => {
+describe("zoomTowardNdc", () => {
+  it("zooms toward the screen center without panning", () => {
     const camera = createOrbitCamera();
     zoomTowardNdc(camera, 0, 0, 1, 0.5);
 
@@ -106,7 +118,7 @@ describe('zoomTowardNdc', () => {
     expect(camera.panY).toBeCloseTo(0);
   });
 
-  it('keeps the cursor world point under the cursor when zooming off-center', () => {
+  it("keeps the cursor world point under the cursor when zooming off-center", () => {
     const camera = createOrbitCamera();
     const ndcX = 0.6;
     const ndcY = -0.3;
@@ -125,7 +137,10 @@ describe('zoomTowardNdc', () => {
 });
 
 /** Apply a column-major 4×4 matrix to a point with w = 1. */
-function transformPoint(m: Float32Array, p: [number, number, number]): [number, number, number] {
+function transformPoint(
+  m: Float32Array,
+  p: [number, number, number],
+): [number, number, number] {
   return [
     m[0]! * p[0] + m[4]! * p[1] + m[8]! * p[2] + m[12]!,
     m[1]! * p[0] + m[5]! * p[1] + m[9]! * p[2] + m[13]!,

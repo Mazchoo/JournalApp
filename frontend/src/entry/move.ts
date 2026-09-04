@@ -1,8 +1,11 @@
-import { dateModal, saveSpinner } from '../components/globals';
-import { requestMoveEntry } from './make-request';
-import { dateSlug } from '../runtime/backend-variables';
-import { showDateCallbackModal, showMessageSimpleModal } from '../runtime/modals';
-import { replaceLocation } from '../runtime/navigation';
+import { dateModal, saveSpinner } from "../components/globals";
+import { requestMoveEntry } from "./make-request";
+import { dateSlug } from "../runtime/backend-variables";
+import {
+  showDateCallbackModal,
+  showMessageSimpleModal,
+} from "../runtime/modals";
+import { replaceLocation } from "../runtime/navigation";
 
 /** Port of static/JS/entry.move.js. */
 
@@ -23,11 +26,12 @@ export function makeMoveRequest(): void {
     },
     {
       success: (response) => {
-        if (response.error !== undefined) showMessageSimpleModal('Move Status', response.error);
+        if (response.error !== undefined)
+          showMessageSimpleModal("Move Status", response.error);
         if (response.new_date !== undefined) replaceLocation(response.new_date);
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
-        showMessageSimpleModal('Unknown Error', errorThrown);
+        showMessageSimpleModal("Unknown Error", errorThrown);
       },
       complete: () => {
         saveSpinner.hide();
@@ -39,9 +43,9 @@ export function makeMoveRequest(): void {
 /** Open the date modal and move the entry once confirmed. */
 export function moveEntry(): void {
   showDateCallbackModal(
-    'Move Date',
-    'What date do you want to move this entry to?',
-    'Confirm',
+    "Move Date",
+    "What date do you want to move this entry to?",
+    "Confirm",
     makeMoveRequest,
   );
 }

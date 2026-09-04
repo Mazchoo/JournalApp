@@ -1,7 +1,7 @@
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'node:path';
+import { defineConfig } from "vitest/config";
+import { resolve } from "node:path";
 
-const distDir = resolve(import.meta.dirname, 'dist');
+const distDir = resolve(import.meta.dirname, "dist");
 
 export default defineConfig({
   build: {
@@ -10,25 +10,25 @@ export default defineConfig({
     outDir: distDir,
     emptyOutDir: true,
     sourcemap: true,
-    target: 'es2021',
+    target: "es2021",
     lib: {
-      entry: resolve(import.meta.dirname, 'src/main.ts'),
-      name: 'Journal',
-      formats: ['iife'],
+      entry: resolve(import.meta.dirname, "src/main.ts"),
+      name: "Journal",
+      formats: ["iife"],
       /** Return the IIFE bundle file name Django templates load. */
-      fileName: () => 'journal.bundle.js',
+      fileName: () => "journal.bundle.js",
     },
   },
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ["./tests/setup.ts"],
     unstubGlobals: true,
-    include: ['tests/**/*.test.ts'],
+    include: ["tests/**/*.test.ts"],
     coverage: {
-      provider: 'v8',
-      include: ['src/**/*.ts'],
-      exclude: ['src/main.ts', 'src/types/**'],
+      provider: "v8",
+      include: ["src/**/*.ts"],
+      exclude: ["src/main.ts", "src/types/**"],
     },
   },
 });

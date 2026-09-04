@@ -6,7 +6,12 @@
  * `event-handling.ts`.
  */
 
-import { CAMERA_FAR, CAMERA_FOV_Y, CAMERA_NEAR, INITIAL_CAMERA_RADIUS } from '../display-config';
+import {
+  CAMERA_FAR,
+  CAMERA_FOV_Y,
+  CAMERA_NEAR,
+  INITIAL_CAMERA_RADIUS,
+} from "../display-config";
 
 type Vec3 = [number, number, number];
 
@@ -69,10 +74,22 @@ export function createProjectionMatrix(aspect: number): Float32Array {
   const f = 1 / Math.tan(CAMERA_FOV_Y / 2);
   const di = 1 / (CAMERA_NEAR - CAMERA_FAR);
   return new Float32Array([
-    f / aspect, 0, 0, 0,
-    0, f, 0, 0,
-    0, 0, (CAMERA_NEAR + CAMERA_FAR) * di, -1,
-    0, 0, 2 * CAMERA_NEAR * CAMERA_FAR * di, 0,
+    f / aspect,
+    0,
+    0,
+    0,
+    0,
+    f,
+    0,
+    0,
+    0,
+    0,
+    (CAMERA_NEAR + CAMERA_FAR) * di,
+    -1,
+    0,
+    0,
+    2 * CAMERA_NEAR * CAMERA_FAR * di,
+    0,
   ]);
 }
 
@@ -80,9 +97,18 @@ export function createProjectionMatrix(aspect: number): Float32Array {
 function cameraEye(camera: OrbitCamera, cog: Vec3): Vec3 {
   const { right, up, forward } = camera;
   return [
-    cog[0] - forward[0] * camera.radius + right[0] * camera.panX + up[0] * camera.panY,
-    cog[1] - forward[1] * camera.radius + right[1] * camera.panX + up[1] * camera.panY,
-    cog[2] - forward[2] * camera.radius + right[2] * camera.panX + up[2] * camera.panY,
+    cog[0] -
+      forward[0] * camera.radius +
+      right[0] * camera.panX +
+      up[0] * camera.panY,
+    cog[1] -
+      forward[1] * camera.radius +
+      right[1] * camera.panX +
+      up[1] * camera.panY,
+    cog[2] -
+      forward[2] * camera.radius +
+      right[2] * camera.panX +
+      up[2] * camera.panY,
   ];
 }
 
@@ -91,10 +117,22 @@ export function createViewMatrix(camera: OrbitCamera, cog: Vec3): Float32Array {
   const { right, up, forward } = camera;
   const eye = cameraEye(camera, cog);
   return new Float32Array([
-    right[0], up[0], -forward[0], 0,
-    right[1], up[1], -forward[1], 0,
-    right[2], up[2], -forward[2], 0,
-    -dot(right, eye), -dot(up, eye), dot(forward, eye), 1,
+    right[0],
+    up[0],
+    -forward[0],
+    0,
+    right[1],
+    up[1],
+    -forward[1],
+    0,
+    right[2],
+    up[2],
+    -forward[2],
+    0,
+    -dot(right, eye),
+    -dot(up, eye),
+    dot(forward, eye),
+    1,
   ]);
 }
 

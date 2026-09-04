@@ -1,4 +1,4 @@
-import type { TinyMCE } from 'tinymce';
+import type { TinyMCE } from "tinymce";
 
 /**
  * Everything below is owned by the Django templates, not by this project.

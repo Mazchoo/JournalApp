@@ -1,9 +1,9 @@
-import { afterEach, vi, type Mock } from 'vitest';
+import { afterEach, vi, type Mock } from "vitest";
 
-import type { RequestError } from '../../src/request-interface';
+import type { RequestError } from "../../src/request-interface";
 
 export interface AjaxSettings {
-  type: 'POST';
+  type: "POST";
   url: string;
   data: Record<string, unknown>;
 }
@@ -39,7 +39,7 @@ function decodeNestedForm(body: string): Record<string, unknown> {
     let cursor = result;
     for (const key of keys) {
       const next = cursor[key];
-      if (typeof next !== 'object' || next === null || Array.isArray(next)) {
+      if (typeof next !== "object" || next === null || Array.isArray(next)) {
         cursor[key] = {};
       }
       cursor = cursor[key] as Record<string, unknown>;
@@ -50,11 +50,19 @@ function decodeNestedForm(body: string): Record<string, unknown> {
 }
 
 /** Rebuild the posted settings from the `fetch` arguments production code sends. */
-function settingsFromFetch(input: RequestInfo | URL, init?: RequestInit): AjaxSettings {
-  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-  const body = typeof init?.body === 'string' ? init.body : '';
+function settingsFromFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): AjaxSettings {
+  const url =
+    typeof input === "string"
+      ? input
+      : input instanceof URL
+        ? input.href
+        : input.url;
+  const body = typeof init?.body === "string" ? init.body : "";
   return {
-    type: 'POST',
+    type: "POST",
     url,
     data: decodeNestedForm(body),
   };
@@ -70,10 +78,10 @@ async function flushTransport(): Promise<void> {
 /** Drop leftover `fetch` promises so Vitest's worker can exit. */
 afterEach(async () => {
   if (unsettled.length === 0) return;
-  const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+  const log = vi.spyOn(console, "log").mockImplementation(() => {});
   try {
     for (const request of unsettled) {
-      request.reject(new Error('Request was not completed'));
+      request.reject(new Error("Request was not completed"));
     }
     unsettled.length = 0;
     await flushTransport();
@@ -85,25 +93,27 @@ afterEach(async () => {
 /** Return the most recent unsettled `fetch`, or throw if none exist. */
 function takeLastPending(): PendingFetch {
   const request = unsettled.pop();
-  if (request === undefined) throw new Error('No request was made.');
+  if (request === undefined) throw new Error("No request was made.");
   return request;
 }
 
 /** Intercept `fetch` so requests can be inspected and answered from tests. */
 export function stubAjax(): AjaxStub {
   const calls: AjaxSettings[] = [];
-  const mock = vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    calls.push(settingsFromFetch(input, init));
-    return new Promise<Response>((resolve, reject) => {
-      unsettled.push({ resolve, reject });
-    });
-  });
-  vi.stubGlobal('fetch', mock);
+  const mock = vi.fn(
+    (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      calls.push(settingsFromFetch(input, init));
+      return new Promise<Response>((resolve, reject) => {
+        unsettled.push({ resolve, reject });
+      });
+    },
+  );
+  vi.stubGlobal("fetch", mock);
 
   /** Return the most recent request settings, or throw if none exist. */
   const last = (): AjaxSettings => {
     const settings = calls[calls.length - 1];
-    if (settings === undefined) throw new Error('No request was made.');
+    if (settings === undefined) throw new Error("No request was made.");
     return settings;
   };
 
@@ -115,13 +125,13 @@ export function stubAjax(): AjaxStub {
     succeed: async (response: unknown) => {
       const { resolve } = takeLastPending();
       if (response instanceof Blob) {
-        resolve(new Response(response, { status: 200, statusText: 'OK' }));
+        resolve(new Response(response, { status: 200, statusText: "OK" }));
       } else {
         resolve(
           new Response(JSON.stringify(response), {
             status: 200,
-            statusText: 'OK',
-            headers: { 'Content-Type': 'application/json' },
+            statusText: "OK",
+            headers: { "Content-Type": "application/json" },
           }),
         );
       }
@@ -132,16 +142,21 @@ export function stubAjax(): AjaxStub {
       const { resolve, reject } = takeLastPending();
       const error = jqXhr as RequestError;
       if (error.responseJSON !== undefined || error.status !== undefined) {
-        const status = error.status !== undefined && error.status >= 400 ? error.status : 400;
+        const status =
+          error.status !== undefined && error.status >= 400
+            ? error.status
+            : 400;
         const body =
-          error.responseJSON !== undefined ? JSON.stringify(error.responseJSON) : null;
+          error.responseJSON !== undefined
+            ? JSON.stringify(error.responseJSON)
+            : null;
         resolve(
           new Response(body, {
             status,
             statusText: error.statusText ?? errorThrown,
             headers:
               error.responseJSON !== undefined
-                ? { 'Content-Type': 'application/json' }
+                ? { "Content-Type": "application/json" }
                 : undefined,
           }),
         );

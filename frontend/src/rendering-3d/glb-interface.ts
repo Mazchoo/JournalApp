@@ -14,7 +14,13 @@ export const UNSIGNED_INT = 5125;
 
 export const GLB_MAGIC = 0x46546c67;
 
-export const TYPE_SIZE = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT4: 16 } as const;
+export const TYPE_SIZE = {
+  SCALAR: 1,
+  VEC2: 2,
+  VEC3: 3,
+  VEC4: 4,
+  MAT4: 16,
+} as const;
 
 export interface GltfAccessor {
   bufferView: number;
