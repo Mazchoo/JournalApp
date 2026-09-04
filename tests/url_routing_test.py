@@ -46,6 +46,12 @@ def test_date_not_found_url_resolves():
     assert match.func.__name__ == "date_not_found_page"
 
 
+def test_help_url_resolves():
+    """URL /help should resolve to help_page."""
+    match = resolve("/help")
+    assert match.func.__name__ == "help_page"
+
+
 def test_save_entry_url_resolves():
     """URL /ajax/save-entry/ should resolve via its URL name."""
     match = resolve("/ajax/save-entry/")

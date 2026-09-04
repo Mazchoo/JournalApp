@@ -1,0 +1,175 @@
+{% load static %}
+{% include "Common/header.html" %}
+{% include "NavBars/home-nav.html" %}
+{% include "Backgrounds/Shapes.html" %}
+
+<body>
+    <div class="container">
+        <br>
+        <h1 class="text-center">Help</h1>
+        <br>
+
+        <div class="card my-4 shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title">
+                    <i class="fa fa-paragraph"></i>
+                    Adding paragraphs to a page
+                </h2>
+                <p>
+                    Open a day from the month calendar with the pencil button.
+                    On that day's page you can add text in two ways:
+                </p>
+                <ul>
+                    <li>
+                        <strong>New Paragraph</strong> at the bottom of the page
+                        adds a text block at the end of the entry.
+                    </li>
+                    <li>
+                        The <strong>paragraph button</strong>
+                        (<i class="fa fa-paragraph"></i>) beside an existing block
+                        inserts a new paragraph immediately above that block.
+                    </li>
+                </ul>
+                <p>
+                    Click in the editor to write. When you are finished, use
+                    <strong>Save</strong> (the green button at the bottom, or
+                    Save in the top bar) so the paragraph is kept.
+                </p>
+            </div>
+        </div>
+
+        <div class="card my-4 shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title">
+                    <i class="fa fa-picture-o"></i>
+                    Adding media to a page
+                </h2>
+                <p>
+                    On a day's page you can add photos, video, or a 3D mesh
+                    in two ways:
+                </p>
+                <ul>
+                    <li>
+                        <strong>New Media</strong> at the bottom of the page
+                        adds a media block at the end of the entry.
+                    </li>
+                    <li>
+                        The <strong>picture button</strong>
+                        (<i class="fa fa-picture-o"></i>) beside an existing
+                        block inserts a new media block immediately above it.
+                    </li>
+                </ul>
+                <p>
+                    Use <strong>Choose file</strong> to pick one or more
+                    files. The type is chosen from the file extension.
+                    Use <strong>Save</strong> when you are finished so the
+                    media is kept.
+                </p>
+
+                <h3 class="mt-4">
+                    <i class="fa fa-camera"></i>
+                    Images
+                </h3>
+                <p>
+                    Images appear as a still picture in the entry.
+                    On a reloaded page, click an image to view it at full resolution.
+                </p>
+                <p>
+                    Supported types:
+                    <strong>.png</strong>,
+                    <strong>.jpg</strong>,
+                    <strong>.jpeg</strong>,
+                    and
+                    <strong>.jfif</strong>.
+                </p>
+
+                <h3 class="mt-4">
+                    <i class="fa fa-video-camera"></i>
+                    Video
+                </h3>
+                <p>
+                    Videos play in place with playback controls.
+                    On a reloaded page, click the video frames to view the video.
+                </p>
+                <p>
+                    Supported type:
+                    <strong>.mp4</strong>.
+                </p>
+
+                <h3 class="mt-4">
+                    <i class="fa fa-cube"></i>
+                    Mesh
+                </h3>
+                <p>
+                    A mesh is shown as a 3D model you can view in the entry.
+                    Click the model first so the controls apply to it:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Middle-click and drag</strong> to orbit
+                        around the model.
+                    </li>
+                    <li>
+                        <strong>Scroll the mouse wheel</strong> to zoom in
+                        and out.
+                    </li>
+                    <li>
+                        <strong>W A S D</strong> to pan up, left, down, and
+                        right.
+                    </li>
+                    <li>
+                        <strong>Q</strong> and <strong>E</strong> to roll
+                        the view.
+                    </li>
+                </ul>
+                <p>
+                    Supported type:
+                    <strong>.glb</strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="card my-4 shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title">
+                    <i class="fa fa-calendar"></i>
+                    Navigating the calendar
+                </h2>
+                <p>
+                    Entries are organised as years, then months, then days.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Home</strong> in the top bar shows every year
+                        as a carousel. Click a year to open it, or use the
+                        previous and next arrows to browse years.
+                    </li>
+                    <li>
+                        On a <strong>year</strong> page, click a month to open
+                        its calendar. The arrows in the top bar move to the
+                        previous or next year.
+                    </li>
+                    <li>
+                        The <strong>month</strong> calendar shows each day.
+                        Click the pencil
+                        (<i class="fa fa-pencil"></i>) to open that day's entry.
+                        A filled pencil means an entry already exists; an
+                        outlined pencil is an empty day you can start writing.
+                        Use the arrows to move between months, or click the
+                        year in the top bar to go back.
+                    </li>
+                    <li>
+                        On a <strong>day</strong> page, the top bar links to
+                        the year and month. The arrows move to the previous
+                        or next day.
+                    </li>
+                    <li>
+                        <strong>Latest</strong> in the top bar jumps to the
+                        entry you edited most recently.
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <br>
+    </div>
+</body>

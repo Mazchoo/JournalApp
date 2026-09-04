@@ -117,6 +117,11 @@ def date_not_found_page(request):
     return render(request=request, template_name="DateNotFound.html")
 
 
+def help_page(request):
+    """Return the help page"""
+    return render(request=request, template_name="help.html")
+
+
 @ajax_request
 def delete_entry(post_data):
     """Async delete an entry"""
