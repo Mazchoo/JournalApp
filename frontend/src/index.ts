@@ -109,4 +109,4 @@ export type {
   SaveData,
 } from "./request-interface";
 export type { MediaContentThumbnail as ImageContent } from "./response-interface";
-export type { SynthesisEditor } from "./runtime/externals";
+export type { SynthesisEditor } from "./runtime/synthesis-editor";

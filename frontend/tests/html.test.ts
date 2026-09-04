@@ -8,6 +8,7 @@ import {
 } from "../src/entry/html";
 import { initializeParagraphRow } from "../src/entry/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
+import { HtmlEntry } from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
 import { createTinyMCE } from "../src/tinymce/helper";
 import { fileNamed, renderDayPage } from "./helpers/dom";
@@ -184,7 +185,7 @@ describe("readHtmlResource", () => {
 describe("imported HTML layout", () => {
   it("shows the file in an iframe and grows the frame to the document", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    paragraph.replaceWithImportedHtml(IMPORTED_HTML, true, () => {});
+    HtmlEntry.replace(paragraph, IMPORTED_HTML, true, () => {});
 
     const iframe = document.querySelector<HTMLIFrameElement>(
       ".imported-html-frame",
@@ -211,7 +212,7 @@ describe("imported HTML layout", () => {
 describe("imported HTML Generate button", () => {
   it("toggles synthesis state and enables saving", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    paragraph.replaceWithImportedHtml(IMPORTED_HTML, true, enableSaveButton);
+    HtmlEntry.replace(paragraph, IMPORTED_HTML, true, enableSaveButton);
 
     document.getElementById("imported-generate0")!.click();
 
@@ -234,7 +235,7 @@ describe("imported HTML Generate button", () => {
 describe("serialize imported HTML", () => {
   it("reads the file contents, host height and Generate state", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    paragraph.replaceWithImportedHtml(IMPORTED_HTML, false, () => {});
+    HtmlEntry.replace(paragraph, IMPORTED_HTML, false, () => {});
     Object.defineProperty(
       document.querySelector(".imported-html-editor")!,
       "clientHeight",

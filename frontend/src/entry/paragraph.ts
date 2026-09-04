@@ -1,3 +1,4 @@
+import { HtmlEntry } from "../components/html-entry";
 import { ParagraphEntry } from "../components/paragraph-entry";
 import { editArea } from "../components/globals";
 import {
@@ -127,7 +128,7 @@ export function initializeImportedHtmlParagraph(
   const paragraph = ParagraphEntry.fromIndex(lastestId);
   if (paragraph === null) return;
 
-  paragraph.replaceWithImportedHtml(html, allowSynthesis, enableSaveButton);
+  HtmlEntry.replace(paragraph, html, allowSynthesis, enableSaveButton);
   bindParagraphHandlers(paragraph);
 }
 

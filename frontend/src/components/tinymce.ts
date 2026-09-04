@@ -1,6 +1,7 @@
 import type { Editor, RawEditorOptions } from "tinymce";
 
-import { tiny, type SynthesisEditor } from "../runtime/externals";
+import { tiny } from "../runtime/externals";
+import type { SynthesisEditor } from "../runtime/synthesis-editor";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 
 /** Initialise a TinyMCE editor with the journal toolbar. */

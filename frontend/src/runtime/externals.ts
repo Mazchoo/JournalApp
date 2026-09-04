@@ -1,4 +1,4 @@
-import type { Editor, TinyMCE } from "tinymce";
+import type { TinyMCE } from "tinymce";
 
 /**
  * TinyMCE is resolved from `window` at call time rather than imported, because the page
@@ -7,8 +7,7 @@ import type { Editor, TinyMCE } from "tinymce";
  * supplies the type definitions used here and the fake used by the test suite.
  */
 
-/** A TinyMCE editor carrying the custom flag set by the "Generate" toggle button. */
-export type SynthesisEditor = Editor & { synthesisEnabled?: boolean };
+export type { SynthesisEditor } from "./synthesis-editor";
 
 /** Throw if a required window global is absent. */
 function missing(name: string): never {

@@ -1,6 +1,10 @@
 import { isHtmlFile } from "../common/file-io";
+import { HtmlEntry } from "../components/html-entry";
 import { ParagraphEntry } from "../components/paragraph-entry";
-import type { SynthesisEditor } from "../runtime/externals";
+import {
+  paragraphIndex,
+  type SynthesisEditor,
+} from "../runtime/synthesis-editor";
 import { enableSaveButton } from "./save";
 
 /** Whether markup looks like a full HTML document rather than a TinyMCE fragment. */
@@ -10,14 +14,12 @@ export function isStandaloneHtmlDocument(html: string): boolean {
 
 /** Replace the editor that raised Import HTML with the chosen HTML file. */
 export function importHtmlFromEditor(editor: SynthesisEditor): void {
-  const paragraph = ParagraphEntry.fromIndex(
-    editor.id.replace(/^paragraph/, ""),
-  );
+  const paragraph = ParagraphEntry.fromIndex(paragraphIndex(editor));
   if (paragraph === null) return;
 
   const allowSynthesis = editor.synthesisEnabled ?? true;
 
-  paragraph.pickHtmlFile((file) => {
+  HtmlEntry.pickFile((file) => {
     readHtmlResource(file, paragraph, allowSynthesis);
   });
 }
@@ -35,7 +37,8 @@ export function readHtmlResource(
 
   const reader = new FileReader();
   reader.onload = () => {
-    paragraph.replaceWithImportedHtml(
+    HtmlEntry.replace(
+      paragraph,
       reader.result as string,
       allowSynthesis,
       enableSaveButton,

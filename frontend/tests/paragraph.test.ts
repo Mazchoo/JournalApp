@@ -18,6 +18,7 @@ import {
   initializeNewParagraph,
   insertNewParagraphToPosition,
 } from "../src/entry/paragraph";
+import { HtmlEntry } from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
 import {
   defineInnerText,
@@ -213,7 +214,8 @@ describe("deleteParagraph", () => {
   });
 
   it("asks before deleting imported HTML that has contents", () => {
-    ParagraphEntry.fromIndex("0")!.replaceWithImportedHtml(
+    HtmlEntry.replace(
+      ParagraphEntry.fromIndex("0")!,
       "<html>Kept</html>",
       true,
       () => {},

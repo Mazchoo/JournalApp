@@ -1,5 +1,5 @@
 import type { RawEditorOptions, TinyMCE } from "tinymce";
-import type { SynthesisEditor } from "../../src/runtime/externals";
+import type { SynthesisEditor } from "../../src/runtime/synthesis-editor";
 
 /**
  * A stand-in for the TinyMCE global. Only the handful of APIs the ported code touches are
