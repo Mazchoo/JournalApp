@@ -45,11 +45,11 @@ describe("createTinyMCE", () => {
     expect(initCallback).toHaveBeenCalledTimes(1);
   });
 
-  it("registers the Import Markdown and Generate toolbar buttons", () => {
+  it("registers the Import HTML and Generate toolbar buttons", () => {
     createTinyMCE("#paragraph0", 220, true);
 
     const editor = tinymce.get("paragraph0")!;
-    expect(editor.buttons["import"]!.text).toBe("Import Markdown");
+    expect(editor.buttons["import"]!.text).toBe("Import HTML");
     expect(editor.toggleButtons["allowSynthesis"]!.text).toBe("Generate");
   });
 
@@ -99,7 +99,7 @@ describe("createTinyMCE", () => {
     ).toBe(true);
   });
 
-  it("logs when the Import Markdown button is pressed", () => {
+  it("logs when the Import HTML button is pressed", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
     createTinyMCE("#paragraph0", 220, true);
 

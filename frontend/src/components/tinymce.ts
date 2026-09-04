@@ -22,7 +22,7 @@ export function createTinyMCE(
     license_key: "gpl",
     setup: (editor: Editor) => {
       editor.ui.registry.addButton("import", {
-        text: "Import Markdown",
+        text: "Import HTML",
         onAction: () => {
           console.log("TinyMCE button clicked");
         },
