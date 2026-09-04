@@ -128,7 +128,7 @@ export function fakeWebGLContext(): FakeGl {
   };
 }
 
-/** Give the canvas a fake WebGL context and stop the render loop after one frame. */
+/** Give the canvas a fake WebGL context. */
 export function prepareCanvas(canvas: HTMLCanvasElement): FakeGl {
   const gl = fakeWebGLContext();
   vi.spyOn(canvas, 'getContext').mockReturnValue(gl.context as unknown as null);

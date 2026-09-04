@@ -1,6 +1,39 @@
 /**
- * Fit a mesh in the preview camera and build the rotating MVP matrix.
+ * Fit a mesh in the preview camera and build the view and projection matrices.
+ *
+ * Camera axes are the image plane (`right`, `up`) and the view direction
+ * (`forward`, into the image). Input that mutates this camera lives in
+ * `event-handling.ts`.
  */
+
+import { CAMERA_FAR, CAMERA_FOV_Y, CAMERA_NEAR, INITIAL_CAMERA_RADIUS } from '../display-config';
+
+type Vec3 = [number, number, number];
+
+/**
+ * Orbit camera in image-plane axes: `right`/`up` are screen x/y, `forward`
+ * looks into the image. Pan is in that same plane.
+ */
+export interface OrbitCamera {
+  right: Vec3;
+  up: Vec3;
+  forward: Vec3;
+  radius: number;
+  panX: number;
+  panY: number;
+}
+
+/** Camera looking down −Z at the pivot from `INITIAL_CAMERA_RADIUS`. */
+export function createOrbitCamera(): OrbitCamera {
+  return {
+    right: [1, 0, 0],
+    up: [0, 1, 0],
+    forward: [0, 0, -1],
+    radius: INITIAL_CAMERA_RADIUS,
+    panX: 0,
+    panY: 0,
+  };
+}
 
 /** Translate a mesh to the origin and scale it to fit a cube of side length 2. */
 export function centerAndScalePositions(positions: Float32Array): Float32Array {
@@ -31,30 +64,37 @@ export function centerAndScalePositions(positions: Float32Array): Float32Array {
   return pos;
 }
 
-/** Perspective projection for the preview camera (45° FOV, near 0.1, far 100). */
+/** Perspective projection for the preview camera. */
 export function createProjectionMatrix(aspect: number): Float32Array {
-  const fv = Math.PI / 4;
-  const nr = 0.1;
-  const fr = 100;
-  const f = 1 / Math.tan(fv / 2);
-  const di = 1 / (nr - fr);
+  const f = 1 / Math.tan(CAMERA_FOV_Y / 2);
+  const di = 1 / (CAMERA_NEAR - CAMERA_FAR);
   return new Float32Array([
     f / aspect, 0, 0, 0,
     0, f, 0, 0,
-    0, 0, (nr + fr) * di, -1,
-    0, 0, 2 * nr * fr * di, 0,
+    0, 0, (CAMERA_NEAR + CAMERA_FAR) * di, -1,
+    0, 0, 2 * CAMERA_NEAR * CAMERA_FAR * di, 0,
   ]);
 }
 
-/** Column-major Y-rotation about the origin, then translate to z = -3. */
-function modelViewMatrix(angle: number): Float32Array {
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
+/** World-space camera position for an orbit around `cog`. */
+function cameraEye(camera: OrbitCamera, cog: Vec3): Vec3 {
+  const { right, up, forward } = camera;
+  return [
+    cog[0] - forward[0] * camera.radius + right[0] * camera.panX + up[0] * camera.panY,
+    cog[1] - forward[1] * camera.radius + right[1] * camera.panX + up[1] * camera.panY,
+    cog[2] - forward[2] * camera.radius + right[2] * camera.panX + up[2] * camera.panY,
+  ];
+}
+
+/** Column-major view matrix looking along −Z, orbiting around `cog`. */
+export function createViewMatrix(camera: OrbitCamera, cog: Vec3): Float32Array {
+  const { right, up, forward } = camera;
+  const eye = cameraEye(camera, cog);
   return new Float32Array([
-    c, 0, -s, 0,
-    0, 1, 0, 0,
-    s, 0, c, 0,
-    0, 0, -3, 1,
+    right[0], up[0], -forward[0], 0,
+    right[1], up[1], -forward[1], 0,
+    right[2], up[2], -forward[2], 0,
+    -dot(right, eye), -dot(up, eye), dot(forward, eye), 1,
   ]);
 }
 
@@ -71,7 +111,15 @@ function multiplyMat4(a: Float32Array, b: Float32Array): Float32Array {
   return r;
 }
 
-/** Build a rotating model-view-projection matrix. */
-export function createMvpMatrix(projection: Float32Array, angle: number): Float32Array {
-  return multiplyMat4(projection, modelViewMatrix(angle));
+/** Build the model-view-projection matrix for the current orbit camera. */
+export function createMvpMatrix(
+  projection: Float32Array,
+  camera: OrbitCamera,
+  cog: Vec3,
+): Float32Array {
+  return multiplyMat4(projection, createViewMatrix(camera, cog));
+}
+
+function dot(a: Vec3, b: Vec3): number {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }

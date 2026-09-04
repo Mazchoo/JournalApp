@@ -52,7 +52,7 @@ export const meshPreview = {
   initialize: initializeMeshRenderer,
 };
 
-/** Parse a GLB buffer and draw a rotating mesh preview. */
+/** Parse a GLB buffer and draw an interactive mesh preview. */
 export function renderGLB(
   canvas: HTMLCanvasElement,
   buffer: ArrayBuffer,

@@ -170,6 +170,69 @@ describe('renderGLB', () => {
     expect(consoleError).toHaveBeenCalledWith('Program link error:', '');
     expect(gl.callsTo('drawElements')).toHaveLength(0);
   });
+
+  it('draws a static first frame instead of scheduling a spin loop', () => {
+    const gl = prepareCanvas(canvas);
+    const raf = vi.mocked(window.requestAnimationFrame);
+
+    renderGLB(canvas, buildTriangleGlb().buffer);
+
+    expect(gl.callsTo('drawElements')).toHaveLength(1);
+    expect(raf).not.toHaveBeenCalled();
+  });
+
+  it('zooms toward the cursor on wheel and redraws', () => {
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+    const before = gl.callsTo('uniformMatrix4fv')[0]![2];
+
+    canvas.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, clientX: 600, clientY: 100, cancelable: true }));
+
+    expect(gl.callsTo('drawElements')).toHaveLength(2);
+    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(before);
+  });
+
+  it('orbits around the mesh when the middle mouse button is dragged', () => {
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+    const before = gl.callsTo('uniformMatrix4fv')[0]![2];
+
+    canvas.dispatchEvent(new MouseEvent('mousedown', { button: 1, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 160, clientY: 130 }));
+
+    expect(gl.callsTo('drawElements')).toHaveLength(2);
+    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(before);
+  });
+
+  it('pans with WASD only while the canvas is focused', () => {
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+    const initial = gl.callsTo('uniformMatrix4fv')[0]![2];
+
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }));
+    expect(gl.callsTo('drawElements')).toHaveLength(1);
+    expect(gl.callsTo('uniformMatrix4fv')[0]![2]).toEqual(initial);
+
+    canvas.focus();
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'd' }));
+    expect(gl.callsTo('drawElements')).toHaveLength(2);
+    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(initial);
+  });
+
+  it('rolls with Q and E only while the canvas is focused', () => {
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+    const initial = gl.callsTo('uniformMatrix4fv')[0]![2];
+
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
+    expect(gl.callsTo('drawElements')).toHaveLength(1);
+    expect(gl.callsTo('uniformMatrix4fv')[0]![2]).toEqual(initial);
+
+    canvas.focus();
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
+    expect(gl.callsTo('drawElements')).toHaveLength(2);
+    expect(gl.callsTo('uniformMatrix4fv')[1]![2]).not.toEqual(initial);
+  });
 });
 
 describe('initializeMeshRenderer', () => {

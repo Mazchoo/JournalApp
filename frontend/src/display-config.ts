@@ -27,3 +27,15 @@ export const MESH_CANVAS_REVEAL_STYLE = {
   position: 'relative',
   zIndex: String(MESH_CANVAS_Z_INDEX),
 };
+
+/** Vertical field of view for the mesh preview camera, in radians. */
+export const CAMERA_FOV_Y = Math.PI / 4;
+
+/** Near clip plane of the mesh preview camera. */
+export const CAMERA_NEAR = 0.1;
+
+/** Far clip plane of the mesh preview camera. */
+export const CAMERA_FAR = 100;
+
+/** Distance from the orbit pivot at which the mesh preview starts. */
+export const INITIAL_CAMERA_RADIUS = 3;

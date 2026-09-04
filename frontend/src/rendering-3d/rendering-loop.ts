@@ -1,6 +1,13 @@
-import { centerAndScalePositions, createMvpMatrix, createProjectionMatrix } from './create-camera-matrix';
+import {
+  centerAndScalePositions,
+  createMvpMatrix,
+  createOrbitCamera,
+  createProjectionMatrix,
+} from './create-camera-matrix';
+import { bindCameraControls } from './event-handling';
 import { createShaders } from './create-shaders';
 import type { MeshRenderData } from './render-data-types';
+import { computeCenterOfGravity } from './vertex-operations';
 
 /** WebGL type constant for an index buffer. */
 function indexComponentType(gl: WebGLRenderingContext, indices: Uint8Array | Uint16Array | Uint32Array): number {
@@ -10,7 +17,8 @@ function indexComponentType(gl: WebGLRenderingContext, indices: Uint8Array | Uin
 }
 
 /**
- * Upload a mesh and draw a rotating preview until the page unloads.
+ * Upload a mesh and draw it. Further frames are drawn only in response to
+ * pointer and keyboard input (wheel zoom, image-plane orbit, WASD pan, Q/E roll).
  *
  * Works on `MeshRenderData` from any parser. Calls `onComplete` after the first frame.
  */
@@ -24,6 +32,8 @@ export function startRenderingLoop(
     ...mesh,
     positions: centerAndScalePositions(mesh.positions),
   };
+  const cog = computeCenterOfGravity(prepared.positions);
+  const camera = createOrbitCamera();
 
   const shaders = createShaders(gl, prepared);
   if (shaders === null) return;
@@ -35,14 +45,12 @@ export function startRenderingLoop(
   gl.viewport(0, 0, canvas.width, canvas.height);
 
   const projection = createProjectionMatrix(canvas.width / canvas.height);
-  let angle = 0;
   let firstFrame = true;
 
-  /** Draw one frame of the rotating mesh preview. */
+  /** Draw the mesh with the current camera. */
   function draw(): void {
-    angle += 0.01;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.uniformMatrix4fv(uMVP, false, createMvpMatrix(projection, angle));
+    gl.uniformMatrix4fv(uMVP, false, createMvpMatrix(projection, camera, cog));
     if (prepared.indices) {
       gl.drawElements(
         gl.TRIANGLES,
@@ -62,9 +70,8 @@ export function startRenderingLoop(
       }
       if (onComplete) onComplete();
     }
-
-    requestAnimationFrame(draw);
   }
 
+  bindCameraControls(canvas, camera, draw);
   draw();
 }
