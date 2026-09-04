@@ -59,7 +59,7 @@ export function initializeServerRenderedContent(): void {
     initializeNewParagraph(paragraph.index, height, '', allowSynthesis);
   });
 
-  editArea.imageRows().forEach((row) => {
+  editArea.mediaRows().forEach((row) => {
     const media = MediaEntry.fromRow(row as HTMLElement);
     if (media === null) return;
     initializeNewMedia(media.index);

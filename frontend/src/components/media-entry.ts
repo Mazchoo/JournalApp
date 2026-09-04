@@ -68,7 +68,7 @@ export class MediaEntry extends ContentRow implements IContent {
       console.error('MediaEntry: event target is not inside a media row');
       return null;
     }
-    const row = target.closest('.image-entry') as HTMLElement | null;
+    const row = target.closest('.media-entry') as HTMLElement | null;
     if (row === null) {
       console.error('MediaEntry: event target is not inside a media row');
       return null;
@@ -76,7 +76,7 @@ export class MediaEntry extends ContentRow implements IContent {
     return MediaEntry.fromRow(row);
   }
 
-  /** Build or reuse the wrapper for an `.image-entry` element. */
+  /** Build or reuse the wrapper for a `.media-entry` element. */
   static fromRow(row: HTMLElement): MediaEntry | null {
     const img = row.querySelector('img');
     if (img === null) {
@@ -214,13 +214,13 @@ export class MediaEntry extends ContentRow implements IContent {
     return true;
   }
 
-  /** Click the row's insert-image button. */
-  static clickInsertImage(media: MediaEntry): void {
-    if (media.insertImageButton === null) {
-      console.error(`MediaEntry: #insert-image${media.index} does not exist`);
+  /** Click the row's insert-media button. */
+  static clickInsertMedia(media: MediaEntry): void {
+    if (media.insertMediaButton === null) {
+      console.error(`MediaEntry: #insert-media${media.index} does not exist`);
       return;
     }
-    media.insertImageButton.click();
+    media.insertMediaButton.click();
   }
 
   get contentType(): ContentType.Image | ContentType.Video {
@@ -246,7 +246,7 @@ export class MediaEntry extends ContentRow implements IContent {
     if (contentType !== ContentType.Image && contentType !== ContentType.Video) {
       return null;
     }
-    const row = element.closest('.image-entry') as HTMLElement | null;
+    const row = element.closest('.media-entry') as HTMLElement | null;
     if (row === null) {
       console.error('MediaEntry: save-content element is not inside a media row');
       return null;
@@ -334,10 +334,10 @@ export class MediaEntry extends ContentRow implements IContent {
       `#insert-paragraph${this.index}`,
     );
     this.listen(
-      this.insertImageButton,
+      this.insertMediaButton,
       'click',
-      handlers.onInsertImage,
-      `#insert-image${this.index}`,
+      handlers.onInsertMedia,
+      `#insert-media${this.index}`,
     );
     this.listen(this.moveUpButton, 'click', handlers.onMoveUp, `#move-content-up${this.index}`);
     this.listen(
@@ -359,10 +359,10 @@ export class MediaEntry extends ContentRow implements IContent {
     super.remove();
   }
 
-  /** Find the `.image-entry` that owns `#image{index}`. */
+  /** Find the `.media-entry` that owns `#image{index}`. */
   private static lookupRow(index: string): HTMLElement | null {
     const image = document.getElementById(`image${index}`);
-    return (image?.closest('.image-entry') as HTMLElement | null) ?? null;
+    return (image?.closest('.media-entry') as HTMLElement | null) ?? null;
   }
 }
 
@@ -371,7 +371,7 @@ export interface MediaEntryHandlers {
   onUpload: EventListener;
   onDelete: EventListener;
   onInsertParagraph: EventListener;
-  onInsertImage: EventListener;
+  onInsertMedia: EventListener;
   onMoveUp: EventListener;
   onMoveDown: EventListener;
   onToggleSynthesis: EventListener;

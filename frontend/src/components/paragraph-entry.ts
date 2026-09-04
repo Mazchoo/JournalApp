@@ -128,10 +128,10 @@ export class ParagraphEntry extends ContentRow implements IContent {
       `#insert-paragraph${this.index}`,
     );
     this.listen(
-      this.insertImageButton,
+      this.insertMediaButton,
       'click',
-      handlers.onInsertImage,
-      `#insert-image${this.index}`,
+      handlers.onInsertMedia,
+      `#insert-media${this.index}`,
     );
     this.listen(this.moveUpButton, 'click', handlers.onMoveUp, `#move-content-up${this.index}`);
     this.listen(
@@ -158,7 +158,7 @@ export class ParagraphEntry extends ContentRow implements IContent {
 export interface ParagraphEntryHandlers {
   onDelete: EventListener;
   onInsertParagraph: EventListener;
-  onInsertImage: EventListener;
+  onInsertMedia: EventListener;
   onMoveUp: EventListener;
   onMoveDown: EventListener;
 }

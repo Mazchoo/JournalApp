@@ -9,7 +9,7 @@ import {
   EditArea,
   ImagePreview,
   MoveButton,
-  NewImageButton,
+  NewMediaButton,
   NewParagraphButton,
   SaveButton,
   SaveNavButton,
@@ -25,7 +25,7 @@ export const saveButton = new SaveButton();
 export const saveSpinner = new SaveSpinner();
 export const saveNavButton = new SaveNavButton();
 export const newParagraphButton = new NewParagraphButton();
-export const newImageButton = new NewImageButton();
+export const newMediaButton = new NewMediaButton();
 export const moveButton = new MoveButton();
 export const editArea = new EditArea();
 export const imagePreview = new ImagePreview();
@@ -43,7 +43,7 @@ const staticComponents = [
   saveSpinner,
   saveNavButton,
   newParagraphButton,
-  newImageButton,
+  newMediaButton,
   moveButton,
   editArea,
   imagePreview,

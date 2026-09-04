@@ -118,10 +118,10 @@ export class NewParagraphButton extends PageElement {
   }
 }
 
-/** "New Image" toolbar button. */
-export class NewImageButton extends PageElement {
+/** "New Media" toolbar button. */
+export class NewMediaButton extends PageElement {
   constructor() {
-    super('btn-new-image');
+    super('btn-new-media');
   }
 }
 
@@ -161,9 +161,9 @@ export class EditArea extends PageElement {
     return this.resolve()?.querySelectorAll('.paragraph-entry') ?? emptyNodeList();
   }
 
-  /** Server- or client-created image/video rows. */
-  imageRows(): NodeListOf<Element> {
-    return this.resolve()?.querySelectorAll('.image-entry') ?? emptyNodeList();
+  /** Server- or client-created image/video/mesh rows. */
+  mediaRows(): NodeListOf<Element> {
+    return this.resolve()?.querySelectorAll('.media-entry') ?? emptyNodeList();
   }
 
   /** Clickable media frames used for zoom. */

@@ -27,12 +27,12 @@ describe('bindDayPageHandlers', () => {
     installFakeTinyMCE();
   });
 
-  it('appends an image row from the toolbar button', () => {
+  it('appends a media row from the toolbar button', () => {
     bindDayPageHandlers();
 
-    document.getElementById('btn-new-image')!.click();
+    document.getElementById('btn-new-media')!.click();
 
-    expect(document.getElementById('edit-area')!.querySelector('.image-entry')).not.toBeNull();
+    expect(document.getElementById('edit-area')!.querySelector('.media-entry')).not.toBeNull();
   });
 
   it('enables delete when ENTRY_EXISTS is set', () => {

@@ -143,7 +143,7 @@ describe('resetMCE', () => {
   });
 
   it('ignores rows that are not paragraphs', () => {
-    resetMCE(document.querySelector('.image-entry'));
+    resetMCE(document.querySelector('.media-entry'));
 
     expect(tinymce.initOptions).toHaveLength(0);
   });

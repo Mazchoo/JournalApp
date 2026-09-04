@@ -36,12 +36,12 @@ function renderRow(kind: RowKind, index: string): string {
   }
 
   if (kind === 'video') {
-    return `<div class="row mt-4 image-entry">${withoutItemData(
+    return `<div class="row mt-4 media-entry">${withoutItemData(
       fillIndex(VIDEO_TEMPLATE, index).replaceAll('{{ item.data.video_id }}', `v${index}`),
     ).replaceAll('{% if item.data.allow_ai_synthesis %}checked{% endif %}', '')}</div>`;
   }
 
-  return `<div class="row mt-4 image-entry">${withoutItemData(
+  return `<div class="row mt-4 media-entry">${withoutItemData(
     fillIndex(MEDIA_TEMPLATE, index).replaceAll('{{ item.data.image_id }}', `i${index}`),
   ).replaceAll(
     '{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}',
@@ -67,7 +67,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
         </div>
         <div class="row mt-3 px-5">
             <button class="btn btn-dark" id="btn-new-para">New Paragraph</button>
-            <button class="btn btn-dark" id="btn-new-image">New Image</button>
+            <button class="btn btn-dark" id="btn-new-media">New Media</button>
             <button class="btn btn-outline-danger disabled" id="btn-delete">Delete</button>
             <button class="btn btn-outline-success disabled" id="btn-save">Save</button>
             <button class="btn btn-info" id="btn-move">Move</button>

@@ -10,7 +10,7 @@ import * as journal from '../src/index';
 const NAMES_USED_BY_BOOT = [
   'initializeServerRenderedContent',
   'appendParagraphToList',
-  'appendImageToList',
+  'appendMediaToList',
   'deleteContent',
   'saveToDatabase',
   'moveEntry',
@@ -64,7 +64,7 @@ const NAMES_FROM_STATIC_JS = [
   'deleteMedia',
   'initializeNewMedia',
   'insertNewMediaToPosition',
-  'appendImageToList',
+  'appendMediaToList',
   'readMediaResource',
   'showFileName',
   'uploadAllMediaFiles',

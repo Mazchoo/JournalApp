@@ -1,5 +1,5 @@
 /**
- * Shared edit-button references for a paragraph or image row.
+ * Shared edit-button references for a paragraph or media row.
  * Child classes add the media- or editor-specific nodes.
  */
 export class ContentRow {
@@ -7,7 +7,7 @@ export class ContentRow {
   readonly row: HTMLElement;
   readonly deleteButton: HTMLElement | null;
   readonly insertParagraphButton: HTMLElement | null;
-  readonly insertImageButton: HTMLElement | null;
+  readonly insertMediaButton: HTMLElement | null;
   readonly moveUpButton: HTMLElement | null;
   readonly moveDownButton: HTMLElement | null;
 
@@ -21,7 +21,7 @@ export class ContentRow {
     this.row = row;
     this.deleteButton = row.querySelector(`#delete-content${index}`);
     this.insertParagraphButton = row.querySelector(`#insert-paragraph${index}`);
-    this.insertImageButton = row.querySelector(`#insert-image${index}`);
+    this.insertMediaButton = row.querySelector(`#insert-media${index}`);
     this.moveUpButton = row.querySelector(`#move-content-up${index}`);
     this.moveDownButton = row.querySelector(`#move-content-down${index}`);
   }

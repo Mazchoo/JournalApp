@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 import { MESH_CANVAS_REVEAL_STYLE } from '../src/display-config';
 import { readImageResource } from '../src/entry/media/image';
 import {
-  appendImageToList,
+  appendMediaToList,
   createNewMedia,
   deleteMedia,
   editMediaContent,
@@ -71,7 +71,7 @@ describe('createNewMedia', () => {
     const div = createNewMedia();
 
     expect(window.CONTENT_INDEX).toBe(2);
-    expect(div.className).toBe('row mt-4 image-entry');
+    expect(div.className).toBe('row mt-4 media-entry');
     expect(div.querySelector('#image2')).not.toBeNull();
   });
 
@@ -125,11 +125,11 @@ describe('initializeNewMedia', () => {
 });
 
 describe('insertNewMediaToPosition', () => {
-  it('inserts a new image row above the clicked one', () => {
+  it('inserts a new media row above the clicked one', () => {
     renderDayPage({ rows: ['image', 'image'] });
     installFakeTinyMCE();
 
-    const div = insertNewMediaToPosition(eventFrom('#insert-image1'));
+    const div = insertNewMediaToPosition(eventFrom('#insert-media1'));
 
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children).toHaveLength(3);
@@ -139,9 +139,9 @@ describe('insertNewMediaToPosition', () => {
   });
 });
 
-describe('appendImageToList', () => {
+describe('appendMediaToList', () => {
   it('appends the row and wires its buttons', () => {
-    const div = appendImageToList();
+    const div = appendMediaToList();
 
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children[editArea.children.length - 1]).toBe(div);

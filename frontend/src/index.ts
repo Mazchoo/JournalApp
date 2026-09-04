@@ -42,7 +42,7 @@ export {
 export { computeNormals, initializeMeshRenderer, loadMeshResource, renderGLB } from './entry/media/mesh';
 
 export {
-  appendImageToList,
+  appendMediaToList,
   createNewMedia,
   deleteMedia,
   editMediaContent,

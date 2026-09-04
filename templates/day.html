@@ -30,11 +30,11 @@
                             {% include "EntryContents/Paragraph.html" %}
                         </div>
                     {% elif item.type == "image" %}
-                        <div class="row mt-4 image-entry">
+                        <div class="row mt-4 media-entry">
                             {% include "EntryContents/Media.html" %}
                         </div>
                     {% elif item.type == "video" %}
-                        <div class="row mt-4 image-entry">
+                        <div class="row mt-4 media-entry">
                             {% include "EntryContents/Video.html" %}
                         </div>
                     {% endif %}
@@ -43,7 +43,7 @@
 
             <div class = 'row mt-3 px-5'>
                 <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-para'>New Paragraph</button>
-                <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-image'>New Image</button>
+                <button class='btn btn-dark px-2 ml-2 mt-2 mb-5' id='btn-new-media'>New Media</button>
                 <button class='btn btn-outline-danger disabled px-2 ml-2 mt-2 mb-5' id='btn-delete'>Delete</button>
                 <button class='btn btn-outline-success disabled px-2 ml-2 mt-2 mb-5' id='btn-save'>Save</button>
                 <button class='btn btn-info px-2 ml-2 mt-2 mb-5' id='btn-move'>Move</button>

@@ -34,7 +34,7 @@ export function createNewMedia(): HTMLElement {
   const div = componentFromTemplate(
     generateMediaTemplate(index),
     'div',
-    'row mt-4 image-entry',
+    'row mt-4 media-entry',
   );
   const media = new MediaEntry(index, div);
   MediaEntry.setSynthesisActive(media, true);
@@ -57,7 +57,7 @@ export function initializeNewMedia(lastestId: string): void {
     onUpload: showImageUpload,
     onDelete: deleteMedia,
     onInsertParagraph: insertNewParagraphToPosition,
-    onInsertImage: insertNewMediaToPosition,
+    onInsertMedia: insertNewMediaToPosition,
     onMoveUp: moveObjectUp,
     onMoveDown: moveObjectDown,
     onToggleSynthesis: () => {
@@ -77,7 +77,7 @@ export function insertNewMediaToPosition(e: Event): HTMLElement | undefined {
 }
 
 /** Append a new media row to the edit area. */
-export function appendImageToList(): HTMLElement {
+export function appendMediaToList(): HTMLElement {
   const div = createNewMedia();
   editArea.append(div);
   initializeNewMedia(contentIndexStr());
@@ -99,7 +99,7 @@ export function uploadAllMediaFiles(
   for (let i = inputFiles.length - 1; i >= 0; i--) {
     if (i < inputFiles.length - 1) {
       const current = MediaEntry.fromIndex(contentInd);
-      if (current !== null) MediaEntry.clickInsertImage(current);
+      if (current !== null) MediaEntry.clickInsertMedia(current);
       contentInd = contentIndexStr();
     }
 

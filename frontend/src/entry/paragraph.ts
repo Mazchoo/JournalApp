@@ -103,7 +103,7 @@ export function initializeNewParagraph(
   paragraph.bindHandlers({
     onDelete: deleteParagraph,
     onInsertParagraph: insertNewParagraphToPosition,
-    onInsertImage: insertNewMediaToPosition,
+    onInsertMedia: insertNewMediaToPosition,
     onMoveUp: moveObjectUp,
     onMoveDown: moveObjectDown,
   });
