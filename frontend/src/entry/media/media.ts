@@ -36,7 +36,8 @@ export function createNewMedia(): HTMLElement {
     'div',
     'row mt-4 image-entry',
   );
-  new MediaEntry(index, div);
+  const media = new MediaEntry(index, div);
+  MediaEntry.setSynthesisActive(media, true);
   return div;
 }
 

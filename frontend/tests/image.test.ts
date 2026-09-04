@@ -74,6 +74,14 @@ describe('createNewMedia', () => {
     expect(div.className).toBe('row mt-4 image-entry');
     expect(div.querySelector('#image2')).not.toBeNull();
   });
+
+  it('turns the Generate button on by default', () => {
+    const div = createNewMedia();
+    const button = div.querySelector('#allow-syn2')!;
+
+    expect(button.classList.contains('btn-primary')).toBe(true);
+    expect(button.classList.contains('btn-outline-secondary')).toBe(false);
+  });
 });
 
 describe('deleteMedia', () => {
@@ -127,6 +135,7 @@ describe('insertNewMediaToPosition', () => {
     expect(editArea.children).toHaveLength(3);
     expect(editArea.children[1]).toBe(div);
     expect(window.CONTENT_INDEX).toBe(3);
+    expect(div.querySelector('#allow-syn3')!.classList.contains('btn-primary')).toBe(true);
   });
 });
 
@@ -137,8 +146,11 @@ describe('appendImageToList', () => {
     const editArea = document.getElementById('edit-area')!;
     expect(editArea.children[editArea.children.length - 1]).toBe(div);
 
-    document.getElementById('allow-syn2')!.click();
-    expect(document.getElementById('allow-syn2')!.classList.contains('btn-primary')).toBe(true);
+    const button = document.getElementById('allow-syn2')!;
+    expect(button.classList.contains('btn-primary')).toBe(true);
+
+    button.click();
+    expect(button.classList.contains('btn-primary')).toBe(false);
   });
 });
 

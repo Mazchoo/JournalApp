@@ -160,5 +160,18 @@ def test_edit_page_renders_paragraph_in_html():
     assert "id='paragraph1'" in content
 
 
+@pytest.mark.django_db
+def test_clone_item_defaults_allow_ai_synthesis_on():
+    """MEDIA_TEMPLATE is rendered with Generate on so new frontend rows start enabled."""
+    client = create_mock_client()
+    create_mock_entry()
+
+    response = client.get("/edit/2025/February/12/")
+
+    clone_item = response.context["clone_item"]
+    assert clone_item["data"]["allow_ai_synthesis"] is True
+    assert 'class="btn btn-sm btn-primary allow-syn"' in response.content.decode()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-x", "--verbose"])

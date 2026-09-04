@@ -100,7 +100,10 @@ def edit_entry_page(request, **kwargs):
         day_form.cleaned_data["day"],
     )
     page_context["tiny_mce"] = ParagraphForm()
-    page_context["clone_item"] = {"index": "{{ item.index }}"}
+    page_context["clone_item"] = {
+        "index": "{{ item.index }}",
+        "data": {"allow_ai_synthesis": True},
+    }
     return render(request=request, template_name="day.html", context=page_context)
 
 
