@@ -1,5 +1,6 @@
 import { MediaEntry } from '../../components/media-entry';
-import { parseGlb, computeNormals } from '../../rendering-3d/glb-parsing';
+import { parseGlb } from '../../rendering-3d/glb-parsing';
+import { computeNormals } from '../../rendering-3d/vertex-operations';
 import { startRenderingLoop } from '../../rendering-3d/rendering-loop';
 import { enableSaveButton } from '../save';
 
