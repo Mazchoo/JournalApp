@@ -4,7 +4,7 @@ import { editArea } from "../components/globals";
 import { scrollToTop } from "../components/common";
 import { requestImageThumbnail, requestVideoThumbnail } from "./make-request";
 import { initializeNewMedia } from "./media/media";
-import { initializeNewParagraph } from "./paragraph";
+import { initializeParagraphRow } from "./paragraph";
 
 /** Port of static/JS/entry.load.js. */
 
@@ -55,8 +55,7 @@ export function initializeServerRenderedContent(): void {
   editArea.paragraphRows().forEach((row) => {
     const paragraph = ParagraphEntry.fromRow(row as HTMLElement);
     if (paragraph === null) return;
-    const { height, allowSynthesis } = paragraph.editorSettings();
-    initializeNewParagraph(paragraph.index, height, "", allowSynthesis);
+    initializeParagraphRow(paragraph);
   });
 
   editArea.mediaRows().forEach((row) => {

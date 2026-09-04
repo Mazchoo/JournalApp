@@ -24,7 +24,12 @@ export {
   reverseString,
 } from "./common/dom";
 
-export { isImageFile, isMeshFile, isVideoFile } from "./common/file-io";
+export {
+  isHtmlFile,
+  isImageFile,
+  isMeshFile,
+  isVideoFile,
+} from "./common/file-io";
 
 export {
   createTinyMCE,
@@ -39,7 +44,9 @@ export {
   deleteParagraph,
   editParagraphContent,
   generateParagraphTemplate,
+  initializeImportedHtmlParagraph,
   initializeNewParagraph,
+  initializeParagraphRow,
   insertNewParagraphToPosition,
 } from "./entry/paragraph";
 

@@ -9,6 +9,7 @@ import {
 } from "vitest";
 
 import { MESH_CANVAS_REVEAL_STYLE } from "../src/display-config";
+import { SYNTHESIS_BUTTON_TOOLTIP } from "../src/tooltip-messages";
 import { readImageResource } from "../src/entry/media/image";
 import {
   appendMediaToList,
@@ -95,6 +96,7 @@ describe("createNewMedia", () => {
 
     expect(button.classList.contains("btn-primary")).toBe(true);
     expect(button.classList.contains("btn-outline-secondary")).toBe(false);
+    expect(button.getAttribute("title")).toBe(SYNTHESIS_BUTTON_TOOLTIP);
   });
 });
 

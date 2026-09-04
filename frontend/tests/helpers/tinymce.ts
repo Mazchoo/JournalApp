@@ -114,6 +114,15 @@ export function installFakeTinyMCE(): FakeTinyMCE {
 
       const setup = options["setup"] as ((editor: unknown) => void) | undefined;
       setup?.(editor);
+      for (const spec of Object.values(editor.toggleButtons)) {
+        const api: FakeToggleButtonApi = {
+          active: false,
+          setActive: (state: boolean) => {
+            api.active = state;
+          },
+        };
+        spec.onSetup(api);
+      }
       editor.fire("init");
     },
   };

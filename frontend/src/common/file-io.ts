@@ -14,3 +14,8 @@ export function isImageFile(fileName: string): boolean {
 export function isMeshFile(fileName: string): boolean {
   return fileName.split(".").pop()!.toLowerCase() === "glb";
 }
+
+/** Return whether a file name has an html or htm extension. */
+export function isHtmlFile(fileName: string): boolean {
+  return ["html", "htm"].includes(fileName.split(".").pop()!.toLowerCase());
+}

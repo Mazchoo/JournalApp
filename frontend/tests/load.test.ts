@@ -112,6 +112,21 @@ describe("initializeServerRenderedContent", () => {
     expect(tinymce.initOptions[0]!["selector"]).toBe("#paragraph0");
   });
 
+  it("shows imported HTML instead of TinyMCE for a standalone document", () => {
+    const textarea = document.getElementById(
+      "paragraph0",
+    ) as HTMLTextAreaElement;
+    textarea.value = "<!DOCTYPE html><html><body>Saved</body></html>";
+
+    initializeServerRenderedContent();
+
+    expect(tinymce.initOptions).toHaveLength(0);
+    expect(document.querySelector(".imported-html-editor")).not.toBeNull();
+    expect(
+      document.querySelector<HTMLIFrameElement>(".imported-html-frame")!.srcdoc,
+    ).toBe("<!DOCTYPE html><html><body>Saved</body></html>");
+  });
+
   it("uses the height and synthesis flag from the textarea data attributes", () => {
     const textarea = document.getElementById("paragraph0")!;
     textarea.setAttribute("data-height", "512");

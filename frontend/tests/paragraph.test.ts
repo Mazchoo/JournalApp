@@ -2,6 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../src/display-config";
 import {
+  DELETE_BUTTON_TOOLTIP,
+  INSERT_MEDIA_BUTTON_TOOLTIP,
+  INSERT_PARAGRAPH_BUTTON_TOOLTIP,
+  MOVE_DOWN_BUTTON_TOOLTIP,
+  MOVE_UP_BUTTON_TOOLTIP,
+} from "../src/tooltip-messages";
+import {
   appendParagraphToList,
   createInitFunction,
   createNewParagraph,
@@ -11,6 +18,7 @@ import {
   initializeNewParagraph,
   insertNewParagraphToPosition,
 } from "../src/entry/paragraph";
+import { ParagraphEntry } from "../src/components/paragraph-entry";
 import {
   defineInnerText,
   installModalStubs,
@@ -63,6 +71,21 @@ describe("createNewParagraph", () => {
     expect(window.CONTENT_INDEX).toBe(2);
     expect(div.className).toBe("row mt-3 paragraph-entry");
     expect(div.querySelector("#paragraph2")).not.toBeNull();
+    expect(div.querySelector("#delete-content2")!.getAttribute("title")).toBe(
+      DELETE_BUTTON_TOOLTIP,
+    );
+    expect(div.querySelector("#insert-paragraph2")!.getAttribute("title")).toBe(
+      INSERT_PARAGRAPH_BUTTON_TOOLTIP,
+    );
+    expect(div.querySelector("#insert-media2")!.getAttribute("title")).toBe(
+      INSERT_MEDIA_BUTTON_TOOLTIP,
+    );
+    expect(div.querySelector("#move-content-up2")!.getAttribute("title")).toBe(
+      MOVE_UP_BUTTON_TOOLTIP,
+    );
+    expect(
+      div.querySelector("#move-content-down2")!.getAttribute("title"),
+    ).toBe(MOVE_DOWN_BUTTON_TOOLTIP);
   });
 });
 
@@ -187,6 +210,19 @@ describe("deleteParagraph", () => {
     deleteParagraph(eventFrom("#delete-content0"));
 
     expect(modals.showCallbackModal).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks before deleting imported HTML that has contents", () => {
+    ParagraphEntry.fromIndex("0")!.replaceWithImportedHtml(
+      "<html>Kept</html>",
+      true,
+      () => {},
+    );
+
+    deleteParagraph(eventFrom("#delete-content0"));
+
+    expect(modals.showCallbackModal).toHaveBeenCalledTimes(1);
+    expect(document.getElementById("edit-area")!.children).toHaveLength(1);
   });
 });
 

@@ -47,8 +47,7 @@ export function zoomToVideo(
       },
       error: (jqXhr, _textStatus, errorThrown) => {
         const responseJSON = jqXhr.responseJSON as
-          | JsonErrorResponse
-          | undefined;
+          JsonErrorResponse | undefined;
         if (responseJSON && "error" in responseJSON) {
           console.log(`Video error : ${responseJSON["error"]}`);
         } else {

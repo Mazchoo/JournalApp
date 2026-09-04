@@ -5,6 +5,7 @@ import {
   getMCEComponentHeight,
   resetMCE,
 } from "../src/tinymce/helper";
+import { SYNTHESIS_BUTTON_TOOLTIP } from "../src/tooltip-messages";
 import { renderDayPage } from "./helpers/dom";
 import {
   installFakeTinyMCE,
@@ -51,6 +52,9 @@ describe("createTinyMCE", () => {
     const editor = tinymce.get("paragraph0")!;
     expect(editor.buttons["import"]!.text).toBe("Import HTML");
     expect(editor.toggleButtons["allowSynthesis"]!.text).toBe("Generate");
+    expect(editor.toggleButtons["allowSynthesis"]!.tooltip).toBe(
+      SYNTHESIS_BUTTON_TOOLTIP,
+    );
   });
 
   it("seeds synthesisEnabled from the argument during setup", () => {
@@ -99,14 +103,16 @@ describe("createTinyMCE", () => {
     ).toBe(true);
   });
 
-  it("logs when the Import HTML button is pressed", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+  it("opens a file picker when the Import HTML button is pressed", () => {
+    const click = vi
+      .spyOn(HTMLInputElement.prototype, "click")
+      .mockImplementation(() => {});
     createTinyMCE("#paragraph0", 220, true);
 
     tinymce.get("paragraph0")!.buttons["import"]!.onAction();
 
-    expect(log).toHaveBeenCalledWith("TinyMCE button clicked");
-    log.mockRestore();
+    expect(click).toHaveBeenCalledTimes(1);
+    click.mockRestore();
   });
 });
 
@@ -159,5 +165,18 @@ describe("resetMCE", () => {
   it("ignores a missing row", () => {
     expect(() => resetMCE(undefined)).not.toThrow();
     expect(tinymce.initOptions).toHaveLength(0);
+  });
+
+  it("leaves an imported HTML widget in place", () => {
+    seedEditor(tinymce, "paragraph0", { containerHeight: 318 });
+    const row = document.querySelector(".paragraph-entry")!;
+    const host = document.createElement("div");
+    host.className = "imported-html-editor";
+    row.appendChild(host);
+
+    resetMCE(row);
+
+    expect(tinymce.initOptions).toHaveLength(0);
+    expect(tinymce.get("paragraph0")).not.toBeNull();
   });
 });

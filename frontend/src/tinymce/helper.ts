@@ -1,4 +1,5 @@
 import { enableSaveButton } from "../entry/save";
+import { importHtmlFromEditor } from "../entry/html";
 import {
   createTinyMCE as createEditor,
   getMCEComponentHeight,
@@ -20,10 +21,11 @@ export function createTinyMCE(
     allowSynthesis,
     initCallback,
     enableSaveButton,
+    importHtmlFromEditor,
   );
 }
 
 /** Recreate a paragraph editor, wiring dirty-state back to the save button. */
 export function resetMCE(div: Element | null | undefined): void {
-  resetEditor(div, enableSaveButton);
+  resetEditor(div, enableSaveButton, importHtmlFromEditor);
 }

@@ -15,6 +15,7 @@ import {
 } from "../runtime/backend-variables";
 import { showCallbackModal } from "../runtime/modals";
 import { createTinyMCE } from "../tinymce/helper";
+import { isStandaloneHtmlDocument } from "./html";
 import { insertNewMediaToPosition } from "./media/media";
 import { enableSaveButton } from "./save";
 
@@ -89,6 +90,17 @@ export function createInitFunction(
   };
 }
 
+/** Bind the row's edit buttons. */
+function bindParagraphHandlers(paragraph: ParagraphEntry): void {
+  paragraph.bindHandlers({
+    onDelete: deleteParagraph,
+    onInsertParagraph: insertNewParagraphToPosition,
+    onInsertMedia: insertNewMediaToPosition,
+    onMoveUp: moveObjectUp,
+    onMoveDown: moveObjectDown,
+  });
+}
+
 /** Create the editor and bind the row's edit buttons. */
 export function initializeNewParagraph(
   lastestId: string,
@@ -101,14 +113,33 @@ export function initializeNewParagraph(
 
   const initFunction = createInitFunction(lastestId, paragraphText);
   createTinyMCE("#paragraph" + lastestId, height, allowSynthesis, initFunction);
+  bindParagraphHandlers(paragraph);
+}
 
-  paragraph.bindHandlers({
-    onDelete: deleteParagraph,
-    onInsertParagraph: insertNewParagraphToPosition,
-    onInsertMedia: insertNewMediaToPosition,
-    onMoveUp: moveObjectUp,
-    onMoveDown: moveObjectDown,
-  });
+/**
+ * Show a saved standalone HTML document in the imported-HTML widget instead of TinyMCE.
+ */
+export function initializeImportedHtmlParagraph(
+  lastestId: string,
+  html: string,
+  allowSynthesis = true,
+): void {
+  const paragraph = ParagraphEntry.fromIndex(lastestId);
+  if (paragraph === null) return;
+
+  paragraph.replaceWithImportedHtml(html, allowSynthesis, enableSaveButton);
+  bindParagraphHandlers(paragraph);
+}
+
+/** Initialise a server-rendered paragraph as TinyMCE or imported HTML. */
+export function initializeParagraphRow(paragraph: ParagraphEntry): void {
+  const { height, allowSynthesis } = paragraph.editorSettings();
+  const html = paragraph.textarea?.value ?? "";
+  if (isStandaloneHtmlDocument(html)) {
+    initializeImportedHtmlParagraph(paragraph.index, html, allowSynthesis);
+    return;
+  }
+  initializeNewParagraph(paragraph.index, height, "", allowSynthesis);
 }
 
 /** Insert a new paragraph row above the clicked row. */

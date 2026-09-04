@@ -1,6 +1,7 @@
 import type { Editor, RawEditorOptions } from "tinymce";
 
 import { tiny, type SynthesisEditor } from "../runtime/externals";
+import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 
 /** Initialise a TinyMCE editor with the journal toolbar. */
 export function createTinyMCE(
@@ -9,6 +10,7 @@ export function createTinyMCE(
   allowSynthesis: boolean,
   initCallback: () => void = () => {},
   onDirty: () => void = () => {},
+  onImportHtml: (editor: SynthesisEditor) => void = () => {},
 ): void {
   const options: RawEditorOptions = {
     selector: componentName,
@@ -24,14 +26,13 @@ export function createTinyMCE(
       editor.ui.registry.addButton("import", {
         text: "Import HTML",
         onAction: () => {
-          console.log("TinyMCE button clicked");
+          onImportHtml(editor as SynthesisEditor);
         },
       });
 
       editor.ui.registry.addToggleButton("allowSynthesis", {
         text: "Generate",
-        tooltip:
-          "Allow content to create new AI generated content visible in the 'Derived Content' section",
+        tooltip: SYNTHESIS_BUTTON_TOOLTIP,
         onAction: (api) => {
           allowSynthesis = !allowSynthesis;
           api.setActive(allowSynthesis);
@@ -66,12 +67,16 @@ export function getMCEComponentHeight(name: string): number {
 export function resetMCE(
   div: Element | null | undefined,
   onDirty: () => void = () => {},
+  onImportHtml: (editor: SynthesisEditor) => void = () => {},
 ): void {
   if (div == null) {
     console.error("resetMCE: element is missing");
     return;
   }
   if (!div.classList.contains("paragraph-entry")) {
+    return;
+  }
+  if (div.querySelector(".imported-html-editor") !== null) {
     return;
   }
 
@@ -86,5 +91,6 @@ export function resetMCE(
     allowSynthesis,
     () => {},
     onDirty,
+    onImportHtml,
   );
 }

@@ -7,6 +7,7 @@ import {
 import type { MediaSavePayload } from "../request-interface";
 import type { MediaContentThumbnail } from "../response-interface";
 import { dateSlug } from "../runtime/backend-variables";
+import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 import { type IContent, contentTypeFromElement, hasMediaSrc } from "./content";
 import { ContentRow } from "./content-row";
 
@@ -34,6 +35,7 @@ export class MediaEntry extends ContentRow implements IContent {
     this.uploadLabel = row.querySelector(`#upload-label${index}`);
     this.allowSyn = row.querySelector(`#allow-syn${index}`);
     this.imageArea = row.querySelector(".image-area");
+    this.applyTooltip(this.allowSyn, SYNTHESIS_BUTTON_TOOLTIP);
     MediaEntry.byIndex[index] = this;
   }
 
