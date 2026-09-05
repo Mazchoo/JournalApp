@@ -8,7 +8,10 @@ import {
 } from "../src/entry/html";
 import { initializeParagraphRow } from "../src/entry/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
-import { HtmlEntry } from "../src/components/html-entry";
+import {
+  generateImportedHtmlTemplate,
+  HtmlEntry,
+} from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
 import { createTinyMCE } from "../src/tinymce/helper";
 import { fileNamed, renderDayPage } from "./helpers/dom";
@@ -51,6 +54,16 @@ function waitForImportedEditor(): Promise<HTMLElement> {
 beforeEach(() => {
   renderDayPage({ rows: ["paragraph"] });
   tinymce = installFakeTinyMCE();
+});
+
+describe("generateImportedHtmlTemplate", () => {
+  it("substitutes every index placeholder", () => {
+    const markup = generateImportedHtmlTemplate("7");
+
+    expect(markup).not.toContain("{{ item.index }}");
+    expect(markup).toContain('id="imported-generate7"');
+    expect(markup).toContain('class="imported-html-frame"');
+  });
 });
 
 describe("isStandaloneHtmlDocument", () => {

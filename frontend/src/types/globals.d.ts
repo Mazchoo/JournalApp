@@ -23,6 +23,7 @@ declare global {
     CONTENT_INDEX: number;
     PARAGRAPH_TEMPLATE: string;
     MEDIA_TEMPLATE: string;
+    IMPORTED_HTML_TEMPLATE: string;
     DATE_SLUG: string;
     ENTRY_EXISTS: boolean;
     SAVE_URL: string;

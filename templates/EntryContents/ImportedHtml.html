@@ -1,0 +1,11 @@
+<!-- Imported HTML preview (client-rendered) -->
+<div class="imported-html-toolbar">
+    <button type="button"
+            class="btn btn-sm {% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %} allow-syn"
+            id="imported-generate{{ item.index }}"
+            data-toggle="tooltip"
+            style="font-size: 0.9rem; white-space: nowrap;">
+        Generate
+    </button>
+</div>
+<iframe class="imported-html-frame" title="Imported HTML" scrolling="no"></iframe>

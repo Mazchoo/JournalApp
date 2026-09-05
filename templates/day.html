@@ -64,6 +64,7 @@
         var CONTENT_INDEX = {{ content_list|length }};
         var PARAGRAPH_TEMPLATE = `{% include "EntryContents/Paragraph.html" with item=clone_item only %}`;
         var MEDIA_TEMPLATE = `{% include "EntryContents/Media.html" with item=clone_item only %}`;
+        var IMPORTED_HTML_TEMPLATE = `{% include "EntryContents/ImportedHtml.html" with item=clone_item only %}`;
         var DATE_SLUG = '{{date_slug}}';
         var ENTRY_EXISTS = {{ entry_exists|yesno:"true,false" }};
         var SAVE_URL = '{% url "main:save-entry" %}';

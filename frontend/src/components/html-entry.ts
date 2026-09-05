@@ -1,10 +1,16 @@
 import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../display-config";
 import type { ParagraphSavePayload } from "../request-interface";
-import { dateSlug } from "../runtime/backend-variables";
+import { dateSlug, importedHtmlTemplate } from "../runtime/backend-variables";
 import { tiny } from "../runtime/externals";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
+import { componentFromTemplate } from "./common";
 
 const HOST_CLASS = "imported-html-editor";
+
+/** Fill the imported-HTML widget template for the given content index. */
+export function generateImportedHtmlTemplate(contentInd: string): string {
+  return importedHtmlTemplate().replaceAll("{{ item.index }}", contentInd);
+}
 
 /** A paragraph row that can host imported HTML in place of TinyMCE. */
 export interface HtmlParagraphHost {
@@ -152,28 +158,26 @@ export class HtmlEntry {
     }
   }
 
+  /** Apply or remove the two Generate-button classes according to the synthesis flag. */
+  private static setSynthesisActive(
+    button: HTMLButtonElement,
+    isActive: boolean,
+  ): void {
+    button.classList.toggle("btn-primary", isActive);
+    button.classList.toggle("btn-outline-secondary", !isActive);
+  }
+
   /** Build the Generate toggle and iframe chrome. */
   private static buildWidget(
     host: HtmlParagraphHost,
     allowSynthesis: boolean,
     onDirty: () => void,
   ): HTMLElement {
-    const widget = document.createElement("div");
-    widget.className = HOST_CLASS;
-
-    const stateClass = allowSynthesis ? "btn-primary" : "btn-outline-secondary";
-    widget.innerHTML = `
-      <div class="imported-html-toolbar">
-        <button type="button"
-                class="btn btn-sm ${stateClass} allow-syn"
-                id="imported-generate${host.index}"
-                data-toggle="tooltip"
-                style="font-size: 0.9rem; white-space: nowrap;">
-          Generate
-        </button>
-      </div>
-      <iframe class="imported-html-frame" title="Imported HTML" scrolling="no"></iframe>
-    `;
+    const widget = componentFromTemplate(
+      generateImportedHtmlTemplate(host.index),
+      "div",
+      HOST_CLASS,
+    );
 
     const button = widget.querySelector<HTMLButtonElement>(
       `#imported-generate${host.index}`,
@@ -184,11 +188,11 @@ export class HtmlEntry {
       );
       return widget;
     }
+    HtmlEntry.setSynthesisActive(button, allowSynthesis);
     button.title = SYNTHESIS_BUTTON_TOOLTIP;
     button.addEventListener("click", () => {
       const next = !button.classList.contains("btn-primary");
-      button.classList.toggle("btn-primary", next);
-      button.classList.toggle("btn-outline-secondary", !next);
+      HtmlEntry.setSynthesisActive(button, next);
       button.setAttribute("aria-pressed", String(next));
       host.textarea?.setAttribute("data-allow-ai-synthesis", next ? "1" : "0");
       onDirty();
