@@ -112,11 +112,12 @@ describe("initializeServerRenderedContent", () => {
     expect(tinymce.initOptions[0]!["selector"]).toBe("#paragraph0");
   });
 
-  it("shows imported HTML instead of TinyMCE for a standalone document", () => {
+  it("shows imported HTML instead of TinyMCE when the textarea is marked imported", () => {
     const textarea = document.getElementById(
       "paragraph0",
     ) as HTMLTextAreaElement;
     textarea.value = "<!DOCTYPE html><html><body>Saved</body></html>";
+    textarea.setAttribute("data-imported-html", "1");
 
     initializeServerRenderedContent();
 

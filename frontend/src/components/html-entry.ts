@@ -6,6 +6,7 @@ import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 import { componentFromTemplate } from "./common";
 
 const HOST_CLASS = "imported-html-editor";
+const IMPORTED_ATTR = "data-imported-html";
 
 /** Fill the imported-HTML widget template for the given content index. */
 export function generateImportedHtmlTemplate(contentInd: string): string {
@@ -31,6 +32,11 @@ export class HtmlEntry {
   /** Whether `root` already contains an imported-HTML widget. */
   static isPresent(root: ParentNode): boolean {
     return root.querySelector(`.${HOST_CLASS}`) !== null;
+  }
+
+  /** Whether `host` is marked as imported HTML rather than a TinyMCE paragraph. */
+  static isImported(host: HtmlParagraphHost): boolean {
+    return host.textarea?.getAttribute(IMPORTED_ATTR) === "1";
   }
 
   /** Return the widget on `host`, or null when the row is still a TinyMCE paragraph. */
@@ -73,6 +79,7 @@ export class HtmlEntry {
 
     host.textarea.value = html;
     host.textarea.style.display = "none";
+    host.textarea.setAttribute(IMPORTED_ATTR, "1");
     host.textarea.setAttribute(
       "data-allow-ai-synthesis",
       allowSynthesis ? "1" : "0",
@@ -122,6 +129,7 @@ export class HtmlEntry {
       text: this.textarea.value,
       height: (host?.clientHeight ?? PARAGRAPH_EDITOR_HEIGHT_PX) + 2,
       allow_ai_synthesis: allowSynthesis ? 1 : 0,
+      raw_html: 1,
       entry: dateSlug(),
     };
   }

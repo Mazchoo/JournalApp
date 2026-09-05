@@ -184,6 +184,20 @@ class ParagraphForm(ModelForm):
             "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
         )
 
+    def clean_raw_html(self):
+        """Treat a missing flag as a TinyMCE paragraph."""
+        imported = self.data.get("raw_html")
+        if imported is None:
+            return False
+
+        cleaned_bool = coerce_string_int_to_bool(imported)
+        if cleaned_bool is not None:
+            return cleaned_bool
+
+        raise forms.ValidationError(
+            "Imported HTML is not coercible to a boolean in 0, 1 format"
+        )
+
 
 class DeleteEntryForm(forms.Form):
     """Validate request to delete a journal entry"""

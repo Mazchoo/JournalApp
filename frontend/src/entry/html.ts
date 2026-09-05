@@ -7,11 +7,6 @@ import {
 } from "../runtime/synthesis-editor";
 import { enableSaveButton } from "./save";
 
-/** Whether markup looks like a full HTML document rather than a TinyMCE fragment. */
-export function isStandaloneHtmlDocument(html: string): boolean {
-  return /<!DOCTYPE\s+html/i.test(html) || /<html[\s>]/i.test(html);
-}
-
 /** Replace the editor that raised Import HTML with the chosen HTML file. */
 export function importHtmlFromEditor(editor: SynthesisEditor): void {
   const paragraph = ParagraphEntry.fromIndex(paragraphIndex(editor));

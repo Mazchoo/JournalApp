@@ -50,6 +50,7 @@ export interface ParagraphSavePayload {
   text: string;
   height: number;
   allow_ai_synthesis: 0 | 1;
+  raw_html?: 0 | 1;
   entry: string;
 }
 

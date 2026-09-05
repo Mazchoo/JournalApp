@@ -88,7 +88,12 @@ def test_paragraph_view_method():
     )
     result = para.view()
 
-    assert result == {"text": "<h1>Title</h1>", "height": 300, "allow_ai_synthesis": 1}
+    assert result == {
+        "text": "<h1>Title</h1>",
+        "height": 300,
+        "allow_ai_synthesis": 1,
+        "raw_html": 0,
+    }
 
 
 @pytest.mark.django_db

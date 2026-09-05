@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../src/tooltip-messages";
-import {
-  importHtmlFromEditor,
-  isStandaloneHtmlDocument,
-  readHtmlResource,
-} from "../src/entry/html";
+import { importHtmlFromEditor, readHtmlResource } from "../src/entry/html";
 import { initializeParagraphRow } from "../src/entry/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
 import {
@@ -66,11 +62,22 @@ describe("generateImportedHtmlTemplate", () => {
   });
 });
 
-describe("isStandaloneHtmlDocument", () => {
-  it("accepts a doctype or an html root element", () => {
-    expect(isStandaloneHtmlDocument("<!DOCTYPE html><p>Hi</p>")).toBe(true);
-    expect(isStandaloneHtmlDocument("<html lang='en'></html>")).toBe(true);
-    expect(isStandaloneHtmlDocument("<p>TinyMCE fragment</p>")).toBe(false);
+describe("HtmlEntry.isImported", () => {
+  it("reads the imported-html marker on the textarea", () => {
+    const paragraph = ParagraphEntry.fromIndex("0")!;
+
+    expect(HtmlEntry.isImported(paragraph)).toBe(false);
+
+    paragraph.textarea!.setAttribute("data-imported-html", "1");
+    expect(HtmlEntry.isImported(paragraph)).toBe(true);
+  });
+
+  it("marks the textarea when replacing TinyMCE", () => {
+    const paragraph = ParagraphEntry.fromIndex("0")!;
+    HtmlEntry.replace(paragraph, IMPORTED_HTML, true, () => {});
+
+    expect(paragraph.textarea!.getAttribute("data-imported-html")).toBe("1");
+    expect(HtmlEntry.isImported(paragraph)).toBe(true);
   });
 });
 
@@ -263,17 +270,19 @@ describe("serialize imported HTML", () => {
       text: IMPORTED_HTML,
       height: 320,
       allow_ai_synthesis: 0,
+      raw_html: 1,
       entry: "2024-03-15",
     });
   });
 });
 
 describe("initializeParagraphRow", () => {
-  it("shows imported HTML for a standalone document instead of TinyMCE", () => {
+  it("shows imported HTML when the textarea is marked imported", () => {
     const textarea = document.getElementById(
       "paragraph0",
     ) as HTMLTextAreaElement;
     textarea.value = IMPORTED_HTML;
+    textarea.setAttribute("data-imported-html", "1");
     textarea.setAttribute("data-allow-ai-synthesis", "0");
 
     initializeParagraphRow(ParagraphEntry.fromIndex("0")!);
@@ -288,9 +297,11 @@ describe("initializeParagraphRow", () => {
     ).toBe(true);
   });
 
-  it("still creates TinyMCE for a fragment", () => {
-    (document.getElementById("paragraph0") as HTMLTextAreaElement).value =
-      "<p>Hello</p>";
+  it("still creates TinyMCE when the textarea is not marked imported", () => {
+    const textarea = document.getElementById(
+      "paragraph0",
+    ) as HTMLTextAreaElement;
+    textarea.value = IMPORTED_HTML;
 
     initializeParagraphRow(ParagraphEntry.fromIndex("0")!);
 
