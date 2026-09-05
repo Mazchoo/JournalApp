@@ -242,7 +242,8 @@ export class HtmlEntry {
       return;
     }
 
-    const source = widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
+    const source =
+      widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
     if (source === null) {
       console.error(
         `HtmlEntry: raw-html-editor source for paragraph${host.index} does not exist`,
@@ -282,7 +283,8 @@ export class HtmlEntry {
     if (widget.dataset.editing !== "1") return;
     widget.dataset.editing = "0";
 
-    const source = widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
+    const source =
+      widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
     if (source === null) {
       console.error(
         `HtmlEntry: raw-html-editor source for paragraph${host.index} does not exist`,

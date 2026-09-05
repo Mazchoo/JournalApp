@@ -12,6 +12,9 @@ import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 import { type IContent, contentTypeFromElement, hasMediaSrc } from "./content";
 import { ContentRow } from "./content-row";
 
+/** Drop the previous layout observer when the same canvas starts a new preview. */
+const canvasSizeObservers = new WeakMap<HTMLCanvasElement, ResizeObserver>();
+
 /** One image/video/mesh row and the DOM nodes it owns. */
 export class MediaEntry extends ContentRow implements IContent {
   /** Rows keyed by content index. */
@@ -321,14 +324,43 @@ export class MediaEntry extends ContentRow implements IContent {
   }
 
   /**
+   * Match the drawing buffer to the canvas's current layout size.
+   * Returns true when the buffer actually changed.
+   */
+  static syncCanvasSize(canvas: HTMLCanvasElement): boolean {
+    const width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
+    const height = canvas.clientHeight || MESH_CANVAS_HEIGHT_PX;
+    if (canvas.width === width && canvas.height === height) return false;
+    canvas.width = width;
+    canvas.height = height;
+    return true;
+  }
+
+  /**
+   * Call `onResize` after the canvas layout box changes.
+   * Replaces any previous observer on the same canvas.
+   */
+  static watchCanvasSize(
+    canvas: HTMLCanvasElement,
+    onResize: () => void,
+  ): void {
+    canvasSizeObservers.get(canvas)?.disconnect();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      onResize();
+    });
+    observer.observe(canvas);
+    canvasSizeObservers.set(canvas, observer);
+  }
+
+  /**
    * Size the canvas and return a WebGL context.
    * Returns null when WebGL is unavailable. Does not hide sibling media.
    * `preserveDrawingBuffer` keeps the last frame readable for snapshots.
    */
   static prepareWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
     Object.assign(canvas.style, MESH_CANVAS_REVEAL_STYLE);
-    canvas.width = canvas.clientWidth || MESH_CANVAS_FALLBACK_WIDTH_PX;
-    canvas.height = MESH_CANVAS_HEIGHT_PX;
+    MediaEntry.syncCanvasSize(canvas);
 
     const contextAttributes: WebGLContextAttributes = {
       preserveDrawingBuffer: true,

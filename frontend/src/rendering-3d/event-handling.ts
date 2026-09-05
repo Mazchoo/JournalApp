@@ -120,15 +120,18 @@ function pointerNdc(
 }
 
 /**
- * Bind wheel zoom, middle-drag orbit, WASD pan, and Q/E roll on `canvas`.
+ * Bind wheel zoom, middle-drag orbit, WASD pan, Q/E roll, and window resize.
  *
  * Calls `onChange` after any camera mutation so the caller can redraw.
+ * Calls `onResize` when the window size changes. The canvas layout observer
+ * is bound by the caller and should invoke the same callback after reflow.
  * Replaces any previous binding on the same canvas.
  */
 export function bindCameraControls(
   canvas: HTMLCanvasElement,
   camera: OrbitCamera,
   onChange: () => void,
+  onResize: () => void,
 ): void {
   canvas.tabIndex = 0;
   loopControllers.get(canvas)?.abort();
@@ -202,6 +205,14 @@ export function bindCameraControls(
         return;
       event.preventDefault();
       onChange();
+    },
+    { signal },
+  );
+
+  window.addEventListener(
+    "resize",
+    () => {
+      onResize();
     },
     { signal },
   );

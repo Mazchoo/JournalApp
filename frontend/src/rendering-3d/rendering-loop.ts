@@ -21,8 +21,9 @@ function indexComponentType(
 
 /**
  * Upload a mesh and draw it. Further frames are drawn when an embedded
- * texture decodes, or in response to pointer and keyboard input.
+ * texture decodes, or in response to pointer, keyboard, or resize input.
  *
+ * `onResize` should match the canvas drawing buffer to its layout size.
  * Works on `MeshRenderData` from any parser. Calls `onComplete` after the first frame.
  */
 export function startRenderingLoop(
@@ -30,7 +31,8 @@ export function startRenderingLoop(
   canvas: HTMLCanvasElement,
   mesh: MeshRenderData,
   onComplete?: () => void,
-): void {
+  onResize?: () => void,
+): { notifyResize: () => void } {
   const prepared: MeshRenderData = {
     ...mesh,
     positions: centerAndScalePositions(mesh.positions),
@@ -42,15 +44,24 @@ export function startRenderingLoop(
   const shaders = createShaders(gl, prepared, () => {
     onTextureReady();
   });
-  if (shaders === null) return;
+  if (shaders === null) return { notifyResize: () => {} };
   const { uMVP } = shaders;
 
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LESS);
   gl.clearColor(0.94, 0.94, 0.94, 1.0);
-  gl.viewport(0, 0, canvas.width, canvas.height);
 
-  const projection = createProjectionMatrix(canvas.width / canvas.height);
+  let projection = createProjectionMatrix(1);
+
+  /** Point the viewport and projection at the current drawing-buffer size. */
+  function fitProjection(): void {
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    projection = createProjectionMatrix(
+      canvas.width / Math.max(canvas.height, 1),
+    );
+  }
+
+  fitProjection();
   let firstFrame = true;
 
   /** Draw the mesh with the current camera. */
@@ -78,7 +89,18 @@ export function startRenderingLoop(
     }
   }
 
+  /** Sync the drawing buffer, then rebuild the projection if the size changed. */
+  function notifyResize(): void {
+    const prevWidth = canvas.width;
+    const prevHeight = canvas.height;
+    onResize?.();
+    if (canvas.width === prevWidth && canvas.height === prevHeight) return;
+    fitProjection();
+    draw();
+  }
+
   onTextureReady = draw;
-  bindCameraControls(canvas, camera, draw);
+  bindCameraControls(canvas, camera, draw, notifyResize);
   requestAnimationFrame(draw);
+  return { notifyResize };
 }

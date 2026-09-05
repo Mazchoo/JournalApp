@@ -252,6 +252,36 @@ describe("renderGLB", () => {
     expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(before);
   });
 
+  it("rebuilds the projection when the canvas aspect ratio changes", () => {
+    Object.defineProperty(canvas, "clientWidth", {
+      configurable: true,
+      get: () => 800,
+    });
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+    const before = gl.callsTo("uniformMatrix4fv")[0]![2];
+
+    Object.defineProperty(canvas, "clientWidth", {
+      configurable: true,
+      get: () => 400,
+    });
+    window.dispatchEvent(new Event("resize"));
+
+    expect(canvas.width).toBe(400);
+    expect(canvas.height).toBe(MESH_CANVAS_HEIGHT_PX);
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+    expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(before);
+  });
+
+  it("does not redraw when a resize leaves the drawing buffer unchanged", () => {
+    const gl = prepareCanvas(canvas);
+    renderGLB(canvas, buildTriangleGlb().buffer);
+
+    window.dispatchEvent(new Event("resize"));
+
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
+  });
+
   it("orbits around the mesh when the middle mouse button is dragged", () => {
     const gl = prepareCanvas(canvas);
     renderGLB(canvas, buildTriangleGlb().buffer);

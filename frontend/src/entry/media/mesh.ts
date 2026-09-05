@@ -23,7 +23,10 @@ function renderMeshBuffer(
   const gl = MediaEntry.prepareWebGL(canvas);
   if (gl === null) return;
 
-  startRenderingLoop(gl, canvas, mesh, onComplete);
+  const preview = startRenderingLoop(gl, canvas, mesh, onComplete, () => {
+    MediaEntry.syncCanvasSize(canvas);
+  });
+  MediaEntry.watchCanvasSize(canvas, preview.notifyResize);
 }
 
 /** Read a mesh file and start the WebGL preview on the canvas. */

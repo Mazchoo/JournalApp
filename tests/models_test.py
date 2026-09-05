@@ -1,4 +1,4 @@
-"""Tests for Entry, Content, EntryParagraph, EntryImage, and EntryVideo models."""
+"""Tests for Entry, Content, EntryParagraph, EntryImage, EntryVideo, and EntryMesh models."""
 
 from datetime import datetime
 
@@ -208,6 +208,131 @@ def test_video_view_method():
     assert result["video_id"] == vid.pk
     assert result["file_name"] == "clip.mp4"
     assert result["allow_ai_synthesis"] == 1
+
+
+@pytest.mark.django_db
+def test_orbit_camera_view_method():
+    """view() should match the frontend OrbitCamera field names."""
+    from main.models import Camera
+
+    camera = Camera.objects.create(
+        right_x=0.0,
+        right_y=1.0,
+        right_z=0.0,
+        up_x=0.0,
+        up_y=0.0,
+        up_z=1.0,
+        forward_x=-1.0,
+        forward_y=0.0,
+        forward_z=0.0,
+        radius=5.0,
+        pan_x=1.25,
+        pan_y=-0.5,
+    )
+
+    assert camera.view() == {
+        "right": [0.0, 1.0, 0.0],
+        "up": [0.0, 0.0, 1.0],
+        "forward": [-1.0, 0.0, 0.0],
+        "radius": 5.0,
+        "panX": 1.25,
+        "panY": -0.5,
+    }
+
+
+@pytest.mark.django_db
+def test_create_orbit_camera_defaults():
+    """OrbitCamera defaults match frontend createOrbitCamera()."""
+    from main.models import Camera
+
+    camera = Camera.objects.create()
+    assert camera.right_x == 1.0
+    assert camera.right_y == 0.0
+    assert camera.right_z == 0.0
+    assert camera.up_x == 0.0
+    assert camera.up_y == 1.0
+    assert camera.up_z == 0.0
+    assert camera.forward_x == 0.0
+    assert camera.forward_y == 0.0
+    assert camera.forward_z == -1.0
+    assert camera.radius == 3.0
+    assert camera.pan_x == 0.0
+    assert camera.pan_y == 0.0
+
+
+@pytest.mark.django_db
+def test_create_mesh():
+    """EntryMesh stores file_path, image_path, and a camera tied to an Entry."""
+    from main.models import EntryMesh, Camera
+
+    entry = create_mock_entry()
+    camera = Camera.objects.create(radius=4.5, pan_x=0.2, pan_y=-0.1)
+    mesh = EntryMesh.objects.create(
+        entry=entry,
+        file_path="2025-02-12/scan.glb",
+        image_path="2025-02-12/scan.jpg",
+        camera=camera,
+    )
+    assert mesh.file_path == "2025-02-12/scan.glb"
+    assert mesh.image_path == "2025-02-12/scan.jpg"
+    assert mesh.camera == camera
+    assert mesh.entry == entry
+
+
+@pytest.mark.django_db
+def test_mesh_str():
+    """__str__ should return the file_path."""
+    from main.models import EntryMesh, Camera
+
+    entry = create_mock_entry()
+    mesh = EntryMesh.objects.create(
+        entry=entry,
+        file_path="some/model.glb",
+        image_path="some/preview.jpg",
+        camera=Camera.objects.create(),
+    )
+    assert str(mesh) == "some/model.glb"
+
+
+@pytest.mark.django_db
+def test_mesh_view_method():
+    """view() should return file_name, image_path, and OrbitCamera fields."""
+    from main.models import EntryMesh, Camera
+
+    entry = create_mock_entry()
+    camera = Camera.objects.create(
+        right_x=0.0,
+        right_y=1.0,
+        right_z=0.0,
+        up_x=0.0,
+        up_y=0.0,
+        up_z=1.0,
+        forward_x=-1.0,
+        forward_y=0.0,
+        forward_z=0.0,
+        radius=5.0,
+        pan_x=1.25,
+        pan_y=-0.5,
+    )
+    mesh = EntryMesh.objects.create(
+        entry=entry,
+        file_path="2025-02-12/scan.glb",
+        image_path="2025-02-12/scan.jpg",
+        camera=camera,
+    )
+
+    result = mesh.view()
+
+    assert result["file_name"] == "scan.glb"
+    assert result["image_path"] == "2025-02-12/scan.jpg"
+    assert result["camera"] == {
+        "right": [0.0, 1.0, 0.0],
+        "up": [0.0, 0.0, 1.0],
+        "forward": [-1.0, 0.0, 0.0],
+        "radius": 5.0,
+        "panX": 1.25,
+        "panY": -0.5,
+    }
 
 
 if __name__ == "__main__":
