@@ -76,6 +76,70 @@ export function buildTriangleGlb(): TriangleGlb {
   return { buffer: buildGlb(gltf, bin), positions, indices };
 }
 
+/** 1×1 opaque white PNG. */
+const WHITE_PNG = Uint8Array.from([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49,
+  0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02,
+  0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xde, 0x00, 0x00, 0x00, 0x0c, 0x49, 0x44,
+  0x41, 0x54, 0x08, 0xd7, 0x63, 0xf8, 0xff, 0xff, 0xff, 0x00, 0x05, 0xfe, 0x02,
+  0xfe, 0xa3, 0x5f, 0x45, 0x59, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44,
+  0xae, 0x42, 0x60, 0x82,
+]);
+
+/** Build a GLB with UVs and an embedded base-color image. */
+export function buildTexturedTriangleGlb(): ArrayBuffer {
+  const positions = new Uint8Array(
+    new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]).buffer,
+  );
+  const indices = new Uint8Array(new Uint16Array([0, 1, 2]).buffer);
+  const uvs = new Uint8Array(new Float32Array([0, 0, 1, 0, 0, 1]).buffer);
+  const bin = new Uint8Array(
+    positions.length + indices.length + uvs.length + WHITE_PNG.length,
+  );
+  let offset = 0;
+  for (const chunk of [positions, indices, uvs, WHITE_PNG]) {
+    bin.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return buildGlb(
+    {
+      accessors: [
+        { bufferView: 0, componentType: 5126, count: 3, type: "VEC3" },
+        { bufferView: 1, componentType: 5123, count: 3, type: "SCALAR" },
+        { bufferView: 2, componentType: 5126, count: 3, type: "VEC2" },
+      ],
+      bufferViews: [
+        { byteOffset: 0, byteLength: positions.length },
+        { byteOffset: positions.length, byteLength: indices.length },
+        {
+          byteOffset: positions.length + indices.length,
+          byteLength: uvs.length,
+        },
+        {
+          byteOffset: positions.length + indices.length + uvs.length,
+          byteLength: WHITE_PNG.length,
+        },
+      ],
+      images: [{ bufferView: 3, mimeType: "image/png" }],
+      textures: [{ source: 0 }],
+      materials: [{ pbrMetallicRoughness: { baseColorTexture: { index: 0 } } }],
+      meshes: [
+        {
+          primitives: [
+            {
+              attributes: { POSITION: 0, TEXCOORD_0: 2 },
+              indices: 1,
+              material: 0,
+            },
+          ],
+        },
+      ],
+    },
+    bin,
+  );
+}
+
 export interface FakeGl {
   context: WebGLRenderingContext;
   calls: Record<string, unknown[][]>;
@@ -136,6 +200,9 @@ export function fakeWebGLContext(): FakeGl {
 export function prepareCanvas(canvas: HTMLCanvasElement): FakeGl {
   const gl = fakeWebGLContext();
   vi.spyOn(canvas, "getContext").mockReturnValue(gl.context as unknown as null);
-  vi.spyOn(window, "requestAnimationFrame").mockReturnValue(0);
+  vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+    cb(0);
+    return 0;
+  });
   return gl;
 }

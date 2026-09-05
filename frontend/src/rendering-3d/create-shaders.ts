@@ -86,12 +86,36 @@ function bindFloatAttribute(
   gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
 }
 
+/** Bind a 1×1 white texture so the first draw is not black while the image decodes. */
+function bindWhitePlaceholder(
+  gl: WebGLRenderingContext,
+  program: WebGLProgram,
+): void {
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    1,
+    1,
+    0,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    new Uint8Array([255, 255, 255, 255]),
+  );
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.uniform1i(gl.getUniformLocation(program, "uTexture"), 0);
+}
+
 /** Decode an embedded image and bind it as TEXTURE0. */
 function loadEmbeddedTexture(
   gl: WebGLRenderingContext,
   program: WebGLProgram,
   bytes: Uint8Array<ArrayBuffer>,
   mimeType: string,
+  onReady?: () => void,
 ): void {
   const blob = new Blob([bytes], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -110,10 +134,10 @@ function loadEmbeddedTexture(
     );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-    const uTexture = gl.getUniformLocation(program, "uTexture");
-    gl.uniform1i(uTexture, 0);
+    gl.uniform1i(gl.getUniformLocation(program, "uTexture"), 0);
 
     URL.revokeObjectURL(url);
+    if (onReady) onReady();
   };
   img.src = url;
 }
@@ -126,6 +150,7 @@ function loadEmbeddedTexture(
 export function createShaders(
   gl: WebGLRenderingContext,
   mesh: MeshRenderData,
+  onTextureReady?: () => void,
 ): MeshShaderProgram | null {
   const hasColors = mesh.colorPass.type === "vertex-color";
   const hasTexCoords = mesh.texCoordPass.type === "texcoords";
@@ -191,7 +216,14 @@ export function createShaders(
   }
 
   if (sampleTexture && texture !== null) {
-    loadEmbeddedTexture(gl, program, texture.bytes, texture.mimeType);
+    bindWhitePlaceholder(gl, program);
+    loadEmbeddedTexture(
+      gl,
+      program,
+      texture.bytes,
+      texture.mimeType,
+      onTextureReady,
+    );
   }
 
   return { program, uMVP };

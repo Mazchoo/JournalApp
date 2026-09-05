@@ -18,7 +18,12 @@ import {
   initializeMeshRenderer,
   renderGLB,
 } from "../src/entry/media/mesh";
-import { buildGlb, buildTriangleGlb, prepareCanvas } from "./helpers/glb";
+import {
+  buildGlb,
+  buildTexturedTriangleGlb,
+  buildTriangleGlb,
+  prepareCanvas,
+} from "./helpers/glb";
 
 let canvas: HTMLCanvasElement;
 let consoleError: MockInstance<typeof console.error>;
@@ -39,6 +44,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("computeNormals", () => {
@@ -187,14 +193,40 @@ describe("renderGLB", () => {
     expect(gl.callsTo("drawElements")).toHaveLength(0);
   });
 
-  it("draws a static first frame instead of scheduling a spin loop", () => {
+  it("redraws after an embedded texture decodes so the first view is not black", () => {
+    const gl = prepareCanvas(canvas);
+    let fireLoad: (() => void) | null = null;
+    vi.stubGlobal("URL", {
+      createObjectURL: () => "blob:test",
+      revokeObjectURL: () => {},
+    });
+    vi.stubGlobal(
+      "Image",
+      class {
+        onload: (() => void) | null = null;
+        set src(_url: string) {
+          fireLoad = () => {
+            this.onload?.();
+          };
+        }
+      },
+    );
+
+    renderGLB(canvas, buildTexturedTriangleGlb());
+    expect(gl.callsTo("drawElements")).toHaveLength(1);
+
+    fireLoad!();
+    expect(gl.callsTo("drawElements")).toHaveLength(2);
+  });
+
+  it("presents the first frame on animation frame instead of a spin loop", () => {
     const gl = prepareCanvas(canvas);
     const raf = vi.mocked(window.requestAnimationFrame);
 
     renderGLB(canvas, buildTriangleGlb().buffer);
 
     expect(gl.callsTo("drawElements")).toHaveLength(1);
-    expect(raf).not.toHaveBeenCalled();
+    expect(raf).toHaveBeenCalledTimes(1);
   });
 
   it("zooms toward the cursor on wheel and redraws", () => {

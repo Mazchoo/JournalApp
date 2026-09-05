@@ -20,8 +20,8 @@ function indexComponentType(
 }
 
 /**
- * Upload a mesh and draw it. Further frames are drawn only in response to
- * pointer and keyboard input (wheel zoom, image-plane orbit, WASD pan, Q/E roll).
+ * Upload a mesh and draw it. Further frames are drawn when an embedded
+ * texture decodes, or in response to pointer and keyboard input.
  *
  * Works on `MeshRenderData` from any parser. Calls `onComplete` after the first frame.
  */
@@ -38,7 +38,10 @@ export function startRenderingLoop(
   const cog = computeCenterOfGravity(prepared.positions);
   const camera = createOrbitCamera();
 
-  const shaders = createShaders(gl, prepared);
+  let onTextureReady = (): void => {};
+  const shaders = createShaders(gl, prepared, () => {
+    onTextureReady();
+  });
   if (shaders === null) return;
   const { uMVP } = shaders;
 
@@ -75,6 +78,7 @@ export function startRenderingLoop(
     }
   }
 
+  onTextureReady = draw;
   bindCameraControls(canvas, camera, draw);
-  draw();
+  requestAnimationFrame(draw);
 }
