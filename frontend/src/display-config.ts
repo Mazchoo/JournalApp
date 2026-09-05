@@ -18,6 +18,9 @@ export const MESH_CANVAS_FALLBACK_WIDTH_PX = 800;
 /** Stacking order of the revealed mesh canvas. */
 export const MESH_CANVAS_Z_INDEX = 10;
 
+/** JPEG quality when encoding a mesh preview frame. */
+export const MESH_FRAME_JPEG_QUALITY = 0.85;
+
 /** Inline styles applied when revealing the mesh canvas. */
 export const MESH_CANVAS_REVEAL_STYLE = {
   visibility: "visible",

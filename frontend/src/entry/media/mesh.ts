@@ -65,6 +65,13 @@ export function renderGLB(
   renderMeshBuffer(canvas, buffer, onComplete);
 }
 
+/** Encode the canvas's current frame as a JPEG data URL. */
+export async function currentFrameAsJpegBase64(
+  canvas: HTMLCanvasElement,
+): Promise<string | null> {
+  return MediaEntry.canvasAsJpegBase64(canvas);
+}
+
 /** Hide 2D media and start a GLB preview on the canvas. */
 export function loadMeshResource(inputFile: File, contentId: string): void {
   const media = MediaEntry.fromIndex(contentId);
