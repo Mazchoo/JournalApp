@@ -5,25 +5,17 @@
  * Q/E rolls about that same axis; WASD pans in the image plane.
  */
 
-import { CAMERA_FOV_Y } from "../display-config";
+import {
+  CAMERA_FOV_Y,
+  CAMERA_MAX_RADIUS,
+  CAMERA_MIN_RADIUS,
+  CAMERA_ORBIT_SENSITIVITY,
+  CAMERA_PAN_STEP_FRACTION,
+  CAMERA_ROLL_STEP,
+} from "../display-config";
 import type { OrbitCamera } from "./create-camera-matrix";
 
 type Vec3 = [number, number, number];
-
-/** Radians of yaw/pitch per pixel of middle-mouse drag. */
-const ORBIT_SENSITIVITY = 0.005;
-
-/** WASD pan distance as a fraction of the current orbit radius. */
-const PAN_STEP_FRACTION = 0.05;
-
-/** Radians of roll about the view axis per Q/E keypress. */
-const ROLL_STEP = 0.08;
-
-/** Smallest allowed distance from the orbit pivot. */
-const MIN_RADIUS = 0.15;
-
-/** Largest allowed distance from the orbit pivot. */
-const MAX_RADIUS = 80;
 
 /** Drop previous input handlers when the same canvas starts a new preview. */
 const loopControllers = new WeakMap<HTMLCanvasElement, AbortController>();
@@ -41,8 +33,8 @@ export function orbitByPixels(
 ): void {
   const up: Vec3 = [camera.up[0], camera.up[1], camera.up[2]];
   const right: Vec3 = [camera.right[0], camera.right[1], camera.right[2]];
-  rotateCamera(camera, up, -dx * ORBIT_SENSITIVITY);
-  rotateCamera(camera, right, -dy * ORBIT_SENSITIVITY);
+  rotateCamera(camera, up, -dx * CAMERA_ORBIT_SENSITIVITY);
+  rotateCamera(camera, right, -dy * CAMERA_ORBIT_SENSITIVITY);
 }
 
 /**
@@ -51,7 +43,7 @@ export function orbitByPixels(
  * Returns false when the key is not a pan binding.
  */
 export function panCamera(camera: OrbitCamera, key: string): boolean {
-  const step = camera.radius * PAN_STEP_FRACTION;
+  const step = camera.radius * CAMERA_PAN_STEP_FRACTION;
   switch (key.toLowerCase()) {
     case "w":
       camera.panY += step;
@@ -74,16 +66,16 @@ export function panCamera(camera: OrbitCamera, key: string): boolean {
  * Roll about the view axis (into the image).
  *
  * Middle-drag already covers image-plane x/y. The wheel dollies along this
- * axis; Q/E is the rotation around it. Q rolls left; E rolls right.
+ * axis; Q/E is the rotation around it. Q rolls right; E rolls left.
  * Returns false when the key is not a roll binding.
  */
 export function rollCamera(camera: OrbitCamera, key: string): boolean {
   switch (key.toLowerCase()) {
     case "q":
-      rotateCamera(camera, camera.forward, -ROLL_STEP);
+      rotateCamera(camera, camera.forward, CAMERA_ROLL_STEP);
       return true;
     case "e":
-      rotateCamera(camera, camera.forward, ROLL_STEP);
+      rotateCamera(camera, camera.forward, -CAMERA_ROLL_STEP);
       return true;
     default:
       return false;
@@ -104,8 +96,8 @@ export function zoomTowardNdc(
   factor: number,
 ): void {
   const newRadius = Math.min(
-    MAX_RADIUS,
-    Math.max(MIN_RADIUS, camera.radius * factor),
+    CAMERA_MAX_RADIUS,
+    Math.max(CAMERA_MIN_RADIUS, camera.radius * factor),
   );
   const s = newRadius / camera.radius;
   const f = 1 / Math.tan(CAMERA_FOV_Y / 2);

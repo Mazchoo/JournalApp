@@ -90,13 +90,13 @@ describe("rollCamera", () => {
     ).toBeCloseTo(0);
   });
 
-  it("rolls left on Q, opposite of E", () => {
+  it("rolls right on Q, opposite of E", () => {
     const camera = createOrbitCamera();
     rollCamera(camera, "e");
     const rightY = camera.right[1];
 
     expect(rollCamera(camera, "Q")).toBe(true);
-    expect(camera.right[1]).toBeGreaterThan(rightY);
+    expect(camera.right[1]).toBeLessThan(rightY);
   });
 
   it("ignores keys that are not Q or E", () => {

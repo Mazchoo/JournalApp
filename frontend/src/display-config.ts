@@ -42,3 +42,18 @@ export const CAMERA_FAR = 100;
 
 /** Distance from the orbit pivot at which the mesh preview starts. */
 export const INITIAL_CAMERA_RADIUS = 3;
+
+/** Smallest allowed distance from the orbit pivot. */
+export const CAMERA_MIN_RADIUS = 0.15;
+
+/** Largest allowed distance from the orbit pivot. */
+export const CAMERA_MAX_RADIUS = 80;
+
+/** Radians of yaw/pitch per pixel of middle-mouse drag. */
+export const CAMERA_ORBIT_SENSITIVITY = 0.005;
+
+/** WASD pan distance as a fraction of the current orbit radius. */
+export const CAMERA_PAN_STEP_FRACTION = 0.05;
+
+/** Radians of roll about the view axis per Q/E keypress. */
+export const CAMERA_ROLL_STEP = 0.08;
