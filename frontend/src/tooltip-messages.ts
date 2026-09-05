@@ -3,9 +3,12 @@
  * Callers apply these strings; they must not restate the copy locally.
  */
 
-/** Generate toggle on TinyMCE, imported HTML, and media rows. */
+/** Generate toggle on TinyMCE, the raw-html-editor, and media rows. */
 export const SYNTHESIS_BUTTON_TOOLTIP =
   "Allow content to create new AI generated content visible in the 'Derived Content' section";
+
+/** Preview in the raw-html-editor: click to edit the source. */
+export const RAW_HTML_EDITOR_TOOLTIP = "Click to edit raw HTML";
 
 /** Delete the current paragraph or media row. */
 export const DELETE_BUTTON_TOOLTIP = "Delete";

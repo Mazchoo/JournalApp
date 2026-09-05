@@ -12,9 +12,11 @@ import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
+  MESH_FRAME_JPEG_QUALITY,
 } from "../src/display-config";
 import {
   computeNormals,
+  currentFrameAsJpegBase64,
   initializeMeshRenderer,
   renderGLB,
 } from "../src/entry/media/mesh";
@@ -124,6 +126,9 @@ describe("renderGLB", () => {
     expect(canvas.style.display).toBe(MESH_CANVAS_REVEAL_STYLE.display);
     expect(canvas.width).toBe(MESH_CANVAS_FALLBACK_WIDTH_PX);
     expect(canvas.height).toBe(MESH_CANVAS_HEIGHT_PX);
+    expect(canvas.getContext).toHaveBeenCalledWith("webgl", {
+      preserveDrawingBuffer: true,
+    });
   });
 
   it("uploads the geometry and draws the indexed triangle", () => {
@@ -291,6 +296,36 @@ describe("renderGLB", () => {
     canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "e" }));
     expect(gl.callsTo("drawElements")).toHaveLength(2);
     expect(gl.callsTo("uniformMatrix4fv")[1]![2]).not.toEqual(initial);
+  });
+});
+
+describe("currentFrameAsJpegBase64", () => {
+  it("returns a JPEG data URL of the canvas", async () => {
+    const jpeg = new Blob([new Uint8Array([0xff, 0xd8, 0xff])], {
+      type: "image/jpeg",
+    });
+    vi.spyOn(canvas, "toBlob").mockImplementation((cb, type, quality) => {
+      expect(type).toBe("image/jpeg");
+      expect(quality).toBe(MESH_FRAME_JPEG_QUALITY);
+      cb(jpeg);
+    });
+
+    const result = await currentFrameAsJpegBase64(canvas);
+
+    expect(result).toMatch(/^data:image\/jpeg;base64,/);
+  });
+
+  it("returns null when the canvas cannot encode a JPEG", async () => {
+    vi.spyOn(canvas, "toBlob").mockImplementation((cb) => {
+      cb(null);
+    });
+
+    const result = await currentFrameAsJpegBase64(canvas);
+
+    expect(result).toBeNull();
+    expect(consoleError).toHaveBeenCalledWith(
+      "MediaEntry: canvas JPEG encode failed",
+    );
   });
 });
 

@@ -117,9 +117,9 @@ export function initializeNewParagraph(
 }
 
 /**
- * Show a saved standalone HTML document in the imported-HTML widget instead of TinyMCE.
+ * Show a saved standalone HTML document in the raw-html-editor instead of TinyMCE.
  */
-export function initializeImportedHtmlParagraph(
+export function initializeRawHtmlParagraph(
   lastestId: string,
   html: string,
   allowSynthesis = true,
@@ -131,11 +131,11 @@ export function initializeImportedHtmlParagraph(
   bindParagraphHandlers(paragraph);
 }
 
-/** Initialise a server-rendered paragraph as TinyMCE or imported HTML. */
+/** Initialise a server-rendered paragraph as TinyMCE or a raw-html-editor. */
 export function initializeParagraphRow(paragraph: ParagraphEntry): void {
   const { height, allowSynthesis } = paragraph.editorSettings();
-  if (HtmlEntry.isImported(paragraph)) {
-    initializeImportedHtmlParagraph(
+  if (HtmlEntry.isRawHtml(paragraph)) {
+    initializeRawHtmlParagraph(
       paragraph.index,
       paragraph.textarea?.value ?? "",
       allowSynthesis,

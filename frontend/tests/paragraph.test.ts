@@ -62,8 +62,10 @@ describe("generateParagraphTemplate", () => {
     expect(markup).not.toContain("{{ item.index }}");
     expect(markup).toContain(`name='paragraph7'`);
     expect(markup).toContain(`id='move-content-down7'`);
-    expect(markup).toContain("imported-generate7");
-    expect(markup).toContain("imported-html-frame");
+    expect(markup).toContain("raw-html-generate7");
+    expect(markup).toContain("raw-html-frame");
+    expect(markup).toContain("raw-html-editor");
+    expect(markup).toContain("raw-html-source");
   });
 });
 
@@ -215,7 +217,7 @@ describe("deleteParagraph", () => {
     expect(modals.showCallbackModal).toHaveBeenCalledTimes(1);
   });
 
-  it("asks before deleting imported HTML that has contents", () => {
+  it("asks before deleting a raw-html-editor that has contents", () => {
     HtmlEntry.replace(
       ParagraphEntry.fromIndex("0")!,
       "<html>Kept</html>",

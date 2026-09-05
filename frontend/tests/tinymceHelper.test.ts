@@ -167,10 +167,10 @@ describe("resetMCE", () => {
     expect(tinymce.initOptions).toHaveLength(0);
   });
 
-  it("leaves an imported HTML widget in place", () => {
+  it("leaves a raw-html-editor in place", () => {
     seedEditor(tinymce, "paragraph0", { containerHeight: 318 });
     const row = document.querySelector(".paragraph-entry")!;
-    row.querySelector(".imported-html-editor")!.classList.remove("d-none");
+    row.querySelector(".raw-html-editor")!.classList.remove("d-none");
 
     resetMCE(row);
 

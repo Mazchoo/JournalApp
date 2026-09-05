@@ -112,23 +112,21 @@ describe("initializeServerRenderedContent", () => {
     expect(tinymce.initOptions[0]!["selector"]).toBe("#paragraph0");
   });
 
-  it("shows imported HTML instead of TinyMCE when the textarea is marked imported", () => {
+  it("shows the raw-html-editor instead of TinyMCE when the textarea is marked raw HTML", () => {
     const textarea = document.getElementById(
       "paragraph0",
     ) as HTMLTextAreaElement;
     textarea.value = "<!DOCTYPE html><html><body>Saved</body></html>";
-    textarea.setAttribute("data-imported-html", "1");
+    textarea.setAttribute("data-raw-html", "1");
 
     initializeServerRenderedContent();
 
     expect(tinymce.initOptions).toHaveLength(0);
     expect(
-      document
-        .querySelector(".imported-html-editor")!
-        .classList.contains("d-none"),
+      document.querySelector(".raw-html-editor")!.classList.contains("d-none"),
     ).toBe(false);
     expect(
-      document.querySelector<HTMLIFrameElement>(".imported-html-frame")!.srcdoc,
+      document.querySelector<HTMLIFrameElement>(".raw-html-frame")!.srcdoc,
     ).toBe("<!DOCTYPE html><html><body>Saved</body></html>");
   });
 

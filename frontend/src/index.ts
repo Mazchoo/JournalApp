@@ -44,7 +44,7 @@ export {
   deleteParagraph,
   editParagraphContent,
   generateParagraphTemplate,
-  initializeImportedHtmlParagraph,
+  initializeRawHtmlParagraph,
   initializeNewParagraph,
   initializeParagraphRow,
   insertNewParagraphToPosition,

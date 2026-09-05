@@ -3,6 +3,20 @@
     width: 32px;
 }
 
+.raw-html-editor {
+    cursor: text;
+}
+
+.raw-html-editor .raw-html-frame {
+    pointer-events: none;
+}
+
+.raw-html-editor .raw-html-source {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.875rem;
+    resize: vertical;
+}
+
 h1 {
     font-family: Dubai;
 }
