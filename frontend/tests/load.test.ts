@@ -122,7 +122,11 @@ describe("initializeServerRenderedContent", () => {
     initializeServerRenderedContent();
 
     expect(tinymce.initOptions).toHaveLength(0);
-    expect(document.querySelector(".imported-html-editor")).not.toBeNull();
+    expect(
+      document
+        .querySelector(".imported-html-editor")!
+        .classList.contains("d-none"),
+    ).toBe(false);
     expect(
       document.querySelector<HTMLIFrameElement>(".imported-html-frame")!.srcdoc,
     ).toBe("<!DOCTYPE html><html><body>Saved</body></html>");

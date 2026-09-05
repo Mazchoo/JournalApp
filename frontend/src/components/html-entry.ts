@@ -1,17 +1,11 @@
 import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../display-config";
 import type { ParagraphSavePayload } from "../request-interface";
-import { dateSlug, importedHtmlTemplate } from "../runtime/backend-variables";
+import { dateSlug } from "../runtime/backend-variables";
 import { tiny } from "../runtime/externals";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
-import { componentFromTemplate } from "./common";
 
 const HOST_CLASS = "imported-html-editor";
 const IMPORTED_ATTR = "data-imported-html";
-
-/** Fill the imported-HTML widget template for the given content index. */
-export function generateImportedHtmlTemplate(contentInd: string): string {
-  return importedHtmlTemplate().replaceAll("{{ item.index }}", contentInd);
-}
 
 /** A paragraph row that can host imported HTML in place of TinyMCE. */
 export interface HtmlParagraphHost {
@@ -29,9 +23,9 @@ export class HtmlEntry {
     readonly textarea: HTMLTextAreaElement,
   ) {}
 
-  /** Whether `root` already contains an imported-HTML widget. */
+  /** Whether `root` is showing the imported-HTML widget (not the hidden chrome). */
   static isPresent(root: ParentNode): boolean {
-    return root.querySelector(`.${HOST_CLASS}`) !== null;
+    return root.querySelector(`.${HOST_CLASS}:not(.d-none)`) !== null;
   }
 
   /** Whether `host` is marked as imported HTML rather than a TinyMCE paragraph. */
@@ -75,7 +69,6 @@ export class HtmlEntry {
     }
 
     tiny().get(host.saveId())?.remove();
-    host.row.querySelector(`.${HOST_CLASS}`)?.remove();
 
     host.textarea.value = html;
     host.textarea.style.display = "none";
@@ -85,15 +78,9 @@ export class HtmlEntry {
       allowSynthesis ? "1" : "0",
     );
 
-    const parent = host.textarea.parentElement;
-    if (parent === null) {
-      console.error(
-        `HtmlEntry: #paragraph${host.index} has no parent to host imported HTML`,
-      );
-      return;
-    }
+    const widget = HtmlEntry.showWidget(host, allowSynthesis, onDirty);
+    if (widget === null) return;
 
-    const widget = HtmlEntry.buildWidget(host, allowSynthesis, onDirty);
     const iframe = widget.querySelector<HTMLIFrameElement>(
       ".imported-html-frame",
     );
@@ -103,11 +90,8 @@ export class HtmlEntry {
       );
       return;
     }
-    iframe.addEventListener("load", () => {
-      HtmlEntry.watchFrame(host.index, iframe);
-    });
+    HtmlEntry.bindFrame(host.index, iframe);
     iframe.srcdoc = html;
-    parent.appendChild(widget);
   }
 
   /** Whether the stored HTML is empty. */
@@ -134,6 +118,15 @@ export class HtmlEntry {
     };
   }
 
+  /** Attach load/resize listeners once, then size the frame to its document. */
+  private static bindFrame(index: string, iframe: HTMLIFrameElement): void {
+    if (iframe.dataset.bound === "1") return;
+    iframe.dataset.bound = "1";
+    iframe.addEventListener("load", () => {
+      HtmlEntry.watchFrame(index, iframe);
+    });
+  }
+
   /** Keep the iframe tall enough for its document, including after the window is resized. */
   private static watchFrame(index: string, iframe: HTMLIFrameElement): void {
     const doc = iframe.contentDocument;
@@ -146,20 +139,23 @@ export class HtmlEntry {
 
     const fit = (): void => {
       if (!iframe.isConnected) return;
+      const live = iframe.contentDocument;
+      if (live === null) return;
+      live.documentElement.style.overflowX = "hidden";
+      if (live.body !== null) {
+        live.body.style.overflowX = "hidden";
+      }
       const height = Math.max(
-        doc.documentElement.scrollHeight,
-        doc.body?.scrollHeight ?? 0,
+        live.documentElement.scrollHeight,
+        live.body?.scrollHeight ?? 0,
       );
       if (height === 0) return;
       iframe.style.height = `${height}px`;
     };
 
-    doc.documentElement.style.overflowX = "hidden";
-    if (doc.body !== null) {
-      doc.body.style.overflowX = "hidden";
-    }
-
     fit();
+    if (iframe.dataset.watched === "1") return;
+    iframe.dataset.watched = "1";
     window.addEventListener("resize", fit);
     if (typeof ResizeObserver !== "undefined") {
       new ResizeObserver(fit).observe(doc.documentElement);
@@ -175,17 +171,20 @@ export class HtmlEntry {
     button.classList.toggle("btn-outline-secondary", !isActive);
   }
 
-  /** Build the Generate toggle and iframe chrome. */
-  private static buildWidget(
+  /** Reveal the paragraph template's imported-HTML chrome and wire Generate. */
+  private static showWidget(
     host: HtmlParagraphHost,
     allowSynthesis: boolean,
     onDirty: () => void,
-  ): HTMLElement {
-    const widget = componentFromTemplate(
-      generateImportedHtmlTemplate(host.index),
-      "div",
-      HOST_CLASS,
-    );
+  ): HTMLElement | null {
+    const widget = host.row.querySelector<HTMLElement>(`.${HOST_CLASS}`);
+    if (widget === null) {
+      console.error(
+        `HtmlEntry: imported HTML editor for paragraph${host.index} does not exist`,
+      );
+      return null;
+    }
+    widget.classList.remove("d-none");
 
     const button = widget.querySelector<HTMLButtonElement>(
       `#imported-generate${host.index}`,
@@ -196,13 +195,16 @@ export class HtmlEntry {
       );
       return widget;
     }
-    HtmlEntry.setSynthesisActive(button, allowSynthesis);
-    button.title = SYNTHESIS_BUTTON_TOOLTIP;
-    button.addEventListener("click", () => {
-      const next = !button.classList.contains("btn-primary");
-      HtmlEntry.setSynthesisActive(button, next);
-      button.setAttribute("aria-pressed", String(next));
-      host.textarea?.setAttribute("data-allow-ai-synthesis", next ? "1" : "0");
+
+    const next = button.cloneNode(true) as HTMLButtonElement;
+    button.replaceWith(next);
+    HtmlEntry.setSynthesisActive(next, allowSynthesis);
+    next.title = SYNTHESIS_BUTTON_TOOLTIP;
+    next.addEventListener("click", () => {
+      const active = !next.classList.contains("btn-primary");
+      HtmlEntry.setSynthesisActive(next, active);
+      next.setAttribute("aria-pressed", String(active));
+      host.textarea?.setAttribute("data-allow-ai-synthesis", active ? "1" : "0");
       onDirty();
     });
     return widget;

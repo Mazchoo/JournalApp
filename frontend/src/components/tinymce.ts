@@ -1,5 +1,6 @@
 import type { Editor, RawEditorOptions } from "tinymce";
 
+import { HtmlEntry } from "./html-entry";
 import { tiny } from "../runtime/externals";
 import type { SynthesisEditor } from "../runtime/synthesis-editor";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
@@ -77,7 +78,7 @@ export function resetMCE(
   if (!div.classList.contains("paragraph-entry")) {
     return;
   }
-  if (div.querySelector(".imported-html-editor") !== null) {
+  if (HtmlEntry.isPresent(div)) {
     return;
   }
 

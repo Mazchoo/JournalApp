@@ -6,34 +6,3 @@
 h1 {
     font-family: Dubai;
 }
-
-.imported-html-editor {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    border: 0;
-    box-shadow: none;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    padding-bottom: 8px;
-    background: transparent;
-}
-
-.imported-html-toolbar {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-    padding: 8px 0;
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-}
-
-.imported-html-frame {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    border: 0;
-    overflow: hidden;
-    border-radius: 0.25rem;
-}

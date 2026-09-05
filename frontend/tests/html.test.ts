@@ -4,10 +4,7 @@ import { SYNTHESIS_BUTTON_TOOLTIP } from "../src/tooltip-messages";
 import { importHtmlFromEditor, readHtmlResource } from "../src/entry/html";
 import { initializeParagraphRow } from "../src/entry/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
-import {
-  generateImportedHtmlTemplate,
-  HtmlEntry,
-} from "../src/components/html-entry";
+import { HtmlEntry } from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
 import { createTinyMCE } from "../src/tinymce/helper";
 import { fileNamed, renderDayPage } from "./helpers/dom";
@@ -38,28 +35,23 @@ function chooseFileOnClick(file: File): ReturnType<typeof vi.spyOn> {
     });
 }
 
-/** Wait until the imported-HTML host is in the document. */
+/** Visible imported-HTML chrome from the paragraph template. */
+function importedEditor(): HTMLElement {
+  const host = document.querySelector<HTMLElement>(".imported-html-editor");
+  if (host === null || host.classList.contains("d-none")) {
+    throw new Error("imported HTML editor is missing");
+  }
+  return host;
+}
+
+/** Wait until the imported-HTML host is showing. */
 function waitForImportedEditor(): Promise<HTMLElement> {
-  return vi.waitFor(() => {
-    const host = document.querySelector<HTMLElement>(".imported-html-editor");
-    if (host === null) throw new Error("imported HTML editor is missing");
-    return host;
-  });
+  return vi.waitFor(() => importedEditor());
 }
 
 beforeEach(() => {
   renderDayPage({ rows: ["paragraph"] });
   tinymce = installFakeTinyMCE();
-});
-
-describe("generateImportedHtmlTemplate", () => {
-  it("substitutes every index placeholder", () => {
-    const markup = generateImportedHtmlTemplate("7");
-
-    expect(markup).not.toContain("{{ item.index }}");
-    expect(markup).toContain('id="imported-generate7"');
-    expect(markup).toContain('class="imported-html-frame"');
-  });
 });
 
 describe("HtmlEntry.isImported", () => {
@@ -74,10 +66,13 @@ describe("HtmlEntry.isImported", () => {
 
   it("marks the textarea when replacing TinyMCE", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
+    expect(HtmlEntry.isPresent(paragraph.row)).toBe(false);
+
     HtmlEntry.replace(paragraph, IMPORTED_HTML, true, () => {});
 
     expect(paragraph.textarea!.getAttribute("data-imported-html")).toBe("1");
     expect(HtmlEntry.isImported(paragraph)).toBe(true);
+    expect(HtmlEntry.isPresent(paragraph.row)).toBe(true);
   });
 });
 
@@ -150,7 +145,11 @@ describe("importHtmlFromEditor", () => {
 
     importHtmlFromEditor(asSynthesisEditor(tinymce.get("paragraph0")!));
 
-    expect(document.querySelector(".imported-html-editor")).toBeNull();
+    expect(
+      document
+        .querySelector(".imported-html-editor")!
+        .classList.contains("d-none"),
+    ).toBe(true);
     expect(tinymce.get("paragraph0")).not.toBeNull();
     click.mockRestore();
   });
@@ -162,7 +161,11 @@ describe("importHtmlFromEditor", () => {
 
     importHtmlFromEditor(asSynthesisEditor(tinymce.get("paragraph0")!));
 
-    expect(document.querySelector(".imported-html-editor")).toBeNull();
+    expect(
+      document
+        .querySelector(".imported-html-editor")!
+        .classList.contains("d-none"),
+    ).toBe(true);
     expect(log).toHaveBeenCalledWith("Unknown HTML type");
     click.mockRestore();
     log.mockRestore();
@@ -306,6 +309,10 @@ describe("initializeParagraphRow", () => {
     initializeParagraphRow(ParagraphEntry.fromIndex("0")!);
 
     expect(tinymce.initOptions).toHaveLength(1);
-    expect(document.querySelector(".imported-html-editor")).toBeNull();
+    expect(
+      document
+        .querySelector(".imported-html-editor")!
+        .classList.contains("d-none"),
+    ).toBe(true);
   });
 });

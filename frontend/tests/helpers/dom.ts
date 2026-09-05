@@ -19,10 +19,6 @@ export const MEDIA_TEMPLATE = readFileSync(
   resolve(entryContents, "Media.html"),
   "utf8",
 );
-export const IMPORTED_HTML_TEMPLATE = readFileSync(
-  resolve(entryContents, "ImportedHtml.html"),
-  "utf8",
-);
 const VIDEO_TEMPLATE = readFileSync(
   resolve(entryContents, "Video.html"),
   "utf8",
@@ -32,7 +28,7 @@ export const CSRF_TOKEN = "test-csrf-token";
 
 export type RowKind = "paragraph" | "image" | "video";
 
-/** Fill `{{ item.index }}` the same way generateParagraphTemplate / generateMediaTemplate / generateImportedHtmlTemplate do. */
+/** Fill `{{ item.index }}` the same way generateParagraphTemplate / generateMediaTemplate do. */
 function fillIndex(template: string, index: string): string {
   return template.replaceAll("{{ item.index }}", index);
 }
@@ -131,7 +127,6 @@ export function installTemplateGlobals(contentIndex: number): void {
   window.CONTENT_INDEX = contentIndex;
   window.PARAGRAPH_TEMPLATE = PARAGRAPH_TEMPLATE;
   window.MEDIA_TEMPLATE = MEDIA_TEMPLATE;
-  window.IMPORTED_HTML_TEMPLATE = IMPORTED_HTML_TEMPLATE;
   window.DATE_SLUG = "2024-03-15";
   window.ENTRY_EXISTS = false;
   window.SAVE_URL = "/save-entry/";

@@ -30,11 +30,6 @@ export function mediaTemplate(): string {
   return window.MEDIA_TEMPLATE;
 }
 
-/** Return the imported-HTML widget template global. */
-export function importedHtmlTemplate(): string {
-  return window.IMPORTED_HTML_TEMPLATE;
-}
-
 /** Return the current date slug global. */
 export function dateSlug(): string {
   return window.DATE_SLUG;

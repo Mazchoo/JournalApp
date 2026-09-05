@@ -2,6 +2,18 @@
 <div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-{{ item.index }}' name='paragraph{{ item.index }}'>
     <form method = 'get' action = '' class = 'card container'>
         <textarea class='entry-text save-content' name='message' cols='40' rows='10' required='' id='paragraph{{ item.index }}' aria-hidden='true' data-height='{{ item.data.height }}' data-allow-ai-synthesis='{{ item.data.allow_ai_synthesis }}' data-imported-html='{{ item.data.raw_html }}'>{{ item.data.text|safe }}</textarea>
+        <div class='imported-html-editor d-none w-100 overflow-hidden py-2'>
+            <div class='mb-2'>
+                <button type='button'
+                        class='btn btn-sm btn-outline-secondary allow-syn'
+                        id='imported-generate{{ item.index }}'
+                        data-toggle='tooltip'
+                        style='font-size: 0.9rem; white-space: nowrap;'>
+                    Generate
+                </button>
+            </div>
+            <iframe class='imported-html-frame w-100 d-block border-0' title='Imported HTML' scrolling='no'></iframe>
+        </div>
     </form>
 </div>
 <!-- Edit Buttons -->

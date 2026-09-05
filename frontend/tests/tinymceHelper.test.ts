@@ -170,9 +170,7 @@ describe("resetMCE", () => {
   it("leaves an imported HTML widget in place", () => {
     seedEditor(tinymce, "paragraph0", { containerHeight: 318 });
     const row = document.querySelector(".paragraph-entry")!;
-    const host = document.createElement("div");
-    host.className = "imported-html-editor";
-    row.appendChild(host);
+    row.querySelector(".imported-html-editor")!.classList.remove("d-none");
 
     resetMCE(row);
 

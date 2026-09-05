@@ -62,6 +62,8 @@ describe("generateParagraphTemplate", () => {
     expect(markup).not.toContain("{{ item.index }}");
     expect(markup).toContain(`name='paragraph7'`);
     expect(markup).toContain(`id='move-content-down7'`);
+    expect(markup).toContain("imported-generate7");
+    expect(markup).toContain("imported-html-frame");
   });
 });
 
