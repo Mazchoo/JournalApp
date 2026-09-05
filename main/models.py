@@ -11,7 +11,7 @@ from main.config import ALLOWED_CONTENT_TYPES
 class Content(Model):
     """Stored data added to an entry (e.g. text, image, ect.)"""
 
-    CONTENT_TYPES = [(t, t.capitalize()) for t in ALLOWED_CONTENT_TYPES]
+    CONTENT_TYPES = [(t, t.capitalize()) for t in sorted(ALLOWED_CONTENT_TYPES)]
 
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES)  # type: ignore[var-annotated]
     content_id = models.BigIntegerField()  # Refers to primary key of Image, Video, ...
@@ -101,4 +101,59 @@ class EntryParagraph(Model):
             "height": self.height,
             "allow_ai_synthesis": int(self.allow_ai_synthesis),
             "raw_html": int(self.raw_html),
+        }
+
+
+class Camera(Model):
+    """Camera matching frontend OrbitCamera (image-plane axes)."""
+
+    right_x = models.FloatField(default=1.0)
+    right_y = models.FloatField(default=0.0)
+    right_z = models.FloatField(default=0.0)
+    up_x = models.FloatField(default=0.0)
+    up_y = models.FloatField(default=1.0)
+    up_z = models.FloatField(default=0.0)
+    forward_x = models.FloatField(default=0.0)
+    forward_y = models.FloatField(default=0.0)
+    forward_z = models.FloatField(default=-1.0)
+    radius = models.FloatField(default=3.0)
+    pan_x = models.FloatField(default=0.0)
+    pan_y = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"Camera r={self.radius} pan=({self.pan_x}, {self.pan_y})"
+
+    def view(self) -> dict:
+        """Web displayable view matching frontend OrbitCamera."""
+        return {
+            "right": [self.right_x, self.right_y, self.right_z],
+            "up": [self.up_x, self.up_y, self.up_z],
+            "forward": [self.forward_x, self.forward_y, self.forward_z],
+            "radius": self.radius,
+            "panX": self.pan_x,
+            "panY": self.pan_y,
+        }
+
+
+class EntryMesh(Model):
+    """3D mesh content added to an entry"""
+
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    file_path = models.CharField(max_length=256)
+    image_path = models.CharField(max_length=256)
+    camera = models.ForeignKey(Camera, on_delete=models.CASCADE)
+
+    def __repr__(self):
+        return f"mesh{self.pk} - Entry {self.entry.name}"
+
+    def __str__(self):
+        return str(self.file_path)
+
+    def view(self) -> dict:
+        """Web displayable view."""
+        file_name = Path(self.file_path).name
+        return {
+            "file_name": file_name,
+            "image_path": self.image_path,
+            "camera": self.camera.view(),
         }
