@@ -9,6 +9,7 @@ export class Modal extends PageElement {
   static readonly byId: Record<string, Modal> = {};
 
   private static behaviorsBound = false;
+  private hideCallback?: () => void;
 
   constructor(
     elementId: string,
@@ -59,6 +60,9 @@ export class Modal extends PageElement {
       const modal = target.closest(".modal");
       if (modal === null || !modal.id) return;
 
+      if (target instanceof HTMLTextAreaElement) return;
+      if (modal.id === "html-modal") return;
+
       const wrapper = Modal.fromId(modal.id);
       if (modal.id === "callback-modal" || modal.id === "date-modal") {
         wrapper.clickAction();
@@ -66,6 +70,12 @@ export class Modal extends PageElement {
       }
       wrapper.clickClose();
     });
+  }
+
+  /** Whether this modal is currently visible. */
+  isShown(): boolean {
+    if (!this.exists()) return false;
+    return this.resolve()!.classList.contains("show");
   }
 
   /** Hide the currently visible `.modal.show`, if any. */
@@ -116,7 +126,15 @@ export class Modal extends PageElement {
     }
 
     dispatchModalEvent(modal, "hidden.bs.modal");
+    const once = this.hideCallback;
+    this.hideCallback = undefined;
     this.onHidden?.();
+    once?.();
+  }
+
+  /** Run `callback` once the next time this modal hides. */
+  onNextHide(callback: () => void): void {
+    this.hideCallback = callback;
   }
 
   /** Replace this node with a clone so previous action listeners are discarded. */

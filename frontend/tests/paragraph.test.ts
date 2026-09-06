@@ -65,7 +65,7 @@ describe("generateParagraphTemplate", () => {
     expect(markup).toContain("raw-html-generate7");
     expect(markup).toContain("raw-html-frame");
     expect(markup).toContain("raw-html-editor");
-    expect(markup).toContain("raw-html-source");
+    expect(markup).toContain("raw-html-edit-hitbox");
   });
 });
 

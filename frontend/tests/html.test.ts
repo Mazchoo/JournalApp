@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../src/display-config";
+import { HTML_MODAL_SOURCE_MIN_HEIGHT_PX } from "../src/display-config";
 import {
   RAW_HTML_EDITOR_TOOLTIP,
   SYNTHESIS_BUTTON_TOOLTIP,
 } from "../src/tooltip-messages";
 import {
+  editRawHtml,
   importHtmlFromEditor,
   readHtmlResource,
+  showRawHtml,
 } from "../src/entry/paragraph/html";
+import { bindModalBehaviors, hideModal } from "../src/runtime/modals";
 import { initializeParagraphRow } from "../src/entry/paragraph/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
 import { HtmlEntry } from "../src/components/html-entry";
@@ -51,6 +54,17 @@ function rawHtmlEditor(): HTMLElement {
   return host;
 }
 
+/** Overlay above the iframe — the element a user actually clicks. */
+function rawHtmlHitbox(): HTMLElement {
+  const hitbox = rawHtmlEditor().querySelector<HTMLElement>(
+    ".raw-html-edit-hitbox",
+  );
+  if (hitbox === null) {
+    throw new Error("raw-html-edit-hitbox is missing");
+  }
+  return hitbox;
+}
+
 /** Wait until the raw-html-editor host is showing. */
 function waitForRawHtmlEditor(): Promise<HTMLElement> {
   return vi.waitFor(() => rawHtmlEditor());
@@ -58,6 +72,7 @@ function waitForRawHtmlEditor(): Promise<HTMLElement> {
 
 beforeEach(() => {
   renderDayPage({ rows: ["paragraph"] });
+  bindModalBehaviors();
   tinymce = installFakeTinyMCE();
 });
 
@@ -99,7 +114,7 @@ describe("importHtmlFromEditor", () => {
     expect(editor.removed).toBe(true);
     expect(tinymce.get("paragraph0")).toBeNull();
     expect(host.style.height).toBe("");
-    expect(host.getAttribute("title")).toBe(RAW_HTML_EDITOR_TOOLTIP);
+    expect(rawHtmlHitbox().getAttribute("title")).toBe(RAW_HTML_EDITOR_TOOLTIP);
 
     const iframe = host.querySelector<HTMLIFrameElement>(".raw-html-frame")!;
     expect(iframe.srcdoc).toBe(RAW_HTML);
@@ -256,58 +271,58 @@ describe("raw-html-editor Generate button", () => {
 });
 
 describe("raw-html-editor source editing", () => {
-  it("opens a source editor when the preview is clicked", () => {
+  it("opens a source editor modal when the preview is clicked", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    HtmlEntry.replace(paragraph, RAW_HTML, true, () => {});
+    showRawHtml(paragraph, RAW_HTML, true);
 
-    const host = rawHtmlEditor();
-    host.click();
+    rawHtmlHitbox().click();
 
-    const source = host.querySelector<HTMLTextAreaElement>(".raw-html-source")!;
-    const iframe = host.querySelector<HTMLIFrameElement>(".raw-html-frame")!;
-    expect(source.classList.contains("d-none")).toBe(false);
-    expect(iframe.classList.contains("d-none")).toBe(true);
+    const modal = document.getElementById("html-modal")!;
+    const source = document.getElementById(
+      "html-modal-source",
+    ) as HTMLTextAreaElement;
+    expect(modal.classList.contains("show")).toBe(true);
     expect(source.value).toBe(RAW_HTML);
-    expect(source.style.minHeight).toBe(`${PARAGRAPH_EDITOR_HEIGHT_PX}px`);
-  });
-
-  it("writes edits back and returns to the preview on blur", () => {
-    const paragraph = ParagraphEntry.fromIndex("0")!;
-    HtmlEntry.replace(paragraph, RAW_HTML, true, () => {});
-
-    const host = rawHtmlEditor();
-    host.click();
-
-    const source = host.querySelector<HTMLTextAreaElement>(".raw-html-source")!;
-    source.value = "<html>Edited</html>";
-    source.dispatchEvent(new Event("input"));
-    source.dispatchEvent(new FocusEvent("blur"));
-
-    expect(paragraph.textarea!.value).toBe("<html>Edited</html>");
+    expect(source.style.minHeight).toBe(`${HTML_MODAL_SOURCE_MIN_HEIGHT_PX}px`);
     expect(
-      host.querySelector<HTMLIFrameElement>(".raw-html-frame")!.srcdoc,
-    ).toBe("<html>Edited</html>");
-    expect(
-      host
-        .querySelector<HTMLTextAreaElement>(".raw-html-source")!
-        .classList.contains("d-none"),
-    ).toBe(true);
-    expect(
-      host
+      rawHtmlEditor()
         .querySelector<HTMLIFrameElement>(".raw-html-frame")!
         .classList.contains("d-none"),
     ).toBe(false);
+    expect(rawHtmlHitbox().getAttribute("title")).toBe(RAW_HTML_EDITOR_TOOLTIP);
   });
 
-  it("enables saving when the raw HTML is edited", () => {
+  it("writes edits back and returns to the preview when the modal closes", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    HtmlEntry.replace(paragraph, RAW_HTML, true, enableSaveButton);
+    showRawHtml(paragraph, RAW_HTML, true);
 
-    const host = rawHtmlEditor();
-    host.click();
-    const source = host.querySelector<HTMLTextAreaElement>(".raw-html-source")!;
+    rawHtmlHitbox().click();
+    const source = document.getElementById(
+      "html-modal-source",
+    ) as HTMLTextAreaElement;
+    source.value = "<html>Edited</html>";
+    hideModal("html-modal");
+
+    expect(paragraph.textarea!.value).toBe("<html>Edited</html>");
+    expect(
+      rawHtmlEditor().querySelector<HTMLIFrameElement>(".raw-html-frame")!
+        .srcdoc,
+    ).toBe("<html>Edited</html>");
+    expect(
+      document.getElementById("html-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("enables saving when the modal closes after an edit", () => {
+    const paragraph = ParagraphEntry.fromIndex("0")!;
+    showRawHtml(paragraph, RAW_HTML, true);
+
+    rawHtmlHitbox().click();
+    const source = document.getElementById(
+      "html-modal-source",
+    ) as HTMLTextAreaElement;
     source.value = "<html>Changed</html>";
-    source.dispatchEvent(new Event("input"));
+    hideModal("html-modal");
 
     expect(paragraph.textarea!.value).toBe("<html>Changed</html>");
     expect(
@@ -315,17 +330,43 @@ describe("raw-html-editor source editing", () => {
     ).toBe(true);
   });
 
-  it("does not enter edit mode when Generate is clicked", () => {
+  it("does not mark the entry dirty when the source is unchanged", () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
-    HtmlEntry.replace(paragraph, RAW_HTML, true, () => {});
+    showRawHtml(paragraph, RAW_HTML, true);
+
+    rawHtmlHitbox().click();
+    hideModal("html-modal");
+
+    expect(paragraph.textarea!.value).toBe(RAW_HTML);
+    expect(
+      document.getElementById("btn-save")!.classList.contains("btn-success"),
+    ).toBe(false);
+  });
+
+  it("does not open the editor when Generate is clicked", () => {
+    const paragraph = ParagraphEntry.fromIndex("0")!;
+    showRawHtml(paragraph, RAW_HTML, true);
 
     document.getElementById("raw-html-generate0")!.click();
 
     expect(
-      rawHtmlEditor()
-        .querySelector(".raw-html-source")!
-        .classList.contains("d-none"),
+      document.getElementById("html-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("opens the modal through editRawHtml", () => {
+    const paragraph = ParagraphEntry.fromIndex("0")!;
+    HtmlEntry.replace(paragraph, RAW_HTML, true, () => {});
+
+    editRawHtml(paragraph);
+
+    expect(
+      document.getElementById("html-modal")!.classList.contains("show"),
     ).toBe(true);
+    expect(
+      (document.getElementById("html-modal-source") as HTMLTextAreaElement)
+        .value,
+    ).toBe(RAW_HTML);
   });
 });
 

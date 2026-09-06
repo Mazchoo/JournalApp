@@ -5,6 +5,7 @@
 import { initializeCarousel } from "./carousel";
 import {
   DateModalFields,
+  HtmlModalFields,
   DeleteButton,
   EditArea,
   ImagePreview,
@@ -34,9 +35,11 @@ export const imagePreview = new ImagePreview();
 export const videoPreview = new VideoPreview();
 export const meshModalPreview = new MeshPreview();
 export const dateModal = new DateModalFields();
+export const htmlModal = new HtmlModalFields();
 export const simpleModal = new Modal("simple-modal");
 export const callbackModal = new Modal("callback-modal");
 export const dateCallbackModal = new Modal("date-modal");
+export const htmlCallbackModal = new Modal("html-modal");
 export const imageModal = new Modal("image-modal");
 export const videoModal = new Modal("video-modal", () => videoPreview.reset());
 export const meshModal = new Modal("mesh-modal", () =>
@@ -58,6 +61,7 @@ const staticComponents = [
   simpleModal,
   callbackModal,
   dateCallbackModal,
+  htmlCallbackModal,
   imageModal,
   videoModal,
   meshModal,
@@ -82,6 +86,7 @@ export function bindPageComponents(): void {
     component.bind();
   }
   dateModal.bind();
+  htmlModal.bind();
   forgetDetachedEntries();
   initializeCarousel();
 }

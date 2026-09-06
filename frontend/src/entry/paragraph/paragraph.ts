@@ -18,6 +18,7 @@ import { showCallbackModal } from "../../runtime/modals";
 import { createTinyMCE } from "../../tinymce/helper";
 import { insertNewMediaToPosition } from "../media/media";
 import { enableSaveButton } from "../save";
+import { showRawHtml } from "./html";
 
 /** Port of static/JS/entry.paragraph.js. */
 
@@ -127,7 +128,7 @@ export function initializeRawHtmlParagraph(
   const paragraph = ParagraphEntry.fromIndex(lastestId);
   if (paragraph === null) return;
 
-  HtmlEntry.replace(paragraph, html, allowSynthesis, enableSaveButton);
+  showRawHtml(paragraph, html, allowSynthesis);
   bindParagraphHandlers(paragraph);
 }
 

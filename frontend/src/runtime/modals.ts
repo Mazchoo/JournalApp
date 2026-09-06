@@ -1,6 +1,8 @@
 import {
   callbackModal,
   dateCallbackModal,
+  htmlCallbackModal,
+  htmlModal,
   simpleModal,
 } from "../components/globals";
 import { Modal } from "../components/modal";
@@ -56,4 +58,18 @@ export function showDateCallbackModal(
     actionTitle,
     callback,
   );
+}
+
+/** Show a raw-HTML source editor and run the callback when it hides. */
+export function showHtmlCallbackModal(
+  modalTitle: string,
+  source: string,
+  onHide: () => void,
+): void {
+  htmlCallbackModal.replaceWithClone();
+  htmlCallbackModal.setTitle(modalTitle);
+  htmlModal.setSource(source);
+  htmlCallbackModal.onNextHide(onHide);
+  htmlCallbackModal.show();
+  htmlModal.focus();
 }

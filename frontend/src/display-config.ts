@@ -9,6 +9,9 @@ export const AUTO_CYCLE_MS = 5000;
 /** TinyMCE editor height when none is stored on the paragraph. */
 export const PARAGRAPH_EDITOR_HEIGHT_PX = 220;
 
+/** Minimum height of the raw-HTML source textarea in the edit modal. */
+export const HTML_MODAL_SOURCE_MIN_HEIGHT_PX = 360;
+
 /** Mesh preview canvas CSS and drawing-buffer height. */
 export const MESH_CANVAS_HEIGHT_PX = 400;
 

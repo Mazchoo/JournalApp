@@ -129,6 +129,15 @@ export function renderDayPage(options: DayPageOptions = {}): void {
         <select id="date-modal-year">
             <option>2023</option><option selected>2024</option>
         </select>
+    </div>
+    <div class="modal" id="html-modal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+            <h5 id="html-modal-title">Title</h5>
+            <textarea id="html-modal-source"></textarea>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div></div>
     </div>`;
 
   installTemplateGlobals(options.contentIndex ?? rows.length);
@@ -157,7 +166,8 @@ export interface ModalStubs {
   showCallbackModal: MockInstance;
   showMessageSimpleModal: MockInstance;
   showDateCallbackModal: MockInstance;
-  /** Run the callback the last `showCallbackModal` / `showDateCallbackModal` was given. */
+  showHtmlCallbackModal: MockInstance;
+  /** Run the callback the last confirm, date, or HTML modal was given. */
   confirmLast(stub: MockInstance): void;
 }
 
@@ -172,16 +182,20 @@ export function installModalStubs(): ModalStubs {
   const showDateCallbackModal = vi
     .spyOn(modals, "showDateCallbackModal")
     .mockImplementation(() => {});
+  const showHtmlCallbackModal = vi
+    .spyOn(modals, "showHtmlCallbackModal")
+    .mockImplementation(() => {});
 
   return {
     showCallbackModal,
     showMessageSimpleModal,
     showDateCallbackModal,
-    /** Run the callback the last confirm or date modal was given. */
+    showHtmlCallbackModal,
+    /** Run the callback the last confirm, date, or HTML modal was given. */
     confirmLast: (stub: MockInstance) => {
       const call = stub.mock.calls[stub.mock.calls.length - 1];
       if (call === undefined) throw new Error("The modal was never shown.");
-      (call[3] as () => void)();
+      (call[call.length - 1] as () => void)();
     },
   };
 }

@@ -8,6 +8,7 @@ import {
   hideModal,
   showCallbackModal,
   showDateCallbackModal,
+  showHtmlCallbackModal,
   showMessageSimpleModal,
   showModal,
 } from "../src/runtime/modals";
@@ -23,6 +24,7 @@ function renderModals(): void {
     "simpleModal.html",
     "callbackModal.html",
     "dateModal.html",
+    "htmlModal.html",
     "videoModal.html",
   ]
     .map((name) => readFileSync(resolve(modalsDir, name), "utf8"))
@@ -202,6 +204,51 @@ describe("showDateCallbackModal", () => {
     );
     expect(
       document.getElementById("date-modal")!.classList.contains("show"),
+    ).toBe(true);
+  });
+});
+
+describe("showHtmlCallbackModal", () => {
+  beforeEach(() => {
+    renderModals();
+    bindModalBehaviors();
+  });
+
+  it("fills the title and source and runs the callback when hidden", () => {
+    const callback = vi.fn();
+
+    showHtmlCallbackModal("Edit HTML", "<html>Source</html>", callback);
+
+    expect(document.getElementById("html-modal-title")!.innerText).toBe(
+      "Edit HTML",
+    );
+    expect(document.getElementById("html-modal-body")).toBeNull();
+    expect(document.getElementById("html-modal-action")).toBeNull();
+    expect(
+      document.getElementById("html-modal-source") as HTMLTextAreaElement,
+    ).toHaveProperty("value", "<html>Source</html>");
+    expect(
+      document.getElementById("html-modal")!.classList.contains("show"),
+    ).toBe(true);
+
+    hideModal("html-modal");
+
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not hide when Enter is pressed in the source textarea", () => {
+    const callback = vi.fn();
+
+    showHtmlCallbackModal("Edit HTML", "<p></p>", callback);
+    document
+      .getElementById("html-modal-source")!
+      .dispatchEvent(
+        new KeyboardEvent("keypress", { key: "Enter", bubbles: true }),
+      );
+
+    expect(callback).not.toHaveBeenCalled();
+    expect(
+      document.getElementById("html-modal")!.classList.contains("show"),
     ).toBe(true);
   });
 });

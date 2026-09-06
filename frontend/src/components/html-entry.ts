@@ -62,6 +62,7 @@ export class HtmlEntry {
     html: string,
     allowSynthesis: boolean,
     onDirty: () => void,
+    onEdit?: (host: HtmlParagraphHost) => void,
   ): void {
     if (host.textarea === null) {
       console.error(`HtmlEntry: #paragraph${host.index} does not exist`);
@@ -69,11 +70,6 @@ export class HtmlEntry {
     }
 
     tiny().get(host.saveId())?.remove();
-
-    const existing = host.row.querySelector<HTMLElement>(".raw-html-editor");
-    if (existing !== null) {
-      HtmlEntry.finishEdit(host, existing, false);
-    }
 
     host.textarea.value = html;
     host.textarea.style.display = "none";
@@ -83,7 +79,7 @@ export class HtmlEntry {
       allowSynthesis ? "1" : "0",
     );
 
-    const widget = HtmlEntry.showWidget(host, allowSynthesis, onDirty);
+    const widget = HtmlEntry.showWidget(host, allowSynthesis, onDirty, onEdit);
     if (widget === null) return;
 
     const iframe = widget.querySelector<HTMLIFrameElement>(".raw-html-frame");
@@ -94,6 +90,32 @@ export class HtmlEntry {
       return;
     }
     HtmlEntry.bindFrame(host.index, iframe);
+    iframe.srcdoc = html;
+  }
+
+  /** Stored HTML for `host`, or null when the textarea is missing. */
+  static source(host: HtmlParagraphHost): string | null {
+    if (host.textarea === null) {
+      console.error(`HtmlEntry: #paragraph${host.index} does not exist`);
+      return null;
+    }
+    return host.textarea.value;
+  }
+
+  /** Write `html` into the stored textarea and refresh the preview iframe. */
+  static applySource(host: HtmlParagraphHost, html: string): void {
+    if (host.textarea === null) {
+      console.error(`HtmlEntry: #paragraph${host.index} does not exist`);
+      return;
+    }
+    host.textarea.value = html;
+    const iframe = host.row.querySelector<HTMLIFrameElement>(".raw-html-frame");
+    if (iframe === null) {
+      console.error(
+        `HtmlEntry: raw-html-editor frame for paragraph${host.index} does not exist`,
+      );
+      return;
+    }
     iframe.srcdoc = html;
   }
 
@@ -179,6 +201,7 @@ export class HtmlEntry {
     host: HtmlParagraphHost,
     allowSynthesis: boolean,
     onDirty: () => void,
+    onEdit?: (host: HtmlParagraphHost) => void,
   ): HTMLElement | null {
     const widget = host.row.querySelector<HTMLElement>(".raw-html-editor");
     if (widget === null) {
@@ -188,8 +211,7 @@ export class HtmlEntry {
       return null;
     }
     widget.classList.remove("d-none");
-    widget.title = RAW_HTML_EDITOR_TOOLTIP;
-    HtmlEntry.bindEdit(host, widget, onDirty);
+    HtmlEntry.bindEdit(host, widget, onEdit);
 
     const button = widget.querySelector<HTMLButtonElement>(
       `#raw-html-generate${host.index}`,
@@ -218,99 +240,36 @@ export class HtmlEntry {
     return widget;
   }
 
-  /** Listen once for a click on the preview so the user can edit the raw HTML. */
+  /**
+   * Listen once on the overlay above the iframe. Clicks inside a srcdoc iframe
+   * never reach the parent page, so the hitbox is the actual edit target.
+   */
   private static bindEdit(
     host: HtmlParagraphHost,
     widget: HTMLElement,
-    onDirty: () => void,
+    onEdit?: (host: HtmlParagraphHost) => void,
   ): void {
-    HtmlEntry.dirtyByWidget.set(widget, onDirty);
-    if (widget.dataset.editBound === "1") return;
-    widget.dataset.editBound = "1";
-    widget.addEventListener("click", (event) => {
-      const target = event.target as Element | null;
-      if (target?.closest("button, .raw-html-source") != null) return;
-      HtmlEntry.beginEdit(host, widget);
-    });
-  }
-
-  /** Hide the preview and show a textarea of the stored HTML source. */
-  private static beginEdit(host: HtmlParagraphHost, widget: HTMLElement): void {
-    if (widget.dataset.editing === "1") return;
-    if (host.textarea === null) {
-      console.error(`HtmlEntry: #paragraph${host.index} does not exist`);
-      return;
+    if (onEdit !== undefined) {
+      HtmlEntry.editByWidget.set(widget, onEdit);
     }
-
-    const source =
-      widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
-    if (source === null) {
+    const hitbox = widget.querySelector<HTMLElement>(".raw-html-edit-hitbox");
+    if (hitbox === null) {
       console.error(
-        `HtmlEntry: raw-html-editor source for paragraph${host.index} does not exist`,
+        `HtmlEntry: raw-html-edit-hitbox for paragraph${host.index} does not exist`,
       );
       return;
     }
-
-    const iframe = widget.querySelector<HTMLIFrameElement>(".raw-html-frame");
-    const previewHeight = iframe?.offsetHeight ?? 0;
-    source.value = host.textarea.value;
-    source.style.height = `${Math.max(previewHeight, PARAGRAPH_EDITOR_HEIGHT_PX)}px`;
-    source.style.minHeight = `${PARAGRAPH_EDITOR_HEIGHT_PX}px`;
-    iframe?.classList.add("d-none");
-    source.classList.remove("d-none");
-    widget.dataset.editing = "1";
-    source.focus();
-
-    source.addEventListener("input", () => {
-      if (host.textarea === null) return;
-      host.textarea.value = source.value;
-      HtmlEntry.dirtyByWidget.get(widget)?.();
-    });
-    source.addEventListener("blur", () => {
-      HtmlEntry.finishEdit(host, widget, true);
+    hitbox.title = RAW_HTML_EDITOR_TOOLTIP;
+    if (hitbox.dataset.editBound === "1") return;
+    hitbox.dataset.editBound = "1";
+    hitbox.addEventListener("click", () => {
+      HtmlEntry.editByWidget.get(widget)?.(host);
     });
   }
 
-  /**
-   * Leave source editing. When `apply` is true, write the textarea back to the
-   * stored HTML and restore the preview.
-   */
-  private static finishEdit(
-    host: HtmlParagraphHost,
-    widget: HTMLElement,
-    apply: boolean,
-  ): void {
-    if (widget.dataset.editing !== "1") return;
-    widget.dataset.editing = "0";
-
-    const source =
-      widget.querySelector<HTMLTextAreaElement>(".raw-html-source");
-    if (source === null) {
-      console.error(
-        `HtmlEntry: raw-html-editor source for paragraph${host.index} does not exist`,
-      );
-      return;
-    }
-
-    const iframe = widget.querySelector<HTMLIFrameElement>(".raw-html-frame");
-    if (apply) {
-      if (host.textarea !== null) {
-        host.textarea.value = source.value;
-      }
-      if (iframe !== null) {
-        iframe.srcdoc = source.value;
-      }
-    }
-
-    source.classList.add("d-none");
-    iframe?.classList.remove("d-none");
-    const clean = source.cloneNode(true) as HTMLTextAreaElement;
-    source.replaceWith(clean);
-  }
-
-  /** Latest dirty callback for each raw-html-editor, used while editing source. */
-  private static readonly dirtyByWidget = new WeakMap<
+  /** Latest preview-click handler for each raw-html-editor. */
+  private static readonly editByWidget = new WeakMap<
     HTMLElement,
-    () => void
+    (host: HtmlParagraphHost) => void
   >();
 }

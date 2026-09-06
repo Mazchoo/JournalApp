@@ -3,15 +3,21 @@
     width: 32px;
 }
 
-.raw-html-editor {
-    cursor: text;
+.raw-html-preview {
+    position: relative;
 }
 
 .raw-html-editor .raw-html-frame {
     pointer-events: none;
 }
 
-.raw-html-editor .raw-html-source {
+.raw-html-edit-hitbox {
+    position: absolute;
+    inset: 0;
+    cursor: text;
+}
+
+#html-modal-source {
     font-family: Consolas, "Courier New", monospace;
     font-size: 0.875rem;
     resize: vertical;
