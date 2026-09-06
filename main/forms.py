@@ -308,9 +308,7 @@ class MeshForm(ModelForm):
             try:
                 return save_mesh_frame_image(Path(full_mesh_path), frame_image)
             except (ValueError, OSError, BinasciiError) as exc:
-                raise forms.ValidationError(
-                    "Frame image is not a valid image"
-                ) from exc
+                raise forms.ValidationError("Frame image is not a valid image") from exc
 
         image_name = self.data.get("image_path")
         if not image_name:
@@ -322,7 +320,9 @@ class MeshForm(ModelForm):
         source_path = get_base_entry_path(image_name)
 
         if not Path(target_path).exists() and not Path(source_path).exists():
-            raise forms.ValidationError(f"Cannot find '{image_name}' in Entries folder.")
+            raise forms.ValidationError(
+                f"Cannot find '{image_name}' in Entries folder."
+            )
 
         move_media_to_save_path(target_path, image_name)
         mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))

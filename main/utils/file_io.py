@@ -54,9 +54,7 @@ def get_icon_file_path(image_file_path: Path) -> Path:
         return image_file_path  # Already suitable to be an icon
 
     extention = (
-        ".jpg"
-        if image_file_path.suffix in (".mp4", ".glb")
-        else image_file_path.suffix
+        ".jpg" if image_file_path.suffix in (".mp4", ".glb") else image_file_path.suffix
     )
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     month = image_file_path.parent.parent.stem
