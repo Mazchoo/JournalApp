@@ -98,6 +98,21 @@ describe("createNewMedia", () => {
     expect(button.classList.contains("btn-outline-secondary")).toBe(false);
     expect(button.getAttribute("title")).toBe(SYNTHESIS_BUTTON_TOOLTIP);
   });
+
+  it("places Generate next to the file picker above the content", () => {
+    const div = createNewMedia();
+    const button = div.querySelector("#allow-syn2")!;
+    const uploadBox = div.querySelector(".upload-box")!;
+    const imageArea = div.querySelector(".image-area")!;
+    const toolbar = uploadBox.parentElement!;
+
+    expect(toolbar.classList.contains("d-flex")).toBe(true);
+    expect(toolbar.contains(button)).toBe(true);
+    expect(
+      imageArea.compareDocumentPosition(toolbar) &
+        Node.DOCUMENT_POSITION_PRECEDING,
+    ).toBeTruthy();
+  });
 });
 
 describe("deleteMedia", () => {

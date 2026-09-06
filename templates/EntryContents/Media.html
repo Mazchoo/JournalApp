@@ -1,37 +1,38 @@
-<div class="row mx-auto entry-region-{{ item.index }}">
-    <!-- Upload media input -->
-    <div class="col col-md-11 upload-box input-group px-2 py-2 rounded-pill bg-white shadow-sm">
-        <input id="upload{{ item.index }}" type="file" multiple="multiple" class="form-control border-0 upload-image">
-        <label id="upload-label{{ item.index }}" for="upload{{ item.index }}" class="font-weight-light text-muted upload-label">
-            {{ item.data.file_name }}
-        </label>
-        <div class="input-group-append">
-            <label for="upload{{ item.index }}" class="btn btn-light m-0 rounded-pill px-4">
-                <i class="fa fa-cloud-upload mr-2 text-muted"></i>
-                <small class="text-uppercase font-weight-bold text-muted">Choose file</small>
+<div class="col col-md-11 entry-region-{{ item.index }}">
+    <!-- Upload media input and Generate share the strip above the content -->
+    <div class="d-flex align-items-center">
+        <div class="upload-box input-group px-2 py-2 rounded-pill bg-white shadow-sm flex-grow-1">
+            <input id="upload{{ item.index }}" type="file" multiple="multiple" class="form-control border-0 upload-image">
+            <label id="upload-label{{ item.index }}" for="upload{{ item.index }}" class="font-weight-light text-muted upload-label">
+                {{ item.data.file_name }}
             </label>
+            <div class="input-group-append">
+                <label for="upload{{ item.index }}" class="btn btn-light m-0 rounded-pill px-4">
+                    <i class="fa fa-cloud-upload mr-2 text-muted"></i>
+                    <small class="text-uppercase font-weight-bold text-muted">Choose file</small>
+                </label>
+            </div>
+        </div>
+        <div class="flex-shrink-0 ml-2 d-flex align-items-center">
+            <button id="allow-syn{{ item.index }}"
+                    type="button"
+                    class="btn btn-sm {% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %} allow-syn"
+                    data-toggle="tooltip"
+                    style="font-size: 0.9rem; white-space: nowrap;">
+                Generate
+            </button>
         </div>
     </div>
-    <!-- Generate button -->
-    <div class='col col-md-1 py-2 d-flex align-items-center'>
-        <button id="allow-syn{{ item.index }}"
-                type="button"
-                class="btn btn-sm {% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %} allow-syn"
-                data-toggle="tooltip"
-                style="font-size: 0.9rem; white-space: nowrap;">
-            Generate
-        </button>
+    <!-- Uploaded media area -->
+    <div class='py-2 border border-dark rounded bg-white mt-2' name='image{{ item.index }}'>
+        <form method = 'get' action = '' class = 'card container image-container'>
+            <div class="image-area">
+                <img id="image{{ item.index }}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-image my-3" data-image-id="{{ item.data.image_id }}">
+                <video id="video{{ item.index }}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video"></video>
+                <canvas id="mesh-canvas{{ item.index }}" class="rounded shadow-sm mx-auto d-block save-content content-mesh" style="visibility: hidden; height: 0; width: 100%; max-width: 800px;"></canvas>
+            </div>
+        </form>
     </div>
-</div>
-<!-- Uploaded media area -->
-<div class='col col-md-11 py-2 border border-dark rounded bg-white mt-2 entry-region-{{ item.index }}' name='image{{ item.index }}'>
-    <form method = 'get' action = '' class = 'card container image-container'>
-        <div class="image-area">
-            <img id="image{{ item.index }}" alt="" class="img-fluid rounded shadow-sm mx-auto d-block save-content content-image my-3" data-image-id="{{ item.data.image_id }}">
-            <video id="video{{ item.index }}" controls="controls" alt="" class="rounded shadow-sm mx-auto d-block embed-responsive save-content content-video"></video>
-            <canvas id="mesh-canvas{{ item.index }}" class="rounded shadow-sm mx-auto d-block save-content content-mesh" style="visibility: hidden; height: 0; width: 100%; max-width: 800px;"></canvas>
-        </div>
-    </form>
 </div>
 <!-- Edit buttons -->
 <div class='col col-md-1 py-2 entry-region-{{ item.index }}'>
