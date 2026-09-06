@@ -32,7 +32,8 @@ export class MediaEntry extends ContentRow implements IContent {
   readonly uploadLabel: HTMLElement | null;
   readonly allowSyn: HTMLElement | null;
   readonly imageArea: HTMLElement | null;
-  private derivedType: ContentType.Image | ContentType.Video | ContentType.Mesh =
+  private derivedType:
+    ContentType.Image | ContentType.Video | ContentType.Mesh =
     ContentType.Image;
 
   constructor(index: string, row: HTMLElement) {

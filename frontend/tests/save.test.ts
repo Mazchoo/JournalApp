@@ -154,7 +154,9 @@ describe("generateSaveEntry", () => {
     setMeshCamera(media.canvas!, camera);
     setUploadLabel("1", "scan.glb");
     vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
-      cb(new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }));
+      cb(
+        new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }),
+      );
     });
 
     const saveData = (await generateSaveEntry(
@@ -175,7 +177,9 @@ describe("generateSaveEntry", () => {
     const media = MediaEntry.fromIndex("1")!;
     MediaEntry.showCanvas(media);
     setUploadLabel("1", "scan.glb");
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),

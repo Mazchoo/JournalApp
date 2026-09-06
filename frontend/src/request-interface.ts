@@ -88,10 +88,7 @@ export interface MeshSavePayload {
 
 /** One row in a save-entry `content` map. */
 export type SavePayload =
-  | ParagraphSavePayload
-  | ImageSavePayload
-  | VideoSavePayload
-  | MeshSavePayload;
+  ParagraphSavePayload | ImageSavePayload | VideoSavePayload | MeshSavePayload;
 
 /** `content` map posted to save-entry, keyed by DOM id. */
 export type SaveData = Record<string, SavePayload>;
