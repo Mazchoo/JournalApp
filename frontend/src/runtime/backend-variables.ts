@@ -70,6 +70,11 @@ export function downsizedVideoImageUrl(): string {
   return window.DOWNSIZED_VIDEO_IMAGE_URL;
 }
 
+/** Return the downsized-mesh-preview endpoint URL. */
+export function downsizedMeshImageUrl(): string {
+  return window.DOWNSIZED_MESH_IMAGE_URL;
+}
+
 /** Return the move-entry endpoint URL. */
 export function moveUrl(): string {
   return window.MOVE_URL;

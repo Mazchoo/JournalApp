@@ -5,7 +5,7 @@ from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
 
-from main.config import ImageConstants, VideoConstants
+from main.config import ImageConstants, MeshConstants, VideoConstants
 
 from Journal.settings import ENTRY_FOLDER, MISSING_ICON_IMAGE
 
@@ -53,7 +53,11 @@ def get_icon_file_path(image_file_path: Path) -> Path:
     if image_file_path == MISSING_ICON_IMAGE:
         return image_file_path  # Already suitable to be an icon
 
-    extention = ".jpg" if image_file_path.suffix == ".mp4" else image_file_path.suffix
+    extention = (
+        ".jpg"
+        if image_file_path.suffix in (".mp4", ".glb")
+        else image_file_path.suffix
+    )
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     month = image_file_path.parent.parent.stem
     year = image_file_path.parent.parent.parent.stem
@@ -80,11 +84,12 @@ def make_image_path_relative(file_name: str) -> str:
 
 def get_resized_filename(file_path: Path) -> Path:
     """Get resized image path from original file path"""
-    extention = (
-        f".{VideoConstants.save_image_extention}"
-        if file_path.suffix == ".mp4"
-        else file_path.suffix
-    )
+    if file_path.suffix == ".mp4":
+        extention = f".{VideoConstants.save_image_extention}"
+    elif file_path.suffix == ".glb":
+        extention = f".{MeshConstants.save_image_extention}"
+    else:
+        extention = file_path.suffix
     return file_path.parent / f"{file_path.stem}_resized{extention}"
 
 

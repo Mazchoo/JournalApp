@@ -5,8 +5,8 @@ from pathlib import Path
 
 from django.forms import model_to_dict
 
-from main.forms import ImageForm, ParagraphForm, VideoForm
-from main.models import EntryImage, EntryParagraph, EntryVideo
+from main.forms import ImageForm, MeshForm, ParagraphForm, VideoForm
+from main.models import EntryImage, EntryMesh, EntryParagraph, EntryVideo
 from main.config import IContentTypes
 
 
@@ -38,6 +38,16 @@ def getUpdatedDateParagraph(
     return ParagraphForm(new_paragraph_dict)
 
 
+def get_updated_date_mesh(mesh: EntryMesh, destination_slug: str) -> MeshForm:
+    """Update mesh content date with a new form"""
+    new_mesh_dict = model_to_dict(mesh)
+    new_mesh_dict["entry"] = destination_slug
+    new_mesh_dict["file_path"] = Path(new_mesh_dict["file_path"]).name
+    new_mesh_dict["image_path"] = Path(new_mesh_dict["image_path"]).name
+
+    return MeshForm(new_mesh_dict)
+
+
 class ContentUpdateFactory:
     """Factory generating model forms for updating a date for a new content model"""
 
@@ -45,14 +55,15 @@ class ContentUpdateFactory:
         "image": get_updated_date_image,
         "paragraph": getUpdatedDateParagraph,
         "video": get_updated_date_video,
+        "mesh": get_updated_date_mesh,
     }
 
     @staticmethod
     def get(
         content_type: IContentTypes,
     ) -> Callable[
-        [Union[EntryImage, EntryParagraph, EntryVideo], str],
-        Union[ImageForm, ParagraphForm, VideoForm],
+        [Union[EntryImage, EntryParagraph, EntryVideo, EntryMesh], str],
+        Union[ImageForm, ParagraphForm, VideoForm, MeshForm],
     ]:
         """Return model form for content type"""
         if content_type not in ContentUpdateFactory._CONTENT_UPDATE_DATE:

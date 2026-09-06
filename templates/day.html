@@ -37,6 +37,10 @@
                         <div class="row mt-4 media-entry">
                             {% include "EntryContents/Video.html" %}
                         </div>
+                    {% elif item.type == "mesh" %}
+                        <div class="row mt-4 media-entry">
+                            {% include "EntryContents/Media.html" %}
+                        </div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -72,6 +76,7 @@
         var DOWNSIZED_IMAGE_URL = '{% url "main:get-downsized-image" %}';
         var VIDEO_URL = '{% url "main:get-video" %}';
         var DOWNSIZED_VIDEO_IMAGE_URL = '{% url "main:get-downsized-video-image" %}';
+        var DOWNSIZED_MESH_IMAGE_URL = '{% url "main:get-downsized-mesh-image" %}';
         var MOVE_URL = '{% url "main:move-date" %}';
     </script>
 </body>

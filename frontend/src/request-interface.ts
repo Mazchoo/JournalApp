@@ -125,6 +125,12 @@ export interface DownsizedVideoImageRequest {
   csrfmiddlewaretoken: string;
 }
 
+/** POST body for `main:get-downsized-mesh-image`. */
+export interface DownsizedMeshImageRequest {
+  mesh_id: string;
+  csrfmiddlewaretoken: string;
+}
+
 /** POST body matching `FullContentPath` (`main:get-image` and `main:get-video`). */
 export interface FullContentRequest {
   file: string;

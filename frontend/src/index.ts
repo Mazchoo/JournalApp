@@ -99,6 +99,7 @@ export {
 export {
   initializeServerRenderedContent,
   loadServerRenderedImage,
+  loadServerRenderedMesh,
   loadServerRenderedVideo,
 } from "./entry/load";
 

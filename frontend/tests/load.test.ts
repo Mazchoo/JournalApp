@@ -4,6 +4,7 @@ import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../src/display-config";
 import {
   initializeServerRenderedContent,
   loadServerRenderedImage,
+  loadServerRenderedMesh,
   loadServerRenderedVideo,
 } from "../src/entry/load";
 import { stubAjax, type AjaxStub } from "./helpers/ajax";
@@ -104,6 +105,62 @@ describe("loadServerRenderedVideo", () => {
   });
 });
 
+describe("loadServerRenderedMesh", () => {
+  it("posts the mesh id to the downsized mesh endpoint", () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+
+    loadServerRenderedMesh("0", "m0");
+
+    const settings = ajax.last();
+    expect(settings.url).toBe("/get-downsized-mesh-image/");
+    expect(settings.data).toEqual({
+      mesh_id: "m0",
+      csrfmiddlewaretoken: CSRF_TOKEN,
+    });
+  });
+
+  it("sets the returned preview on the matching image", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+
+    loadServerRenderedMesh("0", "m0");
+    await ajax.succeed({ base64: "data:image/jpeg;base64,MESH" });
+
+    expect(document.getElementById("image0")!.getAttribute("src")).toBe(
+      "data:image/jpeg;base64,MESH",
+    );
+  });
+
+  it("logs a server-reported error", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    loadServerRenderedMesh("0", "m0");
+    await ajax.succeed({ error: "No preview" });
+
+    expect(log).toHaveBeenCalledWith("Mesh image load error:", "No preview");
+    log.mockRestore();
+  });
+
+  it("logs a transport error", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    loadServerRenderedMesh("0", "m0");
+    await ajax.fail("Gone");
+
+    expect(log).toHaveBeenCalledWith("Failed to load mesh image:", "Gone");
+    log.mockRestore();
+  });
+});
+
 describe("initializeServerRenderedContent", () => {
   it("creates an editor for every server-rendered paragraph", () => {
     initializeServerRenderedContent();
@@ -154,6 +211,18 @@ describe("initializeServerRenderedContent", () => {
     expect(ajax.calls.map((settings) => settings.url)).toEqual([
       "/get-downsized-image/",
       "/get-downsized-video-image/",
+    ]);
+  });
+
+  it("kicks off a downsized request for a mesh row", () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+
+    initializeServerRenderedContent();
+
+    expect(ajax.calls.map((settings) => settings.url)).toEqual([
+      "/get-downsized-mesh-image/",
     ]);
   });
 

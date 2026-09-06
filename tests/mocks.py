@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import base64
 from datetime import datetime
+from io import BytesIO
 from typing import TYPE_CHECKING, List
+from urllib.parse import quote
 
 from django.apps import apps
 from django.test import Client
@@ -126,6 +129,59 @@ def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
     # Minimal valid JPEG: SOI marker + EOI marker
     image_path.write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 20 + b"\xff\xd9")
     return image_path
+
+
+def create_mock_mesh_file(base_path, file_name="scan.glb"):
+    """
+    Create a dummy glb in the base entry folder so MeshForm can move it.
+
+    Returns the full path to the created file. The caller is responsible
+    for patching main.utils.file_io.ENTRY_FOLDER to *base_path*.
+    """
+    from pathlib import Path
+
+    mesh_path = Path(base_path) / file_name
+    mesh_path.write_bytes(b"glTF")
+    return mesh_path
+
+
+def mock_jpeg_data_url() -> str:
+    """Return a small valid JPEG as a data URL for mesh frame_image payloads."""
+    from PIL import Image
+
+    buffer = BytesIO()
+    Image.new("RGB", (32, 32), color=(10, 20, 30)).save(buffer, format="JPEG")
+    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    return f"data:image/jpeg;base64,{encoded}"
+
+
+def mock_mesh_post_data(
+    name: str,
+    file_name: str = "scan.glb",
+    frame_image: str | None = None,
+) -> str:
+    """Build a form-encoded body with one mesh content item."""
+    if frame_image is None:
+        frame_image = mock_jpeg_data_url()
+    encoded_frame = quote(frame_image, safe="")
+    return (
+        f"name={name}"
+        f"&content[mesh1][entry]={name}"
+        f"&content[mesh1][file_path]={file_name}"
+        f"&content[mesh1][frame_image]={encoded_frame}"
+        f"&content[mesh1][camera][right][0]=1"
+        f"&content[mesh1][camera][right][1]=0"
+        f"&content[mesh1][camera][right][2]=0"
+        f"&content[mesh1][camera][up][0]=0"
+        f"&content[mesh1][camera][up][1]=1"
+        f"&content[mesh1][camera][up][2]=0"
+        f"&content[mesh1][camera][forward][0]=0"
+        f"&content[mesh1][camera][forward][1]=0"
+        f"&content[mesh1][camera][forward][2]=-1"
+        f"&content[mesh1][camera][radius]=3"
+        f"&content[mesh1][camera][panX]=0"
+        f"&content[mesh1][camera][panY]=0"
+    )
 
 
 def mock_paragraph_post_data(

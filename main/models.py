@@ -150,9 +150,10 @@ class EntryMesh(Model):
         return str(self.file_path)
 
     def view(self) -> dict:
-        """Web displayable view."""
+        """Web displayable view - returns mesh_id for async loading."""
         file_name = Path(self.file_path).name
         return {
+            "mesh_id": self.pk,
             "file_name": file_name,
             "image_path": self.image_path,
             "camera": self.camera.view(),

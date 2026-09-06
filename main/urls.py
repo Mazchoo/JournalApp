@@ -15,6 +15,7 @@ from main.views import (
     get_downsized_image,
     get_video,
     get_downsized_video_image,
+    get_downsized_mesh_image,
     move_entry_date,
 )
 
@@ -38,6 +39,11 @@ urlpatterns = [
         "ajax/get-downsized-video-image/",
         get_downsized_video_image,
         name="get-downsized-video-image",
+    ),
+    path(
+        "ajax/get-downsized-mesh-image/",
+        get_downsized_mesh_image,
+        name="get-downsized-mesh-image",
     ),
     path("ajax/move-date/", move_entry_date, name="move-date"),
 ]

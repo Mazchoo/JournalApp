@@ -302,6 +302,10 @@ export class MediaEntry extends ContentRow implements IContent {
     return this.image?.getAttribute("data-video-id") ?? null;
   }
 
+  meshId(): string | null {
+    return this.image?.getAttribute("data-mesh-id") ?? null;
+  }
+
   /** Preview source currently shown on the `<img>`. */
   src(): string | null {
     return this.image?.getAttribute("src") ?? null;

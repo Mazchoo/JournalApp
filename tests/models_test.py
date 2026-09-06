@@ -296,7 +296,7 @@ def test_mesh_str():
 
 @pytest.mark.django_db
 def test_mesh_view_method():
-    """view() should return file_name, image_path, and OrbitCamera fields."""
+    """view() should return mesh_id, file_name, image_path, and OrbitCamera fields."""
     from main.models import EntryMesh, Camera
 
     entry = create_mock_entry()
@@ -323,6 +323,7 @@ def test_mesh_view_method():
 
     result = mesh.view()
 
+    assert result["mesh_id"] == mesh.pk
     assert result["file_name"] == "scan.glb"
     assert result["image_path"] == "2025-02-12/scan.jpg"
     assert result["camera"] == {

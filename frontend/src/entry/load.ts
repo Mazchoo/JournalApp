@@ -2,7 +2,11 @@ import { MediaEntry } from "../components/media-entry";
 import { ParagraphEntry } from "../components/paragraph-entry";
 import { editArea } from "../components/globals";
 import { scrollToTop } from "../components/common";
-import { requestImageThumbnail, requestVideoThumbnail } from "./make-request";
+import {
+  requestImageThumbnail,
+  requestMeshThumbnail,
+  requestVideoThumbnail,
+} from "./make-request";
 import { initializeNewMedia } from "./media/media";
 import { initializeParagraphRow } from "./paragraph/paragraph";
 
@@ -50,6 +54,27 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
   );
 }
 
+/** Fetch the downsized preview for a server-rendered mesh row. */
+export function loadServerRenderedMesh(index: string, meshId: string): void {
+  requestMeshThumbnail(
+    { mesh_id: meshId },
+    {
+      success: (response) => {
+        if (response.base64 !== undefined) {
+          const media = MediaEntry.fromIndex(index);
+          if (media !== null) MediaEntry.setSrc(media, response.base64);
+        }
+        if (response.error !== undefined) {
+          console.log("Mesh image load error:", response.error);
+        }
+      },
+      error: (_jqXhr, _textStatus, errorThrown) => {
+        console.log("Failed to load mesh image:", errorThrown);
+      },
+    },
+  );
+}
+
 /** Wire editors, handlers, and async loads for server-rendered rows. */
 export function initializeServerRenderedContent(): void {
   editArea.paragraphRows().forEach((row) => {
@@ -71,6 +96,11 @@ export function initializeServerRenderedContent(): void {
     const videoId = media.videoId();
     if (videoId) {
       loadServerRenderedVideo(media.index, videoId);
+    }
+
+    const meshId = media.meshId();
+    if (meshId) {
+      loadServerRenderedMesh(media.index, meshId);
     }
   });
 

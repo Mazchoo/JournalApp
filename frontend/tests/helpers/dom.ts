@@ -26,7 +26,7 @@ const VIDEO_TEMPLATE = readFileSync(
 
 export const CSRF_TOKEN = "test-csrf-token";
 
-export type RowKind = "paragraph" | "image" | "video";
+export type RowKind = "paragraph" | "image" | "video" | "mesh";
 
 /** Fill `{{ item.index }}` the same way generateParagraphTemplate / generateMediaTemplate do. */
 function fillIndex(template: string, index: string): string {
@@ -56,12 +56,18 @@ function renderRow(kind: RowKind, index: string): string {
     )}</div>`;
   }
 
-  return `<div class="row mt-4 media-entry">${withoutItemData(
-    fillIndex(MEDIA_TEMPLATE, index).replaceAll(
-      "{{ item.data.image_id }}",
-      `i${index}`,
-    ),
-  ).replaceAll(
+  const mediaId =
+    kind === "mesh"
+      ? fillIndex(MEDIA_TEMPLATE, index).replaceAll(
+          "{{ item.data.mesh_id }}",
+          `m${index}`,
+        )
+      : fillIndex(MEDIA_TEMPLATE, index).replaceAll(
+          "{{ item.data.image_id }}",
+          `i${index}`,
+        );
+
+  return `<div class="row mt-4 media-entry">${withoutItemData(mediaId).replaceAll(
     "{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}",
     "btn-outline-secondary",
   )}</div>`;
@@ -135,6 +141,7 @@ export function installTemplateGlobals(contentIndex: number): void {
   window.DOWNSIZED_IMAGE_URL = "/get-downsized-image/";
   window.VIDEO_URL = "/get-video/";
   window.DOWNSIZED_VIDEO_IMAGE_URL = "/get-downsized-video-image/";
+  window.DOWNSIZED_MESH_IMAGE_URL = "/get-downsized-mesh-image/";
   window.MOVE_URL = "/move-date/";
 }
 

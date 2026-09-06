@@ -2,6 +2,7 @@ import { csrfToken } from "../components/common";
 import type {
   DeleteEntryRequest,
   DownsizedImageRequest as ImageThumbnailRequest,
+  DownsizedMeshImageRequest as MeshThumbnailRequest,
   DownsizedVideoImageRequest as VideoThumbnailRequest,
   FullContentRequest,
   MoveEntryRequest,
@@ -21,6 +22,7 @@ import type {
 import {
   deleteUrl,
   downsizedImageUrl,
+  downsizedMeshImageUrl,
   downsizedVideoImageUrl,
   imageUrl,
   moveUrl,
@@ -176,6 +178,14 @@ export function requestVideoThumbnail(
   callbacks: RequestCallbacks<Base64MediaResponse>,
 ): void {
   postJson(downsizedVideoImageUrl(), fields, callbacks);
+}
+
+/** POST a mesh id to `main:get-downsized-mesh-image`. */
+export function requestMeshThumbnail(
+  fields: RequestFields<MeshThumbnailRequest>,
+  callbacks: RequestCallbacks<Base64MediaResponse>,
+): void {
+  postJson(downsizedMeshImageUrl(), fields, callbacks);
 }
 
 /** POST a file name and date slug to `main:get-image`. */

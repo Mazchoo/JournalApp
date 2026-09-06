@@ -7,7 +7,7 @@ from typing import Tuple, Union
 
 from main.config import DateConstants
 from main.database_layer.fe_interfaces import YearEntryInformationContext
-from main.models import Entry, EntryImage, EntryVideo
+from main.models import Entry, EntryImage, EntryMesh, EntryVideo
 from main.utils.image import get_base64_from_image, create_image_icon
 from main.utils.file_io import get_base_entry_path, get_icon_file_path
 
@@ -38,6 +38,13 @@ def get_all_videos_in_month(year: int, month: str) -> list[EntryVideo]:
     )
 
 
+def get_all_meshes_in_month(year: int, month: str) -> list[EntryMesh]:
+    """Return all mesh entries from a specified month."""
+    return list(
+        EntryMesh.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
+    )
+
+
 def get_icon_for_each_month(year: int) -> dict[str, str]:
     """Get a base64 dictionary of icon files for each month in a year."""
     output_dict: dict[str, str] = {}
@@ -47,12 +54,16 @@ def get_icon_for_each_month(year: int) -> dict[str, str]:
 
         month_images = get_all_images_in_month(year, month)
         month_videos = get_all_videos_in_month(year, month)
+        month_meshes = get_all_meshes_in_month(year, month)
 
         image_files = [
             Path(get_base_entry_path(Path(img.file_path))) for img in month_images
         ]
         image_files.extend(
             [Path(get_base_entry_path(Path(vid.file_path))) for vid in month_videos]
+        )
+        image_files.extend(
+            [Path(get_base_entry_path(Path(mesh.file_path))) for mesh in month_meshes]
         )
         valid_images = list(filter(lambda p: p.exists(), image_files))
 

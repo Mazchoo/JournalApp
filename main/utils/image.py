@@ -22,13 +22,16 @@ from main.utils.cache import cache_string
 
 def create_image_icon(target_path_obj: Path):
     """Create image icon for target object"""
+    icon_name_path = target_path_obj
     if target_path_obj.suffix == ".mp4":
         target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
+    elif target_path_obj.suffix == ".glb":
+        target_path_obj = get_resized_filename(target_path_obj)
 
     if not target_path_obj.exists():
         return False
 
-    target_icon_file_path = get_icon_file_path(target_path_obj)
+    target_icon_file_path = get_icon_file_path(icon_name_path)
     if target_icon_file_path.exists():
         return False
 

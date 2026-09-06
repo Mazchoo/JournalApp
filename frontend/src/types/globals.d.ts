@@ -31,6 +31,7 @@ declare global {
     DOWNSIZED_IMAGE_URL: string;
     VIDEO_URL: string;
     DOWNSIZED_VIDEO_IMAGE_URL: string;
+    DOWNSIZED_MESH_IMAGE_URL: string;
     MOVE_URL: string;
 
     tinymce?: TinyMCE;

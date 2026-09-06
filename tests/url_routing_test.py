@@ -88,6 +88,12 @@ def test_get_downsized_video_image_url_resolves():
     assert match.url_name == "get-downsized-video-image"
 
 
+def test_get_downsized_mesh_image_url_resolves():
+    """URL /ajax/get-downsized-mesh-image/ should resolve via its URL name."""
+    match = resolve("/ajax/get-downsized-mesh-image/")
+    assert match.url_name == "get-downsized-mesh-image"
+
+
 def test_move_date_url_resolves():
     """URL /ajax/move-date/ should resolve via its URL name."""
     match = resolve("/ajax/move-date/")

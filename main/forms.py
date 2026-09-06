@@ -1,5 +1,6 @@
 """Data validation to create or edit models"""
 
+from binascii import Error as BinasciiError
 from pathlib import Path
 
 from django import forms
@@ -7,7 +8,15 @@ from django.forms import ModelForm
 from django.db import models as django_models
 from tinymce.widgets import TinyMCE  # type: ignore
 
-from main.models import Entry, EntryImage, EntryParagraph, EntryVideo, Content
+from main.models import (
+    Camera,
+    Content,
+    Entry,
+    EntryImage,
+    EntryMesh,
+    EntryParagraph,
+    EntryVideo,
+)
 from main.utils.image import move_image_to_save_path, create_image_icon
 from main.utils.file_io import (
     path_has_image_extension,
@@ -17,8 +26,14 @@ from main.utils.file_io import (
     move_media_to_save_path,
     get_icon_file_path,
 )
+from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
-from main.config import ImageConstants, VideoConstants, ALLOWED_CONTENT_TYPES
+from main.config import (
+    ALLOWED_CONTENT_TYPES,
+    ImageConstants,
+    MeshConstants,
+    VideoConstants,
+)
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
@@ -156,6 +171,190 @@ class VideoForm(ModelForm):
         raise forms.ValidationError(
             "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
         )
+
+
+def _orbit_vector_component(vector, index: int) -> float:
+    """Read one axis from an orbit-camera vector sent as a list or numbered dict."""
+    if vector is None:
+        raise forms.ValidationError("Camera vector is missing")
+
+    if isinstance(vector, dict):
+        raw = vector.get(str(index), vector.get(index))
+    else:
+        try:
+            raw = vector[index]
+        except (IndexError, TypeError, KeyError) as exc:
+            raise forms.ValidationError("Camera vector is invalid") from exc
+
+    if raw is None:
+        raise forms.ValidationError("Camera vector is incomplete")
+
+    try:
+        return float(raw)
+    except (TypeError, ValueError) as exc:
+        raise forms.ValidationError("Camera vector is not numeric") from exc
+
+
+def orbit_camera_to_model_fields(camera_data: dict) -> dict:
+    """Flatten frontend OrbitCamera fields into Camera model fields."""
+    return {
+        "right_x": _orbit_vector_component(camera_data.get("right"), 0),
+        "right_y": _orbit_vector_component(camera_data.get("right"), 1),
+        "right_z": _orbit_vector_component(camera_data.get("right"), 2),
+        "up_x": _orbit_vector_component(camera_data.get("up"), 0),
+        "up_y": _orbit_vector_component(camera_data.get("up"), 1),
+        "up_z": _orbit_vector_component(camera_data.get("up"), 2),
+        "forward_x": _orbit_vector_component(camera_data.get("forward"), 0),
+        "forward_y": _orbit_vector_component(camera_data.get("forward"), 1),
+        "forward_z": _orbit_vector_component(camera_data.get("forward"), 2),
+        "radius": float(camera_data["radius"]),
+        "pan_x": float(camera_data.get("panX", camera_data.get("pan_x"))),
+        "pan_y": float(camera_data.get("panY", camera_data.get("pan_y"))),
+    }
+
+
+class CameraForm(ModelForm):
+    """Orbit camera stored with a mesh."""
+
+    class Meta:
+        model = Camera
+        fields = "__all__"
+
+
+class MeshForm(ModelForm):
+    """Form to create a mesh content for entry"""
+
+    frame_image = forms.CharField(required=False)
+
+    class Meta:
+        model = EntryMesh
+        fields = ["entry", "file_path"]
+
+    def clean_file_path(self):
+        """Ensure file path refers to a usable glb and move it into the date folder."""
+        clean_data = super().clean()
+        if clean_data is None:
+            raise forms.ValidationError("File path is not defined")
+
+        file_name = clean_data["file_path"]
+        entry = clean_data["entry"]
+
+        if len(file_name) == 0:
+            raise forms.ValidationError("Path is empty")
+
+        if "." not in file_name:
+            raise forms.ValidationError(f"Path '{file_name}' has no extension")
+
+        target_path = get_stored_media_path(file_name, entry.name)
+        target_file_obj = Path(target_path)
+
+        source_path = get_base_entry_path(file_name)
+        source_file_obj = Path(source_path)
+
+        if not target_file_obj.exists() and not source_file_obj.exists():
+            raise forms.ValidationError(f"Cannot find folder '{source_path}'")
+
+        if target_file_obj.suffix.lower() not in MeshConstants.supported_extensions:
+            message = f"Extension '{target_file_obj.suffix}' is not a recognised mesh extension"
+            raise forms.ValidationError(message)
+
+        move_media_to_save_path(target_path, file_name)
+        return make_image_path_relative(target_path)
+
+    def clean_frame_image(self):
+        """Accept a data-URL or raw base64 JPEG when provided."""
+        frame_image = self.data.get("frame_image")
+        if frame_image is None:
+            return ""
+
+        if not isinstance(frame_image, str) or not frame_image:
+            raise forms.ValidationError("Frame image is not defined")
+
+        return frame_image
+
+    def _resolve_camera(self) -> Camera:
+        """Create or load the orbit camera from the nested save payload or a pk."""
+        camera_data = self.data.get("camera")
+        if camera_data is None:
+            raise forms.ValidationError("Camera is not defined")
+
+        if isinstance(camera_data, Camera):
+            return camera_data
+
+        if isinstance(camera_data, (int, str)) and str(camera_data).isdigit():
+            try:
+                return Camera.objects.get(pk=int(camera_data))
+            except Camera.DoesNotExist as exc:
+                raise forms.ValidationError("Camera not found") from exc
+
+        if not isinstance(camera_data, dict):
+            raise forms.ValidationError("Camera is invalid")
+
+        try:
+            camera_form = CameraForm(orbit_camera_to_model_fields(camera_data))
+        except (TypeError, ValueError, KeyError) as exc:
+            raise forms.ValidationError("Camera is invalid") from exc
+
+        if not camera_form.is_valid():
+            raise forms.ValidationError(f"Invalid camera {camera_form.errors}")
+
+        return camera_form.save(commit=False)
+
+    def _resolve_image_path(self, cleaned_data: dict) -> str:
+        """Save the request JPEG, or move an existing preview like other media."""
+        frame_image = cleaned_data.get("frame_image")
+        if frame_image:
+            full_mesh_path = get_base_entry_path(cleaned_data["file_path"])
+            try:
+                return save_mesh_frame_image(Path(full_mesh_path), frame_image)
+            except (ValueError, OSError, BinasciiError) as exc:
+                raise forms.ValidationError(
+                    "Frame image is not a valid image"
+                ) from exc
+
+        image_name = self.data.get("image_path")
+        if not image_name:
+            raise forms.ValidationError("Frame image is not defined")
+
+        image_name = Path(str(image_name)).name
+        entry = cleaned_data["entry"]
+        target_path = get_stored_media_path(image_name, entry.name)
+        source_path = get_base_entry_path(image_name)
+
+        if not Path(target_path).exists() and not Path(source_path).exists():
+            raise forms.ValidationError(f"Cannot find '{image_name}' in Entries folder.")
+
+        move_media_to_save_path(target_path, image_name)
+        mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))
+        icon_path = get_icon_file_path(mesh_path)
+        if not icon_path.exists():
+            create_image_icon(mesh_path)
+
+        return make_image_path_relative(target_path)
+
+    def clean(self):
+        """Attach camera and preview image after the glb has been moved."""
+        cleaned_data = super().clean()
+        if cleaned_data is None:
+            return {}
+        if self.errors:
+            return cleaned_data
+
+        cleaned_data["camera"] = self._resolve_camera()
+        cleaned_data["image_path"] = self._resolve_image_path(cleaned_data)
+        return cleaned_data
+
+    def save(self, commit=True):
+        """Persist the camera first, then the mesh that points at it."""
+        instance = super().save(commit=False)
+        camera = self.cleaned_data["camera"]
+        if camera.pk is None:
+            camera.save()
+        instance.camera = camera
+        instance.image_path = self.cleaned_data["image_path"]
+        if commit:
+            instance.save()
+        return instance
 
 
 class ParagraphForm(ModelForm):
