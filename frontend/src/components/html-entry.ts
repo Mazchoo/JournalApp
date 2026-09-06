@@ -103,7 +103,7 @@ export class HtmlEntry {
   }
 
   /** Save payload for a row that is showing the raw-html-editor. */
-  serialize(): ParagraphSavePayload {
+  async serialize(): Promise<ParagraphSavePayload> {
     const host = this.row.querySelector(".raw-html-editor");
     if (host === null) {
       console.error(

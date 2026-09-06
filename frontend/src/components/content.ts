@@ -1,20 +1,12 @@
 import { ContentType } from "../common/content-types";
-import type {
-  MediaSavePayload,
-  MeshSavePayload,
-  ParagraphSavePayload,
-} from "../request-interface";
+import type { SavePayload } from "../request-interface";
 
 /** One saveable piece of an entry. */
 export interface IContent {
   readonly contentType: ContentType;
   readonly id: string;
   saveId(): string;
-  serialize():
-    | MediaSavePayload
-    | MeshSavePayload
-    | ParagraphSavePayload
-    | Promise<MediaSavePayload | MeshSavePayload | ParagraphSavePayload | null>;
+  serialize(): Promise<SavePayload | null>;
 }
 
 /** Map a save-content element's CSS class to its content type. */

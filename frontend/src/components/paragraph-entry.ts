@@ -76,7 +76,7 @@ export class ParagraphEntry extends ContentRow implements IContent {
     return `${this.contentType}${this.id}`;
   }
 
-  serialize(): ParagraphSavePayload {
+  async serialize(): Promise<ParagraphSavePayload> {
     const html = HtmlEntry.fromHost(this);
     if (html !== null) return html.serialize();
 

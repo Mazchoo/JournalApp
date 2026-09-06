@@ -10,9 +10,10 @@ import {
   saveEntryToDatabase,
   saveToDatabase,
   type CameraSavePayload,
-  type MediaSavePayload,
+  type ImageSavePayload,
   type MeshSavePayload,
   type ParagraphSavePayload,
+  type VideoSavePayload,
 } from "../src/entry/save";
 import { stubAjax, type AjaxStub } from "./helpers/ajax";
 import {
@@ -90,7 +91,7 @@ describe("generateSaveEntry", () => {
       document.querySelectorAll(".save-content"),
     ))!;
 
-    expect(saveData["image1"]).toEqual<MediaSavePayload>({
+    expect(saveData["image1"]).toEqual<ImageSavePayload>({
       file_path: "sunrise.png",
       allow_ai_synthesis: 1,
       entry: "2024-03-15",
@@ -116,7 +117,7 @@ describe("generateSaveEntry", () => {
       document.querySelectorAll(".save-content"),
     ))!;
 
-    expect((saveData["image1"] as MediaSavePayload).allow_ai_synthesis).toBe(0);
+    expect((saveData["image1"] as ImageSavePayload).allow_ai_synthesis).toBe(0);
   });
 
   it("keys video content under a video id, whichever element carries it", async () => {
@@ -130,7 +131,7 @@ describe("generateSaveEntry", () => {
       document.querySelectorAll(".save-content"),
     ))!;
 
-    expect(saveData["video0"]).toEqual<MediaSavePayload>({
+    expect(saveData["video0"]).toEqual<VideoSavePayload>({
       file_path: "holiday.mp4",
       allow_ai_synthesis: 1,
       entry: "2024-03-15",

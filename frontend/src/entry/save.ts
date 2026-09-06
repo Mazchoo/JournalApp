@@ -16,10 +16,12 @@ import { zoomToMedia } from "./media/media";
 
 export type {
   CameraSavePayload,
-  MediaSavePayload,
+  ImageSavePayload,
   MeshSavePayload,
   ParagraphSavePayload,
   SaveData,
+  SavePayload,
+  VideoSavePayload,
 } from "../request-interface";
 
 /** Port of static/JS/entry.save.js. */

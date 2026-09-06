@@ -5,7 +5,7 @@ import {
   MESH_CANVAS_REVEAL_STYLE,
 } from "../display-config";
 import { serializeMesh } from "../entry/media/mesh";
-import type { MediaSavePayload, MeshSavePayload } from "../request-interface";
+import type { SavePayload } from "../request-interface";
 import type { MediaContentThumbnail } from "../response-interface";
 import { dateSlug } from "../runtime/backend-variables";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
@@ -256,9 +256,7 @@ export class MediaEntry extends ContentRow implements IContent {
     return `${this.contentType}${this.id}`;
   }
 
-  serialize():
-    | MediaSavePayload
-    | Promise<MeshSavePayload | null> {
+  async serialize(): Promise<SavePayload | null> {
     if (this.contentType === ContentType.Mesh) {
       return serializeMesh(this);
     }

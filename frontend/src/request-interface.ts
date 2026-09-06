@@ -54,8 +54,15 @@ export interface ParagraphSavePayload {
   entry: string;
 }
 
-/** Image or video row in a save-entry `content` map. */
-export interface MediaSavePayload {
+/** Image row in a save-entry `content` map. */
+export interface ImageSavePayload {
+  file_path: string;
+  allow_ai_synthesis: 0 | 1;
+  entry: string;
+}
+
+/** Video row in a save-entry `content` map. */
+export interface VideoSavePayload {
   file_path: string;
   allow_ai_synthesis: 0 | 1;
   entry: string;
@@ -79,11 +86,15 @@ export interface MeshSavePayload {
   entry: string;
 }
 
+/** One row in a save-entry `content` map. */
+export type SavePayload =
+  | ParagraphSavePayload
+  | ImageSavePayload
+  | VideoSavePayload
+  | MeshSavePayload;
+
 /** `content` map posted to save-entry, keyed by DOM id. */
-export type SaveData = Record<
-  string,
-  ParagraphSavePayload | MediaSavePayload | MeshSavePayload
->;
+export type SaveData = Record<string, SavePayload>;
 
 /** POST body for `main:save-entry`. */
 export interface SaveEntryRequest {
