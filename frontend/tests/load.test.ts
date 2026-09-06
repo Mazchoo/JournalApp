@@ -7,6 +7,7 @@ import {
   loadServerRenderedMesh,
   loadServerRenderedVideo,
 } from "../src/entry/load";
+import { getMeshCamera } from "../src/entry/media/mesh";
 import { stubAjax, type AjaxStub } from "./helpers/ajax";
 import { CSRF_TOKEN, renderDayPage } from "./helpers/dom";
 import { installFakeTinyMCE, type FakeTinyMCE } from "./helpers/tinymce";
@@ -132,6 +133,28 @@ describe("loadServerRenderedMesh", () => {
     expect(document.getElementById("image0")!.getAttribute("src")).toBe(
       "data:image/jpeg;base64,MESH",
     );
+  });
+
+  it("stores the returned camera on the mesh row", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    tinymce = installFakeTinyMCE();
+    ajax = stubAjax();
+    const camera = {
+      right: [0, 1, 0] as [number, number, number],
+      up: [0, 0, 1] as [number, number, number],
+      forward: [-1, 0, 0] as [number, number, number],
+      radius: 4,
+      panX: 0.5,
+      panY: -0.25,
+    };
+
+    loadServerRenderedMesh("0", "m0");
+    await ajax.succeed({
+      base64: "data:image/jpeg;base64,MESH",
+      camera,
+    });
+
+    expect(getMeshCamera("0")).toEqual(camera);
   });
 
   it("logs a server-reported error", async () => {

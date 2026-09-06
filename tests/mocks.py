@@ -131,6 +131,23 @@ def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
     return image_path
 
 
+def create_mock_stored_mesh_file(base_path, name="2025-02-12", file_name="scan.glb"):
+    """
+    Create a dummy glb inside a temporary entry folder structure.
+
+    Returns the full path to the created file. The caller is responsible
+    for patching main.utils.file_io.ENTRY_FOLDER to *base_path*.
+    """
+    from pathlib import Path
+
+    year, month, day = name.split("-")
+    mesh_dir = Path(base_path) / year / month / day
+    mesh_dir.mkdir(parents=True, exist_ok=True)
+    mesh_path = mesh_dir / file_name
+    mesh_path.write_bytes(b"glTF")
+    return mesh_path
+
+
 def create_mock_mesh_file(base_path, file_name="scan.glb"):
     """
     Create a dummy glb in the base entry folder so MeshForm can move it.
@@ -145,12 +162,12 @@ def create_mock_mesh_file(base_path, file_name="scan.glb"):
     return mesh_path
 
 
-def mock_jpeg_data_url() -> str:
+def mock_jpeg_data_url(color=(10, 20, 30)) -> str:
     """Return a small valid JPEG as a data URL for mesh frame_image payloads."""
     from PIL import Image
 
     buffer = BytesIO()
-    Image.new("RGB", (32, 32), color=(10, 20, 30)).save(buffer, format="JPEG")
+    Image.new("RGB", (32, 32), color=color).save(buffer, format="JPEG")
     encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
     return f"data:image/jpeg;base64,{encoded}"
 

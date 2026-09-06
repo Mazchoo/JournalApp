@@ -21,6 +21,9 @@ export const MESH_CANVAS_Z_INDEX = 10;
 /** JPEG quality when encoding a mesh preview frame. */
 export const MESH_FRAME_JPEG_QUALITY = 0.85;
 
+/** Delay before writing a new mesh view to the thumbnail image. */
+export const MESH_VIEW_SNAPSHOT_DEBOUNCE_MS = 150;
+
 /** Inline styles applied when revealing the mesh canvas. */
 export const MESH_CANVAS_REVEAL_STYLE = {
   visibility: "visible",
@@ -30,6 +33,31 @@ export const MESH_CANVAS_REVEAL_STYLE = {
   position: "relative",
   zIndex: String(MESH_CANVAS_Z_INDEX),
 };
+
+/** Canvas reveal styles for the inline preview or the full-mesh modal. */
+export type MeshCanvasRevealStyle = typeof MESH_CANVAS_REVEAL_STYLE & {
+  width?: string;
+  maxWidth?: string;
+  aspectRatio?: string;
+};
+
+/** Aspect ratio used when the source preview has no layout size. */
+export const MESH_FALLBACK_ASPECT_RATIO =
+  MESH_CANVAS_FALLBACK_WIDTH_PX / MESH_CANVAS_HEIGHT_PX;
+
+/** Inline styles for the full-mesh modal canvas, matching a source aspect ratio. */
+export function meshModalRevealStyle(
+  aspectRatio: number,
+  widthPx: number = MESH_CANVAS_FALLBACK_WIDTH_PX,
+): MeshCanvasRevealStyle {
+  return {
+    ...MESH_CANVAS_REVEAL_STYLE,
+    width: "100%",
+    maxWidth: "100%",
+    height: `${Math.round(widthPx / aspectRatio)}px`,
+    aspectRatio: String(aspectRatio),
+  };
+}
 
 /** Vertical field of view for the mesh preview camera, in radians. */
 export const CAMERA_FOV_Y = Math.PI / 4;

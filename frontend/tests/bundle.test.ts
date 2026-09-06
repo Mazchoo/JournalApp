@@ -58,6 +58,7 @@ const NAMES_FROM_STATIC_JS = [
   "renderGLB",
   "computeNormals",
   "loadMeshResource",
+  "getFullMesh",
   // entry.media
   "generateMediaTemplate",
   "createNewMedia",

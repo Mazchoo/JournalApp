@@ -25,6 +25,7 @@ import {
   downsizedMeshImageUrl,
   downsizedVideoImageUrl,
   imageUrl,
+  meshUrl,
   moveUrl,
   saveUrl,
   videoUrl,
@@ -202,6 +203,18 @@ export function requestFullVideo(
   callbacks: RequestCallbacks<BlobPart>,
 ): void {
   postJson(videoUrl(), fields, callbacks, {
+    xhrFields: {
+      responseType: "blob",
+    },
+  });
+}
+
+/** POST a file name and date slug to `main:get-mesh`, expecting a GLB blob. */
+export function requestFullMesh(
+  fields: RequestFields<FullContentRequest>,
+  callbacks: RequestCallbacks<BlobPart>,
+): void {
+  postJson(meshUrl(), fields, callbacks, {
     xhrFields: {
       responseType: "blob",
     },

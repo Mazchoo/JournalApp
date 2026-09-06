@@ -26,4 +26,4 @@ def get_downsized_mesh_image_response(post_data: dict) -> JsonResponse:
     full_path = get_base_entry_path(entry_mesh.file_path)
     b64_string = get_mesh_image_base64(full_path)
 
-    return JsonResponse({"base64": b64_string})
+    return JsonResponse({"base64": b64_string, "camera": entry_mesh.camera.view()})

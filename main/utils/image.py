@@ -20,8 +20,8 @@ from main.utils.file_io import (
 from main.utils.cache import cache_string
 
 
-def create_image_icon(target_path_obj: Path):
-    """Create image icon for target object"""
+def _icon_source_paths(target_path_obj: Path) -> tuple[Path, Path] | None:
+    """Return (path used for the icon name, image to read), or None if missing."""
     icon_name_path = target_path_obj
     if target_path_obj.suffix == ".mp4":
         target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
@@ -29,20 +29,33 @@ def create_image_icon(target_path_obj: Path):
         target_path_obj = get_resized_filename(target_path_obj)
 
     if not target_path_obj.exists():
+        return None
+    return icon_name_path, target_path_obj
+
+
+def write_image_icon(target_path_obj: Path) -> bool:
+    """Write the calendar icon from the current preview image, replacing any existing one."""
+    source_paths = _icon_source_paths(target_path_obj)
+    if source_paths is None:
         return False
 
+    icon_name_path, image_path = source_paths
     target_icon_file_path = get_icon_file_path(icon_name_path)
-    if target_icon_file_path.exists():
-        return False
-
-    image = Image.open(target_path_obj)  # type: Image.Image
-    icon_size = ImageConstants.icon_size
-
-    image_resized = get_square_resized_image(image, icon_size)
+    image = Image.open(image_path)  # type: Image.Image
+    image_resized = get_square_resized_image(image, ImageConstants.icon_size)
     target_icon_file_path.parent.mkdir(parents=True, exist_ok=True)
     image_resized.save(target_icon_file_path)
-
     return True
+
+
+def create_image_icon(target_path_obj: Path):
+    """Create image icon for target object if one does not already exist."""
+    source_paths = _icon_source_paths(target_path_obj)
+    if source_paths is None:
+        return False
+    if get_icon_file_path(source_paths[0]).exists():
+        return False
+    return write_image_icon(target_path_obj)
 
 
 def move_image_to_save_path(target_file_path: str, file_name: str):

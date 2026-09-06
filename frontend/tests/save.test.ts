@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MediaEntry } from "../src/components/media-entry";
-import { setMeshCamera } from "../src/entry/media/mesh";
+import {
+  forgetMeshView,
+  markMeshFrameDirty,
+  setMeshCamera,
+} from "../src/entry/media/mesh";
 import {
   disableSaveButton,
   enableSaveButton,
@@ -44,6 +48,8 @@ function setUploadLabel(index: string, fileName: string): void {
 
 beforeEach(() => {
   renderDayPage({ rows: ["paragraph", "image"] });
+  forgetMeshView("0");
+  forgetMeshView("1");
   tinymce = installFakeTinyMCE();
   ajax = stubAjax();
   modals = installModalStubs();
@@ -151,7 +157,8 @@ describe("generateSaveEntry", () => {
     };
     const media = MediaEntry.fromIndex("1")!;
     MediaEntry.showCanvas(media);
-    setMeshCamera(media.canvas!, camera);
+    setMeshCamera(media.index, camera);
+    markMeshFrameDirty(media.index);
     setUploadLabel("1", "scan.glb");
     vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
       cb(
@@ -172,6 +179,75 @@ describe("generateSaveEntry", () => {
     expect(saveData["image1"]).toBeUndefined();
   });
 
+  it("omits the frame JPEG when the mesh view has not changed", async () => {
+    seedEditor(tinymce, "paragraph0");
+    const camera: CameraSavePayload = {
+      right: [1, 0, 0],
+      up: [0, 1, 0],
+      forward: [0, 0, -1],
+      radius: 3,
+      panX: 0,
+      panY: 0,
+    };
+    const media = MediaEntry.fromIndex("1")!;
+    setMeshCamera(media.index, camera);
+    setUploadLabel("1", "scan.glb");
+    document.getElementById("image1")!.setAttribute("data-mesh-id", "9");
+
+    const saveData = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+
+    expect(saveData["mesh1"]).toEqual<MeshSavePayload>({
+      file_path: "scan.glb",
+      camera,
+      entry: "2024-03-15",
+    });
+    expect(saveData["mesh1"]?.frame_image).toBeUndefined();
+  });
+
+  it("omits the frame JPEG after a successful save until the view changes again", async () => {
+    seedEditor(tinymce, "paragraph0");
+    const camera: CameraSavePayload = {
+      right: [1, 0, 0],
+      up: [0, 1, 0],
+      forward: [0, 0, -1],
+      radius: 3,
+      panX: 0,
+      panY: 0,
+    };
+    const media = MediaEntry.fromIndex("1")!;
+    MediaEntry.showCanvas(media);
+    setMeshCamera(media.index, camera);
+    markMeshFrameDirty(media.index);
+    setUploadLabel("1", "scan.glb");
+    vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
+      cb(
+        new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }),
+      );
+    });
+
+    const firstSave = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+    expect(firstSave["mesh1"]?.frame_image).toMatch(
+      /^data:image\/jpeg;base64,/,
+    );
+
+    saveEntryToDatabase(firstSave);
+    await ajax.succeed({ success: "Saved" });
+
+    const secondSave = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+    expect(secondSave["mesh1"]).toEqual<MeshSavePayload>({
+      file_path: "scan.glb",
+      camera,
+      entry: "2024-03-15",
+    });
+    expect(secondSave["mesh1"]?.frame_image).toBeUndefined();
+  });
+
   it("skips a revealed mesh that has no camera", async () => {
     seedEditor(tinymce, "paragraph0");
     const media = MediaEntry.fromIndex("1")!;
@@ -186,7 +262,6 @@ describe("generateSaveEntry", () => {
     ))!;
 
     expect(saveData["mesh1"]).toBeUndefined();
-    expect(consoleError).toHaveBeenCalledWith("mesh: no camera for", "1");
     consoleError.mockRestore();
   });
 
@@ -194,7 +269,7 @@ describe("generateSaveEntry", () => {
     seedEditor(tinymce, "paragraph0");
     const media = MediaEntry.fromIndex("1")!;
     MediaEntry.showCanvas(media);
-    setMeshCamera(media.canvas!, {
+    setMeshCamera(media.index, {
       right: [1, 0, 0],
       up: [0, 1, 0],
       forward: [0, 0, -1],
@@ -202,6 +277,7 @@ describe("generateSaveEntry", () => {
       panX: 0,
       panY: 0,
     });
+    markMeshFrameDirty(media.index);
     setUploadLabel("1", "scan.glb");
     vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
       cb(null);

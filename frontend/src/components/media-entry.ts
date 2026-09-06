@@ -1,10 +1,17 @@
 import { ContentType } from "../common/content-types";
+import { isMeshFile } from "../common/file-io";
 import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
+  MESH_FALLBACK_ASPECT_RATIO,
 } from "../display-config";
-import { serializeMesh } from "../entry/media/mesh";
+import {
+  canSerializeMesh,
+  forgetMeshView,
+  getMeshCamera,
+  serializeMesh,
+} from "../entry/media/mesh";
 import type { SavePayload } from "../request-interface";
 import type { MediaContentThumbnail } from "../response-interface";
 import { dateSlug } from "../runtime/backend-variables";
@@ -271,16 +278,8 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Resolve the media row that owns a save-content element with a source. */
   static fromSaveElement(element: HTMLElement): MediaEntry | null {
     const contentType = contentTypeFromElement(element);
-    if (contentType === ContentType.Mesh) {
-      if (!hasMeshPreview(element)) return null;
-    } else if (
-      contentType === ContentType.Image ||
-      contentType === ContentType.Video
-    ) {
-      if (!hasMediaSrc(element)) return null;
-    } else {
-      return null;
-    }
+    if (contentType === undefined) return null;
+
     const row = element.closest(".media-entry") as HTMLElement | null;
     if (row === null) {
       console.error(
@@ -290,8 +289,28 @@ export class MediaEntry extends ContentRow implements IContent {
     }
     const media = MediaEntry.fromRow(row);
     if (media === null) return null;
-    media.derivedType = contentType;
-    return media;
+
+    if (media.isMesh() || getMeshCamera(media.index) !== undefined) {
+      if (!canSerializeMesh(media)) return null;
+      media.derivedType = ContentType.Mesh;
+      return media;
+    }
+
+    if (contentType === ContentType.Mesh) {
+      if (!hasMeshPreview(element)) return null;
+      media.derivedType = ContentType.Mesh;
+      return media;
+    }
+
+    if (
+      contentType === ContentType.Image ||
+      contentType === ContentType.Video
+    ) {
+      if (!hasMediaSrc(element)) return null;
+      media.derivedType = contentType;
+      return media;
+    }
+    return null;
   }
 
   imageId(): string | null {
@@ -319,6 +338,31 @@ export class MediaEntry extends ContentRow implements IContent {
   /** Whether the thumbnail is tagged as a video poster. */
   isVideo(): boolean {
     return this.image?.classList.contains("content-video") ?? false;
+  }
+
+  /** Whether this row is a mesh (saved id, visible canvas, or .glb file name). */
+  isMesh(): boolean {
+    if (this.meshId()) return true;
+    if (this.canvas?.style.visibility === "visible") return true;
+    return isMeshFile(this.fileName());
+  }
+
+  /**
+   * Aspect ratio of the visible mesh preview (canvas or thumbnail).
+   * Falls back to the default canvas ratio when the source has no layout size.
+   */
+  previewAspectRatio(): number {
+    if (this.canvas !== null && this.canvas.style.visibility === "visible") {
+      const width = this.canvas.clientWidth || this.canvas.width;
+      const height = this.canvas.clientHeight || this.canvas.height;
+      if (width > 0 && height > 0) return width / height;
+    }
+    if (this.image !== null) {
+      const width = this.image.clientWidth || this.image.naturalWidth;
+      const height = this.image.clientHeight || this.image.naturalHeight;
+      if (width > 0 && height > 0) return width / height;
+    }
+    return MESH_FALLBACK_ASPECT_RATIO;
   }
 
   /**
@@ -428,6 +472,7 @@ export class MediaEntry extends ContentRow implements IContent {
   }
 
   override remove(): void {
+    forgetMeshView(this.index);
     delete MediaEntry.byIndex[this.index];
     super.remove();
   }

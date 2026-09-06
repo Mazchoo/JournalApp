@@ -26,6 +26,8 @@ function indexComponentType(
  *
  * `onResize` should match the canvas drawing buffer to its layout size.
  * Works on `MeshRenderData` from any parser. Calls `onComplete` after the first frame.
+ * `camera` is reused when provided so a mesh has one orbit state.
+ * `onUserViewChange` runs after pointer or keyboard camera edits, not resize.
  */
 export function startRenderingLoop(
   gl: WebGLRenderingContext,
@@ -33,19 +35,22 @@ export function startRenderingLoop(
   mesh: MeshRenderData,
   onComplete?: () => void,
   onResize?: () => void,
-): { notifyResize: () => void; camera: OrbitCamera } {
+  camera: OrbitCamera = createOrbitCamera(),
+  onUserViewChange?: () => void,
+): { notifyResize: () => void; camera: OrbitCamera; redraw: () => void } {
   const prepared: MeshRenderData = {
     ...mesh,
     positions: centerAndScalePositions(mesh.positions),
   };
   const cog = computeCenterOfGravity(prepared.positions);
-  const camera = createOrbitCamera();
 
   let onTextureReady = (): void => {};
   const shaders = createShaders(gl, prepared, () => {
     onTextureReady();
   });
-  if (shaders === null) return { notifyResize: () => {}, camera };
+  if (shaders === null) {
+    return { notifyResize: () => {}, camera, redraw: () => {} };
+  }
   const { uMVP } = shaders;
 
   gl.enable(gl.DEPTH_TEST);
@@ -101,7 +106,15 @@ export function startRenderingLoop(
   }
 
   onTextureReady = draw;
-  bindCameraControls(canvas, camera, draw, notifyResize);
+  bindCameraControls(
+    canvas,
+    camera,
+    () => {
+      draw();
+      onUserViewChange?.();
+    },
+    notifyResize,
+  );
   requestAnimationFrame(draw);
-  return { notifyResize, camera };
+  return { notifyResize, camera, redraw: draw };
 }

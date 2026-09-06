@@ -29,6 +29,7 @@ from main.content_generation.get_downsized_video_image import (
 from main.content_generation.get_downsized_mesh_image import (
     get_downsized_mesh_image_response,
 )
+from main.content_generation.get_full_mesh import get_full_mesh_response
 from main.content_generation.move_date import move_source_date_to_desination_request
 
 
@@ -159,6 +160,12 @@ def get_video(post_data):
 def get_downsized_video_image(post_data):
     """Async get a downsized video collage image by video_id"""
     return get_downsized_video_image_response(post_data)
+
+
+@ajax_request
+def get_mesh(post_data):
+    """Async stream a full GLB"""
+    return get_full_mesh_response(post_data)
 
 
 @ajax_request

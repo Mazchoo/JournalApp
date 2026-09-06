@@ -187,6 +187,98 @@ def test_save_entry_creates_mesh_content(tmp_path, monkeypatch):
     assert preview_data["base64"].startswith("data:image/jpeg;base64,")
 
 
+def _mesh_camera_payload(radius: str = "3") -> dict:
+    """Orbit camera fields as the save-entry request sends them."""
+    return {
+        "right": {"0": "1", "1": "0", "2": "0"},
+        "up": {"0": "0", "1": "1", "2": "0"},
+        "forward": {"0": "0", "1": "0", "2": "-1"},
+        "radius": radius,
+        "panX": "0",
+        "panY": "0",
+    }
+
+
+@pytest.mark.django_db
+def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path, monkeypatch):
+    """A later save that omits frame_image should update the camera only."""
+    from main.content_generation.save_entry import update_or_generate_from_request
+    from tests.mocks import mock_jpeg_data_url
+
+    Entry = apps.get_model("main", "Entry")
+    EntryMesh = apps.get_model("main", "EntryMesh")
+    Camera = apps.get_model("main", "Camera")
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    create_mock_mesh_file(tmp_path)
+
+    first = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "mesh1": {
+                    "entry": "2025-03-01",
+                    "file_path": "scan.glb",
+                    "frame_image": mock_jpeg_data_url((255, 0, 0)),
+                    "camera": _mesh_camera_payload("3"),
+                }
+            },
+        }
+    )
+    assert "success" in json.loads(first.content)
+
+    preview_path = tmp_path / "2025" / "03" / "01" / "scan_resized.jpeg"
+    icon_path = tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg"
+    preview_bytes = preview_path.read_bytes()
+    icon_bytes = icon_path.read_bytes()
+
+    second = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "mesh1": {
+                    "entry": "2025-03-01",
+                    "file_path": "scan.glb",
+                    "camera": _mesh_camera_payload("8"),
+                }
+            },
+        }
+    )
+    assert "success" in json.loads(second.content)
+
+    entry = Entry.objects.get(name="2025-03-01")
+    mesh = EntryMesh.objects.get(pk=entry.content.first().content_id)
+    assert mesh.camera.radius == 8.0
+    assert preview_path.read_bytes() == preview_bytes
+    assert icon_path.read_bytes() == icon_bytes
+    assert Camera.objects.filter(pk=mesh.camera_id).exists()
+
+
+@pytest.mark.django_db
+def test_save_entry_mesh_without_frame_or_preview_returns_error(tmp_path, monkeypatch):
+    """A new mesh with no frame_image and no stored preview should fail."""
+    from main.content_generation.save_entry import update_or_generate_from_request
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    create_mock_mesh_file(tmp_path)
+
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "mesh1": {
+                    "entry": "2025-03-01",
+                    "file_path": "scan.glb",
+                    "camera": _mesh_camera_payload(),
+                }
+            },
+        }
+    )
+
+    data = json.loads(response.content)
+    assert "error" in data
+
+
 @pytest.mark.django_db
 def test_save_entry_mesh_missing_glb_returns_error(tmp_path, monkeypatch):
     """A mesh save without the glb on disk should return a content error."""

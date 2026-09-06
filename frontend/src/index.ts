@@ -53,6 +53,7 @@ export {
 
 export {
   computeNormals,
+  getFullMesh,
   initializeMeshRenderer,
   loadMeshResource,
   renderGLB,

@@ -5,7 +5,11 @@ import {
   moveObjectUp,
 } from "../../common/dom";
 import { isImageFile, isMeshFile, isVideoFile } from "../../common/file-io";
-import { editArea } from "../../components/globals";
+import {
+  editArea,
+  meshModal,
+  meshModalPreview,
+} from "../../components/globals";
 import { MediaEntry } from "../../components/media-entry";
 import type { MediaContentThumbnail } from "../../response-interface";
 import {
@@ -17,7 +21,7 @@ import {
 import { insertNewParagraphToPosition } from "../paragraph/paragraph";
 import { enableSaveButton } from "../save";
 import { openFullImage, readImageResource } from "./image";
-import { loadMeshResource } from "./mesh";
+import { getFullMesh, loadMeshResource } from "./mesh";
 import { readVideoResource, zoomToVideo } from "./video";
 
 /** Generic media-row behavior shared by image, video, and mesh. */
@@ -145,13 +149,23 @@ export function editMediaMeta(
   return MediaEntry.applyMeta(media, mediaContent);
 }
 
-/** Open the full image or video in a modal. */
+/** Open the full image, video, or mesh in a modal. */
 export function zoomToMedia(event: Event): void {
   const media = MediaEntry.fromEvent(event);
   if (media === null) return;
 
   const fileName = media.fileNameHtml();
   const source = media.src();
+
+  if (media.isMesh()) {
+    const canvas = meshModalPreview.canvas();
+    if (canvas === null) return;
+    const aspectRatio = media.previewAspectRatio();
+    meshModal.show();
+    meshModalPreview.fitToAspect(aspectRatio);
+    getFullMesh(fileName, canvas, media.index, aspectRatio);
+    return;
+  }
 
   if (media.isImage()) {
     openFullImage(fileName, source);

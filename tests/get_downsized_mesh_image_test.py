@@ -38,6 +38,7 @@ def test_get_downsized_mesh_image_success(tmp_path, monkeypatch):
     data = json.loads(response.content)
     assert "base64" in data
     assert data["base64"] == "data:image/jpeg;base64,mockdata"
+    assert data["camera"] == mesh.camera.view()
 
 
 @pytest.mark.django_db

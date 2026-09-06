@@ -7,6 +7,7 @@
 {% include "Modals/simpleModal.html" %}
 {% include "Modals/imageModal.html" %}
 {% include "Modals/videoModal.html" %}
+{% include "Modals/meshModal.html" %}
 {% include "Modals/dateModal.html" %}
 
 <link rel="stylesheet" href="{% static 'CSS/image-upload.css' %}"/>
@@ -77,6 +78,7 @@
         var VIDEO_URL = '{% url "main:get-video" %}';
         var DOWNSIZED_VIDEO_IMAGE_URL = '{% url "main:get-downsized-video-image" %}';
         var DOWNSIZED_MESH_IMAGE_URL = '{% url "main:get-downsized-mesh-image" %}';
+        var MESH_URL = '{% url "main:get-mesh" %}';
         var MOVE_URL = '{% url "main:move-date" %}';
     </script>
 </body>

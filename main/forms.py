@@ -25,6 +25,7 @@ from main.utils.file_io import (
     make_image_path_relative,
     move_media_to_save_path,
     get_icon_file_path,
+    get_resized_filename,
 )
 from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
@@ -301,7 +302,7 @@ class MeshForm(ModelForm):
         return camera_form.save(commit=False)
 
     def _resolve_image_path(self, cleaned_data: dict) -> str:
-        """Save the request JPEG, or move an existing preview like other media."""
+        """Write a new preview when the request includes one; otherwise keep the stored image."""
         frame_image = cleaned_data.get("frame_image")
         if frame_image:
             full_mesh_path = get_base_entry_path(cleaned_data["file_path"])
@@ -309,6 +310,13 @@ class MeshForm(ModelForm):
                 return save_mesh_frame_image(Path(full_mesh_path), frame_image)
             except (ValueError, OSError, BinasciiError) as exc:
                 raise forms.ValidationError("Frame image is not a valid image") from exc
+
+        mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))
+        preview_path = get_resized_filename(mesh_path)
+        if preview_path.exists():
+            if not get_icon_file_path(mesh_path).exists():
+                create_image_icon(mesh_path)
+            return make_image_path_relative(str(preview_path))
 
         image_name = self.data.get("image_path")
         if not image_name:
@@ -325,9 +333,7 @@ class MeshForm(ModelForm):
             )
 
         move_media_to_save_path(target_path, image_name)
-        mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))
-        icon_path = get_icon_file_path(mesh_path)
-        if not icon_path.exists():
+        if not get_icon_file_path(mesh_path).exists():
             create_image_icon(mesh_path)
 
         return make_image_path_relative(target_path)

@@ -8,7 +8,12 @@ import {
   type Mock,
 } from "vitest";
 
-import { MESH_CANVAS_REVEAL_STYLE } from "../src/display-config";
+import {
+  MESH_CANVAS_REVEAL_STYLE,
+  MESH_FALLBACK_ASPECT_RATIO,
+  MESH_VIEW_SNAPSHOT_DEBOUNCE_MS,
+  meshModalRevealStyle,
+} from "../src/display-config";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../src/tooltip-messages";
 import { readImageResource } from "../src/entry/media/image";
 import {
@@ -25,7 +30,13 @@ import {
   uploadAllMediaFiles,
   zoomToMedia,
 } from "../src/entry/media/media";
-import { loadMeshResource, meshPreview } from "../src/entry/media/mesh";
+import {
+  getFullMesh,
+  loadMeshResource,
+  meshCamera,
+  meshPreview,
+  type MeshViewOptions,
+} from "../src/entry/media/mesh";
 import {
   changeImageToVideoClass,
   readVideoResource,
@@ -230,6 +241,12 @@ describe("loadMeshResource", () => {
       canvas,
       file,
       expect.any(Function),
+      undefined,
+      expect.objectContaining({
+        index: "0",
+        camera: expect.any(Object),
+        onUserViewChange: expect.any(Function),
+      }),
     );
   });
 
@@ -543,6 +560,161 @@ describe("zoomToMedia", () => {
 
     expect(log).toHaveBeenCalledWith("Unknown error : Service Unavailable");
     log.mockRestore();
+  });
+
+  it("requests the full GLB and shows it in the mesh modal", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    ajax = stubAjax();
+    document.getElementById("upload-label0")!.innerHTML = "scan.glb";
+    const render = vi.spyOn(meshPreview, "render").mockImplementation(() => {});
+
+    clickImageArea();
+
+    const settings = ajax.last();
+    expect(settings.url).toBe("/get-mesh/");
+    expect(settings.data).toEqual({
+      file: "scan.glb",
+      csrfmiddlewaretoken: CSRF_TOKEN,
+      name: "2024-03-15",
+    });
+    expect(
+      document.getElementById("mesh-modal")!.classList.contains("show"),
+    ).toBe(true);
+
+    await ajax.succeed(new Blob(["glb-bytes"], { type: "model/gltf-binary" }));
+    await vi.waitFor(() => {
+      expect(render).toHaveBeenCalledTimes(1);
+    });
+    expect(render.mock.calls[0]![0]).toBe(
+      document.getElementById("mesh-preview"),
+    );
+    expect(render.mock.calls[0]![3]).toEqual(
+      meshModalRevealStyle(MESH_FALLBACK_ASPECT_RATIO),
+    );
+    expect(document.getElementById("mesh-preview")!.style.aspectRatio).toBe(
+      String(MESH_FALLBACK_ASPECT_RATIO),
+    );
+    render.mockRestore();
+  });
+
+  it("sizes the mesh modal to the source canvas aspect ratio", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    ajax = stubAjax();
+    const source = document.getElementById("mesh-canvas0") as HTMLCanvasElement;
+    source.style.visibility = "visible";
+    Object.defineProperty(source, "clientWidth", {
+      configurable: true,
+      value: 640,
+    });
+    Object.defineProperty(source, "clientHeight", {
+      configurable: true,
+      value: 480,
+    });
+    const render = vi.spyOn(meshPreview, "render").mockImplementation(() => {});
+
+    clickImageArea();
+    await ajax.succeed(new Blob(["glb-bytes"], { type: "model/gltf-binary" }));
+    await vi.waitFor(() => {
+      expect(render).toHaveBeenCalledTimes(1);
+    });
+
+    expect(render.mock.calls[0]![3]).toEqual(meshModalRevealStyle(640 / 480));
+    expect(document.getElementById("mesh-preview")!.style.aspectRatio).toBe(
+      String(640 / 480),
+    );
+    render.mockRestore();
+  });
+
+  it("reuses one camera object for the full-mesh preview", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    ajax = stubAjax();
+    const camera = meshCamera("0");
+    const render = vi.spyOn(meshPreview, "render").mockImplementation(() => {});
+
+    getFullMesh(
+      "scan.glb",
+      document.getElementById("mesh-preview") as HTMLCanvasElement,
+      "0",
+    );
+    await ajax.succeed(new Blob(["glb-bytes"], { type: "model/gltf-binary" }));
+    await vi.waitFor(() => {
+      expect(render).toHaveBeenCalledTimes(1);
+    });
+
+    const view = render.mock.calls[0]![4] as MeshViewOptions;
+    expect(view.camera).toBe(camera);
+    render.mockRestore();
+  });
+
+  it("enables save and updates the thumbnail when the mesh view changes", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    ajax = stubAjax();
+    const canvas = document.getElementById("mesh-preview") as HTMLCanvasElement;
+    let onUserViewChange: (() => void) | undefined;
+    const render = vi
+      .spyOn(meshPreview, "render")
+      .mockImplementation((_canvas, _buffer, _onComplete, _style, view) => {
+        onUserViewChange = view?.onUserViewChange;
+      });
+    vi.spyOn(canvas, "toBlob").mockImplementation((cb) => {
+      cb(
+        new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }),
+      );
+    });
+
+    getFullMesh("scan.glb", canvas, "0");
+    await ajax.succeed(new Blob(["glb-bytes"], { type: "model/gltf-binary" }));
+    await vi.waitFor(() => {
+      expect(onUserViewChange).toBeDefined();
+    });
+
+    expect(
+      document.getElementById("btn-save")!.classList.contains("disabled"),
+    ).toBe(true);
+
+    onUserViewChange!();
+    expect(
+      document.getElementById("btn-save")!.classList.contains("disabled"),
+    ).toBe(false);
+
+    await vi.waitFor(
+      () => {
+        expect(document.getElementById("image0")!.getAttribute("src")).toMatch(
+          /^data:image\/jpeg;base64,/,
+        );
+      },
+      { timeout: MESH_VIEW_SNAPSHOT_DEBOUNCE_MS + 500 },
+    );
+    render.mockRestore();
+  });
+
+  it("reports a JSON error body from the mesh endpoint", async () => {
+    renderDayPage({ rows: ["mesh"] });
+    ajax = stubAjax();
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    clickImageArea();
+    await ajax.fail("Bad Request", {
+      responseJSON: { error: "Mesh not found" },
+    });
+
+    expect(log).toHaveBeenCalledWith("Mesh error : Mesh not found");
+    log.mockRestore();
+  });
+
+  it("falls back to a locally uploaded GLB when the mesh request fails", async () => {
+    const localFile = fileNamed("scan.glb");
+    uploadAllMediaFiles("0", [localFile]);
+    document.getElementById("upload-label0")!.innerHTML = "scan.glb";
+    const initialize = vi.mocked(meshPreview.initialize);
+
+    zoomToMedia(eventFrom(".image-area"));
+    await ajax.fail("Not Found");
+
+    expect(initialize).toHaveBeenCalled();
+    const lastCall = initialize.mock.calls[initialize.mock.calls.length - 1]!;
+    expect(lastCall[0]).toBe(document.getElementById("mesh-preview"));
+    expect(lastCall[1]).toBe(localFile);
   });
 
   it("does nothing when the click is not inside an image row", () => {

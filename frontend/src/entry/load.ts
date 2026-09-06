@@ -8,6 +8,7 @@ import {
   requestVideoThumbnail,
 } from "./make-request";
 import { initializeNewMedia } from "./media/media";
+import { setMeshCamera } from "./media/mesh";
 import { initializeParagraphRow } from "./paragraph/paragraph";
 
 /** Port of static/JS/entry.load.js. */
@@ -63,6 +64,9 @@ export function loadServerRenderedMesh(index: string, meshId: string): void {
         if (response.base64 !== undefined) {
           const media = MediaEntry.fromIndex(index);
           if (media !== null) MediaEntry.setSrc(media, response.base64);
+        }
+        if (response.camera !== undefined) {
+          setMeshCamera(index, response.camera);
         }
         if (response.error !== undefined) {
           console.log("Mesh image load error:", response.error);

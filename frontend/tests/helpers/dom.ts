@@ -113,6 +113,11 @@ export function renderDayPage(options: DayPageOptions = {}): void {
             <video id="video-preview" src=""></video>
         </div></div></div>
     </div>
+    <div class="modal" id="mesh-modal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content"><div class="modal-body">
+            <canvas id="mesh-preview"></canvas>
+        </div></div></div>
+    </div>
 
     <div class="modal" id="date-modal" tabindex="-1">
         <select id="date-modal-day">
@@ -144,6 +149,7 @@ export function installTemplateGlobals(contentIndex: number): void {
   window.VIDEO_URL = "/get-video/";
   window.DOWNSIZED_VIDEO_IMAGE_URL = "/get-downsized-video-image/";
   window.DOWNSIZED_MESH_IMAGE_URL = "/get-downsized-mesh-image/";
+  window.MESH_URL = "/get-mesh/";
   window.MOVE_URL = "/move-date/";
 }
 

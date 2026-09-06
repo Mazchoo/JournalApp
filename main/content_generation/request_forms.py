@@ -90,7 +90,7 @@ class DayPageForm(Form):
 
 
 class FullContentPath(Form):
-    """Request a full image or video path - not the reduced version"""
+    """Request a full image, video, or mesh path - not the reduced version"""
 
     name = SlugField()
     file = CharField(max_length=256)

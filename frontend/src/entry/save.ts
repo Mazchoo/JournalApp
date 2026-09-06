@@ -13,6 +13,7 @@ import { dateSlug } from "../runtime/backend-variables";
 import { showMessageSimpleModal } from "../runtime/modals";
 import { enableDeleteButton } from "./delete";
 import { zoomToMedia } from "./media/media";
+import { clearDirtyMeshFrames } from "./media/mesh";
 
 export type {
   CameraSavePayload,
@@ -35,6 +36,7 @@ export async function generateSaveEntry(
     return undefined;
   }
   const saveData: SaveData = {};
+  const seen = new Set<string>();
 
   for (let i = 0; i < saveContent.length; i++) {
     const element = saveContent[i] as HTMLElement;
@@ -42,9 +44,12 @@ export async function generateSaveEntry(
       ParagraphEntry.fromSaveElement(element) ??
       MediaEntry.fromSaveElement(element);
     if (entry === null) continue;
+    const saveId = entry.saveId();
+    if (seen.has(saveId)) continue;
+    seen.add(saveId);
     const payload = await entry.serialize();
     if (payload === null) continue;
-    saveData[entry.saveId()] = payload;
+    saveData[saveId] = payload;
   }
 
   return saveData;
@@ -66,8 +71,10 @@ export function saveEntryToDatabase(
     },
     {
       success: (response) => {
-        if ("success" in response)
+        if ("success" in response) {
+          clearDirtyMeshFrames();
           showMessageSimpleModal("Save Success", response["success"]);
+        }
         if ("error" in response)
           showMessageSimpleModal("Save Errors", response["error"]);
         enableDeleteButton();

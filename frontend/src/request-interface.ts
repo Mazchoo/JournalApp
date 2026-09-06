@@ -81,7 +81,7 @@ export interface CameraSavePayload {
 /** Mesh row in a save-entry `content` map. */
 export interface MeshSavePayload {
   file_path: string;
-  frame_image: string;
+  frame_image?: string;
   camera: CameraSavePayload;
   entry: string;
 }
@@ -131,7 +131,7 @@ export interface DownsizedMeshImageRequest {
   csrfmiddlewaretoken: string;
 }
 
-/** POST body matching `FullContentPath` (`main:get-image` and `main:get-video`). */
+/** POST body matching `FullContentPath` (`main:get-image`, `main:get-video`, and `main:get-mesh`). */
 export interface FullContentRequest {
   file: string;
   name: string;
