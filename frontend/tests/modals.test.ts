@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -9,27 +12,26 @@ import {
   showModal,
 } from "../src/runtime/modals";
 
-/** Render the modal markup the helpers expect. */
+const modalsDir = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../templates/Modals",
+);
+
+/** Render the Django modal templates the page includes. */
 function renderModals(): void {
-  document.body.innerHTML = `
-    <div class="modal fade" id="simple-modal">
-      <h5 id="simple-modal-title">Title</h5>
-      <div id="simple-modal-body">Message</div>
-      <button id="simple-modal-close" data-dismiss="modal">Close</button>
-    </div>
-    <div class="modal fade" id="callback-modal">
-      <h5 id="callback-modal-title">Title</h5>
-      <div id="callback-modal-body">Message</div>
-      <button id="callback-modal-action" data-dismiss="modal">Action</button>
-    </div>
-    <div class="modal fade" id="date-modal">
-      <h5 id="date-modal-title">Title</h5>
-      <div id="date-modal-body">Message</div>
-      <button id="date-modal-action" data-dismiss="modal">Action</button>
-    </div>
-    <div class="modal fade" id="video-modal">
-      <video id="video-preview" src="blob:old"></video>
-    </div>`;
+  document.body.innerHTML = [
+    "simpleModal.html",
+    "callbackModal.html",
+    "dateModal.html",
+    "videoModal.html",
+  ]
+    .map((name) => readFileSync(resolve(modalsDir, name), "utf8"))
+    .join("\n");
+}
+
+/** Fire a bubbling click the same way a user click reaches the document listener. */
+function click(element: Element): void {
+  element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 }
 
 describe("showModal / hideModal", () => {
@@ -66,6 +68,81 @@ describe("showModal / hideModal", () => {
     expect(
       document.getElementById("simple-modal")!.classList.contains("show"),
     ).toBe(false);
+  });
+
+  it("closes when the × inside the dismiss control is clicked", () => {
+    showModal("simple-modal");
+
+    document
+      .querySelector("#simple-modal-close [aria-hidden='true']")!
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("closes when the dimmed overlay around the card is clicked", () => {
+    showModal("simple-modal");
+
+    click(document.querySelector("#simple-modal .modal-dialog")!);
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("closes when the .modal shell is clicked", () => {
+    showModal("simple-modal");
+
+    click(document.getElementById("simple-modal")!);
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("stays open when the card itself is clicked", () => {
+    showModal("simple-modal");
+
+    click(document.querySelector("#simple-modal .modal-content")!);
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(true);
+  });
+
+  it("stays open when copy inside the card is clicked", () => {
+    showModal("simple-modal");
+
+    click(document.getElementById("simple-modal-title")!);
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(true);
+  });
+
+  it("closes when the backdrop is clicked", () => {
+    showModal("simple-modal");
+
+    click(document.querySelector(".modal-backdrop")!);
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
+
+  it("stays open when the same click that opened it bubbles to document", () => {
+    const opener = document.createElement("button");
+    opener.type = "button";
+    document.body.appendChild(opener);
+    opener.addEventListener("click", () => showModal("simple-modal"));
+
+    opener.click();
+
+    expect(
+      document.getElementById("simple-modal")!.classList.contains("show"),
+    ).toBe(true);
   });
 });
 

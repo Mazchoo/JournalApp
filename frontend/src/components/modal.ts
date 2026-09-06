@@ -23,14 +23,14 @@ export class Modal extends PageElement {
     return Modal.byId[id] ?? new Modal(id);
   }
 
-  /** Bind document-level dismiss and Enter-to-confirm listeners once. */
+  /** Bind document-level dismiss, overlay, and Enter-to-confirm listeners once. */
   static bindBehaviors(): void {
     if (Modal.behaviorsBound) return;
     Modal.behaviorsBound = true;
 
     document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
+      const target = eventTargetElement(event);
+      if (target === null) return;
 
       const dismiss = target.closest('[data-dismiss="modal"]');
       if (dismiss !== null) {
@@ -41,13 +41,21 @@ export class Modal extends PageElement {
 
       if (target.classList.contains("modal-backdrop")) {
         Modal.hideOpen();
+        return;
+      }
+
+      // Centered dialogs fill the viewport; a click "outside" the card lands
+      // on `.modal-dialog` (or `.modal`), not on `.modal-content`.
+      const modal = target.closest(".modal");
+      if (modal?.id && target.closest(".modal-content") === null) {
+        Modal.fromId(modal.id).hide();
       }
     });
 
     document.addEventListener("keypress", (event) => {
       if (!isEnterKey(event)) return;
-      const target = event.target;
-      if (!(target instanceof Element)) return;
+      const target = eventTargetElement(event);
+      if (target === null) return;
       const modal = target.closest(".modal");
       if (modal === null || !modal.id) return;
 
@@ -214,4 +222,12 @@ function dispatchModalEvent(
 /** Return whether the key event is Enter, matching the old keypress handlers. */
 function isEnterKey(event: KeyboardEvent): boolean {
   return event.key === "Enter" || event.which === 13 || event.keyCode === 13;
+}
+
+/** Resolve `event.target` to an Element, including when it is a text node. */
+function eventTargetElement(event: Event): Element | null {
+  const target = event.target;
+  if (target instanceof Element) return target;
+  if (target instanceof Node) return target.parentElement;
+  return null;
 }
