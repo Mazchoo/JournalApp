@@ -63,3 +63,12 @@ class VideoConstants:
     billateral_filter: bool = False
     collage_spacing: int = 10
     icon_size: int = 96
+
+
+class MeshConstants:
+    """Static information for displaying meshes"""
+
+    supported_extensions: Tuple[str] = (".glb",)
+    save_image_extention: str = "jpeg"
+    reserved_mesh_tags: tuple = ("_icon",)
+    icon_size: int = 96

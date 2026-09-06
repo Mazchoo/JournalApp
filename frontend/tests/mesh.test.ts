@@ -354,7 +354,7 @@ describe("currentFrameAsJpegBase64", () => {
 
     expect(result).toBeNull();
     expect(consoleError).toHaveBeenCalledWith(
-      "MediaEntry: canvas JPEG encode failed",
+      "mesh: canvas JPEG encode failed",
     );
   });
 });

@@ -3,7 +3,6 @@ import {
   MESH_CANVAS_FALLBACK_WIDTH_PX,
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
-  MESH_FRAME_JPEG_QUALITY,
 } from "../display-config";
 import type { MediaSavePayload } from "../request-interface";
 import type { MediaContentThumbnail } from "../response-interface";
@@ -351,65 +350,6 @@ export class MediaEntry extends ContentRow implements IContent {
     });
     observer.observe(canvas);
     canvasSizeObservers.set(canvas, observer);
-  }
-
-  /**
-   * Size the canvas and return a WebGL context.
-   * Returns null when WebGL is unavailable. Does not hide sibling media.
-   * `preserveDrawingBuffer` keeps the last frame readable for snapshots.
-   */
-  static prepareWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext | null {
-    Object.assign(canvas.style, MESH_CANVAS_REVEAL_STYLE);
-    MediaEntry.syncCanvasSize(canvas);
-
-    const contextAttributes: WebGLContextAttributes = {
-      preserveDrawingBuffer: true,
-    };
-    const gl = (canvas.getContext("webgl", contextAttributes) ??
-      canvas.getContext(
-        "experimental-webgl",
-        contextAttributes,
-      )) as WebGLRenderingContext | null;
-    if (!gl) {
-      console.error("WebGL not supported");
-      return null;
-    }
-    return gl;
-  }
-
-  /**
-   * Encode the canvas's current pixels as a JPEG data URL.
-   * Returns null when encoding fails.
-   */
-  static canvasAsJpegBase64(canvas: HTMLCanvasElement): Promise<string | null> {
-    return new Promise((resolve) => {
-      canvas.toBlob(
-        (blob) => {
-          if (blob === null) {
-            console.error("MediaEntry: canvas JPEG encode failed");
-            resolve(null);
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result;
-            if (typeof result !== "string") {
-              console.error("MediaEntry: canvas JPEG encode failed");
-              resolve(null);
-              return;
-            }
-            resolve(result);
-          };
-          reader.onerror = () => {
-            console.error("MediaEntry: canvas JPEG encode failed");
-            resolve(null);
-          };
-          reader.readAsDataURL(blob);
-        },
-        "image/jpeg",
-        MESH_FRAME_JPEG_QUALITY,
-      );
-    });
   }
 
   fileName(): string {
