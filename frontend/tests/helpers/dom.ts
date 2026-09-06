@@ -67,7 +67,9 @@ function renderRow(kind: RowKind, index: string): string {
           `i${index}`,
         );
 
-  return `<div class="row mt-4 media-entry">${withoutItemData(mediaId).replaceAll(
+  return `<div class="row mt-4 media-entry">${withoutItemData(
+    mediaId,
+  ).replaceAll(
     "{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}",
     "btn-outline-secondary",
   )}</div>`;
