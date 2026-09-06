@@ -48,7 +48,7 @@ export {
   initializeNewParagraph,
   initializeParagraphRow,
   insertNewParagraphToPosition,
-} from "./entry/paragraph";
+} from "./entry/paragraph/paragraph";
 
 export {
   computeNormals,

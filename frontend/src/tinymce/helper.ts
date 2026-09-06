@@ -1,5 +1,5 @@
 import { enableSaveButton } from "../entry/save";
-import { importHtmlFromEditor } from "../entry/html";
+import { importHtmlFromEditor } from "../entry/paragraph/html";
 import {
   createTinyMCE as createEditor,
   getMCEComponentHeight,

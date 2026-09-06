@@ -1,11 +1,11 @@
-import { isHtmlFile } from "../common/file-io";
-import { HtmlEntry } from "../components/html-entry";
-import { ParagraphEntry } from "../components/paragraph-entry";
+import { isHtmlFile } from "../../common/file-io";
+import { HtmlEntry } from "../../components/html-entry";
+import { ParagraphEntry } from "../../components/paragraph-entry";
 import {
   paragraphIndex,
   type SynthesisEditor,
-} from "../runtime/synthesis-editor";
-import { enableSaveButton } from "./save";
+} from "../../runtime/synthesis-editor";
+import { enableSaveButton } from "../save";
 
 /** Replace the editor that raised Import HTML with the chosen HTML file. */
 export function importHtmlFromEditor(editor: SynthesisEditor): void {

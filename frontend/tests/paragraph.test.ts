@@ -17,7 +17,7 @@ import {
   generateParagraphTemplate,
   initializeNewParagraph,
   insertNewParagraphToPosition,
-} from "../src/entry/paragraph";
+} from "../src/entry/paragraph/paragraph";
 import { HtmlEntry } from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
 import {

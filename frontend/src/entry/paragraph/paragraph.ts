@@ -1,23 +1,23 @@
-import { HtmlEntry } from "../components/html-entry";
-import { ParagraphEntry } from "../components/paragraph-entry";
-import { editArea } from "../components/globals";
+import { HtmlEntry } from "../../components/html-entry";
+import { ParagraphEntry } from "../../components/paragraph-entry";
+import { editArea } from "../../components/globals";
 import {
   componentFromTemplate,
   insertNewObjectIntoEditArea,
   moveObjectDown,
   moveObjectUp,
-} from "../common/dom";
-import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../display-config";
+} from "../../common/dom";
+import { PARAGRAPH_EDITOR_HEIGHT_PX } from "../../display-config";
 import {
   contentIndex,
   contentIndexStr,
   paragraphTemplate,
   setContentIndex,
-} from "../runtime/backend-variables";
-import { showCallbackModal } from "../runtime/modals";
-import { createTinyMCE } from "../tinymce/helper";
-import { insertNewMediaToPosition } from "./media/media";
-import { enableSaveButton } from "./save";
+} from "../../runtime/backend-variables";
+import { showCallbackModal } from "../../runtime/modals";
+import { createTinyMCE } from "../../tinymce/helper";
+import { insertNewMediaToPosition } from "../media/media";
+import { enableSaveButton } from "../save";
 
 /** Port of static/JS/entry.paragraph.js. */
 

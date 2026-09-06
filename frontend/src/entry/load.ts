@@ -4,7 +4,7 @@ import { editArea } from "../components/globals";
 import { scrollToTop } from "../components/common";
 import { requestImageThumbnail, requestVideoThumbnail } from "./make-request";
 import { initializeNewMedia } from "./media/media";
-import { initializeParagraphRow } from "./paragraph";
+import { initializeParagraphRow } from "./paragraph/paragraph";
 
 /** Port of static/JS/entry.load.js. */
 

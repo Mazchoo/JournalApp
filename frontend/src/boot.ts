@@ -1,6 +1,6 @@
 import { initializeServerRenderedContent } from "./entry/load";
 import { appendMediaToList, zoomToMedia } from "./entry/media/media";
-import { appendParagraphToList } from "./entry/paragraph";
+import { appendParagraphToList } from "./entry/paragraph/paragraph";
 import { deleteContent, enableDeleteButton } from "./entry/delete";
 import { moveEntry } from "./entry/move";
 import { saveToDatabase } from "./entry/save";

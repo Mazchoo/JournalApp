@@ -14,7 +14,7 @@ import {
   mediaTemplate,
   setContentIndex,
 } from "../../runtime/backend-variables";
-import { insertNewParagraphToPosition } from "../paragraph";
+import { insertNewParagraphToPosition } from "../paragraph/paragraph";
 import { enableSaveButton } from "../save";
 import { openFullImage, readImageResource } from "./image";
 import { loadMeshResource } from "./mesh";

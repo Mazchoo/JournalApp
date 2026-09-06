@@ -5,8 +5,8 @@ import {
   RAW_HTML_EDITOR_TOOLTIP,
   SYNTHESIS_BUTTON_TOOLTIP,
 } from "../src/tooltip-messages";
-import { importHtmlFromEditor, readHtmlResource } from "../src/entry/html";
-import { initializeParagraphRow } from "../src/entry/paragraph";
+import { importHtmlFromEditor, readHtmlResource } from "../src/entry/paragraph/html";
+import { initializeParagraphRow } from "../src/entry/paragraph/paragraph";
 import { enableSaveButton, generateSaveEntry } from "../src/entry/save";
 import { HtmlEntry } from "../src/components/html-entry";
 import { ParagraphEntry } from "../src/components/paragraph-entry";
