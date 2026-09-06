@@ -34,7 +34,7 @@ describe("createTinyMCE", () => {
     expect(options["browser_spellcheck"]).toBe(true);
     expect(options["deprecation_warnings"]).toBe(false);
     expect(options["toolbar"]).toBe(
-      "bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis",
+      "bold italic | alignleft aligncenter alignright alignjustify | import importMarkdown allowSynthesis",
     );
   });
 
@@ -46,11 +46,12 @@ describe("createTinyMCE", () => {
     expect(initCallback).toHaveBeenCalledTimes(1);
   });
 
-  it("registers the Import HTML and Generate toolbar buttons", () => {
+  it("registers the Import HTML, Import Markdown and Generate toolbar buttons", () => {
     createTinyMCE("#paragraph0", 220, true);
 
     const editor = tinymce.get("paragraph0")!;
     expect(editor.buttons["import"]!.text).toBe("Import HTML");
+    expect(editor.buttons["importMarkdown"]!.text).toBe("Import Markdown");
     expect(editor.toggleButtons["allowSynthesis"]!.text).toBe("Generate");
     expect(editor.toggleButtons["allowSynthesis"]!.tooltip).toBe(
       SYNTHESIS_BUTTON_TOOLTIP,
@@ -110,6 +111,18 @@ describe("createTinyMCE", () => {
     createTinyMCE("#paragraph0", 220, true);
 
     tinymce.get("paragraph0")!.buttons["import"]!.onAction();
+
+    expect(click).toHaveBeenCalledTimes(1);
+    click.mockRestore();
+  });
+
+  it("opens a file picker when the Import Markdown button is pressed", () => {
+    const click = vi
+      .spyOn(HTMLInputElement.prototype, "click")
+      .mockImplementation(() => {});
+    createTinyMCE("#paragraph0", 220, true);
+
+    tinymce.get("paragraph0")!.buttons["importMarkdown"]!.onAction();
 
     expect(click).toHaveBeenCalledTimes(1);
     click.mockRestore();

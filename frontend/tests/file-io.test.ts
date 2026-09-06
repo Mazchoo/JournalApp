@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   isHtmlFile,
   isImageFile,
+  isMarkdownFile,
   isMeshFile,
   isVideoFile,
 } from "../src/common/file-io";
@@ -35,6 +36,7 @@ describe("media type detection", () => {
       expect(isVideoFile(name)).toBe(false);
       expect(isMeshFile(name)).toBe(false);
       expect(isHtmlFile(name)).toBe(false);
+      expect(isMarkdownFile(name)).toBe(false);
     },
   );
 
@@ -42,6 +44,16 @@ describe("media type detection", () => {
     "treats %s as HTML",
     (name) => {
       expect(isHtmlFile(name)).toBe(true);
+      expect(isImageFile(name)).toBe(false);
+      expect(isMarkdownFile(name)).toBe(false);
+    },
+  );
+
+  it.each(["notes.md", "NOTES.MD", "readme.markdown"])(
+    "treats %s as markdown",
+    (name) => {
+      expect(isMarkdownFile(name)).toBe(true);
+      expect(isHtmlFile(name)).toBe(false);
       expect(isImageFile(name)).toBe(false);
     },
   );

@@ -13,11 +13,12 @@ export function createTinyMCE(
   initCallback: () => void = () => {},
   onDirty: () => void = () => {},
   onImportHtml: (editor: SynthesisEditor) => void = () => {},
+  onImportMarkdown: (editor: SynthesisEditor) => void = () => {},
 ): void {
   const options: RawEditorOptions = {
     selector: componentName,
     toolbar:
-      "bold italic | alignleft aligncenter alignright alignjustify | import allowSynthesis",
+      "bold italic | alignleft aligncenter alignright alignjustify | import importMarkdown allowSynthesis",
     deprecation_warnings: false,
     browser_spellcheck: true,
     height: height,
@@ -29,6 +30,13 @@ export function createTinyMCE(
         text: "Import HTML",
         onAction: () => {
           onImportHtml(editor as SynthesisEditor);
+        },
+      });
+
+      editor.ui.registry.addButton("importMarkdown", {
+        text: "Import Markdown",
+        onAction: () => {
+          onImportMarkdown(editor as SynthesisEditor);
         },
       });
 
@@ -70,6 +78,7 @@ export function resetMCE(
   div: Element | null | undefined,
   onDirty: () => void = () => {},
   onImportHtml: (editor: SynthesisEditor) => void = () => {},
+  onImportMarkdown: (editor: SynthesisEditor) => void = () => {},
 ): void {
   if (div == null) {
     console.error("resetMCE: element is missing");
@@ -94,5 +103,6 @@ export function resetMCE(
     () => {},
     onDirty,
     onImportHtml,
+    onImportMarkdown,
   );
 }

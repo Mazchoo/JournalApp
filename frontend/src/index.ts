@@ -27,6 +27,7 @@ export {
 export {
   isHtmlFile,
   isImageFile,
+  isMarkdownFile,
   isMeshFile,
   isVideoFile,
 } from "./common/file-io";

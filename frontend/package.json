@@ -14,6 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "marked": "^18.0.11",
     "tinymce": "7.8.0"
   },
   "devDependencies": {

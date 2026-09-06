@@ -19,3 +19,8 @@ export function isMeshFile(fileName: string): boolean {
 export function isHtmlFile(fileName: string): boolean {
   return ["html", "htm"].includes(fileName.split(".").pop()!.toLowerCase());
 }
+
+/** Return whether a file name has a markdown extension. */
+export function isMarkdownFile(fileName: string): boolean {
+  return ["md", "markdown"].includes(fileName.split(".").pop()!.toLowerCase());
+}

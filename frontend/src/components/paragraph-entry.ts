@@ -91,6 +91,19 @@ export class ParagraphEntry extends ContentRow implements IContent {
     };
   }
 
+  /** Open a file picker for markdown and hand the chosen file to `onPicked`. */
+  static pickMarkdownFile(onPicked: (file: File) => void): void {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".md,.markdown,text/markdown";
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      if (file == null) return;
+      onPicked(file);
+    });
+    input.click();
+  }
+
   /** Write HTML into the TinyMCE editor. Returns false when the editor is missing. */
   setContent(html: string): boolean {
     const editor = tiny().get(this.saveId());
