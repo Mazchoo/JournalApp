@@ -48,7 +48,13 @@ export function encodeNestedForm(data: Record<string, unknown>): string {
   /** Append one value, descending into plain objects as bracketed keys. */
   const append = (key: string, value: unknown): void => {
     if (value === undefined || value === null) return;
-    if (typeof value === "object" && !Array.isArray(value)) {
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        append(`${key}[${i}]`, value[i]);
+      }
+      return;
+    }
+    if (typeof value === "object") {
       for (const [child, childValue] of Object.entries(
         value as Record<string, unknown>,
       )) {

@@ -61,8 +61,29 @@ export interface MediaSavePayload {
   entry: string;
 }
 
+/** Orbit camera in a mesh save payload, matching `Camera.view()`. */
+export interface CameraSavePayload {
+  right: [number, number, number];
+  up: [number, number, number];
+  forward: [number, number, number];
+  radius: number;
+  panX: number;
+  panY: number;
+}
+
+/** Mesh row in a save-entry `content` map. */
+export interface MeshSavePayload {
+  file_path: string;
+  frame_image: string;
+  camera: CameraSavePayload;
+  entry: string;
+}
+
 /** `content` map posted to save-entry, keyed by DOM id. */
-export type SaveData = Record<string, ParagraphSavePayload | MediaSavePayload>;
+export type SaveData = Record<
+  string,
+  ParagraphSavePayload | MediaSavePayload | MeshSavePayload
+>;
 
 /** POST body for `main:save-entry`. */
 export interface SaveEntryRequest {

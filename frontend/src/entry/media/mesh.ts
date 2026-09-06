@@ -3,12 +3,18 @@ import {
   MESH_CANVAS_REVEAL_STYLE,
   MESH_FRAME_JPEG_QUALITY,
 } from "../../display-config";
+import type { MeshSavePayload } from "../../request-interface";
+import type { OrbitCamera } from "../../rendering-3d/create-camera-matrix";
 import { parseGlb } from "../../rendering-3d/glb-parsing";
 import { computeNormals } from "../../rendering-3d/vertex-operations";
 import { startRenderingLoop } from "../../rendering-3d/rendering-loop";
+import { dateSlug } from "../../runtime/backend-variables";
 import { enableSaveButton } from "../save";
 
 export { computeNormals };
+
+/** Live orbit camera for each preview canvas. */
+const cameras = new WeakMap<HTMLCanvasElement, OrbitCamera>();
 
 /**
  * Size the canvas and return a WebGL context.
@@ -89,6 +95,7 @@ function renderMeshBuffer(
   const preview = startRenderingLoop(gl, canvas, mesh, onComplete, () => {
     MediaEntry.syncCanvasSize(canvas);
   });
+  setMeshCamera(canvas, preview.camera);
   MediaEntry.watchCanvasSize(canvas, preview.notifyResize);
 }
 
@@ -136,6 +143,37 @@ export async function currentFrameAsJpegBase64(
   canvas: HTMLCanvasElement,
 ): Promise<string | null> {
   return canvasAsJpegBase64(canvas);
+}
+
+/** Remember the orbit camera for a preview canvas. */
+export function setMeshCamera(
+  canvas: HTMLCanvasElement,
+  camera: OrbitCamera,
+): void {
+  cameras.set(canvas, camera);
+}
+
+/** Build the save payload for a mesh row, or null when the frame or camera is missing. */
+export async function serializeMesh(
+  media: MediaEntry,
+): Promise<MeshSavePayload | null> {
+  if (media.canvas === null) {
+    console.error("Canvas element not found for contentId:", media.index);
+    return null;
+  }
+  const camera = cameras.get(media.canvas);
+  if (camera === undefined) {
+    console.error("mesh: no camera for", media.index);
+    return null;
+  }
+  const frameImage = await currentFrameAsJpegBase64(media.canvas);
+  if (frameImage === null) return null;
+  return {
+    file_path: media.fileName(),
+    frame_image: frameImage,
+    camera,
+    entry: dateSlug(),
+  };
 }
 
 /** Hide 2D media and start a GLB preview on the canvas. */

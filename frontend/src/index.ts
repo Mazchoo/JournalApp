@@ -104,7 +104,9 @@ export {
 export { getDestinationSlug, makeMoveRequest, moveEntry } from "./entry/move";
 
 export type {
+  CameraSavePayload,
   MediaSavePayload,
+  MeshSavePayload,
   ParagraphSavePayload,
   SaveData,
 } from "./request-interface";

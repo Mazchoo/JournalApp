@@ -3,6 +3,7 @@ import {
   createMvpMatrix,
   createOrbitCamera,
   createProjectionMatrix,
+  type OrbitCamera,
 } from "./create-camera-matrix";
 import { bindCameraControls } from "./event-handling";
 import { createShaders } from "./create-shaders";
@@ -32,7 +33,7 @@ export function startRenderingLoop(
   mesh: MeshRenderData,
   onComplete?: () => void,
   onResize?: () => void,
-): { notifyResize: () => void } {
+): { notifyResize: () => void; camera: OrbitCamera } {
   const prepared: MeshRenderData = {
     ...mesh,
     positions: centerAndScalePositions(mesh.positions),
@@ -44,7 +45,7 @@ export function startRenderingLoop(
   const shaders = createShaders(gl, prepared, () => {
     onTextureReady();
   });
-  if (shaders === null) return { notifyResize: () => {} };
+  if (shaders === null) return { notifyResize: () => {}, camera };
   const { uMVP } = shaders;
 
   gl.enable(gl.DEPTH_TEST);
@@ -102,5 +103,5 @@ export function startRenderingLoop(
   onTextureReady = draw;
   bindCameraControls(canvas, camera, draw, notifyResize);
   requestAnimationFrame(draw);
-  return { notifyResize };
+  return { notifyResize, camera };
 }

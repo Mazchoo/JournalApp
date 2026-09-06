@@ -4,11 +4,17 @@ import {
   MESH_CANVAS_HEIGHT_PX,
   MESH_CANVAS_REVEAL_STYLE,
 } from "../display-config";
-import type { MediaSavePayload } from "../request-interface";
+import { serializeMesh } from "../entry/media/mesh";
+import type { MediaSavePayload, MeshSavePayload } from "../request-interface";
 import type { MediaContentThumbnail } from "../response-interface";
 import { dateSlug } from "../runtime/backend-variables";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
-import { type IContent, contentTypeFromElement, hasMediaSrc } from "./content";
+import {
+  type IContent,
+  contentTypeFromElement,
+  hasMediaSrc,
+  hasMeshPreview,
+} from "./content";
 import { ContentRow } from "./content-row";
 
 /** Drop the previous layout observer when the same canvas starts a new preview. */
@@ -26,7 +32,7 @@ export class MediaEntry extends ContentRow implements IContent {
   readonly uploadLabel: HTMLElement | null;
   readonly allowSyn: HTMLElement | null;
   readonly imageArea: HTMLElement | null;
-  private derivedType: ContentType.Image | ContentType.Video =
+  private derivedType: ContentType.Image | ContentType.Video | ContentType.Mesh =
     ContentType.Image;
 
   constructor(index: string, row: HTMLElement) {
@@ -242,7 +248,7 @@ export class MediaEntry extends ContentRow implements IContent {
     media.insertMediaButton.click();
   }
 
-  get contentType(): ContentType.Image | ContentType.Video {
+  get contentType(): ContentType.Image | ContentType.Video | ContentType.Mesh {
     return this.derivedType;
   }
 
@@ -250,7 +256,12 @@ export class MediaEntry extends ContentRow implements IContent {
     return `${this.contentType}${this.id}`;
   }
 
-  serialize(): MediaSavePayload {
+  serialize():
+    | MediaSavePayload
+    | Promise<MeshSavePayload | null> {
+    if (this.contentType === ContentType.Mesh) {
+      return serializeMesh(this);
+    }
     return {
       file_path: this.fileName(),
       allow_ai_synthesis: this.isSynthesisActive() ? 1 : 0,
@@ -260,12 +271,15 @@ export class MediaEntry extends ContentRow implements IContent {
 
   /** Resolve the media row that owns a save-content element with a source. */
   static fromSaveElement(element: HTMLElement): MediaEntry | null {
-    if (!hasMediaSrc(element)) return null;
     const contentType = contentTypeFromElement(element);
-    if (
-      contentType !== ContentType.Image &&
-      contentType !== ContentType.Video
+    if (contentType === ContentType.Mesh) {
+      if (!hasMeshPreview(element)) return null;
+    } else if (
+      contentType === ContentType.Image ||
+      contentType === ContentType.Video
     ) {
+      if (!hasMediaSrc(element)) return null;
+    } else {
       return null;
     }
     const row = element.closest(".media-entry") as HTMLElement | null;

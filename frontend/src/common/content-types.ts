@@ -3,4 +3,5 @@ export enum ContentType {
   Image = "image",
   Video = "video",
   Paragraph = "paragraph",
+  Mesh = "mesh",
 }

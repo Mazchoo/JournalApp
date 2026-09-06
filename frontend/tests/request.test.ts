@@ -18,6 +18,22 @@ describe("encodeNestedForm", () => {
     expect(params.get("content[paragraph0][allow_ai_synthesis]")).toBe("1");
   });
 
+  it("encodes arrays as numbered bracket keys", () => {
+    const body = encodeNestedForm({
+      content: {
+        mesh0: {
+          camera: { right: [1, 0, 0], radius: 3 },
+        },
+      },
+    });
+    const params = new URLSearchParams(body);
+
+    expect(params.get("content[mesh0][camera][right][0]")).toBe("1");
+    expect(params.get("content[mesh0][camera][right][1]")).toBe("0");
+    expect(params.get("content[mesh0][camera][right][2]")).toBe("0");
+    expect(params.get("content[mesh0][camera][radius]")).toBe("3");
+  });
+
   it("omits nullish values and empty objects", () => {
     const body = encodeNestedForm({
       name: "x",

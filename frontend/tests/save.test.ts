@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MediaEntry } from "../src/components/media-entry";
+import { setMeshCamera } from "../src/entry/media/mesh";
 import {
   disableSaveButton,
   enableSaveButton,
@@ -7,7 +9,9 @@ import {
   getSaveData,
   saveEntryToDatabase,
   saveToDatabase,
+  type CameraSavePayload,
   type MediaSavePayload,
+  type MeshSavePayload,
   type ParagraphSavePayload,
 } from "../src/entry/save";
 import { stubAjax, type AjaxStub } from "./helpers/ajax";
@@ -45,16 +49,16 @@ beforeEach(() => {
 });
 
 describe("generateSaveEntry", () => {
-  it("collects paragraph text, height and the synthesis flag", () => {
+  it("collects paragraph text, height and the synthesis flag", async () => {
     seedEditor(tinymce, "paragraph0", {
       content: "<p>A day in the life</p>",
       containerHeight: 298,
       synthesisEnabled: false,
     });
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(saveData["paragraph0"]).toEqual<ParagraphSavePayload>({
       text: "<p>A day in the life</p>",
@@ -64,27 +68,27 @@ describe("generateSaveEntry", () => {
     });
   });
 
-  it("defaults the paragraph synthesis flag to enabled", () => {
+  it("defaults the paragraph synthesis flag to enabled", async () => {
     seedEditor(tinymce, "paragraph0", { content: "text" });
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(
       (saveData["paragraph0"] as ParagraphSavePayload).allow_ai_synthesis,
     ).toBe(1);
   });
 
-  it("collects images that have a source, keyed by the image id", () => {
+  it("collects images that have a source, keyed by the image id", async () => {
     seedEditor(tinymce, "paragraph0");
     setSrc("image1", "data:image/png;base64,AAA");
     setUploadLabel("1", "sunrise.png");
     document.getElementById("allow-syn1")!.classList.add("btn-primary");
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(saveData["image1"]).toEqual<MediaSavePayload>({
       file_path: "sunrise.png",
@@ -93,38 +97,38 @@ describe("generateSaveEntry", () => {
     });
   });
 
-  it("skips media elements that have no source", () => {
+  it("skips media elements that have no source", async () => {
     seedEditor(tinymce, "paragraph0");
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(Object.keys(saveData)).toEqual(["paragraph0"]);
   });
 
-  it("reads the synthesis flag from the Generate button state", () => {
+  it("reads the synthesis flag from the Generate button state", async () => {
     seedEditor(tinymce, "paragraph0");
     setSrc("image1", "data:image/png;base64,AAA");
     setUploadLabel("1", "sunrise.png");
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect((saveData["image1"] as MediaSavePayload).allow_ai_synthesis).toBe(0);
   });
 
-  it("keys video content under a video id, whichever element carries it", () => {
+  it("keys video content under a video id, whichever element carries it", async () => {
     renderDayPage({ rows: ["video"] });
     tinymce = installFakeTinyMCE();
     setSrc("image0", "data:video/mp4;base64,AAA");
     setUploadLabel("0", "holiday.mp4");
     document.getElementById("allow-syn0")!.classList.add("btn-primary");
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(saveData["video0"]).toEqual<MediaSavePayload>({
       file_path: "holiday.mp4",
@@ -134,14 +138,85 @@ describe("generateSaveEntry", () => {
     expect(saveData["image0"]).toBeUndefined();
   });
 
-  it("returns undefined when there is no content to walk", () => {
-    expect(generateSaveEntry(null)).toBeUndefined();
+  it("keys mesh content under a mesh id with the frame JPEG and camera", async () => {
+    seedEditor(tinymce, "paragraph0");
+    const camera: CameraSavePayload = {
+      right: [0, 1, 0],
+      up: [0, 0, 1],
+      forward: [-1, 0, 0],
+      radius: 5,
+      panX: 1.25,
+      panY: -0.5,
+    };
+    const media = MediaEntry.fromIndex("1")!;
+    MediaEntry.showCanvas(media);
+    setMeshCamera(media.canvas!, camera);
+    setUploadLabel("1", "scan.glb");
+    vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
+      cb(new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }));
+    });
+
+    const saveData = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+
+    expect(saveData["mesh1"]).toEqual<MeshSavePayload>({
+      file_path: "scan.glb",
+      frame_image: expect.stringMatching(/^data:image\/jpeg;base64,/) as string,
+      camera,
+      entry: "2024-03-15",
+    });
+    expect(saveData["image1"]).toBeUndefined();
   });
 
-  it("returns an empty payload for an empty selection", () => {
+  it("skips a revealed mesh that has no camera", async () => {
+    seedEditor(tinymce, "paragraph0");
+    const media = MediaEntry.fromIndex("1")!;
+    MediaEntry.showCanvas(media);
+    setUploadLabel("1", "scan.glb");
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const saveData = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+
+    expect(saveData["mesh1"]).toBeUndefined();
+    expect(consoleError).toHaveBeenCalledWith("mesh: no camera for", "1");
+    consoleError.mockRestore();
+  });
+
+  it("skips a mesh when the canvas cannot encode a JPEG", async () => {
+    seedEditor(tinymce, "paragraph0");
+    const media = MediaEntry.fromIndex("1")!;
+    MediaEntry.showCanvas(media);
+    setMeshCamera(media.canvas!, {
+      right: [1, 0, 0],
+      up: [0, 1, 0],
+      forward: [0, 0, -1],
+      radius: 3,
+      panX: 0,
+      panY: 0,
+    });
+    setUploadLabel("1", "scan.glb");
+    vi.spyOn(media.canvas!, "toBlob").mockImplementation((cb) => {
+      cb(null);
+    });
+
+    const saveData = (await generateSaveEntry(
+      document.querySelectorAll(".save-content"),
+    ))!;
+
+    expect(saveData["mesh1"]).toBeUndefined();
+  });
+
+  it("returns undefined when there is no content to walk", async () => {
+    expect(await generateSaveEntry(null)).toBeUndefined();
+  });
+
+  it("returns an empty payload for an empty selection", async () => {
     renderDayPage({ rows: [] });
 
-    expect(getSaveData()).toEqual({});
+    expect(await getSaveData()).toEqual({});
   });
 });
 
@@ -240,7 +315,7 @@ describe("saveToDatabase", () => {
     expect(ajax.calls).toHaveLength(0);
   });
 
-  it("disables the button, shows the spinner, scrolls down and posts", () => {
+  it("disables the button, shows the spinner, scrolls down and posts", async () => {
     const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     enableSaveButton();
 
@@ -253,7 +328,7 @@ describe("saveToDatabase", () => {
       document.getElementById("spinner-save")!.classList.contains("invisible"),
     ).toBe(false);
     expect(scrollTo).toHaveBeenCalledWith(0, document.body.scrollHeight);
-    expect(ajax.calls).toHaveLength(1);
+    await vi.waitFor(() => expect(ajax.calls).toHaveLength(1));
     scrollTo.mockRestore();
   });
 });

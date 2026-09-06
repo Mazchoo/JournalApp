@@ -15,7 +15,9 @@ import { enableDeleteButton } from "./delete";
 import { zoomToMedia } from "./media/media";
 
 export type {
+  CameraSavePayload,
   MediaSavePayload,
+  MeshSavePayload,
   ParagraphSavePayload,
   SaveData,
 } from "../request-interface";
@@ -23,9 +25,9 @@ export type {
 /** Port of static/JS/entry.save.js. */
 
 /** Build the save payload from the current content elements. */
-export function generateSaveEntry(
+export async function generateSaveEntry(
   saveContent: ArrayLike<Element> | null,
-): SaveData | undefined {
+): Promise<SaveData | undefined> {
   if (saveContent === null) {
     console.error("generateSaveEntry: save content is missing");
     return undefined;
@@ -38,7 +40,9 @@ export function generateSaveEntry(
       ParagraphEntry.fromSaveElement(element) ??
       MediaEntry.fromSaveElement(element);
     if (entry === null) continue;
-    saveData[entry.saveId()] = entry.serialize();
+    const payload = await entry.serialize();
+    if (payload === null) continue;
+    saveData[entry.saveId()] = payload;
   }
 
   return saveData;
@@ -78,7 +82,7 @@ export function saveEntryToDatabase(
 }
 
 /** Collect the save payload from every `.save-content` element. */
-export function getSaveData(): SaveData | undefined {
+export function getSaveData(): Promise<SaveData | undefined> {
   return generateSaveEntry(editArea.saveContent());
 }
 
@@ -90,9 +94,10 @@ export function saveToDatabase(): void {
 
   disableSaveButton();
   saveSpinner.show();
-  const saveData = getSaveData();
   scrollToBottom();
-  saveEntryToDatabase(saveData);
+  void getSaveData().then((saveData) => {
+    saveEntryToDatabase(saveData);
+  });
 }
 
 /** Enable the save button and nav link. */

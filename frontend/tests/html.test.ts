@@ -327,7 +327,7 @@ describe("raw-html-editor source editing", () => {
 });
 
 describe("serialize raw-html-editor", () => {
-  it("reads the file contents, host height and Generate state", () => {
+  it("reads the file contents, host height and Generate state", async () => {
     const paragraph = ParagraphEntry.fromIndex("0")!;
     HtmlEntry.replace(paragraph, RAW_HTML, false, () => {});
     Object.defineProperty(
@@ -339,9 +339,9 @@ describe("serialize raw-html-editor", () => {
       },
     );
 
-    const saveData = generateSaveEntry(
+    const saveData = (await generateSaveEntry(
       document.querySelectorAll(".save-content"),
-    )!;
+    ))!;
 
     expect(saveData["paragraph0"]).toEqual({
       text: RAW_HTML,
