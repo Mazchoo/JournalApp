@@ -40,15 +40,15 @@ describe("orbitByPixels", () => {
 });
 
 describe("panCamera", () => {
-  it("pans right and left on D and A", () => {
+  it("pans the preview right on D and left on A", () => {
     const camera = createOrbitCamera();
 
     expect(panCamera(camera, "d")).toBe(true);
-    expect(camera.panX).toBeGreaterThan(0);
+    expect(camera.panX).toBeLessThan(0);
     const right = camera.panX;
 
     expect(panCamera(camera, "a")).toBe(true);
-    expect(camera.panX).toBeLessThan(right);
+    expect(camera.panX).toBeGreaterThan(right);
   });
 
   it("pans up and down on W and S", () => {

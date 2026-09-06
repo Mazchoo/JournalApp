@@ -38,8 +38,9 @@ export function orbitByPixels(
 }
 
 /**
- * Pan the camera in its image plane from a WASD key.
+ * Pan the preview in its image plane from a WASD key.
  *
+ * A/D shift the mesh left/right on screen; W/S shift it up/down.
  * Returns false when the key is not a pan binding.
  */
 export function panCamera(camera: OrbitCamera, key: string): boolean {
@@ -52,10 +53,10 @@ export function panCamera(camera: OrbitCamera, key: string): boolean {
       camera.panY -= step;
       return true;
     case "a":
-      camera.panX -= step;
+      camera.panX += step;
       return true;
     case "d":
-      camera.panX += step;
+      camera.panX -= step;
       return true;
     default:
       return false;
