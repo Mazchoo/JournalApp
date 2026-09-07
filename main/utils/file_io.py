@@ -24,11 +24,7 @@ def remove_empty_parent_folders(folder: Path):
 
 def path_has_image_extension(path: Path) -> bool:
     """Image path is a recognised image extention"""
-    for tag in ImageConstants.reserved_image_tags:
-        ending_position = path.stem.rfind(tag)
-        if ending_position >= 0 and ending_position == len(path.stem) - len(tag):
-            return True
-    return False
+    return any(path.stem.endswith(tag) for tag in ImageConstants.reserved_image_tags)
 
 
 def make_parent_folders(target_folder: Path):
