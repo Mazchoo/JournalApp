@@ -3,20 +3,20 @@
  * Call `bindPageComponents()` once the document (or a test fixture) is in place.
  */
 import { initializeCarousel } from "./carousel";
+import { DateModalFields } from "./modals/date-modal-fields";
+import { HtmlModalFields } from "./modals/html-modal-fields";
+import { ImagePreview } from "./modals/image-preview";
+import { MeshPreview } from "./modals/mesh-preview";
+import { VideoPreview } from "./modals/video-preview";
 import {
-  DateModalFields,
-  HtmlModalFields,
   DeleteButton,
   EditArea,
-  ImagePreview,
-  MeshPreview,
   MoveButton,
   NewMediaButton,
   NewParagraphButton,
   SaveButton,
   SaveNavButton,
   SaveSpinner,
-  VideoPreview,
 } from "./static-elements";
 import { forgetMeshView } from "../entry/media/mesh";
 import { MediaEntry } from "./media-entry";
