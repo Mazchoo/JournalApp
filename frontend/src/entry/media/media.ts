@@ -163,6 +163,7 @@ export function zoomToMedia(event: Event): void {
     const aspectRatio = media.previewAspectRatio();
     meshModal.show();
     meshModalPreview.fitToAspect(aspectRatio);
+    meshModalPreview.focus();
     getFullMesh(fileName, canvas, media.index, aspectRatio);
     return;
   }

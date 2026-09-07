@@ -115,7 +115,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
     </div>
     <div class="modal" id="mesh-modal" tabindex="-1">
         <div class="modal-dialog"><div class="modal-content"><div class="modal-body">
-            <canvas id="mesh-preview"></canvas>
+            <canvas id="mesh-preview" tabindex="0"></canvas>
         </div></div></div>
     </div>
 

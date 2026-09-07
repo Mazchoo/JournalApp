@@ -15,6 +15,14 @@ export class MeshPreview extends PageElement<HTMLCanvasElement> {
     return this.resolve();
   }
 
+  /** Focus the canvas so keyboard camera controls work immediately. */
+  focus(): void {
+    const canvas = this.resolve();
+    if (canvas === null) return;
+    canvas.tabIndex = 0;
+    canvas.focus();
+  }
+
   /** Size the modal canvas to the given aspect ratio. */
   fitToAspect(aspectRatio: number): void {
     const canvas = this.resolve();

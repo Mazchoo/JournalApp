@@ -580,6 +580,9 @@ describe("zoomToMedia", () => {
     expect(
       document.getElementById("mesh-modal")!.classList.contains("show"),
     ).toBe(true);
+    expect(document.activeElement).toBe(
+      document.getElementById("mesh-preview"),
+    );
 
     await ajax.succeed(new Blob(["glb-bytes"], { type: "model/gltf-binary" }));
     await vi.waitFor(() => {
