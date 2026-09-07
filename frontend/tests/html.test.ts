@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { HTML_MODAL_SOURCE_MIN_HEIGHT_PX } from "../src/display-config";
+import {
+  HTML_MODAL_DIALOG_STYLE,
+  HTML_MODAL_SOURCE_MIN_HEIGHT_PX,
+} from "../src/display-config";
 import {
   RAW_HTML_EDITOR_TOOLTIP,
   SYNTHESIS_BUTTON_TOOLTIP,
@@ -284,6 +287,11 @@ describe("raw-html-editor source editing", () => {
     expect(modal.classList.contains("show")).toBe(true);
     expect(source.value).toBe(RAW_HTML);
     expect(source.style.minHeight).toBe(`${HTML_MODAL_SOURCE_MIN_HEIGHT_PX}px`);
+    const dialog = modal.querySelector(".modal-dialog") as HTMLElement;
+    expect(dialog.style.width).toBe(HTML_MODAL_DIALOG_STYLE.width);
+    expect(dialog.style.maxWidth).toBe(HTML_MODAL_DIALOG_STYLE.maxWidth);
+    expect(dialog.style.height).toBe(HTML_MODAL_DIALOG_STYLE.height);
+    expect(dialog.style.maxHeight).toBe(HTML_MODAL_DIALOG_STYLE.maxHeight);
     expect(
       rawHtmlEditor()
         .querySelector<HTMLIFrameElement>(".raw-html-frame")!

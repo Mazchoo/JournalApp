@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { HTML_MODAL_DIALOG_STYLE } from "../src/display-config";
 import {
   bindModalBehaviors,
   hideModal,
@@ -230,6 +231,11 @@ describe("showHtmlCallbackModal", () => {
     expect(
       document.getElementById("html-modal")!.classList.contains("show"),
     ).toBe(true);
+    const dialog = document.querySelector(
+      "#html-modal .modal-dialog",
+    ) as HTMLElement;
+    expect(dialog.style.width).toBe(HTML_MODAL_DIALOG_STYLE.width);
+    expect(dialog.style.height).toBe(HTML_MODAL_DIALOG_STYLE.height);
 
     hideModal("html-modal");
 

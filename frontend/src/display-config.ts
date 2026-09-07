@@ -9,6 +9,20 @@ export const AUTO_CYCLE_MS = 5000;
 /** TinyMCE editor height when none is stored on the paragraph. */
 export const PARAGRAPH_EDITOR_HEIGHT_PX = 220;
 
+/** Viewport width fraction occupied by the raw-HTML edit modal. */
+export const HTML_MODAL_VIEWPORT_WIDTH_FRACTION = 0.92;
+
+/** Viewport height fraction occupied by the raw-HTML edit modal. */
+export const HTML_MODAL_VIEWPORT_HEIGHT_FRACTION = 0.9;
+
+/** Dialog styles so the raw-HTML editor fills most of the screen. */
+export const HTML_MODAL_DIALOG_STYLE = {
+  width: `${HTML_MODAL_VIEWPORT_WIDTH_FRACTION * 100}vw`,
+  maxWidth: `${HTML_MODAL_VIEWPORT_WIDTH_FRACTION * 100}vw`,
+  height: `${HTML_MODAL_VIEWPORT_HEIGHT_FRACTION * 100}vh`,
+  maxHeight: `${HTML_MODAL_VIEWPORT_HEIGHT_FRACTION * 100}vh`,
+} as const;
+
 /** Minimum height of the raw-HTML source textarea in the edit modal. */
 export const HTML_MODAL_SOURCE_MIN_HEIGHT_PX = 360;
 
