@@ -1,0 +1,28 @@
+"""Tests for media path helpers in file_io."""
+
+from pathlib import Path
+
+from main.utils.file_io import is_media_content_file, path_has_image_reserved_tag
+
+
+def test_is_media_content_file_accepts_image_video_and_mesh():
+    """Image, video, and mesh extensions are media content."""
+    assert is_media_content_file(Path("photo.jpg"))
+    assert is_media_content_file(Path("photo.PNG"))
+    assert is_media_content_file(Path("clip.mp4"))
+    assert is_media_content_file(Path("scan.glb"))
+
+
+def test_is_media_content_file_rejects_other_extensions():
+    """Non-media files are not treated as content."""
+    assert not is_media_content_file(Path("notes.txt"))
+    assert not is_media_content_file(Path("tags.json"))
+
+
+def test_path_has_image_reserved_tag_requires_image_extension():
+    """Reserved tags only apply to files that are images."""
+    assert path_has_image_reserved_tag(Path("photo_icon.jpg"))
+    assert path_has_image_reserved_tag(Path("clip_resized.jpeg"))
+    assert not path_has_image_reserved_tag(Path("scan_icon.glb"))
+    assert not path_has_image_reserved_tag(Path("clip_resized.mp4"))
+    assert not path_has_image_reserved_tag(Path("photo.jpg"))

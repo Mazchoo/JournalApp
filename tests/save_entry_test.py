@@ -312,5 +312,63 @@ def test_save_entry_mesh_missing_glb_returns_error(tmp_path, monkeypatch):
     assert "error" in data
 
 
+def _write_jpeg(path, color=(10, 20, 30)):
+    """Write a small JPEG so ImageForm can build an icon."""
+    from PIL import Image
+
+    Image.new("RGB", (32, 32), color=color).save(path, format="JPEG")
+
+
+@pytest.mark.django_db
+def test_save_entry_moves_removed_media_back_to_entry_folder(tmp_path, monkeypatch):
+    """Media no longer in the form should return to the base entry folder."""
+    from main.content_generation.save_entry import update_or_generate_from_request
+
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    _write_jpeg(tmp_path / "keep.jpg", (255, 0, 0))
+    _write_jpeg(tmp_path / "drop.jpg", (0, 255, 0))
+
+    first = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "keep.jpg",
+                    "allow_ai_synthesis": 0,
+                },
+                "image2": {
+                    "entry": "2025-03-01",
+                    "file_path": "drop.jpg",
+                    "allow_ai_synthesis": 0,
+                },
+            },
+        }
+    )
+    assert "success" in json.loads(first.content)
+
+    dated = tmp_path / "2025" / "03" / "01"
+    assert (dated / "keep.jpg").exists()
+    assert (dated / "drop.jpg").exists()
+
+    second = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "keep.jpg",
+                    "allow_ai_synthesis": 0,
+                }
+            },
+        }
+    )
+    assert "success" in json.loads(second.content)
+
+    assert (dated / "keep.jpg").exists()
+    assert not (dated / "drop.jpg").exists()
+    assert (tmp_path / "drop.jpg").exists()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-x", "--verbose"])

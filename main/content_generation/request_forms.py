@@ -1,7 +1,7 @@
 """Forms for page requests, full content, and date moves"""
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from django.forms import Form, SlugField, CharField, IntegerField, ValidationError
 
@@ -151,6 +151,19 @@ class SaveEntryForm(Form):
     def __init__(self, *args, content: Optional[dict] = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.content: dict = content or {}
+
+    @property
+    def media_file_names(self) -> List[str]:
+        """File names of media content submitted with this entry."""
+        names: List[str] = []
+        for value in self.content.values():
+            if not isinstance(value, dict):
+                continue
+            for key in ("file_path", "image_path"):
+                raw = str(value.get(key) or "").strip()
+                if raw:
+                    names.append(Path(raw).name)
+        return names
 
     def clean(self) -> dict:
         """Ensure content is provided"""

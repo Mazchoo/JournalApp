@@ -15,6 +15,9 @@ def remove_empty_parent_folders(folder: Path):
     if not folder.is_dir():
         return
 
+    if listdir(str(folder)):
+        return
+
     rmdir(str(folder))
 
     parent_folder = folder.parent
@@ -22,9 +25,21 @@ def remove_empty_parent_folders(folder: Path):
         remove_empty_parent_folders(parent_folder)
 
 
-def path_has_image_extension(path: Path) -> bool:
-    """Image path is a recognised image extention"""
+def path_has_image_reserved_tag(path: Path) -> bool:
+    """True if path is an image whose stem ends with a reserved tag."""
+    if path.suffix.lower() not in ImageConstants.supported_extensions:
+        return False
     return any(path.stem.endswith(tag) for tag in ImageConstants.reserved_image_tags)
+
+
+def is_media_content_file(path: Path) -> bool:
+    """True if the file extension is a supported image, mesh, or video type."""
+    suffix = path.suffix.lower()
+    return (
+        suffix in ImageConstants.supported_extensions
+        or suffix in MeshConstants.supported_extensions
+        or suffix in VideoConstants.supported_extensions
+    )
 
 
 def make_parent_folders(target_folder: Path):

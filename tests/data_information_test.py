@@ -305,6 +305,30 @@ def test_save_entry_form_no_content():
     assert not form.is_valid()
 
 
+def test_save_entry_form_media_file_names():
+    """media_file_names extracts image, video, and mesh file names from content."""
+    from main.content_generation.request_forms import SaveEntryForm
+
+    form = SaveEntryForm(
+        {"name": "2025-02-12"},
+        content={
+            "paragraph1": {"text": "Hello", "height": "200"},
+            "image1": {"file_path": "sunrise.png", "entry": "2025-02-12"},
+            "video1": {"file_path": "holiday.mp4", "entry": "2025-02-12"},
+            "mesh1": {
+                "file_path": "\n                pikachu.glb\n",
+                "image_path": "2025/02/12/scan_resized.jpeg",
+            },
+        },
+    )
+    assert form.media_file_names == [
+        "sunrise.png",
+        "holiday.mp4",
+        "pikachu.glb",
+        "scan_resized.jpeg",
+    ]
+
+
 @pytest.mark.django_db
 def test_delete_entry_form_valid():
     """DeleteEntryForm should accept an existing entry slug."""

@@ -19,7 +19,7 @@ from main.models import (
 )
 from main.utils.image import move_image_to_save_path, create_image_icon
 from main.utils.file_io import (
-    path_has_image_extension,
+    path_has_image_reserved_tag,
     get_stored_media_path,
     get_base_entry_path,
     make_image_path_relative,
@@ -95,7 +95,7 @@ class ImageForm(ModelForm):
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
-        if path_has_image_extension(target_file_obj):
+        if path_has_image_reserved_tag(target_file_obj):
             message = f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}"
             raise forms.ValidationError(message)
 
