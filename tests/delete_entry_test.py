@@ -91,12 +91,23 @@ def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(
     mesh.write_bytes(b"glb")
     tag.write_bytes(b"tag")
     notes.write_text("keep")
+    icon_dir = tmp_path / "icons" / "2025" / "03"
+    icon_dir.mkdir(parents=True)
+    photo_icon = icon_dir / "photo_icon.jpg"
+    video_icon = icon_dir / "clip_icon.jpg"
+    mesh_icon = icon_dir / "scan_icon.jpg"
+    photo_icon.write_bytes(b"icon")
+    video_icon.write_bytes(b"icon")
+    mesh_icon.write_bytes(b"icon")
 
     move_files_out_of_folder([photo, video, mesh, tag, notes])
 
     assert (tmp_path / "photo.jpg").exists()
     assert (tmp_path / "clip.mp4").exists()
     assert (tmp_path / "scan.glb").exists()
+    assert not photo_icon.exists()
+    assert not video_icon.exists()
+    assert not mesh_icon.exists()
     assert not tag.exists()
     assert notes.exists()
     assert not (tmp_path / "notes.txt").exists()

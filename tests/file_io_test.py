@@ -2,7 +2,11 @@
 
 from pathlib import Path
 
-from main.utils.file_io import is_media_content_file, path_has_image_reserved_tag
+from main.utils.file_io import (
+    extract_date_from_folder,
+    is_media_content_file,
+    path_has_image_reserved_tag,
+)
 
 
 def test_is_media_content_file_accepts_image_video_and_mesh():
@@ -26,3 +30,9 @@ def test_path_has_image_reserved_tag_requires_image_extension():
     assert not path_has_image_reserved_tag(Path("scan_icon.glb"))
     assert not path_has_image_reserved_tag(Path("clip_resized.mp4"))
     assert not path_has_image_reserved_tag(Path("photo.jpg"))
+
+
+def test_extract_date_from_folder():
+    """Dated folder path yields day, month, year."""
+    folder = Path("/entries/2025/03/01")
+    assert extract_date_from_folder(folder) == ("01", "03", "2025")

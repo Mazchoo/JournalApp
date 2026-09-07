@@ -1,6 +1,6 @@
 """Helpers to move files between paths"""
 
-from typing import Union
+from typing import Tuple, Union
 from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
@@ -58,6 +58,14 @@ def get_base_entry_path(file_name: Union[str, Path]) -> str:
     return f"{ENTRY_FOLDER}/{file_name}"
 
 
+def extract_date_from_folder(folder: Path) -> Tuple[str, str, str]:
+    """Return day, month, year from a dated entry folder."""
+    day = folder.stem
+    month = folder.parent.stem
+    year = folder.parent.parent.stem
+    return day, month, year
+
+
 # ToDo - generate icon path on file creation
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
@@ -68,9 +76,15 @@ def get_icon_file_path(image_file_path: Path) -> Path:
         ".jpg" if image_file_path.suffix in (".mp4", ".glb") else image_file_path.suffix
     )
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
-    month = image_file_path.parent.parent.stem
-    year = image_file_path.parent.parent.parent.stem
+    _, month, year = extract_date_from_folder(image_file_path.parent)
     return Path(f"{ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
+
+
+def remove_icon_file(media_file_path: Path):
+    """Delete the calendar icon for a media file if it exists."""
+    icon_path = get_icon_file_path(media_file_path)
+    if icon_path.exists() and icon_path != MISSING_ICON_IMAGE:
+        icon_path.unlink()
 
 
 def get_stored_media_folder(date_pattern: str) -> str:

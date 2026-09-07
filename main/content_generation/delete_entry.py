@@ -16,6 +16,7 @@ from main.utils.file_io import (
     get_stored_media_folder,
     is_media_content_file,
     remove_empty_parent_folders,
+    remove_icon_file,
     path_has_image_reserved_tag,
 )
 
@@ -57,6 +58,7 @@ def move_files_out_of_folder(
         if path_has_image_reserved_tag(file):
             file.unlink()
         elif is_media_content_file(file):
+            remove_icon_file(file)
             destination_path = Path(get_base_entry_path(file.name))
             move(str(file), str(destination_path))
 
