@@ -45,7 +45,11 @@ from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
 class EntryForm(ModelForm):
-    """A dated journal entry - at most one entry per date"""
+    """A dated journal entry - at most one entry per date.
+
+    Creating or validating this form writes no files. ``save()`` only persists
+    the Entry row.
+    """
 
     class Meta:
         model = Entry
@@ -67,7 +71,19 @@ class EntryForm(ModelForm):
 
 
 class ImageForm(ModelForm):
-    """Image content that belongs to an entry form"""
+    """Image content that belongs to an entry form.
+
+    Construction writes no files. ``is_valid()`` runs ``clean_file_path``, which
+    may create dated folders, move the original, and lazily write derivatives:
+
+    - ``{year}/{month}/{day}/{filename}`` — original, moved from the unsorted
+      entry folder if it is not already in the date folder
+    - ``{year}/{month}/{day}/{stem}_resized{ext}`` — downsized preview, only if
+      the longest side is at least 1024px
+    - ``icons/{year}/{month}/{stem}_icon{ext}`` — square calendar icon, if missing
+
+    ``save()`` only persists the EntryImage row.
+    """
 
     class Meta:
         model = EntryImage
@@ -126,7 +142,18 @@ class ImageForm(ModelForm):
 
 
 class VideoForm(ModelForm):
-    """Form to create a video content for entry"""
+    """Form to create a video content for entry.
+
+    Construction writes no files. ``is_valid()`` runs ``clean_file_path``, which
+    may create dated folders, move the original, and lazily write derivatives:
+
+    - ``{year}/{month}/{day}/{filename}`` — original .mp4, moved from the unsorted
+      entry folder if it is not already in the date folder
+    - ``{year}/{month}/{day}/{stem}_resized.jpeg`` — frame collage preview, if missing
+    - ``icons/{year}/{month}/{stem}_icon.jpg`` — square calendar icon, if missing
+
+    ``save()`` only persists the EntryVideo row.
+    """
 
     class Meta:
         model = EntryVideo
@@ -183,7 +210,11 @@ class VideoForm(ModelForm):
 
 
 class CameraForm(ModelForm):
-    """Orbit camera stored with a mesh."""
+    """Orbit camera stored with a mesh.
+
+    Creating, validating, or saving this form writes no files. ``save()`` only
+    persists the Camera row.
+    """
 
     class Meta:
         model = Camera
@@ -233,7 +264,22 @@ class CameraForm(ModelForm):
 
 
 class MeshForm(ModelForm):
-    """Form to create a mesh content for entry"""
+    """Form to create a mesh content for entry.
+
+    Construction writes no files. ``is_valid()`` may create dated folders, move
+    the .glb, and write a preview plus icon:
+
+    - ``{year}/{month}/{day}/{filename}`` — original .glb, moved from the unsorted
+      entry folder if it is not already in the date folder
+    - ``{year}/{month}/{day}/{stem}_resized.jpeg`` — viewport snapshot; written
+      (and overwritten) when the request includes ``frame_image``
+    - ``icons/{year}/{month}/{stem}_icon.jpg`` — square calendar icon; replaced
+      when ``frame_image`` is present, otherwise created only if missing
+
+    If ``frame_image`` is omitted, an existing ``_resized`` preview is required
+    and is left unchanged. ``save()`` persists the Camera row then the EntryMesh
+    row; it writes no files.
+    """
 
     camera = forms.Field()  # needs to be intialized as camera object
     image_path = forms.CharField(required=False, max_length=256)  # lazily updated
@@ -327,7 +373,11 @@ class MeshForm(ModelForm):
 
 
 class ParagraphForm(ModelForm):
-    """Text content in journal entry"""
+    """Text content in journal entry.
+
+    Creating, validating, or saving this form writes no files. ``save()`` only
+    persists the EntryParagraph row.
+    """
 
     text = forms.CharField(
         widget=TinyMCE(attrs={"cols": 80, "rows": 30, "required": False})
@@ -368,7 +418,11 @@ class ParagraphForm(ModelForm):
 
 
 class DeleteEntryForm(forms.Form):
-    """Validate request to delete a journal entry"""
+    """Validate request to delete a journal entry.
+
+    Creating or validating this form writes or deletes no files. File removal
+    happens in the delete-entry handler after this form succeeds.
+    """
 
     entry = forms.SlugField(max_length=10)
 
@@ -384,7 +438,11 @@ class DeleteEntryForm(forms.Form):
 
 
 class ContentForm(ModelForm):
-    """Generic content that applies to all content types e.g. image, text, ect."""
+    """Generic content that applies to all content types e.g. image, text, ect.
+
+    Creating, validating, or saving this form writes no files. ``save()`` only
+    persists the Content row that points at an image, paragraph, video, or mesh.
+    """
 
     class Meta:
         model = Content
