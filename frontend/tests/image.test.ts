@@ -168,6 +168,35 @@ describe("initializeNewMedia", () => {
 
     expect(document.getElementById("edit-area")!.children).toHaveLength(0);
   });
+
+  it("requests the full image when a saved thumbnail is clicked", () => {
+    initializeNewMedia("0");
+    document.getElementById("upload-label0")!.innerHTML = "sunrise.png";
+
+    document
+      .querySelector(".image-area")!
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(ajax.last().url).toBe("/get-image/");
+  });
+
+  it("opens the local original in the modal as soon as a file is loaded", async () => {
+    initializeNewMedia("0");
+    readImageResource(fileNamed("sunrise.png", "binary", "image/png"), "0");
+    const src = await waitForSrc("image0");
+
+    document
+      .querySelector(".image-area")!
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(ajax.calls).toHaveLength(0);
+    expect(document.getElementById("image-preview")!.getAttribute("src")).toBe(
+      src,
+    );
+    expect(
+      document.getElementById("image-modal")!.classList.contains("show"),
+    ).toBe(true);
+  });
 });
 
 describe("insertNewMediaToPosition", () => {
@@ -465,6 +494,21 @@ describe("zoomToMedia", () => {
 
   afterEach(() => {
     delete (URL as unknown as { createObjectURL?: unknown }).createObjectURL;
+  });
+
+  it("shows a locally uploaded original in the modal without requesting the server", async () => {
+    readImageResource(fileNamed("sunrise.png", "binary", "image/png"), "0");
+    const src = await waitForSrc("image0");
+
+    clickImageArea();
+
+    expect(ajax.calls).toHaveLength(0);
+    expect(document.getElementById("image-preview")!.getAttribute("src")).toBe(
+      src,
+    );
+    expect(
+      document.getElementById("image-modal")!.classList.contains("show"),
+    ).toBe(true);
   });
 
   it("requests the full image and shows it in the image modal", async () => {

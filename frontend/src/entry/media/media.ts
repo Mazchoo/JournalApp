@@ -58,6 +58,7 @@ export function initializeNewMedia(lastestId: string): void {
   const media = MediaEntry.fromIndex(lastestId);
   if (media === null) return;
   media.bindHandlers({
+    onZoom: zoomToMedia,
     onUpload: showImageUpload,
     onDelete: deleteMedia,
     onInsertParagraph: insertNewParagraphToPosition,
@@ -169,7 +170,7 @@ export function zoomToMedia(event: Event): void {
   }
 
   if (media.isImage()) {
-    openFullImage(fileName, source);
+    openFullImage(media);
   } else if (media.isVideo()) {
     zoomToVideo(media, fileName, source);
   }

@@ -335,7 +335,7 @@ describe("saveEntryToDatabase", () => {
     expect(ajax.calls).toHaveLength(0);
   });
 
-  it("reports success, enables deleting and rearms the image zoom", async () => {
+  it("reports success, enables deleting and hides the spinner", async () => {
     saveEntryToDatabase({});
     await ajax.succeed({ success: "Saved 2 items" });
 

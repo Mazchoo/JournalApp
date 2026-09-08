@@ -1,5 +1,5 @@
 import { initializeServerRenderedContent } from "./entry/load";
-import { appendMediaToList, zoomToMedia } from "./entry/media/media";
+import { appendMediaToList } from "./entry/media/media";
 import { appendParagraphToList } from "./entry/paragraph/paragraph";
 import { deleteContent, enableDeleteButton } from "./entry/delete";
 import { moveEntry } from "./entry/move";
@@ -17,7 +17,7 @@ import {
   saveNavButton,
 } from "./components/globals";
 
-/** Bind the day-page toolbar and image-zoom handlers. */
+/** Bind the day-page toolbar. */
 export function bindDayPageHandlers(): void {
   newParagraphButton.onClick(appendParagraphToList);
   newMediaButton.onClick(appendMediaToList);
@@ -28,8 +28,6 @@ export function bindDayPageHandlers(): void {
     saveToDatabase();
   });
   moveButton.onClick(moveEntry);
-
-  editArea.onImageAreaClick(zoomToMedia);
 
   if (entryExists()) enableDeleteButton();
 }

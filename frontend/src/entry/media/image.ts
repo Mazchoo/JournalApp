@@ -14,19 +14,38 @@ export function readImageResource(inputFile: File, contentId: string): void {
 
   reader.onload = (e) => {
     MediaEntry.hideVideo(media);
-    MediaEntry.setSrc(media, e.target!.result as string);
+    MediaEntry.setSrc(media, e.target!.result as string, true);
     enableSaveButton();
   };
   reader.readAsDataURL(inputFile);
 }
 
-/** Fetch the full-size image and show it in the image modal. */
-export function openFullImage(fileName: string, source: string | null): void {
+/** Show `src` in the existing full-image modal. */
+function showImageInModal(src: string): void {
+  imagePreview.setSrc(src);
+  imageModal.show();
+}
+
+/**
+ * Show the full-size image in the image modal.
+ * Locally uploaded originals are already complete; saved images are fetched.
+ */
+export function openFullImage(media: MediaEntry): void {
+  const source = media.src();
+  if (media.isLocalFull()) {
+    if (source === null || source === "") {
+      console.error(`openFullImage: #image${media.index} has no source`);
+      return;
+    }
+    showImageInModal(source);
+    return;
+  }
+
   let imageSource = source;
 
   requestFullImage(
     {
-      file: fileName,
+      file: media.fileNameHtml(),
       name: dateSlug(),
     },
     {
@@ -39,8 +58,7 @@ export function openFullImage(fileName: string, source: string | null): void {
         console.log(`Unknown error : ${errorThrown}`);
       },
       complete: () => {
-        imagePreview.setSrc(imageSource!);
-        imageModal.show();
+        showImageInModal(imageSource!);
       },
     },
   );

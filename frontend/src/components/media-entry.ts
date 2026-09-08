@@ -116,13 +116,21 @@ export class MediaEntry extends ContentRow implements IContent {
     element.style.height = "0px";
   }
 
-  /** Write a data URL (or remote src) onto the `<img>`. */
-  static setSrc(media: MediaEntry, src: string): void {
+  /**
+   * Write a data URL (or remote src) onto the `<img>`.
+   * `localFull` marks a just-uploaded original so zoom can skip the server.
+   */
+  static setSrc(media: MediaEntry, src: string, localFull = false): void {
     if (media.image === null) {
       console.error(`MediaEntry: #image${media.index} does not exist`);
       return;
     }
     media.image.setAttribute("src", src);
+    if (localFull) {
+      media.image.dataset.localFull = "1";
+    } else {
+      delete media.image.dataset.localFull;
+    }
   }
 
   /** Hide the video element of this row. */
@@ -330,6 +338,11 @@ export class MediaEntry extends ContentRow implements IContent {
     return this.image?.getAttribute("src") ?? null;
   }
 
+  /** Whether the `<img>` currently shows a locally loaded original file. */
+  isLocalFull(): boolean {
+    return this.image?.dataset.localFull === "1";
+  }
+
   /** Whether the thumbnail is tagged as a still image. */
   isImage(): boolean {
     return this.image?.classList.contains("content-image") ?? false;
@@ -427,6 +440,7 @@ export class MediaEntry extends ContentRow implements IContent {
 
   /** Bind edit, upload, and synthesis handlers on this row. */
   bindHandlers(handlers: MediaEntryHandlers): void {
+    this.listen(this.imageArea, "click", handlers.onZoom, ".image-area");
     this.listen(
       this.upload,
       "change",
@@ -486,6 +500,7 @@ export class MediaEntry extends ContentRow implements IContent {
 
 /** Click/change handlers wired onto a new media row. */
 export interface MediaEntryHandlers {
+  onZoom: EventListener;
   onUpload: EventListener;
   onDelete: EventListener;
   onInsertParagraph: EventListener;

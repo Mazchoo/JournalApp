@@ -12,7 +12,6 @@ import type { SaveData } from "../request-interface";
 import { dateSlug } from "../runtime/backend-variables";
 import { showMessageSimpleModal } from "../runtime/modals";
 import { enableDeleteButton } from "./delete";
-import { zoomToMedia } from "./media/media";
 import { clearDirtyMeshFrames } from "./media/mesh";
 
 export type {
@@ -78,7 +77,6 @@ export function saveEntryToDatabase(
         if ("error" in response)
           showMessageSimpleModal("Save Errors", response["error"]);
         enableDeleteButton();
-        editArea.onImageAreaClick(zoomToMedia);
       },
       error: (_jqXhr, _textStatus, errorThrown) => {
         showMessageSimpleModal("Unknown Error", errorThrown);
