@@ -43,7 +43,7 @@ def get_updated_date_mesh(mesh: EntryMesh, destination_slug: str) -> MeshForm:
     new_mesh_dict = model_to_dict(mesh)
     new_mesh_dict["entry"] = destination_slug
     new_mesh_dict["file_path"] = Path(new_mesh_dict["file_path"]).name
-    new_mesh_dict["image_path"] = Path(new_mesh_dict["image_path"]).name
+    new_mesh_dict["camera"] = mesh.camera.view()
 
     return MeshForm(new_mesh_dict)
 

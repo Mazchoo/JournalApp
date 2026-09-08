@@ -235,11 +235,12 @@ class CameraForm(ModelForm):
 class MeshForm(ModelForm):
     """Form to create a mesh content for entry"""
 
-    frame_image = forms.CharField(required=False)
+    camera = forms.Field()  # needs to be intialized as camera object
+    image_path = forms.CharField(required=False, max_length=256)  # lazily updated
 
     class Meta:
         model = EntryMesh
-        fields = ["entry", "file_path"]
+        fields = "__all__"
 
     def clean_file_path(self):
         """Ensure file path refers to a usable glb and move it into the date folder."""
@@ -259,45 +260,22 @@ class MeshForm(ModelForm):
         target_path = get_stored_media_path(file_name, entry.name)
         target_file_obj = Path(target_path)
 
+        if target_file_obj.suffix.lower() not in MeshConstants.supported_extensions:
+            message = f"Extension '{target_file_obj.suffix}' is not a recognised mesh extension"
+            raise forms.ValidationError(message)
+
         source_path = get_base_entry_path(file_name)
         source_file_obj = Path(source_path)
 
         if not target_file_obj.exists() and not source_file_obj.exists():
             raise forms.ValidationError(f"Cannot find folder '{source_path}'")
 
-        if target_file_obj.suffix.lower() not in MeshConstants.supported_extensions:
-            message = f"Extension '{target_file_obj.suffix}' is not a recognised mesh extension"
-            raise forms.ValidationError(message)
-
         move_media_to_save_path(target_path, file_name)
         return make_media_path_relative(target_path)
 
-    def clean_frame_image(self):
-        """Accept a data-URL or raw base64 JPEG when provided."""
-        frame_image = self.data.get("frame_image")
-        if frame_image is None:
-            return ""
-
-        if not isinstance(frame_image, str) or not frame_image:
-            raise forms.ValidationError("Frame image is not defined")
-
-        return frame_image
-
-    def _resolve_camera(self) -> Camera:
-        """Create or load the orbit camera from the nested save payload or a pk."""
-        camera_data = self.data.get("camera")
-        if camera_data is None:
-            raise forms.ValidationError("Camera is not defined")
-
-        if isinstance(camera_data, Camera):
-            return camera_data
-
-        if isinstance(camera_data, (int, str)) and str(camera_data).isdigit():
-            try:
-                return Camera.objects.get(pk=int(camera_data))
-            except Camera.DoesNotExist as exc:
-                raise forms.ValidationError("Camera not found") from exc
-
+    def clean_camera(self):
+        """Turn the orbit-camera dict into a Camera."""
+        camera_data = self.cleaned_data["camera"]
         if not isinstance(camera_data, dict):
             raise forms.ValidationError("Camera data is not a dict")
 
@@ -313,64 +291,39 @@ class MeshForm(ModelForm):
 
         return camera_form.save(commit=False)
 
-    def _resolve_image_path(self, cleaned_data: dict) -> str:
-        """Write a new preview when the request includes one; otherwise keep the stored image."""
-        frame_image = cleaned_data.get("frame_image")
+    def clean_image_path(self):
+        """Write a new preview from a data-URL, or keep the stored one."""
+        frame_image = self.data.get("frame_image") or ""
+        file_path = self.cleaned_data.get("file_path")
+        if not file_path:
+            return self.cleaned_data.get("image_path") or ""
+
+        full_mesh_path = Path(get_base_entry_path(file_path))
         if frame_image:
-            full_mesh_path = get_base_entry_path(cleaned_data["file_path"])
             try:
-                return save_mesh_frame_image(Path(full_mesh_path), frame_image)
+                return save_mesh_frame_image(full_mesh_path, frame_image)
             except (ValueError, OSError, BinasciiError) as exc:
                 raise forms.ValidationError("Frame image is not a valid image") from exc
 
-        mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))
-        preview_path = get_resized_filename(mesh_path)
+        preview_path = get_resized_filename(full_mesh_path)
         if preview_path.exists():
             lazy_create_image_icon(preview_path)
             return make_media_path_relative(str(preview_path))
 
-        image_name = self.data.get("image_path")
-        if not image_name:
-            raise forms.ValidationError("Frame image is not defined")
+        raise forms.ValidationError("Frame image is not defined")
 
-        image_name = Path(str(image_name)).name
-        entry = cleaned_data["entry"]
-        target_path = get_stored_media_path(image_name, entry.name)
-        source_path = get_base_entry_path(image_name)
-
-        if not Path(target_path).exists() and not Path(source_path).exists():
-            raise forms.ValidationError(
-                f"Cannot find '{image_name}' in Entries folder."
-            )
-
-        move_media_to_save_path(target_path, image_name)
-        lazy_create_image_icon(mesh_path)
-
-        return make_media_path_relative(target_path)
-
-    def clean(self):
-        """Attach camera and preview image after the glb has been moved."""
-        cleaned_data = super().clean()
-        if cleaned_data is None:
-            return {}
-        if self.errors:
-            return cleaned_data
-
-        cleaned_data["camera"] = self._resolve_camera()
-        cleaned_data["image_path"] = self._resolve_image_path(cleaned_data)
-        return cleaned_data
+    def _get_validation_exclusions(self):
+        """Skip FK checks on the unsaved camera until save() persists it."""
+        exclude = super()._get_validation_exclusions()
+        exclude.add("camera")
+        return exclude
 
     def save(self, commit=True):
         """Persist the camera first, then the mesh that points at it."""
-        instance = super().save(commit=False)
         camera = self.cleaned_data["camera"]
-        if camera.pk is None:
-            camera.save()
-        instance.camera = camera
-        instance.image_path = self.cleaned_data["image_path"]
-        if commit:
-            instance.save()
-        return instance
+        camera.save()
+        self.instance.camera = camera
+        return super().save(commit)
 
 
 class ParagraphForm(ModelForm):
