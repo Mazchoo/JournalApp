@@ -19,7 +19,6 @@ from main.models import (
     EntryVideo,
 )
 from main.utils.image import move_image_to_save_path, create_image_icon
-from main.utils.video import save_video_preview_and_icon
 from main.utils.file_io import (
     path_has_image_reserved_tag,
     get_stored_media_path,
