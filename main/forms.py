@@ -30,7 +30,6 @@ from main.utils.file_io import (
     get_base_entry_path,
     make_media_path_relative,
     move_media_to_save_path,
-    get_icon_file_path,
     get_resized_filename,
 )
 from main.utils.mesh import save_mesh_frame_image
@@ -165,6 +164,7 @@ class VideoForm(ModelForm):
         video_path = Path(target_path)
         lazy_create_video_icon(video_path)
         lazy_create_resized_collage(video_path)
+
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
