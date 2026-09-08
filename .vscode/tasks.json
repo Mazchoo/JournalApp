@@ -94,7 +94,8 @@
                 "reveal": "always",
                 "focus": true,
                 "panel": "shared"
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "Django: Make Migrations",
