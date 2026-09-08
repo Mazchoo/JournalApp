@@ -4,7 +4,7 @@ import base64
 from pathlib import Path
 from typing import Union
 
-from main.utils.file_io import get_resized_filename, make_image_path_relative
+from main.utils.file_io import get_resized_filename, make_media_path_relative
 from main.utils.image import create_image_icon, get_base64_from_image, write_image_icon
 
 
@@ -22,7 +22,7 @@ def save_mesh_frame_image(mesh_file_path: Path, frame_image: str) -> str:
     preview_path.parent.mkdir(parents=True, exist_ok=True)
     preview_path.write_bytes(decode_frame_image(frame_image))
     write_image_icon(mesh_file_path)
-    return make_image_path_relative(str(preview_path))
+    return make_media_path_relative(str(preview_path))
 
 
 def get_mesh_image_base64(file_path: Union[Path, str]) -> str:

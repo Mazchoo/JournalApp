@@ -66,7 +66,6 @@ def extract_date_from_folder(folder: Path) -> Tuple[str, str, str]:
     return day, month, year
 
 
-# ToDo - generate icon path on file creation
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
     if image_file_path == MISSING_ICON_IMAGE:
@@ -98,7 +97,7 @@ def get_stored_media_path(file_name: str, date_pattern: str) -> str:
     return f"{get_stored_media_folder(date_pattern)}/{file_name}"
 
 
-def make_image_path_relative(file_name: str) -> str:
+def make_media_path_relative(file_name: str) -> str:
     """Remove entry folder from the beginning of file path"""
     if file_name.startswith(ENTRY_FOLDER):
         file_name = file_name[len(ENTRY_FOLDER) :]

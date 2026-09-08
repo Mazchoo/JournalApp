@@ -22,7 +22,7 @@ from main.utils.file_io import (
     path_has_image_reserved_tag,
     get_stored_media_path,
     get_base_entry_path,
-    make_image_path_relative,
+    make_media_path_relative,
     move_media_to_save_path,
     get_icon_file_path,
     get_resized_filename,
@@ -104,7 +104,7 @@ class ImageForm(ModelForm):
         if not icon_path.exists():
             create_image_icon(target_file_obj)
 
-        return make_image_path_relative(target_path)
+        return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
         """Ensure file path refers to usuable file"""
@@ -157,7 +157,7 @@ class VideoForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_media_to_save_path(target_path, file_name)
-        return make_image_path_relative(target_path)
+        return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
         """Ensure file path refers to usuable file"""
@@ -174,52 +174,54 @@ class VideoForm(ModelForm):
         )
 
 
-def _orbit_vector_component(vector, index: int) -> float:
-    """Read one axis from an orbit-camera vector sent as a list or numbered dict."""
-    if vector is None:
-        raise forms.ValidationError("Camera vector is missing")
-
-    if isinstance(vector, dict):
-        raw = vector.get(str(index), vector.get(index))
-    else:
-        try:
-            raw = vector[index]
-        except (IndexError, TypeError, KeyError) as exc:
-            raise forms.ValidationError("Camera vector is invalid") from exc
-
-    if raw is None:
-        raise forms.ValidationError("Camera vector is incomplete")
-
-    try:
-        return float(raw)
-    except (TypeError, ValueError) as exc:
-        raise forms.ValidationError("Camera vector is not numeric") from exc
-
-
-def orbit_camera_to_model_fields(camera_data: dict) -> dict:
-    """Flatten frontend OrbitCamera fields into Camera model fields."""
-    return {
-        "right_x": _orbit_vector_component(camera_data.get("right"), 0),
-        "right_y": _orbit_vector_component(camera_data.get("right"), 1),
-        "right_z": _orbit_vector_component(camera_data.get("right"), 2),
-        "up_x": _orbit_vector_component(camera_data.get("up"), 0),
-        "up_y": _orbit_vector_component(camera_data.get("up"), 1),
-        "up_z": _orbit_vector_component(camera_data.get("up"), 2),
-        "forward_x": _orbit_vector_component(camera_data.get("forward"), 0),
-        "forward_y": _orbit_vector_component(camera_data.get("forward"), 1),
-        "forward_z": _orbit_vector_component(camera_data.get("forward"), 2),
-        "radius": float(camera_data["radius"]),
-        "pan_x": float(camera_data.get("panX", camera_data.get("pan_x"))),
-        "pan_y": float(camera_data.get("panY", camera_data.get("pan_y"))),
-    }
-
-
 class CameraForm(ModelForm):
     """Orbit camera stored with a mesh."""
 
     class Meta:
         model = Camera
         fields = "__all__"
+
+    @staticmethod
+    def _orbit_vector_component(vector, ind: int) -> float:
+        """Read one axis from an orbit-camera vector sent as a list or numbered dict."""
+        if vector is None:
+            raise forms.ValidationError("Camera vector is missing")
+
+        if isinstance(vector, dict):
+            raw = vector.get(str(ind), vector.get(ind))
+        else:
+            try:
+                raw = vector[ind]
+            except (IndexError, TypeError, KeyError) as exc:
+                raise forms.ValidationError("Camera vector is invalid") from exc
+
+        if raw is None:
+            raise forms.ValidationError("Camera vector is incomplete")
+
+        try:
+            return float(raw)
+        except (TypeError, ValueError) as exc:
+            raise forms.ValidationError("Camera vector is not numeric") from exc
+
+    @classmethod
+    def orbit_camera_to_model_fields(cls, camera_data: dict):
+        """Construct a CameraForm from frontend OrbitCamera fields."""
+        return cls(
+            {
+                "right_x": cls._orbit_vector_component(camera_data.get("right"), 0),
+                "right_y": cls._orbit_vector_component(camera_data.get("right"), 1),
+                "right_z": cls._orbit_vector_component(camera_data.get("right"), 2),
+                "up_x": cls._orbit_vector_component(camera_data.get("up"), 0),
+                "up_y": cls._orbit_vector_component(camera_data.get("up"), 1),
+                "up_z": cls._orbit_vector_component(camera_data.get("up"), 2),
+                "forward_x": cls._orbit_vector_component(camera_data.get("forward"), 0),
+                "forward_y": cls._orbit_vector_component(camera_data.get("forward"), 1),
+                "forward_z": cls._orbit_vector_component(camera_data.get("forward"), 2),
+                "radius": float(camera_data["radius"]),
+                "pan_x": float(camera_data.get("panX", camera_data.get("pan_x"))),
+                "pan_y": float(camera_data.get("panY", camera_data.get("pan_y"))),
+            }
+        )
 
 
 class MeshForm(ModelForm):
@@ -260,7 +262,7 @@ class MeshForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_media_to_save_path(target_path, file_name)
-        return make_image_path_relative(target_path)
+        return make_media_path_relative(target_path)
 
     def clean_frame_image(self):
         """Accept a data-URL or raw base64 JPEG when provided."""
@@ -289,10 +291,10 @@ class MeshForm(ModelForm):
                 raise forms.ValidationError("Camera not found") from exc
 
         if not isinstance(camera_data, dict):
-            raise forms.ValidationError("Camera is invalid")
+            raise forms.ValidationError("Camera data is not a dict")
 
         try:
-            camera_form = CameraForm(orbit_camera_to_model_fields(camera_data))
+            camera_form = CameraForm.orbit_camera_to_model_fields(camera_data)
         except (TypeError, ValueError, KeyError) as exc:
             raise forms.ValidationError("Camera is invalid") from exc
 
@@ -316,7 +318,7 @@ class MeshForm(ModelForm):
         if preview_path.exists():
             if not get_icon_file_path(mesh_path).exists():
                 create_image_icon(mesh_path)
-            return make_image_path_relative(str(preview_path))
+            return make_media_path_relative(str(preview_path))
 
         image_name = self.data.get("image_path")
         if not image_name:
@@ -336,7 +338,7 @@ class MeshForm(ModelForm):
         if not get_icon_file_path(mesh_path).exists():
             create_image_icon(mesh_path)
 
-        return make_image_path_relative(target_path)
+        return make_media_path_relative(target_path)
 
     def clean(self):
         """Attach camera and preview image after the glb has been moved."""
