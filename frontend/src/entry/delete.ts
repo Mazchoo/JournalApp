@@ -19,12 +19,11 @@ export function disableDeleteButton(): void {
 /** POST a delete request for the current date slug. */
 export function deleteFromDatabase(): void {
   requestDeleteEntry(
-    { name: dateSlug() },
+    { entry: dateSlug() },
     {
       success: (response) => {
-        // Forwards the whole response, matching the original entry.delete.js behaviour.
-        if ("error" in response)
-          showMessageSimpleModal("Delete Error", response);
+        if (response.error !== undefined)
+          showMessageSimpleModal("Delete Error", response.error);
         if ("success" in response) reloadPage();
       },
       error: (_jqXhr, _textStatus, errorThrown) => {

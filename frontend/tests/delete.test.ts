@@ -88,7 +88,7 @@ describe("deleteFromDatabase", () => {
     expect(settings.url).toBe("/delete-entry/");
     expect(settings.data).toEqual({
       csrfmiddlewaretoken: CSRF_TOKEN,
-      name: "2024-03-15",
+      entry: "2024-03-15",
     });
   });
 
@@ -103,9 +103,10 @@ describe("deleteFromDatabase", () => {
     deleteFromDatabase();
     await ajax.succeed({ error: "Entry is locked" });
 
-    expect(modals.showMessageSimpleModal).toHaveBeenCalledWith("Delete Error", {
-      error: "Entry is locked",
-    });
+    expect(modals.showMessageSimpleModal).toHaveBeenCalledWith(
+      "Delete Error",
+      "Entry is locked",
+    );
     expect(vi.mocked(reloadPage)).not.toHaveBeenCalled();
   });
 

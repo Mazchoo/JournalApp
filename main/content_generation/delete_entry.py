@@ -9,6 +9,7 @@ from django.http import JsonResponse
 
 from main.models import Entry, Content
 from main.forms import DeleteEntryForm
+from main.utils.errors import form_errors_message
 from main.content_generation.content_factory_models import ContentFactory
 from main.config import ImageConstants
 from main.utils.file_io import (
@@ -76,12 +77,12 @@ def move_files_from_entry(entry: Entry, ignore_file_names: Optional[List[str]] =
     remove_empty_parent_folders(image_folder)
 
 
-def delete_entry_and_content(post_data):
+def delete_entry_and_content(post_data: dict) -> JsonResponse:
     """Clear out content from entry's date folder and update database"""
-    form = DeleteEntryForm(post_data)
+    form = DeleteEntryForm({"entry": post_data.get("entry")})
 
     if not form.is_valid():
-        return JsonResponse({"error": form.errors})
+        return JsonResponse({"error": form_errors_message(form.errors)})
 
     entry = form.cleaned_data["entry"]
     delete_entry_content(entry)

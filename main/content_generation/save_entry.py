@@ -10,6 +10,7 @@ from django.forms.utils import ErrorDict, ErrorList
 
 from main.models import Entry
 from main.forms import EntryForm, ContentForm
+from main.utils.errors import form_errors_message
 from main.content_generation.delete_entry import (
     delete_entry_content,
     move_files_from_entry,
@@ -34,7 +35,9 @@ def generate_new_entry(name: str, errors: ErrorDict) -> Optional[Entry]:
         entry_form.save(commit=True)
         return entry_form.instance
 
-    errors["entry"] = ErrorList([f"Invalid entry {entry_form.errors}"])
+    errors["entry"] = ErrorList(
+        [f"Invalid entry {form_errors_message(entry_form.errors)}"]
+    )
     return None
 
 
@@ -117,11 +120,11 @@ def update_or_generate_from_request(post_data: dict):
 
     form = SaveEntryForm(post_data, content=post_data.get("content"))
     if not form.is_valid():
-        return JsonResponse({"error": form.errors})
+        return JsonResponse({"error": form_errors_message(form.errors)})
 
     entry = create_or_get_entry(form.cleaned_data["name"], errors)
     if entry is None:
-        return JsonResponse({"error": errors})
+        return JsonResponse({"error": form_errors_message(errors)})
 
     delete_entry_content(entry)
     move_files_from_entry(entry, ignore_file_names=form.media_file_names)
@@ -133,6 +136,6 @@ def update_or_generate_from_request(post_data: dict):
 
     # Expect user to resolve content (e.g. text region) on their current page else it is gone
     if errors:
-        return JsonResponse({"error": f"Invalid content {errors}"})
+        return JsonResponse({"error": f"Invalid content {form_errors_message(errors)}"})
 
     return JsonResponse({"success": "Entry Saved Successfully"})

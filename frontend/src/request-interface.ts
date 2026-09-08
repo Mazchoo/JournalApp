@@ -102,7 +102,7 @@ export interface SaveEntryRequest {
 
 /** POST body for `main:delete-entry`. */
 export interface DeleteEntryRequest {
-  name: string;
+  entry: string;
   csrfmiddlewaretoken: string;
 }
 

@@ -2,6 +2,7 @@
 
 from binascii import Error as BinasciiError
 from pathlib import Path
+from typing import Self
 
 from django import forms
 from django.forms import ModelForm
@@ -18,6 +19,7 @@ from main.models import (
     EntryVideo,
 )
 from main.utils.image import move_image_to_save_path, create_image_icon
+from main.utils.video import save_video_preview_and_icon
 from main.utils.file_io import (
     path_has_image_reserved_tag,
     get_stored_media_path,
@@ -29,6 +31,7 @@ from main.utils.file_io import (
 )
 from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
+from main.utils.errors import form_errors_message
 from main.config import (
     ALLOWED_CONTENT_TYPES,
     ImageConstants,
@@ -100,10 +103,6 @@ class ImageForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)
-        icon_path = get_icon_file_path(target_file_obj)
-        if not icon_path.exists():
-            create_image_icon(target_file_obj)
-
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
@@ -157,6 +156,7 @@ class VideoForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_media_to_save_path(target_path, file_name)
+        save_video_preview_and_icon(Path(target_path))
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
@@ -204,7 +204,7 @@ class CameraForm(ModelForm):
             raise forms.ValidationError("Camera vector is not numeric") from exc
 
     @classmethod
-    def orbit_camera_to_model_fields(cls, camera_data: dict):
+    def orbit_camera_to_model_fields(cls, camera_data: dict) -> Self:
         """Construct a CameraForm from frontend OrbitCamera fields."""
         return cls(
             {
@@ -299,7 +299,9 @@ class MeshForm(ModelForm):
             raise forms.ValidationError("Camera is invalid") from exc
 
         if not camera_form.is_valid():
-            raise forms.ValidationError(f"Invalid camera {camera_form.errors}")
+            raise forms.ValidationError(
+                f"Invalid camera {form_errors_message(camera_form.errors)}"
+            )
 
         return camera_form.save(commit=False)
 

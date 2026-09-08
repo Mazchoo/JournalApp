@@ -42,7 +42,8 @@ def test_delete_nonexistent_entry_returns_error():
     )
 
     data = json.loads(response.content)
-    assert "error" in data
+    assert isinstance(data["error"], str)
+    assert "Invalid entry 9999-01-01" in data["error"]
 
 
 @pytest.mark.django_db
