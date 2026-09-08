@@ -18,7 +18,12 @@ from main.models import (
     EntryParagraph,
     EntryVideo,
 )
-from main.utils.image import move_image_to_save_path, create_image_icon
+from main.utils.image import (
+    move_image_to_save_path,
+    lazy_create_image_icon,
+    lazy_create_base64_image_data,
+)
+from main.utils.video import lazy_create_video_icon, lazy_create_resized_collage
 from main.utils.file_io import (
     path_has_image_reserved_tag,
     get_stored_media_path,
@@ -102,6 +107,8 @@ class ImageForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)
+        lazy_create_base64_image_data(Path(target_path))
+        lazy_create_image_icon(Path(target_path))
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
@@ -155,6 +162,9 @@ class VideoForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_media_to_save_path(target_path, file_name)
+        video_path = Path(target_path)
+        lazy_create_video_icon(video_path)
+        lazy_create_resized_collage(video_path)
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
@@ -316,8 +326,7 @@ class MeshForm(ModelForm):
         mesh_path = Path(get_base_entry_path(cleaned_data["file_path"]))
         preview_path = get_resized_filename(mesh_path)
         if preview_path.exists():
-            if not get_icon_file_path(mesh_path).exists():
-                create_image_icon(mesh_path)
+            lazy_create_image_icon(preview_path)
             return make_media_path_relative(str(preview_path))
 
         image_name = self.data.get("image_path")
@@ -335,8 +344,7 @@ class MeshForm(ModelForm):
             )
 
         move_media_to_save_path(target_path, image_name)
-        if not get_icon_file_path(mesh_path).exists():
-            create_image_icon(mesh_path)
+        lazy_create_image_icon(mesh_path)
 
         return make_media_path_relative(target_path)
 

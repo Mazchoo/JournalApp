@@ -8,7 +8,7 @@ from typing import Tuple, Union
 from main.config import DateConstants
 from main.database_layer.fe_interfaces import YearEntryInformationContext
 from main.models import Entry, EntryImage, EntryMesh, EntryVideo
-from main.utils.image import get_base64_from_image, create_image_icon
+from main.utils.image import get_base64_from_image, lazy_create_image_icon
 from main.utils.file_io import get_base_entry_path, get_icon_file_path
 
 
@@ -71,7 +71,7 @@ def get_icon_for_each_month(year: int) -> dict[str, str]:
             selected_image = valid_images[random.randint(0, len(valid_images) - 1)]
             selected_icon_path = get_icon_file_path(selected_image)
 
-            if selected_icon_path.exists() or create_image_icon(selected_image):
+            if lazy_create_image_icon(selected_image):
                 output_dict[month_name] = get_base64_from_image(selected_icon_path)
 
     return output_dict

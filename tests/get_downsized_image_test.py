@@ -26,7 +26,7 @@ def test_get_downsized_image_success(tmp_path, monkeypatch):
     )
 
     with patch(
-        "main.content_generation.get_downsized_image.fetch_base64_image_data",
+        "main.content_generation.get_downsized_image.lazy_create_base64_image_data",
         return_value="data:image/jpeg;base64,mockdata",
     ):
         response = get_downsized_image_response({"image_id": str(img.pk)})

@@ -1,0 +1,26 @@
+---
+description: Never import inside a function; all imports belong at module top
+alwaysApply: true
+---
+
+# No inline imports
+
+Put every import at the top of the file. Never import inside a function, method,
+conditional, or loop.
+
+```python
+# ❌ BAD
+def test_save_entry_creates_mesh_content(tmp_path, monkeypatch):
+    from main.content_generation.save_entry import update_or_generate_from_request
+    response = update_or_generate_from_request({...})
+
+# ✅ GOOD
+from main.content_generation.save_entry import update_or_generate_from_request
+
+def test_save_entry_creates_mesh_content(tmp_path, monkeypatch):
+    response = update_or_generate_from_request({...})
+```
+
+Do not use a mid-function import to avoid circular imports, missing optional
+dependencies, or test collection side effects. Fix the module graph or import
+at the top instead.

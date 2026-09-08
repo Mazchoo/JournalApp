@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Union
 
 from main.utils.file_io import get_resized_filename, make_media_path_relative
-from main.utils.image import create_image_icon, get_base64_from_image, write_image_icon
+from main.utils.image import (
+    lazy_create_image_icon,
+    get_base64_from_image,
+    write_image_icon,
+)
 
 
 def decode_frame_image(frame_image: str) -> bytes:
@@ -28,7 +32,7 @@ def save_mesh_frame_image(mesh_file_path: Path, frame_image: str) -> str:
 def get_mesh_image_base64(file_path: Union[Path, str]) -> str:
     """Return the stored mesh preview as a data URL, creating the icon if needed."""
     file_path = Path(file_path)
-    create_image_icon(file_path)
+    lazy_create_image_icon(file_path)
     resize_file_name = get_resized_filename(file_path)
     if not resize_file_name.exists():
         return ""

@@ -31,8 +31,11 @@ CollageDrawDimensions = namedtuple(
 )
 
 
-def create_video_icon(video_path: Path) -> bool:
-    """Create a small image representing video - return False if creation of icon fails"""
+def lazy_create_video_icon(video_path: Path) -> bool:
+    """
+    Create a small image representing video (if it does not already exist).
+    return False if creation of icon fails or video path is not valid
+    """
     if not video_path.exists():
         return False
 
@@ -43,13 +46,15 @@ def create_video_icon(video_path: Path) -> bool:
     with VideoCapture(video_path) as capture:
         nr_frames = capture.get_total_frames()
         if nr_frames == 0:
+            print(f"Error! Video {video_path} has no frames to create icon.")
             return False
 
-        frame = capture.get_frame_at_idx(nr_frames // 2)
-        if frame is None:
+        frame_ind = capture.get_frame_at_idx(nr_frames // 2)
+        if frame_ind is None:
+            print(f"Error! Can get frame index {frame_ind} from {video_path}.")
             return False
 
-        image = Image.fromarray(frame)
+        image = Image.fromarray(frame_ind)
 
     image_resized = get_square_resized_image(image, VideoConstants.icon_size)
     image_resized.save(target_icon_file_path)
@@ -150,35 +155,37 @@ def create_collage_image(
     return load_image_directly(resized_path)
 
 
-@lru_cache(maxsize=1024)
-def get_collage_base64(file_path: Union[Path, str]) -> str:
-    """Will create collage once and not update it when the video parameters change"""
-    file_path = Path(file_path)
-    create_video_icon(file_path)
+def lazy_create_resized_collage(file_path: Path) -> str:
+    """
+    Write the collage preview next to the video if it does not already exist.
+    return the base64 encoded image if successful, otherwise return an empty string.
+    """
     resize_file_name = get_resized_filename(file_path)
-
     if resize_file_name.exists():
-        b64_string = load_image_directly(resize_file_name)
-        return add_encoding_type_to_base64(
-            b64_string, VideoConstants.save_image_extention
-        )
+        return load_image_directly(resize_file_name)
 
     with VideoCapture(file_path) as capture:
         if capture:
             factor = get_resizing_factor_to_collage_size(capture)
             if collage_b64 := create_collage_image(capture, factor, resize_file_name):
-                b64_string = add_encoding_type_to_base64(
-                    collage_b64, VideoConstants.save_image_extention
-                )
-            else:
-                print(f"Error! Video {file_path} could not create collage!")
-                b64_string = ""
+                return collage_b64
+            print(f"Error! Video {file_path} could not create collage!")
+            return ""
 
-        else:
-            print(f"Error! Video {file_path} cannot stream!")
-            b64_string = ""
+        print(f"Error! Video {file_path} cannot stream!")
+        return ""
 
-    return b64_string
+
+@lru_cache(maxsize=1024)
+def get_collage_base64(file_path: Union[Path, str]) -> str:
+    """Will create collage once and not update it when the video parameters change"""
+    file_path = Path(file_path)
+    lazy_create_video_icon(file_path)
+
+    if not (collage_b64 := lazy_create_resized_collage(file_path)):
+        return collage_b64
+
+    return add_encoding_type_to_base64(collage_b64, VideoConstants.save_image_extention)
 
 
 if __name__ == "__main__":
@@ -186,4 +193,4 @@ if __name__ == "__main__":
 
     with VideoCapture(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4")) as cap:
         create_collage_image(cap, 2, Path(f"{ENTRY_FOLDER}/20260129_222725.jpg"))
-    create_video_icon(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4"))
+    lazy_create_video_icon(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4"))

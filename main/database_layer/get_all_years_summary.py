@@ -2,7 +2,6 @@
 
 import random
 import datetime
-from os import getcwd
 from pathlib import Path
 from typing import List, Tuple
 from functools import lru_cache
@@ -12,7 +11,7 @@ from django.db.models.functions import ExtractYear
 from Journal.settings import MISSING_ICON_IMAGE
 from main.database_layer.fe_interfaces import AllEntryYearsContext
 from main.models import Entry, EntryImage
-from main.utils.image import get_base64_from_image, create_image_icon
+from main.utils.image import get_base64_from_image, lazy_create_image_icon
 from main.utils.file_io import get_icon_file_path, get_base_entry_path
 
 from main.config import NR_IMAGES_TO_DISPLAY
@@ -58,10 +57,10 @@ def get_valid_icon_paths(selected_img_paths: List[Path]) -> List[Path]:
     valid_icon_paths = []
     icon_paths = [get_icon_file_path(path) for path in selected_img_paths]
     for icon_path, path in zip(icon_paths, selected_img_paths):
-        if icon_path.exists() or create_image_icon(path):
+        if lazy_create_image_icon(path):
             valid_icon_paths.append(icon_path)
         else:
-            valid_icon_paths.append(Path(f"{getcwd()}{MISSING_ICON_IMAGE}"))
+            valid_icon_paths.append(Path(MISSING_ICON_IMAGE))
 
     return valid_icon_paths
 

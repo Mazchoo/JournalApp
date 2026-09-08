@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.forms.utils import ErrorDict, ErrorList
 
 from main.models import EntryImage
-from main.utils.image import fetch_base64_image_data
+from main.utils.image import lazy_create_base64_image_data
 from main.utils.file_io import get_base_entry_path
 
 
@@ -24,6 +24,6 @@ def get_downsized_image_response(post_data: dict) -> JsonResponse:
         return JsonResponse({"error": errors})
 
     full_path = get_base_entry_path(entry_image.file_path)
-    b64_string = fetch_base64_image_data(full_path)
+    b64_string = lazy_create_base64_image_data(full_path)
 
     return JsonResponse({"base64": b64_string})

@@ -48,7 +48,7 @@ def write_image_icon(target_path_obj: Path) -> bool:
     return True
 
 
-def create_image_icon(target_path_obj: Path):
+def lazy_create_image_icon(target_path_obj: Path):
     """Create image icon for target object if one does not already exist."""
     source_paths = _icon_source_paths(target_path_obj)
     if source_paths is None:
@@ -60,7 +60,7 @@ def create_image_icon(target_path_obj: Path):
 
 def move_image_to_save_path(target_file_path: str, file_name: str):
     """Move image to the date save path"""
-    create_image_icon(Path(target_file_path))
+    lazy_create_image_icon(Path(target_file_path))
     return move_media_to_save_path(target_file_path, file_name)
 
 
@@ -80,7 +80,7 @@ def get_encoding_type(file_path: Union[Path, str]) -> str:
 def get_resized_base64(file_path: Path, factor: float, ecoding_type: str) -> str:
     """Get a downsized image in base64 form"""
     if not get_icon_file_path(file_path).exists():
-        create_image_icon(file_path)
+        lazy_create_image_icon(file_path)
 
     resized_path = get_resized_filename(file_path)
     if resized_path.exists():
@@ -116,7 +116,7 @@ def add_encoding_type_to_base64(b64_string: str, ecoding_type: str) -> str:
 
 
 @cache_string
-def fetch_base64_image_data(file_path: Union[Path, str]) -> str:
+def lazy_create_base64_image_data(file_path: Union[Path, str]) -> str:
     """Load image or create base64 image from downsized original (if original size above threshold)"""
     file_path = Path(file_path)
 
