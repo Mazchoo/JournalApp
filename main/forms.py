@@ -155,7 +155,6 @@ class VideoForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_media_to_save_path(target_path, file_name)
-        save_video_preview_and_icon(Path(target_path))
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
