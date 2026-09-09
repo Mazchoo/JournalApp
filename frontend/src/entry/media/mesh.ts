@@ -442,7 +442,11 @@ function handleMeshViewChange(index: string, canvas: HTMLCanvasElement): void {
   });
 }
 
-/** Encode a canvas frame and write it onto the row thumbnail. */
+/**
+ * Encode a canvas frame for the next save.
+ * Writes it onto the row thumbnail only when the live canvas is not showing,
+ * so a just-loaded mesh does not grow a second image.
+ */
 async function captureMeshFrame(
   index: string,
   canvas: HTMLCanvasElement,
@@ -451,7 +455,9 @@ async function captureMeshFrame(
   if (frame === null) return null;
   lastFrames.set(index, frame);
   const media = MediaEntry.fromIndex(index);
-  if (media !== null) MediaEntry.setSrc(media, frame);
+  if (media !== null && !media.isInlineMeshShown()) {
+    MediaEntry.setSrc(media, frame);
+  }
   return frame;
 }
 

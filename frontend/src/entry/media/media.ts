@@ -159,6 +159,10 @@ export function zoomToMedia(event: Event): void {
     return;
   }
 
+  if (media.isInlineMeshShown()) {
+    return;
+  }
+
   const fileName = media.fileNameHtml();
 
   if (media.isMesh()) {

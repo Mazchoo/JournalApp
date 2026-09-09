@@ -375,6 +375,11 @@ export class MediaEntry extends ContentRow implements IContent {
     );
   }
 
+  /** Whether the live mesh canvas is currently shown. */
+  isInlineMeshShown(): boolean {
+    return this.canvas?.style.visibility === "visible";
+  }
+
   /** Whether this row is a mesh (saved id, visible canvas, or .glb file name). */
   isMesh(): boolean {
     if (this.meshId()) return true;

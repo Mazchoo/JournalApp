@@ -691,16 +691,15 @@ describe("zoomToMedia", () => {
     render.mockRestore();
   });
 
-  it("sizes the mesh modal to the source canvas aspect ratio", async () => {
+  it("sizes the mesh modal to the thumbnail aspect ratio", async () => {
     renderDayPage({ rows: ["mesh"] });
     ajax = stubAjax();
-    const source = document.getElementById("mesh-canvas0") as HTMLCanvasElement;
-    source.style.visibility = "visible";
-    Object.defineProperty(source, "clientWidth", {
+    const thumbnail = document.getElementById("image0") as HTMLImageElement;
+    Object.defineProperty(thumbnail, "clientWidth", {
       configurable: true,
       value: 640,
     });
-    Object.defineProperty(source, "clientHeight", {
+    Object.defineProperty(thumbnail, "clientHeight", {
       configurable: true,
       value: 480,
     });
@@ -782,6 +781,32 @@ describe("zoomToMedia", () => {
     render.mockRestore();
   });
 
+  it("does not reveal a thumbnail while the live canvas is showing", async () => {
+    const canvas = document.getElementById("mesh-canvas0") as HTMLCanvasElement;
+    let onUserViewChange: (() => void) | undefined;
+    vi.mocked(meshPreview.initialize).mockImplementation(
+      (_canvas, _file, _onComplete, _style, view) => {
+        onUserViewChange = view?.onUserViewChange;
+      },
+    );
+    vi.spyOn(canvas, "toBlob").mockImplementation((cb) => {
+      cb(
+        new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: "image/jpeg" }),
+      );
+    });
+
+    loadMeshResource(fileNamed("scan.glb"), "0");
+    expect(onUserViewChange).toBeDefined();
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
+
+    onUserViewChange!();
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, MESH_VIEW_SNAPSHOT_DEBOUNCE_MS + 50);
+    });
+
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
+  });
+
   it("reports a JSON error body from the mesh endpoint", async () => {
     renderDayPage({ rows: ["mesh"] });
     ajax = stubAjax();
@@ -796,13 +821,33 @@ describe("zoomToMedia", () => {
     log.mockRestore();
   });
 
-  it("falls back to a locally uploaded GLB when the mesh request fails", async () => {
+  it("does not open a modal when a just-loaded mesh is clicked", () => {
     const localFile = fileNamed("scan.glb");
     uploadAllMediaFiles("0", [localFile]);
     document.getElementById("upload-label0")!.innerHTML = "scan.glb";
-    const initialize = vi.mocked(meshPreview.initialize);
 
     zoomToMedia(eventFrom(".image-area"));
+
+    expect(ajax.calls).toHaveLength(0);
+    expect(
+      document.getElementById("mesh-modal")!.classList.contains("show"),
+    ).toBe(false);
+    expect(
+      document.getElementById("image-modal")!.classList.contains("show"),
+    ).toBe(false);
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
+  });
+
+  it("falls back to a locally uploaded GLB when the mesh request fails", async () => {
+    const localFile = fileNamed("scan.glb");
+    uploadAllMediaFiles("0", [localFile]);
+    const initialize = vi.mocked(meshPreview.initialize);
+
+    getFullMesh(
+      "scan.glb",
+      document.getElementById("mesh-preview") as HTMLCanvasElement,
+      "0",
+    );
     await ajax.fail("Not Found");
 
     expect(initialize).toHaveBeenCalled();
