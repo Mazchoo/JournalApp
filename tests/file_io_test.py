@@ -72,7 +72,9 @@ def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, monkeypatch
     assert tmp_path.exists()
 
 
-def test_remove_empty_parent_folders_does_not_remove_entry_folder(tmp_path, monkeypatch):
+def test_remove_empty_parent_folders_does_not_remove_entry_folder(
+    tmp_path, monkeypatch
+):
     """Calling the pruner on the entry root must leave it in place."""
     entries = tmp_path / "entries"
     entries.mkdir()

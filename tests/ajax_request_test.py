@@ -6,7 +6,10 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.http import QueryDict
 
-from main.database_layer.ajax_request import ajax_request, convert_query_into_nested_dict
+from main.database_layer.ajax_request import (
+    ajax_request,
+    convert_query_into_nested_dict,
+)
 from tests.mocks import create_mock_client, create_ajax_headers
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"

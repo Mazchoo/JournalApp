@@ -35,6 +35,7 @@ from main.utils.file_io import (
 from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
 from main.utils.errors import form_errors_message
+from main.utils.html_sanitize import sanitize_paragraph_html
 from main.config import (
     ALLOWED_CONTENT_TYPES,
     ImageConstants,
@@ -396,6 +397,10 @@ class ParagraphForm(ModelForm):
     class Meta:
         model = EntryParagraph
         fields = "__all__"
+
+    def clean_text(self):
+        """Remove script tags and their contents from paragraph HTML."""
+        return sanitize_paragraph_html(self.cleaned_data["text"])
 
     def clean_allow_ai_synthesis(self):
         """Ensure file path refers to usuable file"""
