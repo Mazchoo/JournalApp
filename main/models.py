@@ -6,6 +6,7 @@ from django.db.models import Model
 from django.db import models
 
 from main.config import ALLOWED_CONTENT_TYPES
+from main.queries import EntryQuerySet
 
 
 class Content(Model):
@@ -24,10 +25,20 @@ class Entry(Model):
     """A dated journal entry"""
 
     name = models.SlugField(max_length=10, primary_key=True)
-    date = models.DateTimeField()
+    year = models.PositiveSmallIntegerField()
+    month = models.PositiveSmallIntegerField()
+    day = models.PositiveSmallIntegerField()
     first_created = models.DateTimeField()
     last_edited = models.DateTimeField()
     content = models.ManyToManyField(Content)  # type: models.ManyToManyField
+    objects = EntryQuerySet.as_manager()
+
+    class Meta:
+        indexes = [
+            # A composite index on year and month allows fast lookups
+            models.Index(fields=["year", "month"], name="entry_year_month_idx"),
+            models.Index(fields=["year"], name="entry_year_idx"),
+        ]
 
     def __str__(self):
         return f"Entry {self.name} - last modified - {self.last_edited}"

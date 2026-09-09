@@ -21,27 +21,33 @@ def get_month_strings(month_index: int) -> Tuple[str, str]:
 
 def get_all_entries_in_month(year: int, month: str) -> list[Entry]:
     """Return all entries from a specified month."""
-    return list(Entry.objects.all().filter(name__istartswith=f"{year}-{month}"))
+    return list(Entry.objects.in_year_month(year, int(month)))
 
 
 def get_all_images_in_month(year: int, month: str) -> list[EntryImage]:
     """Return all image entries from a specified month."""
     return list(
-        EntryImage.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
+        EntryImage.objects.filter(
+            entry__in=Entry.objects.in_year_month(year, int(month))
+        )
     )
 
 
 def get_all_videos_in_month(year: int, month: str) -> list[EntryVideo]:
     """Return all video entries from a specified month."""
     return list(
-        EntryVideo.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
+        EntryVideo.objects.filter(
+            entry__in=Entry.objects.in_year_month(year, int(month))
+        )
     )
 
 
 def get_all_meshes_in_month(year: int, month: str) -> list[EntryMesh]:
     """Return all mesh entries from a specified month."""
     return list(
-        EntryMesh.objects.all().filter(entry__name__istartswith=f"{year}-{month}-")
+        EntryMesh.objects.filter(
+            entry__in=Entry.objects.in_year_month(year, int(month))
+        )
     )
 
 

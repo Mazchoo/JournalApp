@@ -13,6 +13,7 @@ def get_latest_entry_tuple() -> Optional[Tuple[str, str, str]]:
     all_entities = Entry.objects.all()
 
     if all_entities:
-        output = convert_date_to_url_tuple(all_entities.latest("last_edited").date)
+        latest = all_entities.latest("last_edited")
+        output = convert_date_to_url_tuple(latest.year, latest.month, latest.day)
 
     return output

@@ -6,8 +6,6 @@ from pathlib import Path
 from typing import List, Tuple
 from functools import lru_cache
 
-from django.db.models.functions import ExtractYear
-
 from Journal.settings import MISSING_ICON_IMAGE
 from main.database_layer.fe_interfaces import AllEntryYearsContext
 from main.models import Entry, EntryImage
@@ -24,16 +22,12 @@ def get_current_year():
 
 def get_all_images_in_year(year: int):
     """Load all database images from a certain year"""
-    return EntryImage.objects.all().filter(entry__name__istartswith=f"{year}-")
+    return EntryImage.objects.filter(entry__in=Entry.objects.in_year(year))
 
 
 def get_all_entry_years() -> AllEntryYearsContext:
     """Return all available years."""
-    distinct_years = (
-        Entry.objects.all().annotate(year=ExtractYear("date")).values("year").distinct()
-    )
-    years = [entry["year"] for entry in distinct_years]
-    years.sort()
+    years = sorted(Entry.objects.values_list("year", flat=True).distinct())
 
     return {"all_years": years if years else [get_current_year()]}
 

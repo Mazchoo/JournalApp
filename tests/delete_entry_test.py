@@ -6,6 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
+from main.content_generation.delete_entry import move_files_out_of_folder
+from main.models import Entry
 from tests.mocks import create_mock_client, create_mock_entry, create_ajax_headers
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
@@ -50,13 +52,13 @@ def test_delete_nonexistent_entry_returns_error():
 @patch("main.content_generation.delete_entry.move_files_from_entry")
 def test_delete_entry_removes_from_db(mock_move_files):
     """A deleted entry should be removed from the database."""
-    from main.models import Entry
-
     client = create_mock_client()
 
     Entry.objects.create(
         name="2025-04-01",
-        date=datetime(2025, 4, 1),
+        year=2025,
+        month=4,
+        day=1,
         first_created=datetime.now(),
         last_edited=datetime.now(),
     )
@@ -76,8 +78,6 @@ def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(
     tmp_path, monkeypatch
 ):
     """Image, video, and mesh files move back; reserved image tags are deleted."""
-    from main.content_generation.delete_entry import move_files_out_of_folder
-
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
 
     dated = tmp_path / "2025" / "03" / "01"
@@ -118,8 +118,6 @@ def test_move_files_out_of_folder_ignores_form_files_and_companions(
     tmp_path, monkeypatch
 ):
     """Files listed in ignore_file_names stay, including reserved-tag companions."""
-    from main.content_generation.delete_entry import move_files_out_of_folder
-
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
 
     dated = tmp_path / "2025" / "03" / "01"

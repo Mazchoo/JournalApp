@@ -53,21 +53,24 @@ class EntryForm(ModelForm):
 
     class Meta:
         model = Entry
-        fields = ["name", "first_created", "last_edited", "date"]
+        fields = ["name", "first_created", "last_edited"]
 
-    def clean_date(self):
-        """Convert slug string into date object"""
-        clean_data = super().clean()
-        if clean_data is None:
+    def clean(self):
+        """Derive year, month, and day from the entry name slug."""
+        cleaned_data = super().clean()
+        if cleaned_data is None:
             raise forms.ValidationError("Date is not defined")
 
-        name = clean_data["name"]
-        entry_date = get_valid_date_from_slug(name)
+        name = cleaned_data.get("name")
+        entry_date = get_valid_date_from_slug(name) if name else None
 
         if entry_date is None:
             raise forms.ValidationError(f"Entry must have a real date {name}")
 
-        return entry_date
+        self.instance.year = entry_date.year
+        self.instance.month = entry_date.month
+        self.instance.day = entry_date.day
+        return cleaned_data
 
 
 class ImageForm(ModelForm):
@@ -429,9 +432,8 @@ class DeleteEntryForm(forms.Form):
     def clean_entry(self):
         """Ensure entry exists and return the entry object"""
         entry_name = self.cleaned_data["entry"]
-        entry = Entry.objects.filter(name=entry_name).first()
 
-        if entry is None:
+        if not (entry := Entry.objects.filter(name=entry_name).first()):
             raise forms.ValidationError(f"Invalid entry {entry_name}")
 
         return entry

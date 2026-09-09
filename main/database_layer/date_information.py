@@ -125,21 +125,10 @@ def get_day_information(
     }
 
 
-def get_days_with_entries_in_month(
-    year: int, month: str, next_month: str, next_month_year: int
-) -> DaysWithEntriesContext:
+def get_days_with_entries_in_month(year: int, month: str) -> DaysWithEntriesContext:
     """Return list of days in month that have entries."""
-    month_names = DateConstants.month_names
-    month_ind = month_names.index(month) + 1
-    next_month_ind = month_names.index(next_month) + 1
-
-    first_day = datetime(year, month_ind, 1)
-    last_day = datetime(next_month_year, next_month_ind, 1)
-
-    entries = (
-        Entry.objects.all()
-        .filter(date__date__gte=first_day)
-        .filter(date__date__lt=last_day)
+    month_ind = DateConstants.month_names.index(month) + 1
+    days = list(
+        Entry.objects.in_year_month(year, month_ind).values_list("day", flat=True)
     )
-
-    return {"days_with_an_entry": [entry.date.day for entry in entries]}
+    return {"days_with_an_entry": days}

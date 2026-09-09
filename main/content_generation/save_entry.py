@@ -27,7 +27,6 @@ def generate_new_entry(name: str, errors: ErrorDict) -> Optional[Entry]:
             "name": name,
             "first_created": datetime.now(),
             "last_edited": datetime.now(),
-            "date": datetime.now(),
         }
     )
 

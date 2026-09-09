@@ -4,29 +4,39 @@ from datetime import datetime
 
 import pytest
 
+from main.models import (
+    Camera,
+    Content,
+    Entry,
+    EntryImage,
+    EntryMesh,
+    EntryParagraph,
+    EntryVideo,
+)
 from tests.mocks import create_mock_entry
 
 
 @pytest.mark.django_db
 def test_create_entry():
     """Creating an Entry should persist it in the database."""
-    from main.models import Entry
-
     entry = Entry.objects.create(
         name="2025-06-15",
-        date=datetime(2025, 6, 15),
+        year=2025,
+        month=6,
+        day=15,
         first_created=datetime(2025, 6, 15),
         last_edited=datetime(2025, 6, 15),
     )
     assert Entry.objects.filter(name="2025-06-15").exists()
     assert entry.pk == "2025-06-15"
+    assert entry.year == 2025
+    assert entry.month == 6
+    assert entry.day == 15
 
 
 @pytest.mark.django_db
 def test_entry_content_many_to_many():
     """An Entry can have multiple Content objects linked via M2M."""
-    from main.models import Content
-
     entry = create_mock_entry()
 
     c1 = Content.objects.create(content_type="paragraph", content_id=1)
@@ -40,8 +50,6 @@ def test_entry_content_many_to_many():
 @pytest.mark.django_db
 def test_create_content():
     """A Content record stores a content_type and content_id."""
-    from main.models import Content
-
     content = Content.objects.create(content_type="paragraph", content_id=42)
     assert content.content_type == "paragraph"
     assert content.content_id == 42
@@ -50,8 +58,6 @@ def test_create_content():
 @pytest.mark.django_db
 def test_content_str():
     """__str__ should combine content_type and content_id."""
-    from main.models import Content
-
     content = Content.objects.create(content_type="image", content_id=7)
     assert str(content) == "image7"
 
@@ -59,8 +65,6 @@ def test_content_str():
 @pytest.mark.django_db
 def test_create_paragraph():
     """EntryParagraph stores HTML text and a height tied to an Entry."""
-    from main.models import EntryParagraph
-
     entry = create_mock_entry()
     para = EntryParagraph.objects.create(
         entry=entry,
@@ -77,8 +81,6 @@ def test_create_paragraph():
 @pytest.mark.django_db
 def test_paragraph_view_method():
     """view() should return a dict with text and height keys."""
-    from main.models import EntryParagraph
-
     entry = create_mock_entry()
     para = EntryParagraph.objects.create(
         entry=entry,
@@ -99,8 +101,6 @@ def test_paragraph_view_method():
 @pytest.mark.django_db
 def test_paragraph_str():
     """__str__ should return the raw text content."""
-    from main.models import EntryParagraph
-
     entry = create_mock_entry()
     para = EntryParagraph.objects.create(
         entry=entry,
@@ -114,8 +114,6 @@ def test_paragraph_str():
 @pytest.mark.django_db
 def test_create_image():
     """EntryImage stores a file_path and original flag tied to an Entry."""
-    from main.models import EntryImage
-
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,
@@ -129,8 +127,6 @@ def test_create_image():
 @pytest.mark.django_db
 def test_image_str():
     """__str__ should return the file_path."""
-    from main.models import EntryImage
-
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,
@@ -143,8 +139,6 @@ def test_image_str():
 @pytest.mark.django_db
 def test_image_view_method():
     """view() should return image_id, file_name, and original flag for async loading."""
-    from main.models import EntryImage
-
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,
@@ -162,8 +156,6 @@ def test_image_view_method():
 @pytest.mark.django_db
 def test_image_view_non_original():
     """When allow_ai_synthesis=False, view() dict should have original=0."""
-    from main.models import EntryImage
-
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,
@@ -179,8 +171,6 @@ def test_image_view_non_original():
 @pytest.mark.django_db
 def test_create_video():
     """EntryVideo stores a file_path and original flag."""
-    from main.models import EntryVideo
-
     entry = create_mock_entry()
     vid = EntryVideo.objects.create(
         entry=entry,
@@ -194,8 +184,6 @@ def test_create_video():
 @pytest.mark.django_db
 def test_video_view_method():
     """view() should return video_id, file_name, and original flag for async loading."""
-    from main.models import EntryVideo
-
     entry = create_mock_entry()
     vid = EntryVideo.objects.create(
         entry=entry,
@@ -213,8 +201,6 @@ def test_video_view_method():
 @pytest.mark.django_db
 def test_orbit_camera_view_method():
     """view() should match the frontend OrbitCamera field names."""
-    from main.models import Camera
-
     camera = Camera.objects.create(
         right_x=0.0,
         right_y=1.0,
@@ -243,8 +229,6 @@ def test_orbit_camera_view_method():
 @pytest.mark.django_db
 def test_create_orbit_camera_defaults():
     """OrbitCamera defaults match frontend createOrbitCamera()."""
-    from main.models import Camera
-
     camera = Camera.objects.create()
     assert camera.right_x == 1.0
     assert camera.right_y == 0.0
@@ -263,8 +247,6 @@ def test_create_orbit_camera_defaults():
 @pytest.mark.django_db
 def test_create_mesh():
     """EntryMesh stores file_path, image_path, and a camera tied to an Entry."""
-    from main.models import EntryMesh, Camera
-
     entry = create_mock_entry()
     camera = Camera.objects.create(radius=4.5, pan_x=0.2, pan_y=-0.1)
     mesh = EntryMesh.objects.create(
@@ -282,8 +264,6 @@ def test_create_mesh():
 @pytest.mark.django_db
 def test_mesh_str():
     """__str__ should return the file_path."""
-    from main.models import EntryMesh, Camera
-
     entry = create_mock_entry()
     mesh = EntryMesh.objects.create(
         entry=entry,
@@ -297,8 +277,6 @@ def test_mesh_str():
 @pytest.mark.django_db
 def test_mesh_view_method():
     """view() should return mesh_id, file_name, image_path, and OrbitCamera fields."""
-    from main.models import EntryMesh, Camera
-
     entry = create_mock_entry()
     camera = Camera.objects.create(
         right_x=0.0,

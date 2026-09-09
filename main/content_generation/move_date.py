@@ -10,10 +10,7 @@ from main.models import Entry, Content
 from main.forms import EntryForm, ContentForm
 
 from main.content_generation.request_forms import DateMoveForm
-from main.database_layer.date_slugs import (
-    get_valid_date_from_slug,
-    convert_date_to_url_tuple,
-)
+from main.database_layer.date_slugs import convert_date_to_url_tuple
 from main.content_generation.delete_entry import move_files_from_entry
 from main.content_generation.content_factory_models import ContentFactory
 from main.content_generation.content_factory_update import ContentUpdateFactory
@@ -41,7 +38,6 @@ def create_new_entry_at_new_date(
 
     entry_dict = model_to_dict(source_entry)
     entry_dict["name"] = destination_slug
-    entry_dict["date"] = get_valid_date_from_slug(destination_slug)
     entry_dict["content"] = []
 
     new_entry_form = EntryForm(entry_dict)
@@ -151,7 +147,9 @@ def move_source_date_to_desination_request(post_data: dict) -> JsonResponse:
     if new_entry is None:
         return JsonResponse({"error": f"Update errors {errors}"})
 
-    if date_tuple := convert_date_to_url_tuple(new_entry.date):
+    if date_tuple := convert_date_to_url_tuple(
+        new_entry.year, new_entry.month, new_entry.day
+    ):
         return JsonResponse({"new_date": f"/edit/{'/'.join(date_tuple)}"})
 
     return JsonResponse({"error": f"Update errors {errors}"})

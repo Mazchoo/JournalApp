@@ -72,9 +72,7 @@ def get_month_page_context(
     """Build context for month page."""
     year_info = get_year_information(year)
     month_info = get_month_information(year, month)
-    days_info = get_days_with_entries_in_month(
-        year, month, month_info["next_month"], month_info["next_month_year"]
-    )
+    days_info = get_days_with_entries_in_month(year, month)
 
     return {
         **context,  # type: ignore[typeddict-item]

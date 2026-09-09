@@ -37,7 +37,9 @@ def create_mock_entry() -> Entry:
     Entry = apps.get_model("main", "Entry")
     entry = Entry.objects.create(
         name="2025-02-12",
-        date=datetime(2025, 2, 12),
+        year=2025,
+        month=2,
+        day=12,
         first_created=datetime(2025, 2, 12, 10, 0, 0),
         last_edited=datetime(2025, 2, 12, 15, 30, 0),
     )
@@ -86,7 +88,9 @@ def create_multiple_mock_entries() -> List[Entry]:
         slug = f"{year}-{month_str}-{day_str}"
         entry = Entry.objects.create(
             name=slug,
-            date=datetime(year, month, day),
+            year=year,
+            month=month,
+            day=day,
             first_created=datetime(year, month, day, 8, 0, 0),
             last_edited=datetime(year, month, day, 18, 0, 0),
         )

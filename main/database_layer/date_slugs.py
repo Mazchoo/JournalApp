@@ -25,9 +25,9 @@ def get_valid_date_from_slug(slug: str) -> Optional[datetime]:
     return slug_date
 
 
-def convert_date_to_url_tuple(date: datetime) -> Tuple[str, str, str]:
-    """Convert date time to tuple of strings"""
-    return (str(date.year), date.strftime("%B"), str(date.day))
+def convert_date_to_url_tuple(year: int, month: int, day: int) -> Tuple[str, str, str]:
+    """Convert year, month, and day integers to a URL tuple of strings."""
+    return (str(year), DateConstants.month_names[month - 1], str(day))
 
 
 def date_exists(year: int, month: str = "January", day: int = 1) -> bool:
