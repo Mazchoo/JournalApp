@@ -43,7 +43,7 @@ ADMIN_PASSWORD = SECURITY_JSON["ADMIN_PASSWORD"]
 ENTRY_FOLDER = SECURITY_JSON["ENTRY_FOLDER"]
 
 # Display Settings
-MISSING_ICON_IMAGE = STATIC_DIR / "Image/missing_icon.png"
+MISSING_ICON_IMAGE = STATIC_DIR / "Image/backgrounds/missing_icon.png"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
