@@ -3,8 +3,9 @@
 from collections import OrderedDict
 from typing import Any, List
 
+from django.core.exceptions import ValidationError
 from django.http.request import QueryDict
-from django.http import Http404, HttpRequest
+from django.http import Http404, HttpRequest, JsonResponse
 
 
 def is_ajax(request: HttpRequest) -> bool:
@@ -16,7 +17,7 @@ def is_ajax(request: HttpRequest) -> bool:
 
 def extract_nested_key(key: str) -> List[str]:
     """Turn the ajax key into list of named keys"""
-    return [k[:-1] if k[-1] == "]" else k for k in key.split("[")]
+    return [k.removesuffix("]") for k in key.split("[")]
 
 
 def add_nested_value_to_dict(
@@ -26,6 +27,10 @@ def add_nested_value_to_dict(
     current_dict = output_dict
     for nested_key in nested_keys[:-1]:
         if nested_key in current_dict:
+            if not isinstance(current_dict[nested_key], OrderedDict):
+                raise ValidationError(
+                    f"Cannot nest under '{nested_key}' because it is already a value"
+                )
             current_dict = current_dict[nested_key]
         else:
             current_dict[nested_key] = OrderedDict()
@@ -52,7 +57,10 @@ def ajax_request(func):
     def wrap_func(request):
         if not is_ajax(request) or not request.POST:
             raise Http404
-        post_data = convert_query_into_nested_dict(request.POST)
+        try:
+            post_data = convert_query_into_nested_dict(request.POST)
+        except ValidationError as exc:
+            return JsonResponse({"error": " ".join(exc.messages)})
 
         return func(post_data)
 
