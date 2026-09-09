@@ -74,12 +74,8 @@ def test_delete_entry_removes_from_db(mock_move_files):
     assert not Entry.objects.filter(name="2025-04-01").exists()
 
 
-def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(
-    tmp_path, monkeypatch
-):
+def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(tmp_path):
     """Image, video, and mesh files move back; reserved image tags are deleted."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-
     dated = tmp_path / "2025" / "03" / "01"
     dated.mkdir(parents=True)
     photo = dated / "photo.jpg"
@@ -114,12 +110,8 @@ def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(
     assert not (tmp_path / "notes.txt").exists()
 
 
-def test_move_files_out_of_folder_ignores_form_files_and_companions(
-    tmp_path, monkeypatch
-):
+def test_move_files_out_of_folder_ignores_form_files_and_companions(tmp_path):
     """Files listed in ignore_file_names stay, including reserved-tag companions."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-
     dated = tmp_path / "2025" / "03" / "01"
     dated.mkdir(parents=True)
     keep = dated / "keep.jpg"

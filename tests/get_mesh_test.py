@@ -25,12 +25,10 @@ def test_get_mesh_mime_type_unknown_defaults_to_glb():
     assert get_mesh_mime_type("scan.xyz") == "model/gltf-binary"
 
 
-def test_get_mesh_path_from_post_valid(tmp_path, monkeypatch):
+def test_get_mesh_path_from_post_valid(tmp_path):
     """Valid post data with an existing file should return the path."""
     from main.content_generation.get_full_mesh import get_mesh_path_from_post
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_stored_mesh_file(tmp_path)
 
     errors = ErrorDict()
@@ -50,12 +48,10 @@ def test_get_mesh_path_from_post_missing_fields():
     assert errors
 
 
-def test_create_mesh_stream_response_success(tmp_path, monkeypatch):
+def test_create_mesh_stream_response_success(tmp_path):
     """An existing mesh file should return a FileResponse with the GLB type."""
     from main.content_generation.get_full_mesh import create_mesh_stream_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     mesh_path = create_mock_stored_mesh_file(tmp_path)
 
     errors = ErrorDict()
@@ -75,12 +71,10 @@ def test_create_mesh_stream_response_file_not_found():
     assert "file" in errors
 
 
-def test_get_full_mesh_response_success(tmp_path, monkeypatch):
+def test_get_full_mesh_response_success(tmp_path):
     """A valid request with an existing file should return a streaming FileResponse."""
     from main.content_generation.get_full_mesh import get_full_mesh_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_stored_mesh_file(tmp_path)
 
     response = get_full_mesh_response({"name": "2025-02-12", "file": "scan.glb"})
@@ -88,12 +82,10 @@ def test_get_full_mesh_response_success(tmp_path, monkeypatch):
     assert response["Content-Type"] == "model/gltf-binary"
 
 
-def test_get_full_mesh_response_file_not_found(tmp_path, monkeypatch):
+def test_get_full_mesh_response_file_not_found(tmp_path):
     """A request for a nonexistent mesh should return a JSON error."""
     from main.content_generation.get_full_mesh import get_full_mesh_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     response = get_full_mesh_response({"name": "2025-02-12", "file": "missing.glb"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)

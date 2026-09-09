@@ -102,9 +102,8 @@ def create_mock_video_file(base_path, name="2025-02-12", file_name="clip.mp4"):
     """
     Create a video file inside a temporary entry folder structure.
 
-    Returns the full path to the created file. The caller is responsible
-    for patching main.utils.file_io.ENTRY_FOLDER to *base_path* and for
-    cleaning up (e.g. via tmp_path which tears down automatically).
+    Returns the full path to the created file. Write it under the test
+    ENTRY_FOLDER (pytest tmp_path).
     """
     from pathlib import Path
 
@@ -120,9 +119,8 @@ def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):
     """
     Create a small JPEG file inside a temporary entry folder structure.
 
-    Returns the full path to the created file. The caller is responsible
-    for patching main.utils.file_io.ENTRY_FOLDER to *base_path* and for
-    cleaning up (e.g. via tmp_path which tears down automatically).
+    Returns the full path to the created file. Write it under the test
+    ENTRY_FOLDER (pytest tmp_path).
     """
     from pathlib import Path
 
@@ -139,8 +137,8 @@ def create_mock_stored_mesh_file(base_path, name="2025-02-12", file_name="scan.g
     """
     Create a dummy glb inside a temporary entry folder structure.
 
-    Returns the full path to the created file. The caller is responsible
-    for patching main.utils.file_io.ENTRY_FOLDER to *base_path*.
+    Returns the full path to the created file. Write it under the test
+    ENTRY_FOLDER (pytest tmp_path).
     """
     from pathlib import Path
 
@@ -156,8 +154,8 @@ def create_mock_mesh_file(base_path, file_name="scan.glb"):
     """
     Create a dummy glb in the base entry folder so MeshForm can move it.
 
-    Returns the full path to the created file. The caller is responsible
-    for patching main.utils.file_io.ENTRY_FOLDER to *base_path*.
+    Returns the full path to the created file. Write it under the test
+    ENTRY_FOLDER (pytest tmp_path).
     """
     from pathlib import Path
 

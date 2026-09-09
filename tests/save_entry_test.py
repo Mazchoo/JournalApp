@@ -126,7 +126,7 @@ def test_save_entry_replaces_existing_content():
 
 
 @pytest.mark.django_db
-def test_save_entry_creates_mesh_content(tmp_path, monkeypatch):
+def test_save_entry_creates_mesh_content(tmp_path):
     """Saving an entry with mesh data should move the glb and store the preview."""
     from main.content_generation.save_entry import update_or_generate_from_request
     from tests.mocks import mock_jpeg_data_url
@@ -135,7 +135,6 @@ def test_save_entry_creates_mesh_content(tmp_path, monkeypatch):
     EntryMesh = apps.get_model("main", "EntryMesh")
     Camera = apps.get_model("main", "Camera")
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     create_mock_mesh_file(tmp_path)
 
     response = update_or_generate_from_request(
@@ -200,7 +199,7 @@ def _mesh_camera_payload(radius: str = "3") -> dict:
 
 
 @pytest.mark.django_db
-def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path, monkeypatch):
+def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path):
     """A later save that omits frame_image should update the camera only."""
     from main.content_generation.save_entry import update_or_generate_from_request
     from tests.mocks import mock_jpeg_data_url
@@ -209,7 +208,6 @@ def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path, monkeypa
     EntryMesh = apps.get_model("main", "EntryMesh")
     Camera = apps.get_model("main", "Camera")
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     create_mock_mesh_file(tmp_path)
 
     first = update_or_generate_from_request(
@@ -256,11 +254,10 @@ def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path, monkeypa
 
 
 @pytest.mark.django_db
-def test_save_entry_mesh_without_frame_or_preview_returns_error(tmp_path, monkeypatch):
+def test_save_entry_mesh_without_frame_or_preview_returns_error(tmp_path):
     """A new mesh with no frame_image and no stored preview should fail."""
     from main.content_generation.save_entry import update_or_generate_from_request
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     create_mock_mesh_file(tmp_path)
 
     response = update_or_generate_from_request(
@@ -281,12 +278,10 @@ def test_save_entry_mesh_without_frame_or_preview_returns_error(tmp_path, monkey
 
 
 @pytest.mark.django_db
-def test_save_entry_mesh_missing_glb_returns_error(tmp_path, monkeypatch):
+def test_save_entry_mesh_missing_glb_returns_error(tmp_path):
     """A mesh save without the glb on disk should return a content error."""
     from main.content_generation.save_entry import update_or_generate_from_request
     from tests.mocks import mock_jpeg_data_url
-
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
 
     response = update_or_generate_from_request(
         {
@@ -321,11 +316,10 @@ def _write_jpeg(path, color=(10, 20, 30)):
 
 
 @pytest.mark.django_db
-def test_save_entry_moves_removed_media_back_to_entry_folder(tmp_path, monkeypatch):
+def test_save_entry_moves_removed_media_back_to_entry_folder(tmp_path):
     """Media no longer in the form should return to the base entry folder."""
     from main.content_generation.save_entry import update_or_generate_from_request
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     _write_jpeg(tmp_path / "keep.jpg", (255, 0, 0))
     _write_jpeg(tmp_path / "drop.jpg", (0, 255, 0))
 

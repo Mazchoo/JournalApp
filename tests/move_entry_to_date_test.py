@@ -99,11 +99,10 @@ def _mesh_camera_payload() -> dict:
 
 
 @pytest.mark.django_db
-def test_move_entry_keeps_mesh_content(tmp_path, monkeypatch):
+def test_move_entry_keeps_mesh_content(tmp_path):
     """A mesh saved at the source date must exist at the destination date."""
     Entry = apps.get_model("main", "Entry")
     EntryMesh = apps.get_model("main", "EntryMesh")
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     create_mock_mesh_file(tmp_path)
 
     update_or_generate_from_request(
@@ -177,11 +176,8 @@ def test_failed_move_restores_only_files_it_moved(tmp_path):
 
 
 @pytest.mark.django_db
-def test_move_entry_reports_error_when_destination_url_cannot_be_built(
-    tmp_path, monkeypatch
-):
+def test_move_entry_reports_error_when_destination_url_cannot_be_built(monkeypatch):
     """Failing to build the edit URL must not fall back to a generic update error."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     monkeypatch.setattr(
         "main.content_generation.move_date.move_dated_folder",
         lambda *args, **kwargs: [],

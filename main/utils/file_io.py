@@ -5,17 +5,20 @@ from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
 
+from django.conf import settings
+
 from main.config import ImageConstants, MeshConstants, VideoConstants
 
-from Journal.settings import ENTRY_FOLDER, MISSING_ICON_IMAGE
 
-RESOLVED_ENTRY_FOLDER = Path(ENTRY_FOLDER).resolve()
+def resolved_entry_folder() -> Path:
+    """Resolved path of the configured ENTRY_FOLDER."""
+    return Path(settings.ENTRY_FOLDER).resolve()
 
 
 def remove_empty_parent_folders(folder: Path):
     """Remove empty folders under the entry folder, stopping at ENTRY_FOLDER."""
     folder = folder.resolve()
-    root = Path(ENTRY_FOLDER).resolve()
+    root = resolved_entry_folder()
     if folder == root or root not in folder.parents:
         return
 
@@ -62,7 +65,7 @@ def make_parent_folders(target_folder: Path):
 
 def get_base_entry_path(file_name: Union[str, Path]) -> str:
     """Get path of object in entry folder"""
-    return f"{ENTRY_FOLDER}/{file_name}"
+    return f"{settings.ENTRY_FOLDER}/{file_name}"
 
 
 def extract_date_from_folder(folder: Path) -> Tuple[str, str, str]:
@@ -75,7 +78,7 @@ def extract_date_from_folder(folder: Path) -> Tuple[str, str, str]:
 
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
-    if image_file_path == MISSING_ICON_IMAGE:
+    if image_file_path == settings.MISSING_ICON_IMAGE:
         return image_file_path  # Already suitable to be an icon
 
     extention = (
@@ -83,20 +86,20 @@ def get_icon_file_path(image_file_path: Path) -> Path:
     )
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     _, month, year = extract_date_from_folder(image_file_path.parent)
-    return Path(f"{ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
+    return Path(f"{settings.ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
 
 
 def remove_icon_file(media_file_path: Path):
     """Delete the calendar icon for a media file if it exists."""
     icon_path = get_icon_file_path(media_file_path)
-    if icon_path.exists() and icon_path != MISSING_ICON_IMAGE:
+    if icon_path.exists() and icon_path != settings.MISSING_ICON_IMAGE:
         icon_path.unlink()
 
 
 def move_icon(source_media: Path, dest_media: Path) -> None:
     """Move the calendar icon for a media file to match its new dated folder."""
     old_icon = get_icon_file_path(source_media)
-    if not old_icon.exists() or old_icon == MISSING_ICON_IMAGE:
+    if not old_icon.exists() or old_icon == settings.MISSING_ICON_IMAGE:
         return
 
     new_icon = get_icon_file_path(dest_media)
@@ -115,7 +118,7 @@ def get_stored_media_folder(date_pattern: str) -> Optional[str]:
     if len(parts := date_pattern.split("-")) != 3:
         return None
     year, month, day = parts
-    return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
+    return f"{settings.ENTRY_FOLDER}/{year}/{month}/{day}"
 
 
 def move_dated_folder(
@@ -165,8 +168,8 @@ def get_stored_media_path(file_name: str, date_pattern: str) -> Optional[str]:
 
 def make_media_path_relative(file_name: str) -> str:
     """Remove entry folder from the beginning of file path"""
-    if file_name.startswith(ENTRY_FOLDER):
-        file_name = file_name[len(ENTRY_FOLDER) :]
+    if file_name.startswith(settings.ENTRY_FOLDER):
+        file_name = file_name[len(settings.ENTRY_FOLDER) :]
     return file_name
 
 

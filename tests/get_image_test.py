@@ -12,12 +12,10 @@ from tests.mocks import create_mock_client, create_mock_image_file
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
-def test_check_target_path_in_post_valid(tmp_path, monkeypatch):
+def test_check_target_path_in_post_valid(tmp_path):
     """Valid post data with an existing file should return the resolved path."""
     from main.content_generation.get_full_image import check_target_path_in_post
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_image_file(tmp_path)
     errors = ErrorDict()
     result = check_target_path_in_post(
@@ -38,12 +36,10 @@ def test_check_target_path_in_post_missing_fields():
     assert errors
 
 
-def test_check_target_path_in_post_file_not_found(tmp_path, monkeypatch):
+def test_check_target_path_in_post_file_not_found(tmp_path):
     """A file that doesn't exist on disk should return None with errors."""
     from main.content_generation.get_full_image import check_target_path_in_post
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     errors = ErrorDict()
     result = check_target_path_in_post(
         {"name": "2025-02-12", "file": "missing.jpg"}, errors
@@ -52,12 +48,10 @@ def test_check_target_path_in_post_file_not_found(tmp_path, monkeypatch):
     assert errors
 
 
-def test_create_full_image_base64_success(tmp_path, monkeypatch):
+def test_create_full_image_base64_success(tmp_path):
     """A valid JPEG path should return a base64 string with encoding prefix."""
     from main.content_generation.get_full_image import create_full_image_base64
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     image_path = create_mock_image_file(tmp_path)
     errors = ErrorDict()
     result = create_full_image_base64(str(image_path), errors)
@@ -78,12 +72,10 @@ def test_create_full_image_base64_unknown_encoding(tmp_path):
     assert "encoding" in errors
 
 
-def test_get_full_image_reponse_success(tmp_path, monkeypatch):
+def test_get_full_image_reponse_success(tmp_path):
     """A valid request with an existing image should return a base64 JSON response."""
     from main.content_generation.get_full_image import get_full_image_reponse
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_image_file(tmp_path)
     response = get_full_image_reponse({"name": "2025-02-12", "file": "photo.jpg"})
     assert isinstance(response, JsonResponse)
@@ -92,12 +84,10 @@ def test_get_full_image_reponse_success(tmp_path, monkeypatch):
     assert data["base64"].startswith("data:image/jpeg;base64,")
 
 
-def test_get_full_image_reponse_file_not_found(tmp_path, monkeypatch):
+def test_get_full_image_reponse_file_not_found(tmp_path):
     """A request for a nonexistent image should return a JSON error."""
     from main.content_generation.get_full_image import get_full_image_reponse
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     response = get_full_image_reponse({"name": "2025-02-12", "file": "missing.jpg"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)
@@ -114,10 +104,8 @@ def test_get_full_image_reponse_invalid_form():
     assert "error" in data
 
 
-def test_get_full_image_with_non_date_name_returns_json_error(tmp_path, monkeypatch):
+def test_get_full_image_with_non_date_name_returns_json_error():
     """`name` that is not YYYY-MM-DD must be rejected by the form."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-
     response = get_full_image_reponse({"name": "abc", "file": "photo.jpg"})
 
     assert "error" in json.loads(response.content)

@@ -116,7 +116,7 @@ class FullContentPath(Form):
             raise ValidationError(f"Date {clean_data['name']} is malformed")
 
         target = Path(stored_path).resolve()
-        if not target.is_relative_to(file_io.RESOLVED_ENTRY_FOLDER):
+        if not target.is_relative_to(file_io.resolved_entry_folder()):
             raise ValidationError("File is outside the entry folder")
 
         if not target.exists():

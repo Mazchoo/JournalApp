@@ -32,12 +32,10 @@ def test_get_video_mime_type_unknown_defaults_to_mp4():
     assert get_video_mime_type("video.xyz") == "video/mp4"
 
 
-def test_get_video_path_from_post_valid(tmp_path, monkeypatch):
+def test_get_video_path_from_post_valid(tmp_path):
     """Valid post data with an existing file should return the path."""
     from main.content_generation.get_full_video import get_video_path_from_post
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_video_file(tmp_path)
 
     errors = ErrorDict()
@@ -59,12 +57,10 @@ def test_get_video_path_from_post_missing_fields():
     assert errors
 
 
-def test_create_video_stream_response_success(tmp_path, monkeypatch):
+def test_create_video_stream_response_success(tmp_path):
     """An existing video file should return a FileResponse with correct headers."""
     from main.content_generation.get_full_video import create_video_stream_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     video_path = create_mock_video_file(tmp_path)
 
     errors = ErrorDict()
@@ -85,12 +81,10 @@ def test_create_video_stream_response_file_not_found():
     assert "file" in errors
 
 
-def test_get_full_video_response_success(tmp_path, monkeypatch):
+def test_get_full_video_response_success(tmp_path):
     """A valid request with an existing file should return a streaming FileResponse."""
     from main.content_generation.get_full_video import get_full_video_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_video_file(tmp_path)
 
     response = get_full_video_response({"name": "2025-02-12", "file": "clip.mp4"})
@@ -98,12 +92,10 @@ def test_get_full_video_response_success(tmp_path, monkeypatch):
     assert response["Content-Type"] == "video/mp4"
 
 
-def test_get_full_video_response_file_not_found(tmp_path, monkeypatch):
+def test_get_full_video_response_file_not_found(tmp_path):
     """A request for a nonexistent video should return a JSON error."""
     from main.content_generation.get_full_video import get_full_video_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     response = get_full_video_response({"name": "2025-02-12", "file": "missing.mp4"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)

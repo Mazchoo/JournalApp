@@ -12,14 +12,13 @@ FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
 @pytest.mark.django_db
-def test_get_downsized_mesh_image_success(tmp_path, monkeypatch):
+def test_get_downsized_mesh_image_success():
     """A valid mesh_id should return a base64 JSON response."""
     from main.models import Camera, EntryMesh
     from main.content_generation.get_downsized_mesh_image import (
         get_downsized_mesh_image_response,
     )
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     entry = create_mock_entry()
     mesh = EntryMesh.objects.create(
         entry=entry,

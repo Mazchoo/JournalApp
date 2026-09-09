@@ -12,12 +12,11 @@ FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
 @pytest.mark.django_db
-def test_get_downsized_image_success(tmp_path, monkeypatch):
+def test_get_downsized_image_success():
     """A valid image_id should return a base64 JSON response."""
     from main.models import EntryImage
     from main.content_generation.get_downsized_image import get_downsized_image_response
 
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     entry = create_mock_entry()
     img = EntryImage.objects.create(
         entry=entry,

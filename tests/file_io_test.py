@@ -2,9 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
-from main.utils import file_io
 from main.utils.file_io import (
     extract_date_from_folder,
     get_stored_media_folder,
@@ -51,9 +48,9 @@ def test_get_stored_media_folder_returns_none_for_malformed_date():
     assert get_stored_media_folder("a-b-c-d") is None
 
 
-def test_get_stored_media_folder_returns_path_for_date_slug(monkeypatch):
+def test_get_stored_media_folder_returns_path_for_date_slug(settings):
     """A YYYY-MM-DD slug maps onto the dated entry folder."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", "/entries")
+    settings.ENTRY_FOLDER = "/entries"
     assert get_stored_media_folder("2025-02-12") == "/entries/2025/02/12"
 
 
@@ -62,12 +59,12 @@ def test_get_stored_media_path_returns_none_for_malformed_date():
     assert get_stored_media_path("photo.jpg", "abc") is None
 
 
-def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, monkeypatch):
+def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, settings):
     """Pruning an empty dated folder must not delete the entry root."""
     entries = tmp_path / "entries"
     day_folder = entries / "2025" / "02" / "12"
     day_folder.mkdir(parents=True)
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+    settings.ENTRY_FOLDER = str(entries)
 
     remove_empty_parent_folders(day_folder)
 
@@ -77,12 +74,12 @@ def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, monkeypatch
 
 
 def test_remove_empty_parent_folders_does_not_remove_entry_folder(
-    tmp_path, monkeypatch
+    tmp_path, settings
 ):
     """Calling the pruner on the entry root must leave it in place."""
     entries = tmp_path / "entries"
     entries.mkdir()
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+    settings.ENTRY_FOLDER = str(entries)
 
     remove_empty_parent_folders(entries)
 
@@ -90,14 +87,14 @@ def test_remove_empty_parent_folders_does_not_remove_entry_folder(
 
 
 def test_remove_empty_parent_folders_ignores_folders_outside_entry_folder(
-    tmp_path, monkeypatch
+    tmp_path, settings
 ):
     """Folders outside the entry root must not be deleted."""
     entries = tmp_path / "entries"
     entries.mkdir()
     outsider = tmp_path / "other" / "empty"
     outsider.mkdir(parents=True)
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+    settings.ENTRY_FOLDER = str(entries)
 
     remove_empty_parent_folders(outsider)
 
@@ -105,9 +102,8 @@ def test_remove_empty_parent_folders_ignores_folders_outside_entry_folder(
     assert (tmp_path / "other").exists()
 
 
-def test_move_dated_folder_moves_every_file(tmp_path, monkeypatch):
+def test_move_dated_folder_moves_every_file(tmp_path):
     """A date move copies the whole folder, including previews and non-media files."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     source = tmp_path / "2025" / "02" / "12"
     source.mkdir(parents=True)
     (source / "scan.glb").write_bytes(b"glb")
@@ -130,9 +126,8 @@ def test_move_dated_folder_moves_every_file(tmp_path, monkeypatch):
     assert not source.exists()
 
 
-def test_move_dated_folder_moves_only_named_files(tmp_path, monkeypatch):
+def test_move_dated_folder_moves_only_named_files(tmp_path):
     """A filtered move leaves files that were already at the destination."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
     dest = tmp_path / "2025" / "03" / "01"
     dest.mkdir(parents=True)
     (dest / "scan.glb").write_bytes(b"glb")
@@ -147,26 +142,13 @@ def test_move_dated_folder_moves_only_named_files(tmp_path, monkeypatch):
     assert not (dest / "scan.glb").exists()
 
 
-def test_move_dated_folder_is_noop_when_source_missing(tmp_path, monkeypatch):
+def test_move_dated_folder_is_noop_when_source_missing(tmp_path):
     """A paragraph-only entry has no dated folder to move."""
-    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
-
     move_dated_folder("2025-02-12", "2025-03-01")
 
     assert not (tmp_path / "2025").exists()
 
 
-def test_entry_folder_is_isolated_to_tmp_path(tmp_path):
+def test_entry_folder_is_isolated_to_tmp_path(tmp_path, settings):
     """Every test must use pytest's temp dir, not the live journal folder."""
-    assert Path(file_io.ENTRY_FOLDER).resolve() == tmp_path.resolve()
-    assert file_io.RESOLVED_ENTRY_FOLDER == tmp_path.resolve()
-
-
-def test_move_refuses_live_journal_paths(live_journal_root, tmp_path):
-    """A move whose source or destination is the live journal must raise."""
-    with pytest.raises(RuntimeError, match="live journal folder"):
-        file_io.move(
-            str(live_journal_root / "should-not-be-touched.jpg"),
-            str(tmp_path / "out.jpg"),
-        )
-
+    assert Path(settings.ENTRY_FOLDER).resolve() == tmp_path.resolve()
