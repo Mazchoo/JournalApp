@@ -226,7 +226,20 @@ class CameraForm(ModelForm):
 
     class Meta:
         model = Camera
-        exclude = ("mesh",)
+        fields = [
+            "right_x",
+            "right_y",
+            "right_z",
+            "up_x",
+            "up_y",
+            "up_z",
+            "forward_x",
+            "forward_y",
+            "forward_z",
+            "radius",
+            "pan_x",
+            "pan_y",
+        ]
 
     @staticmethod
     def _orbit_vector_component(vector, ind: int) -> float:

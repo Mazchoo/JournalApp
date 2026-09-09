@@ -155,6 +155,7 @@ class EntryMesh(Model):
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
     image_path = models.CharField(max_length=256)
+    camera: Camera  # reverse OneToOne from Camera.mesh
 
     def __repr__(self):
         return f"mesh{self.pk} - Entry {self.entry.name}"
