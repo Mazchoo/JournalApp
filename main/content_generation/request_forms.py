@@ -108,9 +108,14 @@ class FullContentPath(Form):
         if clean_data is None:
             raise ValidationError("FullContentPath has no file provided")
 
-        target = Path(
-            file_io.get_stored_media_path(clean_data["file"], clean_data["name"])
-        ).resolve()
+        if (
+            stored_path := file_io.get_stored_media_path(
+                clean_data["file"], clean_data["name"]
+            )
+        ) is None:
+            raise ValidationError(f"Date {clean_data['name']} is malformed")
+
+        target = Path(stored_path).resolve()
         if not target.is_relative_to(file_io.RESOLVED_ENTRY_FOLDER):
             raise ValidationError("File is outside the entry folder")
 

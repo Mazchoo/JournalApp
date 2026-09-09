@@ -66,7 +66,10 @@ def move_files_out_of_folder(
 
 def move_files_from_entry(entry: Entry, ignore_file_names: Optional[List[str]] = None):
     """Move files from entry's date folder to base folder"""
-    image_folder = Path(get_stored_media_folder(entry.name))
+    if (stored_folder := get_stored_media_folder(entry.name)) is None:
+        return
+
+    image_folder = Path(stored_folder)
     if not image_folder.exists():
         return
 

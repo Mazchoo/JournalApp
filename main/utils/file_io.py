@@ -1,6 +1,6 @@
 """Helpers to move files between paths"""
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
@@ -88,15 +88,19 @@ def remove_icon_file(media_file_path: Path):
         icon_path.unlink()
 
 
-def get_stored_media_folder(date_pattern: str) -> str:
-    """Get folder path from date pattern"""
-    year, month, day = date_pattern.split("-")
+def get_stored_media_folder(date_pattern: str) -> Optional[str]:
+    """Get folder path from date pattern, or None if it is not year-month-day."""
+    if len(parts := date_pattern.split("-")) != 3:
+        return None
+    year, month, day = parts
     return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
 
 
-def get_stored_media_path(file_name: str, date_pattern: str) -> str:
-    """Get path of file entry folder"""
-    return f"{get_stored_media_folder(date_pattern)}/{file_name}"
+def get_stored_media_path(file_name: str, date_pattern: str) -> Optional[str]:
+    """Get path of file in the entry folder, or None if the date pattern is malformed."""
+    if (folder := get_stored_media_folder(date_pattern)) is None:
+        return None
+    return f"{folder}/{file_name}"
 
 
 def make_media_path_relative(file_name: str) -> str:

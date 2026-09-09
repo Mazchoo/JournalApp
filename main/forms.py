@@ -107,7 +107,9 @@ class ImageForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        target_path = get_stored_media_path(file_name, entry.name)
+        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
+            raise forms.ValidationError(f"Date {entry.name} is malformed")
+
         target_file_obj = Path(target_path)
 
         source_path = get_base_entry_path(file_name)
@@ -177,7 +179,9 @@ class VideoForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        target_path = get_stored_media_path(file_name, entry.name)
+        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
+            raise forms.ValidationError(f"Date {entry.name} is malformed")
+
         target_file_obj = Path(target_path)
 
         source_path = get_base_entry_path(file_name)
@@ -306,7 +310,9 @@ class MeshForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        target_path = get_stored_media_path(file_name, entry.name)
+        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
+            raise forms.ValidationError(f"Date {entry.name} is malformed")
+
         target_file_obj = Path(target_path)
 
         if target_file_obj.suffix.lower() not in MeshConstants.supported_extensions:

@@ -6,6 +6,7 @@ import pytest
 from django.forms.utils import ErrorDict
 from django.http import JsonResponse
 
+from main.content_generation.get_full_image import get_full_image_reponse
 from tests.mocks import create_mock_client, create_mock_image_file
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
@@ -111,6 +112,15 @@ def test_get_full_image_reponse_invalid_form():
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)
     assert "error" in data
+
+
+def test_get_full_image_with_non_date_name_returns_json_error(tmp_path, monkeypatch):
+    """`name` that is not YYYY-MM-DD must be rejected by the form."""
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+
+    response = get_full_image_reponse({"name": "abc", "file": "photo.jpg"})
+
+    assert "error" in json.loads(response.content)
 
 
 @pytest.mark.django_db
