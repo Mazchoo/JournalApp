@@ -6,6 +6,9 @@
 /** Home-page carousel auto-advance interval. */
 export const AUTO_CYCLE_MS = 5000;
 
+/** Bootstrap `.carousel.slide` transform duration. */
+export const CAROUSEL_SLIDE_MS = 1200;
+
 /** TinyMCE editor height when none is stored on the paragraph. */
 export const PARAGRAPH_EDITOR_HEIGHT_PX = 220;
 
