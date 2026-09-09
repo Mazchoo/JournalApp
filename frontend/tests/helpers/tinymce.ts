@@ -34,7 +34,7 @@ export interface FakeEditor {
   handlers: Record<string, (() => void)[]>;
   getContent(): string;
   setContent(value: string): void;
-  getContainer(): { clientHeight: number };
+  getContainer(): HTMLElement;
   remove(): void;
   on(name: string, handler: () => void): void;
   fire(name: string): void;
@@ -52,6 +52,7 @@ const DEFAULT_CONTAINER_HEIGHT = 300;
 
 /** Build a TinyMCE editor stand-in owned by the given fake. */
 function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
+  const container = document.createElement("div");
   const editor: FakeEditor = {
     id,
     content: "",
@@ -67,10 +68,11 @@ function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
       editor.content = value;
     },
     /** Return the fake editor container. */
-    getContainer: () => ({ clientHeight: editor.containerHeight }),
+    getContainer: () => container,
     /** Mark the editor removed and drop it from the owner. */
     remove: () => {
       editor.removed = true;
+      editor.fire("remove");
       owner.editors.delete(id);
     },
     /** Register an event handler. */
@@ -94,6 +96,10 @@ function createEditor(owner: FakeTinyMCE, id: string): FakeEditor {
       },
     },
   };
+  Object.defineProperty(container, "clientHeight", {
+    configurable: true,
+    get: () => editor.containerHeight,
+  });
   return editor;
 }
 

@@ -104,6 +104,76 @@ describe("createTinyMCE", () => {
     ).toBe(true);
   });
 
+  it("enables the save button when TinyMCE reports a resize", () => {
+    createTinyMCE("#paragraph0", 220, true);
+
+    tinymce.get("paragraph0")!.fire("ResizeEditor");
+
+    expect(
+      document.getElementById("btn-save")!.classList.contains("btn-success"),
+    ).toBe(true);
+  });
+
+  it("enables the save button when the editor container height changes", () => {
+    const observers: Array<{ callback: () => void }> = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          observers.push({ callback });
+        }
+        observe(): void {}
+        disconnect(): void {}
+        unobserve(): void {}
+      },
+    );
+
+    try {
+      createTinyMCE("#paragraph0", 220, true);
+      const editor = tinymce.get("paragraph0")!;
+      observers[0]!.callback();
+      expect(
+        document.getElementById("btn-save")!.classList.contains("btn-success"),
+      ).toBe(false);
+
+      editor.containerHeight = 480;
+      observers[0]!.callback();
+
+      expect(
+        document.getElementById("btn-save")!.classList.contains("btn-success"),
+      ).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("does not enable save when a resize leaves the container height unchanged", () => {
+    const observers: Array<{ callback: () => void }> = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          observers.push({ callback });
+        }
+        observe(): void {}
+        disconnect(): void {}
+        unobserve(): void {}
+      },
+    );
+
+    try {
+      createTinyMCE("#paragraph0", 220, true);
+      observers[0]!.callback();
+      observers[0]!.callback();
+
+      expect(
+        document.getElementById("btn-save")!.classList.contains("btn-success"),
+      ).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("opens a file picker when the Import HTML button is pressed", () => {
     const click = vi
       .spyOn(HTMLInputElement.prototype, "click")

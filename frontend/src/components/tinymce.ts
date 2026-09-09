@@ -5,6 +5,40 @@ import { tiny } from "../runtime/externals";
 import type { SynthesisEditor } from "../runtime/synthesis-editor";
 import { SYNTHESIS_BUTTON_TOOLTIP } from "../tooltip-messages";
 
+/** Drop the previous height observer when the same editor is rebuilt. */
+const editorHeightObservers = new WeakMap<HTMLElement, ResizeObserver>();
+
+/**
+ * Enable save when the editor container's height changes.
+ * TinyMCE's `input` event does not fire for the resize handle.
+ */
+function watchEditorHeight(editor: Editor, onDirty: () => void): void {
+  const container = editor.getContainer();
+  if (!(container instanceof HTMLElement)) return;
+  if (typeof ResizeObserver === "undefined") return;
+
+  editorHeightObservers.get(container)?.disconnect();
+  let lastHeight = container.clientHeight;
+  let primed = false;
+  const observer = new ResizeObserver(() => {
+    const height = container.clientHeight;
+    if (!primed) {
+      primed = true;
+      lastHeight = height;
+      return;
+    }
+    if (height === lastHeight) return;
+    lastHeight = height;
+    onDirty();
+  });
+  observer.observe(container);
+  editorHeightObservers.set(container, observer);
+  editor.on("remove", () => {
+    observer.disconnect();
+    editorHeightObservers.delete(container);
+  });
+}
+
 /** Initialise a TinyMCE editor with the journal toolbar. */
 export function createTinyMCE(
   componentName: string,
@@ -59,8 +93,12 @@ export function createTinyMCE(
       editor.on("input", () => {
         onDirty();
       });
+      editor.on("ResizeEditor", () => {
+        onDirty();
+      });
       editor.on("init", () => {
         initCallback();
+        watchEditorHeight(editor, onDirty);
       });
     },
   };
