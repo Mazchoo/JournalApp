@@ -16,6 +16,7 @@ def test_check_target_path_in_post_valid(tmp_path, monkeypatch):
     from main.content_generation.get_full_image import check_target_path_in_post
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_image_file(tmp_path)
     errors = ErrorDict()
     result = check_target_path_in_post(
@@ -41,6 +42,7 @@ def test_check_target_path_in_post_file_not_found(tmp_path, monkeypatch):
     from main.content_generation.get_full_image import check_target_path_in_post
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     errors = ErrorDict()
     result = check_target_path_in_post(
         {"name": "2025-02-12", "file": "missing.jpg"}, errors
@@ -54,6 +56,7 @@ def test_create_full_image_base64_success(tmp_path, monkeypatch):
     from main.content_generation.get_full_image import create_full_image_base64
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     image_path = create_mock_image_file(tmp_path)
     errors = ErrorDict()
     result = create_full_image_base64(str(image_path), errors)
@@ -79,6 +82,7 @@ def test_get_full_image_reponse_success(tmp_path, monkeypatch):
     from main.content_generation.get_full_image import get_full_image_reponse
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_image_file(tmp_path)
     response = get_full_image_reponse({"name": "2025-02-12", "file": "photo.jpg"})
     assert isinstance(response, JsonResponse)
@@ -92,6 +96,7 @@ def test_get_full_image_reponse_file_not_found(tmp_path, monkeypatch):
     from main.content_generation.get_full_image import get_full_image_reponse
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     response = get_full_image_reponse({"name": "2025-02-12", "file": "missing.jpg"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)

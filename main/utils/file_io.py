@@ -9,6 +9,8 @@ from main.config import ImageConstants, MeshConstants, VideoConstants
 
 from Journal.settings import ENTRY_FOLDER, MISSING_ICON_IMAGE
 
+RESOLVED_ENTRY_FOLDER = Path(ENTRY_FOLDER).resolve()
+
 
 def remove_empty_parent_folders(folder: Path):
     """Remove entry folders with no contents"""

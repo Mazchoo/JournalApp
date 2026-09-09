@@ -30,6 +30,7 @@ def test_get_mesh_path_from_post_valid(tmp_path, monkeypatch):
     from main.content_generation.get_full_mesh import get_mesh_path_from_post
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_stored_mesh_file(tmp_path)
 
     errors = ErrorDict()
@@ -54,6 +55,7 @@ def test_create_mesh_stream_response_success(tmp_path, monkeypatch):
     from main.content_generation.get_full_mesh import create_mesh_stream_response
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     mesh_path = create_mock_stored_mesh_file(tmp_path)
 
     errors = ErrorDict()
@@ -78,6 +80,7 @@ def test_get_full_mesh_response_success(tmp_path, monkeypatch):
     from main.content_generation.get_full_mesh import get_full_mesh_response
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     create_mock_stored_mesh_file(tmp_path)
 
     response = get_full_mesh_response({"name": "2025-02-12", "file": "scan.glb"})
@@ -90,6 +93,7 @@ def test_get_full_mesh_response_file_not_found(tmp_path, monkeypatch):
     from main.content_generation.get_full_mesh import get_full_mesh_response
 
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr("main.utils.file_io.RESOLVED_ENTRY_FOLDER", tmp_path.resolve())
     response = get_full_mesh_response({"name": "2025-02-12", "file": "missing.glb"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)

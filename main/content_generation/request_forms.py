@@ -8,8 +8,8 @@ from django.forms import Form, SlugField, CharField, IntegerField, ValidationErr
 from main.config import DateConstants
 from main.database_layer.date_slugs import get_valid_date_from_slug
 from main.models import Entry
+from main.utils import file_io
 from main.utils.date import date_exists
-from main.utils.file_io import get_stored_media_path
 
 
 class MonthNameForm(Form):
@@ -108,12 +108,16 @@ class FullContentPath(Form):
         if clean_data is None:
             raise ValidationError("FullContentPath has no file provided")
 
-        target_path = get_stored_media_path(clean_data["file"], clean_data["name"])
+        target = Path(
+            file_io.get_stored_media_path(clean_data["file"], clean_data["name"])
+        ).resolve()
+        if not target.is_relative_to(file_io.RESOLVED_ENTRY_FOLDER):
+            raise ValidationError("File is outside the entry folder")
 
-        if not Path(target_path).exists():
-            raise ValidationError(f"File {target_path} does not exist")
+        if not target.exists():
+            raise ValidationError(f"File {target} does not exist")
 
-        return target_path
+        return str(target)
 
 
 class DateMoveForm(Form):
