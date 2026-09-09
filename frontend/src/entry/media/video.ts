@@ -1,4 +1,3 @@
-import { videoModal, videoPreview } from "../../components/globals";
 import { MediaEntry } from "../../components/media-entry";
 import { requestFullVideo } from "../make-request";
 import type { JsonErrorResponse } from "../../response-interface";
@@ -9,6 +8,7 @@ import { enableSaveButton } from "../save";
 export function readVideoResource(inputFile: File, contentId: string): void {
   const media = MediaEntry.fromIndex(contentId);
   if (media === null) return;
+  MediaEntry.hideImage(media);
   const reader = new FileReader();
 
   reader.onload = (e) => {
@@ -27,14 +27,8 @@ export function changeImageToVideoClass(
   return MediaEntry.changeToVideoClass(media) ? true : undefined;
 }
 
-/** Open the full video in a modal. */
-export function zoomToVideo(
-  media: MediaEntry,
-  fileName: string,
-  source: string | null,
-): void {
-  let videoSource = source;
-
+/** Fetch the full video and play it in the row. Videos do not use a modal. */
+export function zoomToVideo(media: MediaEntry, fileName: string): void {
   requestFullVideo(
     {
       file: fileName,
@@ -43,7 +37,7 @@ export function zoomToVideo(
     {
       success: (response) => {
         const videoBlob = new Blob([response], { type: "video/mp4" });
-        videoSource = URL.createObjectURL(videoBlob);
+        MediaEntry.showVideo(media, URL.createObjectURL(videoBlob));
       },
       error: (jqXhr, _textStatus, errorThrown) => {
         const responseJSON = jqXhr.responseJSON as
@@ -53,10 +47,6 @@ export function zoomToVideo(
         } else {
           console.log(`Unknown error : ${errorThrown}`);
         }
-      },
-      complete: () => {
-        videoPreview.setSrc(videoSource!);
-        videoModal.show();
       },
     },
   );

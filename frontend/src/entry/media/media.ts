@@ -150,13 +150,16 @@ export function editMediaMeta(
   return MediaEntry.applyMeta(media, mediaContent);
 }
 
-/** Open the full image, video, or mesh in a modal. */
+/** Open the full image or mesh in a modal, or play a saved video in place. */
 export function zoomToMedia(event: Event): void {
   const media = MediaEntry.fromEvent(event);
   if (media === null) return;
 
+  if (MediaEntry.isVideoElementTarget(event) || media.isInlineVideoShown()) {
+    return;
+  }
+
   const fileName = media.fileNameHtml();
-  const source = media.src();
 
   if (media.isMesh()) {
     const canvas = meshModalPreview.canvas();
@@ -169,9 +172,9 @@ export function zoomToMedia(event: Event): void {
     return;
   }
 
-  if (media.isImage()) {
+  if (media.isImageShown()) {
     openFullImage(media);
   } else if (media.isVideo()) {
-    zoomToVideo(media, fileName, source);
+    zoomToVideo(media, fileName);
   }
 }

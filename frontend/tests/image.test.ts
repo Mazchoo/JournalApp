@@ -197,6 +197,24 @@ describe("initializeNewMedia", () => {
       document.getElementById("image-modal")!.classList.contains("show"),
     ).toBe(true);
   });
+
+  it("does not open a modal when a just-loaded video is clicked", async () => {
+    initializeNewMedia("0");
+    readVideoResource(fileNamed("holiday.mp4", "binary", "video/mp4"), "0");
+    await waitForSrc("video0");
+
+    document
+      .getElementById("video0")!
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(ajax.calls).toHaveLength(0);
+    expect(
+      document.getElementById("image-modal")!.classList.contains("show"),
+    ).toBe(false);
+    expect(
+      document.getElementById("video-modal")!.classList.contains("show"),
+    ).toBe(false);
+  });
 });
 
 describe("insertNewMediaToPosition", () => {
@@ -241,6 +259,18 @@ describe("readMediaResource", () => {
       document.getElementById("btn-save")!.classList.contains("btn-success"),
     ).toBe(true);
   });
+
+  it("shows the image again when an image replaces a video on the same row", async () => {
+    readVideoResource(fileNamed("holiday.mp4", "binary", "video/mp4"), "0");
+    await waitForSrc("video0");
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
+
+    readImageResource(fileNamed("sunrise.png", "binary", "image/png"), "0");
+    await waitForSrc("image0");
+
+    expect(document.getElementById("image0")!.style.visibility).toBe("visible");
+    expect(document.getElementById("video0")!.style.visibility).toBe("hidden");
+  });
 });
 
 describe("readVideoResource", () => {
@@ -251,6 +281,7 @@ describe("readVideoResource", () => {
     const video = document.getElementById("video0")!;
     expect(video.style.visibility).toBe("visible");
     expect(video.style.height).toBe("auto");
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
   });
 });
 
@@ -559,7 +590,7 @@ describe("zoomToMedia", () => {
     log.mockRestore();
   });
 
-  it("requests the video as a blob and shows it in the video modal", async () => {
+  it("requests the video as a blob and plays it in place", async () => {
     renderDayPage({ rows: ["video"] });
     ajax = stubAjax();
     document.getElementById("upload-label0")!.innerHTML = "holiday.mp4";
@@ -572,12 +603,28 @@ describe("zoomToMedia", () => {
 
     await ajax.succeed(new Blob(["video-bytes"], { type: "video/mp4" }));
     expect(createObjectURL).toHaveBeenCalledTimes(1);
-    expect(document.getElementById("video-preview")!.getAttribute("src")).toBe(
-      "blob:journal/video",
-    );
+    const video = document.getElementById("video0")!;
+    expect(video.getAttribute("src")).toBe("blob:journal/video");
+    expect(video.style.visibility).toBe("visible");
+    expect(document.getElementById("image0")!.style.visibility).toBe("hidden");
     expect(
       document.getElementById("video-modal")!.classList.contains("show"),
-    ).toBe(true);
+    ).toBe(false);
+  });
+
+  it("does not open a modal when an already-playing video is clicked", async () => {
+    readVideoResource(fileNamed("holiday.mp4", "binary", "video/mp4"), "0");
+    await waitForSrc("video0");
+
+    clickImageArea();
+
+    expect(ajax.calls).toHaveLength(0);
+    expect(
+      document.getElementById("image-modal")!.classList.contains("show"),
+    ).toBe(false);
+    expect(
+      document.getElementById("video-modal")!.classList.contains("show"),
+    ).toBe(false);
   });
 
   it("reports a JSON error body from the video endpoint", async () => {

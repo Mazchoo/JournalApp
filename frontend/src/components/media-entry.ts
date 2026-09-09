@@ -117,7 +117,7 @@ export class MediaEntry extends ContentRow implements IContent {
   }
 
   /**
-   * Write a data URL (or remote src) onto the `<img>`.
+   * Write a data URL (or remote src) onto the `<img>` and show it.
    * `localFull` marks a just-uploaded original so zoom can skip the server.
    */
   static setSrc(media: MediaEntry, src: string, localFull = false): void {
@@ -126,6 +126,8 @@ export class MediaEntry extends ContentRow implements IContent {
       return;
     }
     media.image.setAttribute("src", src);
+    media.image.style.visibility = "visible";
+    media.image.style.height = "auto";
     if (localFull) {
       media.image.dataset.localFull = "1";
     } else {
@@ -143,15 +145,21 @@ export class MediaEntry extends ContentRow implements IContent {
     MediaEntry.hideMedia(media.image, `#image${media.index}`);
   }
 
-  /** Reveal the video element and set its source. */
+  /** Reveal the video element and set its source, hiding the poster image. */
   static showVideo(media: MediaEntry, src: string): void {
     if (media.video === null) {
       console.error(`MediaEntry: #video${media.index} does not exist`);
       return;
     }
+    MediaEntry.hideImage(media);
     media.video.style.visibility = "visible";
     media.video.style.height = "auto";
     media.video.setAttribute("src", src);
+  }
+
+  /** Whether the click landed on an inline `<video>` player. */
+  static isVideoElementTarget(event: Event): boolean {
+    return event.target instanceof HTMLVideoElement;
   }
 
   /** Reveal the mesh canvas. Returns false when the canvas is missing. */
@@ -348,9 +356,23 @@ export class MediaEntry extends ContentRow implements IContent {
     return this.image?.classList.contains("content-image") ?? false;
   }
 
+  /** Whether the still-image thumbnail is currently on screen. */
+  isImageShown(): boolean {
+    return this.isImage() && this.image?.style.visibility !== "hidden";
+  }
+
   /** Whether the thumbnail is tagged as a video poster. */
   isVideo(): boolean {
     return this.image?.classList.contains("content-video") ?? false;
+  }
+
+  /** Whether the inline `<video>` is currently shown with a source. */
+  isInlineVideoShown(): boolean {
+    return (
+      this.video !== null &&
+      this.video.style.visibility === "visible" &&
+      hasMediaSrc(this.video)
+    );
   }
 
   /** Whether this row is a mesh (saved id, visible canvas, or .glb file name). */
