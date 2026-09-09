@@ -6,6 +6,7 @@ IContentTypes = Literal["image", "paragraph", "video", "mesh"]
 ALLOWED_CONTENT_TYPES = set(get_args(IContentTypes))
 
 NR_IMAGES_TO_DISPLAY = 18
+NR_ATTEMPTS_TO_SELECT_IMAGE = 10
 
 IDayNamesOfWeek = Tuple[str, str, str, str, str, str, str]
 IMonthNamesOfYear = Tuple[str, str, str, str, str, str, str, str, str, str, str, str]

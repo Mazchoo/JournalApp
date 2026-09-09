@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Tuple, Union
 
-from main.config import DateConstants
+from main.config import DateConstants, NR_ATTEMPTS_TO_SELECT_IMAGE
 from main.database_layer.fe_interfaces import YearEntryInformationContext
 from main.models import Entry, EntryImage, EntryMesh, EntryVideo
 from main.utils.image import get_base64_from_image, lazy_create_image_icon
@@ -65,14 +65,18 @@ def get_icon_for_each_month(year: int) -> dict[str, str]:
         image_files.extend(
             [Path(get_base_entry_path(Path(mesh.file_path))) for mesh in month_meshes]
         )
-        valid_images = list(filter(lambda p: p.exists(), image_files))
+        last_ind = len(image_files) - 1
 
-        if valid_images:
-            selected_image = valid_images[random.randint(0, len(valid_images) - 1)]
+        if not image_files:
+            continue
+
+        for i in range(NR_ATTEMPTS_TO_SELECT_IMAGE):
+            selected_image = image_files[random.randint(0, last_ind)]
             selected_icon_path = get_icon_file_path(selected_image)
 
             if lazy_create_image_icon(selected_image):
                 output_dict[month_name] = get_base64_from_image(selected_icon_path)
+                break
 
     return output_dict
 

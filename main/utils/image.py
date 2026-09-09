@@ -54,7 +54,7 @@ def lazy_create_image_icon(target_path_obj: Path):
     if source_paths is None:
         return False
     if get_icon_file_path(source_paths[0]).exists():
-        return False
+        return True
     return write_image_icon(target_path_obj)
 
 
