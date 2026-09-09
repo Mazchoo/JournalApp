@@ -5,6 +5,7 @@ from typing import Optional, Dict, List, Any
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
 from django.forms import model_to_dict
+from django.db import transaction
 
 from main.models import Entry, Content
 from main.forms import EntryForm, ContentForm
@@ -110,22 +111,28 @@ def update_entry_date(
 ) -> Optional[Entry]:
     """Load and move entry from source date slug to destination date slug"""
     entry = Entry.objects.get(name=source_slug)
-    new_entry = create_new_entry_at_new_date(entry, destination_slug, errors)
-    if errors or new_entry is None:
-        return new_entry
+    moved = move_dated_folder(source_slug, destination_slug)
+    try:
+        with transaction.atomic():
+            new_entry = create_new_entry_at_new_date(entry, destination_slug, errors)
+            if errors or new_entry is None:
+                raise RuntimeError
 
-    move_dated_folder(source_slug, destination_slug)
+            content_ids = []
+            for content in list(entry.content.all()):
+                update_all_content_with_new_entry(
+                    content, destination_slug, content_ids, errors
+                )
 
-    content_ids = []
-    for content in entry.content.all():
-        update_all_content_with_new_entry(
-            content, destination_slug, content_ids, errors
-        )
+            if errors:
+                raise RuntimeError
 
-    new_entry.content.set(content_ids)
-    new_entry.save()
-    if not errors:
-        entry.delete()
+            new_entry.content.set(content_ids)
+            new_entry.save()
+            entry.delete()
+    except Exception:
+        move_dated_folder(destination_slug, source_slug, moved)
+        return None
 
     return new_entry
 
@@ -143,12 +150,15 @@ def move_source_date_to_desination_request(post_data: dict) -> JsonResponse:
         cleaned_data["move_from"], cleaned_data["move_to"], errors
     )
 
-    if new_entry is None:
+    if errors or new_entry is None:
         return JsonResponse({"error": f"Update errors {errors}"})
 
-    if date_tuple := convert_date_to_url_tuple(
+    date_tuple = convert_date_to_url_tuple(
         new_entry.year, new_entry.month, new_entry.day
-    ):
-        return JsonResponse({"new_date": f"/edit/{'/'.join(date_tuple)}"})
+    )
+    if date_tuple is None:
+        return JsonResponse(
+            {"error": "Could not convert destination date to an edit URL"}
+        )
 
-    return JsonResponse({"error": f"Update errors {errors}"})
+    return JsonResponse({"new_date": f"/edit/{'/'.join(date_tuple)}"})

@@ -1,13 +1,17 @@
 """Tests for the move_entry_date AJAX view (URL: /ajax/move-date/)."""
 
 import json
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
 from django.apps import apps
 from django.http import JsonResponse
 
-from main.content_generation.move_date import move_source_date_to_desination_request
+from main.content_generation.move_date import (
+    move_source_date_to_desination_request,
+    update_entry_date,
+)
 from main.content_generation.save_entry import update_or_generate_from_request
 from tests.mocks import (
     create_ajax_headers,
@@ -137,6 +141,63 @@ def test_move_entry_keeps_mesh_content(tmp_path, monkeypatch):
     assert not (tmp_path / "icons" / "2025" / "02" / "scan_icon.jpg").exists()
     assert not list(tmp_path.rglob("*_resized_icon*"))
     assert not (tmp_path / "2025" / "02" / "12").exists()
+
+
+@pytest.mark.django_db
+def test_failed_move_restores_only_files_it_moved(tmp_path):
+    """A rolled-back date move must not pull files that already lived at dest."""
+    Entry = apps.get_model("main", "Entry")
+    source = tmp_path / "2025" / "02" / "12"
+    dest = tmp_path / "2025" / "03" / "01"
+    source.mkdir(parents=True)
+    dest.mkdir(parents=True)
+    (source / "moved.jpg").write_bytes(b"src")
+    (dest / "already.jpg").write_bytes(b"dest")
+
+    create_mock_entry()
+    Entry.objects.create(
+        name="2025-03-01",
+        year=2025,
+        month=3,
+        day=1,
+        first_created=datetime(2025, 3, 1, 10, 0, 0),
+        last_edited=datetime(2025, 3, 1, 10, 0, 0),
+    )
+
+    errors = {}
+    result = update_entry_date("2025-02-12", "2025-03-01", errors)
+
+    assert result is None
+    assert errors
+    assert Entry.objects.filter(name="2025-02-12").exists()
+    assert Entry.objects.filter(name="2025-03-01").exists()
+    assert (source / "moved.jpg").read_bytes() == b"src"
+    assert (dest / "already.jpg").read_bytes() == b"dest"
+    assert not (dest / "moved.jpg").exists()
+
+
+@pytest.mark.django_db
+def test_move_entry_reports_error_when_destination_url_cannot_be_built(
+    tmp_path, monkeypatch
+):
+    """Failing to build the edit URL must not fall back to a generic update error."""
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    monkeypatch.setattr(
+        "main.content_generation.move_date.move_dated_folder",
+        lambda *args, **kwargs: [],
+    )
+    create_mock_entry()
+
+    with patch(
+        "main.content_generation.move_date.convert_date_to_url_tuple",
+        return_value=None,
+    ):
+        response = move_source_date_to_desination_request(
+            {"move_from": "2025-02-12", "move_to": "2025-03-01"}
+        )
+
+    data = json.loads(response.content)
+    assert data == {"error": "Could not convert destination date to an edit URL"}
 
 
 @pytest.mark.django_db

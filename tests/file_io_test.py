@@ -2,6 +2,9 @@
 
 from pathlib import Path
 
+import pytest
+
+from main.utils import file_io
 from main.utils.file_io import (
     extract_date_from_folder,
     get_stored_media_folder,
@@ -114,9 +117,10 @@ def test_move_dated_folder_moves_every_file(tmp_path, monkeypatch):
     icon_dir.mkdir(parents=True)
     (icon_dir / "scan_icon.jpg").write_bytes(b"icon")
 
-    move_dated_folder("2025-02-12", "2025-03-01")
+    moved = move_dated_folder("2025-02-12", "2025-03-01")
 
     dest = tmp_path / "2025" / "03" / "01"
+    assert set(moved) == {"scan.glb", "scan_resized.jpeg", "notes.txt"}
     assert (dest / "scan.glb").read_bytes() == b"glb"
     assert (dest / "scan_resized.jpeg").read_bytes() == b"jpg"
     assert (dest / "notes.txt").read_text() == "keep"
@@ -126,6 +130,23 @@ def test_move_dated_folder_moves_every_file(tmp_path, monkeypatch):
     assert not source.exists()
 
 
+def test_move_dated_folder_moves_only_named_files(tmp_path, monkeypatch):
+    """A filtered move leaves files that were already at the destination."""
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    dest = tmp_path / "2025" / "03" / "01"
+    dest.mkdir(parents=True)
+    (dest / "scan.glb").write_bytes(b"glb")
+    (dest / "already.txt").write_bytes(b"keep")
+
+    moved = move_dated_folder("2025-03-01", "2025-02-12", ["scan.glb"])
+
+    source = tmp_path / "2025" / "02" / "12"
+    assert moved == ["scan.glb"]
+    assert (source / "scan.glb").read_bytes() == b"glb"
+    assert (dest / "already.txt").read_bytes() == b"keep"
+    assert not (dest / "scan.glb").exists()
+
+
 def test_move_dated_folder_is_noop_when_source_missing(tmp_path, monkeypatch):
     """A paragraph-only entry has no dated folder to move."""
     monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
@@ -133,3 +154,19 @@ def test_move_dated_folder_is_noop_when_source_missing(tmp_path, monkeypatch):
     move_dated_folder("2025-02-12", "2025-03-01")
 
     assert not (tmp_path / "2025").exists()
+
+
+def test_entry_folder_is_isolated_to_tmp_path(tmp_path):
+    """Every test must use pytest's temp dir, not the live journal folder."""
+    assert Path(file_io.ENTRY_FOLDER).resolve() == tmp_path.resolve()
+    assert file_io.RESOLVED_ENTRY_FOLDER == tmp_path.resolve()
+
+
+def test_move_refuses_live_journal_paths(live_journal_root, tmp_path):
+    """A move whose source or destination is the live journal must raise."""
+    with pytest.raises(RuntimeError, match="live journal folder"):
+        file_io.move(
+            str(live_journal_root / "should-not-be-touched.jpg"),
+            str(tmp_path / "out.jpg"),
+        )
+

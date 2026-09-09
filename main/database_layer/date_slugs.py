@@ -4,6 +4,7 @@ from datetime import datetime
 import re
 from typing import Tuple, Optional
 
+from main.config import DateConstants
 from main.utils.date import get_month_name
 
 
@@ -25,6 +26,10 @@ def get_valid_date_from_slug(slug: str) -> Optional[datetime]:
     return slug_date
 
 
-def convert_date_to_url_tuple(year: int, month: int, day: int) -> Tuple[str, str, str]:
+def convert_date_to_url_tuple(
+    year: int, month: int, day: int
+) -> Optional[Tuple[str, str, str]]:
     """Convert year, month, and day integers to a URL tuple of strings."""
+    if month < 1 or month > len(DateConstants.month_names):
+        return None
     return (str(year), get_month_name(month), str(day))

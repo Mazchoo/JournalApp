@@ -49,6 +49,12 @@ def test_convert_date_to_url_tuple():
     assert result == ("2025", "February", "12")
 
 
+def test_convert_date_to_url_tuple_rejects_invalid_month():
+    """A month outside 1-12 cannot be turned into a URL tuple."""
+    assert convert_date_to_url_tuple(2025, 0, 12) is None
+    assert convert_date_to_url_tuple(2025, 13, 12) is None
+
+
 def test_date_exists_valid():
     """A real date should return True."""
     assert date_exists(2025, "February", 12) is True

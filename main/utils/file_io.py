@@ -1,6 +1,6 @@
 """Helpers to move files between paths"""
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 from pathlib import Path
 from os import listdir, rmdir, mkdir
 from shutil import move
@@ -118,29 +118,42 @@ def get_stored_media_folder(date_pattern: str) -> Optional[str]:
     return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
 
 
-def move_dated_folder(source_slug: str, destination_slug: str) -> None:
-    """Move every file from one dated entry folder into another."""
+def move_dated_folder(
+    source_slug: str,
+    destination_slug: str,
+    filenames: Optional[List[str]] = None,
+) -> List[str]:
+    """Move files from one dated entry folder into another.
+
+    If filenames is given, only those names are moved.
+    Returns the names that were moved.
+    """
+    moved: List[str] = []
     source_folder = get_stored_media_folder(source_slug)
     dest_folder = get_stored_media_folder(destination_slug)
     if source_folder is None or dest_folder is None:
-        return
+        return moved
 
     source_path = Path(source_folder)
     dest_path = Path(dest_folder)
     if not source_path.is_dir() or source_path.resolve() == dest_path.resolve():
-        return
+        return moved
 
     make_parent_folders(dest_path)
     for item in list(source_path.iterdir()):
         if not item.is_file():
+            continue
+        if filenames is not None and item.name not in filenames:
             continue
         target = dest_path / item.name
         if target.exists():
             target.unlink()
         move_icon(item, target)
         move(str(item), str(target))
+        moved.append(item.name)
 
     remove_empty_parent_folders(source_path)
+    return moved
 
 
 def get_stored_media_path(file_name: str, date_pattern: str) -> Optional[str]:
