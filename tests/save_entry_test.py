@@ -251,6 +251,7 @@ def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path, monkeypa
     assert mesh.camera.radius == 8.0
     assert preview_path.read_bytes() == preview_bytes
     assert icon_path.read_bytes() == icon_bytes
+    assert not list(tmp_path.rglob("*_resized_icon*"))
     assert Camera.objects.filter(pk=mesh.camera_id).exists()
 
 

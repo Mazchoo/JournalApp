@@ -64,7 +64,9 @@ def move_files_out_of_folder(
             move(str(file), str(destination_path))
 
 
-def move_files_from_entry(entry: Entry, ignore_file_names: Optional[List[str]] = None):
+def remove_files_from_entry(
+    entry: Entry, ignore_file_names: Optional[List[str]] = None
+):
     """Move files from entry's date folder to base folder"""
     if (stored_folder := get_stored_media_folder(entry.name)) is None:
         return
@@ -89,7 +91,7 @@ def delete_entry_and_content(post_data: dict) -> JsonResponse:
 
     entry = form.cleaned_data["entry"]
     delete_entry_content(entry)
-    move_files_from_entry(entry)
+    remove_files_from_entry(entry)
     entry.delete()
 
     success_message = "It's gone!"

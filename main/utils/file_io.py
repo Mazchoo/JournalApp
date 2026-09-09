@@ -93,12 +93,54 @@ def remove_icon_file(media_file_path: Path):
         icon_path.unlink()
 
 
+def move_icon(source_media: Path, dest_media: Path) -> None:
+    """Move the calendar icon for a media file to match its new dated folder."""
+    old_icon = get_icon_file_path(source_media)
+    if not old_icon.exists() or old_icon == MISSING_ICON_IMAGE:
+        return
+
+    new_icon = get_icon_file_path(dest_media)
+    if old_icon.resolve() == new_icon.resolve():
+        return
+
+    make_parent_folders(new_icon.parent)
+    if new_icon.exists():
+        new_icon.unlink()
+    move(str(old_icon), str(new_icon))
+    remove_empty_parent_folders(old_icon.parent)
+
+
 def get_stored_media_folder(date_pattern: str) -> Optional[str]:
     """Get folder path from date pattern, or None if it is not year-month-day."""
     if len(parts := date_pattern.split("-")) != 3:
         return None
     year, month, day = parts
     return f"{ENTRY_FOLDER}/{year}/{month}/{day}"
+
+
+def move_dated_folder(source_slug: str, destination_slug: str) -> None:
+    """Move every file from one dated entry folder into another."""
+    source_folder = get_stored_media_folder(source_slug)
+    dest_folder = get_stored_media_folder(destination_slug)
+    if source_folder is None or dest_folder is None:
+        return
+
+    source_path = Path(source_folder)
+    dest_path = Path(dest_folder)
+    if not source_path.is_dir() or source_path.resolve() == dest_path.resolve():
+        return
+
+    make_parent_folders(dest_path)
+    for item in list(source_path.iterdir()):
+        if not item.is_file():
+            continue
+        target = dest_path / item.name
+        if target.exists():
+            target.unlink()
+        move_icon(item, target)
+        move(str(item), str(target))
+
+    remove_empty_parent_folders(source_path)
 
 
 def get_stored_media_path(file_name: str, date_pattern: str) -> Optional[str]:

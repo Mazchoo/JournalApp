@@ -4,9 +4,18 @@ import json
 from unittest.mock import patch
 
 import pytest
+from django.apps import apps
 from django.http import JsonResponse
 
-from tests.mocks import create_mock_client, create_mock_entry, create_ajax_headers
+from main.content_generation.move_date import move_source_date_to_desination_request
+from main.content_generation.save_entry import update_or_generate_from_request
+from tests.mocks import (
+    create_ajax_headers,
+    create_mock_client,
+    create_mock_entry,
+    create_mock_mesh_file,
+    mock_jpeg_data_url,
+)
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
@@ -71,6 +80,63 @@ def test_move_entry_from_nonexistent_source_returns_error():
 
     data = json.loads(response.content)
     assert "error" in data
+
+
+def _mesh_camera_payload() -> dict:
+    """Orbit camera fields as the save-entry request sends them."""
+    return {
+        "right": {"0": "1", "1": "0", "2": "0"},
+        "up": {"0": "0", "1": "1", "2": "0"},
+        "forward": {"0": "0", "1": "0", "2": "-1"},
+        "radius": "3",
+        "panX": "0",
+        "panY": "0",
+    }
+
+
+@pytest.mark.django_db
+def test_move_entry_keeps_mesh_content(tmp_path, monkeypatch):
+    """A mesh saved at the source date must exist at the destination date."""
+    Entry = apps.get_model("main", "Entry")
+    EntryMesh = apps.get_model("main", "EntryMesh")
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    create_mock_mesh_file(tmp_path)
+
+    update_or_generate_from_request(
+        {
+            "name": "2025-02-12",
+            "content": {
+                "mesh1": {
+                    "entry": "2025-02-12",
+                    "file_path": "scan.glb",
+                    "frame_image": mock_jpeg_data_url(),
+                    "camera": _mesh_camera_payload(),
+                }
+            },
+        }
+    )
+
+    response = move_source_date_to_desination_request(
+        {"move_from": "2025-02-12", "move_to": "2025-03-01"}
+    )
+    data = json.loads(response.content)
+    assert "new_date" in data
+
+    moved_entry = Entry.objects.get(name="2025-03-01")
+    assert moved_entry.content.count() == 1
+    assert not Entry.objects.filter(name="2025-02-12").exists()
+
+    content = moved_entry.content.first()
+    assert content is not None
+    mesh = EntryMesh.objects.get(pk=content.content_id)
+    assert mesh.file_path.endswith("scan.glb")
+    assert mesh.image_path.endswith("scan_resized.jpeg")
+    assert (tmp_path / "2025" / "03" / "01" / "scan.glb").exists()
+    assert (tmp_path / "2025" / "03" / "01" / "scan_resized.jpeg").exists()
+    assert (tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg").exists()
+    assert not (tmp_path / "icons" / "2025" / "02" / "scan_icon.jpg").exists()
+    assert not list(tmp_path.rglob("*_resized_icon*"))
+    assert not (tmp_path / "2025" / "02" / "12").exists()
 
 
 @pytest.mark.django_db

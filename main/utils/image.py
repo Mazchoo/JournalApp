@@ -14,14 +14,22 @@ from main.utils.pil_image_wrapper import (
 )
 from main.utils.file_io import (
     get_icon_file_path,
-    move_media_to_save_path,
     get_resized_filename,
+    move_media_to_save_path,
+    path_has_image_reserved_tag,
 )
 from main.utils.cache import cache_string
 
 
 def _icon_source_paths(target_path_obj: Path) -> tuple[Path, Path] | None:
-    """Return (path used for the icon name, image to read), or None if missing."""
+    """Return (path used for the icon name, image to read), or None if missing.
+
+    The icon is always named from the original media file. Derivative ``_resized``
+    / ``_icon`` images are not a naming source.
+    """
+    if path_has_image_reserved_tag(target_path_obj):
+        return None
+
     icon_name_path = target_path_obj
     if target_path_obj.suffix == ".mp4":
         target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"

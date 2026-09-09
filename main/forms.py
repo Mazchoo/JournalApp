@@ -363,7 +363,7 @@ class MeshForm(ModelForm):
 
         preview_path = get_resized_filename(full_mesh_path)
         if preview_path.exists():
-            lazy_create_image_icon(preview_path)
+            lazy_create_image_icon(full_mesh_path)
             return make_media_path_relative(str(preview_path))
 
         raise forms.ValidationError("Frame image is not defined")

@@ -13,7 +13,7 @@ from main.forms import EntryForm, ContentForm
 from main.utils.errors import form_errors_message
 from main.content_generation.delete_entry import (
     delete_entry_content,
-    move_files_from_entry,
+    remove_files_from_entry,
 )
 from main.config import ALLOWED_CONTENT_TYPES
 from main.content_generation.content_factory_forms import ContentFormFactory
@@ -126,7 +126,7 @@ def update_or_generate_from_request(post_data: dict):
         return JsonResponse({"error": form_errors_message(errors)})
 
     delete_entry_content(entry)
-    move_files_from_entry(entry, ignore_file_names=form.media_file_names)
+    remove_files_from_entry(entry, ignore_file_names=form.media_file_names)
     content_ids = process_content_submitted(form.content, errors)
 
     entry.last_edited = datetime.now()

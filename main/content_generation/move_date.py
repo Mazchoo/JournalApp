@@ -11,9 +11,9 @@ from main.forms import EntryForm, ContentForm
 
 from main.content_generation.request_forms import DateMoveForm
 from main.database_layer.date_slugs import convert_date_to_url_tuple
-from main.content_generation.delete_entry import move_files_from_entry
 from main.content_generation.content_factory_models import ContentFactory
 from main.content_generation.content_factory_update import ContentUpdateFactory
+from main.utils.file_io import move_dated_folder
 
 
 def check_move_request(
@@ -32,9 +32,8 @@ def check_move_request(
 def create_new_entry_at_new_date(
     source_entry: Entry, destination_slug: str, errors: Dict[str, ErrorDict]
 ) -> Optional[Entry]:
-    """Moves an entry to destination date"""
+    """Create a new entry row at the destination date."""
     new_entry = None
-    move_files_from_entry(source_entry)
 
     entry_dict = model_to_dict(source_entry)
     entry_dict["name"] = destination_slug
@@ -111,11 +110,11 @@ def update_entry_date(
 ) -> Optional[Entry]:
     """Load and move entry from source date slug to destination date slug"""
     entry = Entry.objects.get(name=source_slug)
-    move_files_from_entry(entry)
-
     new_entry = create_new_entry_at_new_date(entry, destination_slug, errors)
     if errors or new_entry is None:
         return new_entry
+
+    move_dated_folder(source_slug, destination_slug)
 
     content_ids = []
     for content in entry.content.all():

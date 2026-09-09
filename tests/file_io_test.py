@@ -7,6 +7,7 @@ from main.utils.file_io import (
     get_stored_media_folder,
     get_stored_media_path,
     is_media_content_file,
+    move_dated_folder,
     path_has_image_reserved_tag,
     remove_empty_parent_folders,
 )
@@ -99,3 +100,36 @@ def test_remove_empty_parent_folders_ignores_folders_outside_entry_folder(
 
     assert outsider.exists()
     assert (tmp_path / "other").exists()
+
+
+def test_move_dated_folder_moves_every_file(tmp_path, monkeypatch):
+    """A date move copies the whole folder, including previews and non-media files."""
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+    source = tmp_path / "2025" / "02" / "12"
+    source.mkdir(parents=True)
+    (source / "scan.glb").write_bytes(b"glb")
+    (source / "scan_resized.jpeg").write_bytes(b"jpg")
+    (source / "notes.txt").write_text("keep")
+    icon_dir = tmp_path / "icons" / "2025" / "02"
+    icon_dir.mkdir(parents=True)
+    (icon_dir / "scan_icon.jpg").write_bytes(b"icon")
+
+    move_dated_folder("2025-02-12", "2025-03-01")
+
+    dest = tmp_path / "2025" / "03" / "01"
+    assert (dest / "scan.glb").read_bytes() == b"glb"
+    assert (dest / "scan_resized.jpeg").read_bytes() == b"jpg"
+    assert (dest / "notes.txt").read_text() == "keep"
+    assert (tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg").read_bytes() == b"icon"
+    assert not (tmp_path / "icons" / "2025" / "02" / "scan_icon.jpg").exists()
+    assert not list(tmp_path.rglob("*_resized_icon*"))
+    assert not source.exists()
+
+
+def test_move_dated_folder_is_noop_when_source_missing(tmp_path, monkeypatch):
+    """A paragraph-only entry has no dated folder to move."""
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(tmp_path))
+
+    move_dated_folder("2025-02-12", "2025-03-01")
+
+    assert not (tmp_path / "2025").exists()
