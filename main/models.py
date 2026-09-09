@@ -118,6 +118,9 @@ class EntryParagraph(Model):
 class Camera(Model):
     """Camera matching frontend OrbitCamera (image-plane axes)."""
 
+    mesh = models.OneToOneField(
+        "EntryMesh", on_delete=models.CASCADE, related_name="camera"
+    )
     right_x = models.FloatField(default=1.0)
     right_y = models.FloatField(default=0.0)
     right_z = models.FloatField(default=0.0)
@@ -152,7 +155,6 @@ class EntryMesh(Model):
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
     file_path = models.CharField(max_length=256)
     image_path = models.CharField(max_length=256)
-    camera = models.OneToOneField(Camera, on_delete=models.CASCADE)
 
     def __repr__(self):
         return f"mesh{self.pk} - Entry {self.entry.name}"

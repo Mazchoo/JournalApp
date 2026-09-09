@@ -1,0 +1,24 @@
+---
+description: Never apply migrations or change the live application state
+alwaysApply: true
+---
+
+# Do not touch live application state
+
+Never apply migrations, restart the server, or otherwise change the running
+app or its live database and media.
+
+```bash
+# ❌ BAD
+python manage.py migrate
+python manage.py runserver
+
+# ✅ GOOD
+python manage.py makemigrations --dry-run --check
+pytest tests/
+```
+
+Writing a migration file is fine. Applying it with `migrate` is not. Pytest
+may use its own isolated test database; do not migrate, write, or delete
+`db.sqlite3`, `ENTRY_FOLDER`, or anything the running server is using.
+Leave live state for the user.

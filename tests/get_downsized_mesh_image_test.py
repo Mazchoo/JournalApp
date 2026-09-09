@@ -6,6 +6,10 @@ from unittest.mock import patch
 import pytest
 from django.http import JsonResponse
 
+from main.content_generation.get_downsized_mesh_image import (
+    get_downsized_mesh_image_response,
+)
+from main.models import Camera, EntryMesh
 from tests.mocks import create_mock_client, create_mock_entry
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
@@ -14,18 +18,13 @@ FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 @pytest.mark.django_db
 def test_get_downsized_mesh_image_success():
     """A valid mesh_id should return a base64 JSON response."""
-    from main.models import Camera, EntryMesh
-    from main.content_generation.get_downsized_mesh_image import (
-        get_downsized_mesh_image_response,
-    )
-
     entry = create_mock_entry()
     mesh = EntryMesh.objects.create(
         entry=entry,
         file_path="2025/02/12/scan.glb",
         image_path="2025/02/12/scan.jpeg",
-        camera=Camera.objects.create(),
     )
+    Camera.objects.create(mesh=mesh)
 
     with patch(
         "main.content_generation.get_downsized_mesh_image.get_mesh_image_base64",
@@ -43,10 +42,6 @@ def test_get_downsized_mesh_image_success():
 @pytest.mark.django_db
 def test_get_downsized_mesh_image_missing_id():
     """A request without mesh_id should return an error."""
-    from main.content_generation.get_downsized_mesh_image import (
-        get_downsized_mesh_image_response,
-    )
-
     response = get_downsized_mesh_image_response({})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)
@@ -56,10 +51,6 @@ def test_get_downsized_mesh_image_missing_id():
 @pytest.mark.django_db
 def test_get_downsized_mesh_image_not_found():
     """A request with a nonexistent mesh_id should return an error."""
-    from main.content_generation.get_downsized_mesh_image import (
-        get_downsized_mesh_image_response,
-    )
-
     response = get_downsized_mesh_image_response({"mesh_id": "99999"})
     assert isinstance(response, JsonResponse)
     data = json.loads(response.content)

@@ -5,10 +5,12 @@ import json
 import pytest
 from django.apps import apps
 
+from main.content_generation.save_entry import update_or_generate_from_request
 from tests.mocks import (
     create_ajax_headers,
     create_mock_client,
     create_mock_mesh_file,
+    mock_jpeg_data_url,
     mock_paragraph_post_data,
 )
 
@@ -174,7 +176,7 @@ def test_save_entry_creates_mesh_content(tmp_path):
     assert (tmp_path / "2025" / "03" / "01" / "scan.glb").exists()
     assert (tmp_path / "2025" / "03" / "01" / "scan_resized.jpeg").exists()
     assert (tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg").exists()
-    assert Camera.objects.filter(pk=mesh.camera_id).exists()
+    assert Camera.objects.filter(pk=mesh.camera.pk).exists()
     assert mesh.camera.radius == 3.0
 
     from main.content_generation.get_downsized_mesh_image import (
@@ -250,7 +252,30 @@ def test_save_entry_mesh_without_frame_keeps_preview_and_icon(tmp_path):
     assert preview_path.read_bytes() == preview_bytes
     assert icon_path.read_bytes() == icon_bytes
     assert not list(tmp_path.rglob("*_resized_icon*"))
-    assert Camera.objects.filter(pk=mesh.camera_id).exists()
+    assert Camera.objects.filter(pk=mesh.camera.pk).exists()
+
+
+@pytest.mark.django_db
+def test_save_entry_mesh_does_not_leak_cameras_on_resave(tmp_path):
+    """Replacing a mesh on save must not leave the previous Camera behind."""
+    create_mock_mesh_file(tmp_path)
+    payload = {
+        "name": "2025-03-01",
+        "content": {
+            "mesh1": {
+                "entry": "2025-03-01",
+                "file_path": "scan.glb",
+                "frame_image": mock_jpeg_data_url(),
+                "camera": _mesh_camera_payload("3"),
+            }
+        },
+    }
+
+    assert "success" in json.loads(update_or_generate_from_request(payload).content)
+    assert "success" in json.loads(update_or_generate_from_request(payload).content)
+
+    Camera = apps.get_model("main", "Camera")
+    assert Camera.objects.count() == 1
 
 
 @pytest.mark.django_db

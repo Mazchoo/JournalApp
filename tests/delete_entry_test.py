@@ -6,9 +6,19 @@ from unittest.mock import patch
 
 import pytest
 
-from main.content_generation.delete_entry import move_files_out_of_folder
-from main.models import Entry
-from tests.mocks import create_mock_client, create_mock_entry, create_ajax_headers
+from main.content_generation.delete_entry import (
+    delete_entry_and_content,
+    move_files_out_of_folder,
+)
+from main.content_generation.save_entry import update_or_generate_from_request
+from main.models import Camera, Entry
+from tests.mocks import (
+    create_ajax_headers,
+    create_mock_client,
+    create_mock_entry,
+    create_mock_mesh_file,
+    mock_jpeg_data_url,
+)
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
@@ -72,6 +82,37 @@ def test_delete_entry_removes_from_db(mock_move_files):
     )
 
     assert not Entry.objects.filter(name="2025-04-01").exists()
+
+
+@pytest.mark.django_db
+def test_deleting_mesh_entry_removes_its_camera(tmp_path):
+    """No Camera rows should survive the deletion of the only mesh."""
+    create_mock_mesh_file(tmp_path)
+
+    update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "mesh1": {
+                    "entry": "2025-03-01",
+                    "file_path": "scan.glb",
+                    "frame_image": mock_jpeg_data_url(),
+                    "camera": {
+                        "right": {"0": "1", "1": "0", "2": "0"},
+                        "up": {"0": "0", "1": "1", "2": "0"},
+                        "forward": {"0": "0", "1": "0", "2": "-1"},
+                        "radius": "3",
+                        "panX": "0",
+                        "panY": "0",
+                    },
+                }
+            },
+        }
+    )
+
+    delete_entry_and_content({"entry": "2025-03-01"})
+
+    assert Camera.objects.count() == 0
 
 
 def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(tmp_path):

@@ -226,7 +226,7 @@ class CameraForm(ModelForm):
 
     class Meta:
         model = Camera
-        fields = "__all__"
+        exclude = ("mesh",)
 
     @staticmethod
     def _orbit_vector_component(vector, ind: int) -> float:
@@ -285,11 +285,11 @@ class MeshForm(ModelForm):
       when ``frame_image`` is present, otherwise created only if missing
 
     If ``frame_image`` is omitted, an existing ``_resized`` preview is required
-    and is left unchanged. ``save()`` persists the Camera row then the EntryMesh
-    row; it writes no files.
+    and is left unchanged. ``save()`` persists the EntryMesh row then the Camera
+    row that points at it; it writes no files.
     """
 
-    camera = forms.Field()  # needs to be intialized as camera object
+    camera = forms.Field()  # needs to be initialized as camera object
     image_path = forms.CharField(required=False, max_length=256)  # lazily updated
 
     class Meta:
@@ -368,18 +368,14 @@ class MeshForm(ModelForm):
 
         raise forms.ValidationError("Frame image is not defined")
 
-    def _get_validation_exclusions(self):
-        """Skip FK checks on the unsaved camera until save() persists it."""
-        exclude = super()._get_validation_exclusions()
-        exclude.add("camera")
-        return exclude
-
     def save(self, commit=True):
-        """Persist the camera first, then the mesh that points at it."""
+        """Persist the mesh first, then the camera that points at it."""
+        mesh = super().save(commit=True)
         camera = self.cleaned_data["camera"]
-        camera.save()
-        self.instance.camera = camera
-        return super().save(commit)
+        camera.mesh = mesh
+        if commit:
+            camera.save()
+        return mesh
 
 
 class ParagraphForm(ModelForm):

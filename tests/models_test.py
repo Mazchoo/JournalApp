@@ -16,6 +16,23 @@ from main.models import (
 from tests.mocks import create_mock_entry
 
 
+def _create_mesh_with_camera(
+    entry=None,
+    file_path="2025-02-12/scan.glb",
+    image_path="2025-02-12/scan.jpg",
+    **camera_fields,
+):
+    """Persist an EntryMesh and the Camera that points at it."""
+    entry = entry or create_mock_entry()
+    mesh = EntryMesh.objects.create(
+        entry=entry,
+        file_path=file_path,
+        image_path=image_path,
+    )
+    camera = Camera.objects.create(mesh=mesh, **camera_fields)
+    return mesh, camera
+
+
 @pytest.mark.django_db
 def test_create_entry():
     """Creating an Entry should persist it in the database."""
@@ -201,7 +218,7 @@ def test_video_view_method():
 @pytest.mark.django_db
 def test_orbit_camera_view_method():
     """view() should match the frontend OrbitCamera field names."""
-    camera = Camera.objects.create(
+    _, camera = _create_mesh_with_camera(
         right_x=0.0,
         right_y=1.0,
         right_z=0.0,
@@ -229,7 +246,7 @@ def test_orbit_camera_view_method():
 @pytest.mark.django_db
 def test_create_orbit_camera_defaults():
     """OrbitCamera defaults match frontend createOrbitCamera()."""
-    camera = Camera.objects.create()
+    _, camera = _create_mesh_with_camera()
     assert camera.right_x == 1.0
     assert camera.right_y == 0.0
     assert camera.right_z == 0.0
@@ -248,28 +265,28 @@ def test_create_orbit_camera_defaults():
 def test_create_mesh():
     """EntryMesh stores file_path, image_path, and a camera tied to an Entry."""
     entry = create_mock_entry()
-    camera = Camera.objects.create(radius=4.5, pan_x=0.2, pan_y=-0.1)
-    mesh = EntryMesh.objects.create(
-        entry=entry,
-        file_path="2025-02-12/scan.glb",
-        image_path="2025-02-12/scan.jpg",
-        camera=camera,
-    )
+    mesh, camera = _create_mesh_with_camera(entry, radius=4.5, pan_x=0.2, pan_y=-0.1)
     assert mesh.file_path == "2025-02-12/scan.glb"
     assert mesh.image_path == "2025-02-12/scan.jpg"
     assert mesh.camera == camera
+    assert camera.mesh == mesh
     assert mesh.entry == entry
+
+
+@pytest.mark.django_db
+def test_deleting_mesh_cascades_to_camera():
+    """Deleting an EntryMesh must delete the Camera that points at it."""
+    mesh, camera = _create_mesh_with_camera()
+    camera_pk = camera.pk
+    mesh.delete()
+    assert not Camera.objects.filter(pk=camera_pk).exists()
 
 
 @pytest.mark.django_db
 def test_mesh_str():
     """__str__ should return the file_path."""
-    entry = create_mock_entry()
-    mesh = EntryMesh.objects.create(
-        entry=entry,
-        file_path="some/model.glb",
-        image_path="some/preview.jpg",
-        camera=Camera.objects.create(),
+    mesh, _ = _create_mesh_with_camera(
+        file_path="some/model.glb", image_path="some/preview.jpg"
     )
     assert str(mesh) == "some/model.glb"
 
@@ -277,8 +294,7 @@ def test_mesh_str():
 @pytest.mark.django_db
 def test_mesh_view_method():
     """view() should return mesh_id, file_name, image_path, and OrbitCamera fields."""
-    entry = create_mock_entry()
-    camera = Camera.objects.create(
+    mesh, _ = _create_mesh_with_camera(
         right_x=0.0,
         right_y=1.0,
         right_z=0.0,
@@ -291,12 +307,6 @@ def test_mesh_view_method():
         radius=5.0,
         pan_x=1.25,
         pan_y=-0.5,
-    )
-    mesh = EntryMesh.objects.create(
-        entry=entry,
-        file_path="2025-02-12/scan.glb",
-        image_path="2025-02-12/scan.jpg",
-        camera=camera,
     )
 
     result = mesh.view()
