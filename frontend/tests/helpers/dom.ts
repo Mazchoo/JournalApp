@@ -19,14 +19,15 @@ export const MEDIA_TEMPLATE = readFileSync(
   resolve(entryContents, "Media.html"),
   "utf8",
 );
-const VIDEO_TEMPLATE = readFileSync(
-  resolve(entryContents, "Video.html"),
-  "utf8",
-);
 
 export const CSRF_TOKEN = "test-csrf-token";
 
 export type RowKind = "paragraph" | "image" | "video" | "mesh";
+
+const SYNTHESIS_CLASS_TAG =
+  "{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}";
+const MEDIA_TYPE_CLASS_TAG =
+  "{% if item.data.video_id %}content-video{% else %}content-image{% endif %}";
 
 /** Fill `{{ item.index }}` the same way generateParagraphTemplate / generateMediaTemplate do. */
 function fillIndex(template: string, index: string): string {
@@ -38,41 +39,53 @@ function withoutItemData(template: string): string {
   return template.replaceAll(/\{\{\s*item\.data\.[^}]+\}\}/g, "");
 }
 
+/** Resolve Django `{% if %}` tags the way day.html does for Media.html. */
+function resolveMediaTemplateTags(
+  html: string,
+  synthesisClass: string,
+  mediaClass: string,
+): string {
+  return html
+    .replaceAll(SYNTHESIS_CLASS_TAG, synthesisClass)
+    .replaceAll(MEDIA_TYPE_CLASS_TAG, mediaClass);
+}
+
+/**
+ * MEDIA_TEMPLATE as Django renders it with clone_item: Generate on, image class,
+ * empty data attributes, and `{{ item.index }}` left for the frontend to fill.
+ */
+function cloneItemMediaTemplate(): string {
+  return resolveMediaTemplateTags(
+    withoutItemData(MEDIA_TEMPLATE),
+    "btn-primary",
+    "content-image",
+  );
+}
+
+/** Fill Media.html for a server-rendered image, video, or mesh row. */
+function fillMediaRow(kind: "image" | "video" | "mesh", index: string): string {
+  let html = fillIndex(MEDIA_TEMPLATE, index);
+  if (kind === "video") {
+    html = html.replaceAll("{{ item.data.video_id }}", `v${index}`);
+  } else if (kind === "mesh") {
+    html = html.replaceAll("{{ item.data.mesh_id }}", `m${index}`);
+  } else {
+    html = html.replaceAll("{{ item.data.image_id }}", `i${index}`);
+  }
+  return resolveMediaTemplateTags(
+    withoutItemData(html),
+    "btn-outline-secondary",
+    kind === "video" ? "content-video" : "content-image",
+  );
+}
+
 /** Render one content row of the given kind at the given index. */
 function renderRow(kind: RowKind, index: string): string {
   if (kind === "paragraph") {
     return `<div class="row mt-3 paragraph-entry">${withoutItemData(fillIndex(PARAGRAPH_TEMPLATE, index))}</div>`;
   }
 
-  if (kind === "video") {
-    return `<div class="row mt-4 media-entry">${withoutItemData(
-      fillIndex(VIDEO_TEMPLATE, index).replaceAll(
-        "{{ item.data.video_id }}",
-        `v${index}`,
-      ),
-    ).replaceAll(
-      "{% if item.data.allow_ai_synthesis %}checked{% endif %}",
-      "",
-    )}</div>`;
-  }
-
-  const mediaId =
-    kind === "mesh"
-      ? fillIndex(MEDIA_TEMPLATE, index).replaceAll(
-          "{{ item.data.mesh_id }}",
-          `m${index}`,
-        )
-      : fillIndex(MEDIA_TEMPLATE, index).replaceAll(
-          "{{ item.data.image_id }}",
-          `i${index}`,
-        );
-
-  return `<div class="row mt-4 media-entry">${withoutItemData(
-    mediaId,
-  ).replaceAll(
-    "{% if item.data.allow_ai_synthesis %}btn-primary{% else %}btn-outline-secondary{% endif %}",
-    "btn-outline-secondary",
-  )}</div>`;
+  return `<div class="row mt-4 media-entry">${fillMediaRow(kind, index)}</div>`;
 }
 
 export interface DayPageOptions {
@@ -148,7 +161,7 @@ export function renderDayPage(options: DayPageOptions = {}): void {
 export function installTemplateGlobals(contentIndex: number): void {
   window.CONTENT_INDEX = contentIndex;
   window.PARAGRAPH_TEMPLATE = PARAGRAPH_TEMPLATE;
-  window.MEDIA_TEMPLATE = MEDIA_TEMPLATE;
+  window.MEDIA_TEMPLATE = cloneItemMediaTemplate();
   window.DATE_SLUG = "2024-03-15";
   window.ENTRY_EXISTS = false;
   window.SAVE_URL = "/save-entry/";
