@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 from typing import Tuple, Optional
 
-from main.config import DateConstants
+from main.utils.date import get_month_name
 
 
 def get_valid_date_from_slug(slug: str) -> Optional[datetime]:
@@ -27,17 +27,4 @@ def get_valid_date_from_slug(slug: str) -> Optional[datetime]:
 
 def convert_date_to_url_tuple(year: int, month: int, day: int) -> Tuple[str, str, str]:
     """Convert year, month, and day integers to a URL tuple of strings."""
-    return (str(year), DateConstants.month_names[month - 1], str(day))
-
-
-def date_exists(year: int, month: str = "January", day: int = 1) -> bool:
-    """Return if day, month, year represents a real date."""
-    month_names = DateConstants.month_names
-    month_ind = month_names.index(month) + 1
-
-    try:
-        datetime(year, month_ind, day)
-    except ValueError:
-        return False
-
-    return True
+    return (str(year), get_month_name(month), str(day))

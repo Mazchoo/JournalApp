@@ -6,8 +6,9 @@ from typing import List, Optional
 from django.forms import Form, SlugField, CharField, IntegerField, ValidationError
 
 from main.config import DateConstants
-from main.database_layer.date_slugs import date_exists, get_valid_date_from_slug
+from main.database_layer.date_slugs import get_valid_date_from_slug
 from main.models import Entry
+from main.utils.date import date_exists
 from main.utils.file_io import get_stored_media_path
 
 
@@ -32,8 +33,10 @@ class YearPageForm(Form):
     def clean_year(self) -> int:
         """Ensure year exists in the database."""
         year = self.cleaned_data["year"]
+
         if not date_exists(year):
             raise ValidationError(f"Year {year} not found")
+
         return year
 
 
@@ -57,8 +60,10 @@ class MonthPageForm(Form):
             return {}
         year = cleaned_data.get("year")
         month = cleaned_data.get("month")
+
         if year and month and not date_exists(year, month):
             raise ValidationError(f"{month} {year} not found")
+
         return cleaned_data
 
 
@@ -84,8 +89,10 @@ class DayPageForm(Form):
         year = cleaned_data.get("year")
         month = cleaned_data.get("month")
         day = cleaned_data.get("day")
+
         if year and month and day and not date_exists(year, month, day):
             raise ValidationError(f"{day} {month} {year} not found")
+
         return cleaned_data
 
 

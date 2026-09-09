@@ -19,11 +19,11 @@ from main.database_layer.date_information import (
 )
 from main.database_layer.date_slugs import (
     convert_date_to_url_tuple,
-    date_exists,
     get_valid_date_from_slug,
 )
 from main.database_layer.get_context import put_day_and_month_names_into_context
 from main.forms import DeleteEntryForm
+from main.utils.date import date_exists
 from tests.mocks import create_mock_entry
 
 
