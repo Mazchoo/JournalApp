@@ -13,7 +13,12 @@ RESOLVED_ENTRY_FOLDER = Path(ENTRY_FOLDER).resolve()
 
 
 def remove_empty_parent_folders(folder: Path):
-    """Remove entry folders with no contents"""
+    """Remove empty folders under the entry folder, stopping at ENTRY_FOLDER."""
+    folder = folder.resolve()
+    root = Path(ENTRY_FOLDER).resolve()
+    if folder == root or root not in folder.parents:
+        return
+
     if not folder.is_dir():
         return
 

@@ -8,6 +8,7 @@ from main.utils.file_io import (
     get_stored_media_path,
     is_media_content_file,
     path_has_image_reserved_tag,
+    remove_empty_parent_folders,
 )
 
 
@@ -55,3 +56,44 @@ def test_get_stored_media_folder_returns_path_for_date_slug(monkeypatch):
 def test_get_stored_media_path_returns_none_for_malformed_date():
     """A malformed date slug yields no file path."""
     assert get_stored_media_path("photo.jpg", "abc") is None
+
+
+def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, monkeypatch):
+    """Pruning an empty dated folder must not delete the entry root."""
+    entries = tmp_path / "entries"
+    day_folder = entries / "2025" / "02" / "12"
+    day_folder.mkdir(parents=True)
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+
+    remove_empty_parent_folders(day_folder)
+
+    assert entries.exists()
+    assert not (entries / "2025").exists()
+    assert tmp_path.exists()
+
+
+def test_remove_empty_parent_folders_does_not_remove_entry_folder(tmp_path, monkeypatch):
+    """Calling the pruner on the entry root must leave it in place."""
+    entries = tmp_path / "entries"
+    entries.mkdir()
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+
+    remove_empty_parent_folders(entries)
+
+    assert entries.exists()
+
+
+def test_remove_empty_parent_folders_ignores_folders_outside_entry_folder(
+    tmp_path, monkeypatch
+):
+    """Folders outside the entry root must not be deleted."""
+    entries = tmp_path / "entries"
+    entries.mkdir()
+    outsider = tmp_path / "other" / "empty"
+    outsider.mkdir(parents=True)
+    monkeypatch.setattr("main.utils.file_io.ENTRY_FOLDER", str(entries))
+
+    remove_empty_parent_folders(outsider)
+
+    assert outsider.exists()
+    assert (tmp_path / "other").exists()
