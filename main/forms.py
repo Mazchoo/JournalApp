@@ -25,7 +25,7 @@ from main.utils.image import (
 )
 from main.utils.video import lazy_create_video_icon, lazy_create_resized_collage
 from main.utils.file_io import (
-    path_has_image_reserved_tag,
+    path_has_image_reserved_suffix,
     get_stored_media_path,
     get_base_entry_path,
     make_media_path_relative,
@@ -36,8 +36,8 @@ from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
 from main.utils.errors import form_errors_message
 from main.utils.html_sanitize import sanitize_paragraph_html
-from main.config import ALLOWED_CONTENT_TYPES, ImageConstants
-from main.file_types import ImageFileType, MeshFileType, VideoFileType
+from main.config import ALLOWED_CONTENT_TYPES
+from main.file_types import ImageFileType, MeshFileType, ReservedSuffix, VideoFileType
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
@@ -121,8 +121,8 @@ class ImageForm(ModelForm):
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
-        if path_has_image_reserved_tag(target_file_obj):
-            message = f"File '{target_file_obj.stem}' uses reserved tag in {ImageConstants.reserved_image_tags}"
+        if path_has_image_reserved_suffix(target_file_obj):
+            message = f"File '{target_file_obj.stem}' uses reserved suffix in {tuple(ReservedSuffix)}"
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)

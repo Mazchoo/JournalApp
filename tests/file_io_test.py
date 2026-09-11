@@ -9,7 +9,7 @@ from main.utils.file_io import (
     get_stored_media_path,
     is_media_content_file,
     move_dated_folder,
-    path_has_image_reserved_tag,
+    path_has_image_reserved_suffix,
     remove_empty_parent_folders,
 )
 
@@ -29,14 +29,14 @@ def test_is_media_content_file_rejects_other_extensions():
     assert not is_media_content_file(Path("tags.json"))
 
 
-def test_path_has_image_reserved_tag_requires_image_extension():
-    """Reserved tags only apply to files that are images."""
-    assert path_has_image_reserved_tag(Path("photo_icon.jpg"))
-    assert path_has_image_reserved_tag(Path("clip_resized.jpeg"))
-    assert not path_has_image_reserved_tag(Path("scan_icon.glb"))
-    assert not path_has_image_reserved_tag(Path("clip_resized.mp4"))
-    assert not path_has_image_reserved_tag(Path("photo.jpg"))
-    assert not path_has_image_reserved_tag(Path("logo.svg"))
+def test_path_has_image_reserved_suffix_requires_image_extension():
+    """Reserved suffixes only apply to files that are images."""
+    assert path_has_image_reserved_suffix(Path("photo_icon.jpg"))
+    assert path_has_image_reserved_suffix(Path("clip_resized.jpeg"))
+    assert not path_has_image_reserved_suffix(Path("scan_icon.glb"))
+    assert not path_has_image_reserved_suffix(Path("clip_resized.mp4"))
+    assert not path_has_image_reserved_suffix(Path("photo.jpg"))
+    assert not path_has_image_reserved_suffix(Path("logo.svg"))
 
 
 def test_get_icon_file_path_maps_svg_to_png(settings):

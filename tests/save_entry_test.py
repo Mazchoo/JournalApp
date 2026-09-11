@@ -455,8 +455,8 @@ def test_save_entry_succeeds_when_svg_cannot_be_rasterised(tmp_path):
 
 
 @pytest.mark.django_db
-def test_save_entry_rejects_resized_svg_reserved_tag(tmp_path):
-    """logo_resized.svg is a reserved image tag, even though it is a vector file."""
+def test_save_entry_rejects_resized_svg_reserved_suffix(tmp_path):
+    """logo_resized.svg is a reserved image suffix, even though it is a vector file."""
     (tmp_path / "logo_resized.svg").write_text(MINIMAL_SVG, encoding="utf-8")
 
     response = update_or_generate_from_request(

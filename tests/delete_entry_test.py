@@ -116,8 +116,8 @@ def test_deleting_mesh_entry_removes_its_camera(tmp_path):
     assert Camera.objects.count() == 0
 
 
-def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(tmp_path):
-    """Image, video, and mesh files move back; reserved image tags are deleted."""
+def test_move_files_out_of_folder_moves_media_and_deletes_image_suffixes(tmp_path):
+    """Image, video, and mesh files move back; reserved image suffixes are deleted."""
     dated = tmp_path / "2025" / "03" / "01"
     dated.mkdir(parents=True)
     photo = dated / "photo.jpg"
@@ -153,7 +153,7 @@ def test_move_files_out_of_folder_moves_media_and_deletes_image_tags(tmp_path):
 
 
 def test_move_files_out_of_folder_ignores_form_files_and_companions(tmp_path):
-    """Files listed in ignore_file_names stay, including reserved-tag companions."""
+    """Files listed in ignore_file_names stay, including reserved-suffix companions."""
     dated = tmp_path / "2025" / "03" / "01"
     dated.mkdir(parents=True)
     keep = dated / "keep.jpg"

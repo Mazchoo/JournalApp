@@ -7,8 +7,7 @@ from shutil import move
 
 from django.conf import settings
 
-from main.config import ImageConstants
-from main.file_types import ImageFileType, MeshFileType, VideoFileType
+from main.file_types import ImageFileType, MeshFileType, ReservedSuffix, VideoFileType
 
 
 def resolved_entry_folder() -> Path:
@@ -36,11 +35,11 @@ def remove_empty_parent_folders(folder: Path):
         remove_empty_parent_folders(parent_folder)
 
 
-def path_has_image_reserved_tag(path: Path) -> bool:
-    """True if path is an image whose stem ends with a reserved tag."""
+def path_has_image_reserved_suffix(path: Path) -> bool:
+    """True if path is an image whose stem ends with a reserved suffix."""
     if path.suffix.lower() not in ImageFileType:
         return False
-    return any(path.stem.endswith(tag) for tag in ImageConstants.reserved_image_tags)
+    return any(path.stem.endswith(suffix) for suffix in ReservedSuffix)
 
 
 def is_media_content_file(path: Path) -> bool:
@@ -86,7 +85,7 @@ def get_icon_file_path(image_file_path: Path) -> Path:
         return image_file_path  # Already suitable to be an icon
 
     extention = _ICON_EXTENSIONS.get(image_file_path.suffix, image_file_path.suffix)
-    icon_file_name = f"{image_file_path.stem}_icon{extention}"
+    icon_file_name = f"{image_file_path.stem}{ReservedSuffix.ICON}{extention}"
     _, month, year = extract_date_from_folder(image_file_path.parent)
     return Path(f"{settings.ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
 
@@ -183,7 +182,7 @@ def get_resized_filename(file_path: Path) -> Path:
         extention = ImageFileType.JPEG
     else:
         extention = file_path.suffix
-    return file_path.parent / f"{file_path.stem}_resized{extention}"
+    return file_path.parent / f"{file_path.stem}{ReservedSuffix.RESIZED}{extention}"
 
 
 def move_media_to_save_path(target_file_path: str, file_name: str):

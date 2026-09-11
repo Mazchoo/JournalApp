@@ -11,14 +11,14 @@ from main.models import Entry, Content
 from main.forms import DeleteEntryForm
 from main.utils.errors import form_errors_message
 from main.content_generation.content_factory_models import ContentFactory
-from main.config import ImageConstants
+from main.file_types import ReservedSuffix
 from main.utils.file_io import (
     get_base_entry_path,
     get_stored_media_folder,
     is_media_content_file,
     remove_empty_parent_folders,
     remove_icon_file,
-    path_has_image_reserved_tag,
+    path_has_image_reserved_suffix,
 )
 
 
@@ -32,14 +32,14 @@ def delete_entry_content(entry: Entry):
 
 
 def _is_ignored_media_file(file: Path, ignore_file_names: List[str]) -> bool:
-    """True if the file or a reserved-tag companion of it should stay put."""
+    """True if the file or a reserved-suffix companion of it should stay put."""
     if file.name in ignore_file_names:
         return True
 
     return any(
-        file.stem == f"{Path(ignored_name).stem}{tag}"
+        file.stem == f"{Path(ignored_name).stem}{suffix}"
         for ignored_name in ignore_file_names
-        for tag in ImageConstants.reserved_image_tags
+        for suffix in ReservedSuffix
     )
 
 
@@ -56,7 +56,7 @@ def move_files_out_of_folder(
         if _is_ignored_media_file(file, ignore_names):
             continue
 
-        if path_has_image_reserved_tag(file):
+        if path_has_image_reserved_suffix(file):
             file.unlink()
         elif is_media_content_file(file):
             remove_icon_file(file)

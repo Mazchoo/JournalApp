@@ -47,7 +47,6 @@ class ImageConstants:
     """Static image configuration"""
 
     supported_extensions: tuple[ImageFileType, ...] = tuple(ImageFileType)
-    reserved_image_tags: tuple = ("_icon", "_resized")
     unknown_enoding_type: str = "unknown"
     default_display_longest_side: int = 1024
     icon_size: int = 96
@@ -58,7 +57,6 @@ class VideoConstants:
 
     supported_extensions: tuple[VideoFileType, ...] = tuple(VideoFileType)
     save_image_extention: str = ImageFileType.JPEG.encoding
-    reserved_video_tags: tuple = ("_icon", "_resized")
     collage_image_longest_side: int = 768
     collage_nr_rows: int = 1
     collage_nr_cols: int = 3
@@ -73,5 +71,4 @@ class MeshConstants:
 
     supported_extensions: tuple[MeshFileType, ...] = tuple(MeshFileType)
     save_image_extention: str = ImageFileType.JPEG.encoding
-    reserved_mesh_tags: tuple = ("_icon",)
     icon_size: int = 96

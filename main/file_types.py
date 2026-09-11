@@ -1,4 +1,4 @@
-"""String enums for supported media file extensions."""
+"""String enums for supported media file extensions and reserved stem suffixes."""
 
 from enum import StrEnum
 
@@ -32,3 +32,10 @@ class MeshFileType(StrEnum):
     """File extensions treated as meshes."""
 
     GLB = ".glb"
+
+
+class ReservedSuffix(StrEnum):
+    """Stem suffixes reserved for generated companion files."""
+
+    ICON = "_icon"
+    RESIZED = "_resized"

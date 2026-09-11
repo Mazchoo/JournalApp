@@ -18,7 +18,7 @@ from main.utils.file_io import (
     get_icon_file_path,
     get_resized_filename,
     move_media_to_save_path,
-    path_has_image_reserved_tag,
+    path_has_image_reserved_suffix,
 )
 from main.utils.cache import cache_string
 
@@ -29,7 +29,7 @@ def _icon_source_paths(target_path_obj: Path) -> tuple[Path, Path] | None:
     The icon is always named from the original media file. Derivative ``_resized``
     / ``_icon`` images are not a naming source.
     """
-    if path_has_image_reserved_tag(target_path_obj):
+    if path_has_image_reserved_suffix(target_path_obj):
         return None
 
     icon_name_path = target_path_obj
