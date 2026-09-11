@@ -13,6 +13,7 @@ from main.content_generation.delete_entry import (
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.models import Camera, Entry
 from tests.mocks import (
+    MINIMAL_SVG,
     create_ajax_headers,
     create_mock_client,
     create_mock_entry,
@@ -168,6 +169,35 @@ def test_move_files_out_of_folder_ignores_form_files_and_companions(tmp_path):
     assert keep_resized.exists()
     assert (tmp_path / "drop.jpg").exists()
     assert not drop.exists()
+
+
+@pytest.mark.django_db
+def test_delete_entry_moves_svg_back_and_removes_icon(tmp_path):
+    """Deleting an entry with an SVG restores the original and removes its PNG icon."""
+    (tmp_path / "logo.svg").write_text(MINIMAL_SVG, encoding="utf-8")
+    update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "logo.svg",
+                    "allow_ai_synthesis": 0,
+                }
+            },
+        }
+    )
+
+    dated = tmp_path / "2025" / "03" / "01" / "logo.svg"
+    icon = tmp_path / "icons" / "2025" / "03" / "logo_icon.png"
+    assert dated.exists()
+    assert icon.exists()
+
+    delete_entry_and_content({"entry": "2025-03-01"})
+
+    assert (tmp_path / "logo.svg").exists()
+    assert not dated.exists()
+    assert not icon.exists()
 
 
 if __name__ == "__main__":

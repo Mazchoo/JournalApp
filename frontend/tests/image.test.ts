@@ -353,6 +353,17 @@ describe("uploadAllMediaFiles", () => {
     expect(document.getElementById("upload-label0")!.textContent).toBe("a.png");
   });
 
+  it("routes an svg to the image reader as a data URL", async () => {
+    uploadAllMediaFiles("0", [
+      fileNamed("logo.svg", "<svg></svg>", "image/svg+xml"),
+    ]);
+
+    expect(await waitForSrc("image0")).toMatch(/^data:image\/svg\+xml/);
+    expect(
+      document.getElementById("btn-save")!.classList.contains("btn-success"),
+    ).toBe(true);
+  });
+
   it("routes a mesh to the mesh renderer", () => {
     uploadAllMediaFiles("0", [fileNamed("scan.glb")]);
 

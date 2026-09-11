@@ -15,7 +15,7 @@ describe("media type detection", () => {
     expect(isMeshFile(name)).toBe(false);
   });
 
-  it.each(["a.jpg", "a.jpeg", "a.jfif", "a.PNG"])(
+  it.each(["a.jpg", "a.jpeg", "a.jfif", "a.PNG", "a.svg", "A.SVG"])(
     "treats %s as an image",
     (name) => {
       expect(isImageFile(name)).toBe(true);

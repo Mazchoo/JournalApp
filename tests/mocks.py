@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import TYPE_CHECKING, List
 from urllib.parse import quote
 
@@ -113,6 +114,27 @@ def create_mock_video_file(base_path, name="2025-02-12", file_name="clip.mp4"):
     video_path = video_dir / file_name
     video_path.write_bytes(b"\x00\x00\x00\x1cftypisom")
     return video_path
+
+
+MINIMAL_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
+    '<rect width="10" height="10"/></svg>'
+)
+
+
+def create_mock_svg_file(base_path, name="2025-02-12", file_name="logo.svg"):
+    """
+    Create a minimal SVG file inside a temporary entry folder structure.
+
+    Returns the full path to the created file. Write it under the test
+    ENTRY_FOLDER (pytest tmp_path).
+    """
+    year, month, day = name.split("-")
+    image_dir = Path(base_path) / year / month / day
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / file_name
+    image_path.write_text(MINIMAL_SVG, encoding="utf-8")
+    return image_path
 
 
 def create_mock_image_file(base_path, name="2025-02-12", file_name="photo.jpg"):

@@ -83,8 +83,10 @@ class ImageForm(ModelForm):
     - ``{year}/{month}/{day}/{filename}`` — original, moved from the unsorted
       entry folder if it is not already in the date folder
     - ``{year}/{month}/{day}/{stem}_resized{ext}`` — downsized preview, only if
-      the longest side is at least 1024px
-    - ``icons/{year}/{month}/{stem}_icon{ext}`` — square calendar icon, if missing
+      the longest side is at least 1024px. A vector image gets no ``_resized``
+      preview
+    - ``icons/{year}/{month}/{stem}_icon{ext}`` — square calendar icon, if missing.
+      A vector image's icon is a rasterised ``{stem}_icon.png``
 
     ``save()`` only persists the EntryImage row.
     """

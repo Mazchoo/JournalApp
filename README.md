@@ -71,7 +71,7 @@ Use **Choose file** to pick one or more files. The type is chosen from the file 
 
 Click an image to view it at full resolution.
 
-Supported types: **.png**, **.jpg**, **.jpeg**, and **.jfif**.
+Supported types: **.png**, **.jpg**, **.jpeg**, **.jfif** and **.svg**.
 
 ![An image in a journal entry](static/Image/Examples/Image.png)
 

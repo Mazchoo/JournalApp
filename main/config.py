@@ -44,7 +44,7 @@ class DateConstants:
 class ImageConstants:
     """Static image configuration"""
 
-    supported_extensions: tuple = (".png", ".jpg", ".jpeg", ".jfif")
+    supported_extensions: tuple = (".png", ".jpg", ".jpeg", ".jfif", ".svg")
     reserved_image_tags: tuple = ("_icon", "_resized")
     unknown_enoding_type: str = "unknown"
     default_display_longest_side: int = 1024

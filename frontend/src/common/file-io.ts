@@ -7,7 +7,7 @@ export function isVideoFile(fileName: string): boolean {
 /** Return whether a file name has a supported image extension. */
 export function isImageFile(fileName: string): boolean {
   const fileExtention = fileName.split(".").pop()!.toLowerCase();
-  return ["jpg", "jpeg", "jfif", "png"].includes(fileExtention);
+  return ["jpg", "jpeg", "jfif", "png", "svg"].includes(fileExtention);
 }
 
 /** Return whether a file name has a glb extension. */

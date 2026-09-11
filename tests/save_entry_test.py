@@ -7,6 +7,7 @@ from django.apps import apps
 
 from main.content_generation.save_entry import update_or_generate_from_request
 from tests.mocks import (
+    MINIMAL_SVG,
     create_ajax_headers,
     create_mock_client,
     create_mock_mesh_file,
@@ -388,6 +389,90 @@ def test_save_entry_moves_removed_media_back_to_entry_folder(tmp_path):
     assert (dated / "keep.jpg").exists()
     assert not (dated / "drop.jpg").exists()
     assert (tmp_path / "drop.jpg").exists()
+
+
+@pytest.mark.django_db
+def test_save_entry_creates_svg_image_content(tmp_path):
+    """Saving an SVG moves the original, writes a PNG icon, and skips _resized."""
+    Entry = apps.get_model("main", "Entry")
+    EntryImage = apps.get_model("main", "EntryImage")
+
+    (tmp_path / "logo.svg").write_text(MINIMAL_SVG, encoding="utf-8")
+
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "logo.svg",
+                    "allow_ai_synthesis": 0,
+                }
+            },
+        }
+    )
+
+    data = json.loads(response.content)
+    assert "success" in data
+
+    entry = Entry.objects.get(name="2025-03-01")
+    assert entry.content.count() == 1
+
+    content = entry.content.first()
+    assert content is not None
+    assert content.content_type == "image"
+
+    image = EntryImage.objects.get(pk=content.content_id)
+    assert image.file_path.endswith("logo.svg")
+
+    dated = tmp_path / "2025" / "03" / "01"
+    assert (dated / "logo.svg").exists()
+    assert not (dated / "logo_resized.svg").exists()
+    assert (tmp_path / "icons" / "2025" / "03" / "logo_icon.png").exists()
+
+
+@pytest.mark.django_db
+def test_save_entry_succeeds_when_svg_cannot_be_rasterised(tmp_path):
+    """An SVG svglib cannot render still saves; it just has no calendar icon."""
+    (tmp_path / "logo.svg").write_text("this is not svg", encoding="utf-8")
+
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "logo.svg",
+                    "allow_ai_synthesis": 0,
+                }
+            },
+        }
+    )
+
+    assert "success" in json.loads(response.content)
+    assert (tmp_path / "2025" / "03" / "01" / "logo.svg").exists()
+    assert not (tmp_path / "icons" / "2025" / "03" / "logo_icon.png").exists()
+
+
+@pytest.mark.django_db
+def test_save_entry_rejects_resized_svg_reserved_tag(tmp_path):
+    """logo_resized.svg is a reserved image tag, even though it is a vector file."""
+    (tmp_path / "logo_resized.svg").write_text(MINIMAL_SVG, encoding="utf-8")
+
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "image1": {
+                    "entry": "2025-03-01",
+                    "file_path": "logo_resized.svg",
+                    "allow_ai_synthesis": 0,
+                }
+            },
+        }
+    )
+
+    assert "error" in json.loads(response.content)
 
 
 if __name__ == "__main__":

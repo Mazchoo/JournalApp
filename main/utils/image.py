@@ -7,6 +7,7 @@ from typing import Union
 from PIL import Image
 
 from main.config import ImageConstants
+from main.utils.svg import is_svg_path, write_svg_icon
 from main.utils.pil_image_wrapper import (
     get_square_resized_image,
     get_resizing_factor_to_downsized,
@@ -49,6 +50,9 @@ def write_image_icon(target_path_obj: Path) -> bool:
 
     icon_name_path, image_path = source_paths
     target_icon_file_path = get_icon_file_path(icon_name_path)
+    if is_svg_path(image_path):
+        return write_svg_icon(image_path, target_icon_file_path)
+
     image = Image.open(image_path)  # type: Image.Image
     image_resized = get_square_resized_image(image, ImageConstants.icon_size)
     target_icon_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -79,6 +83,8 @@ def get_encoding_type(file_path: Union[Path, str]) -> str:
         ecoding_type = "jpeg"
     elif path.suffix.lower() == ".png":
         ecoding_type = "png"
+    elif path.suffix.lower() == ".svg":
+        ecoding_type = "svg+xml"
     else:
         ecoding_type = ImageConstants.unknown_enoding_type
 
@@ -132,7 +138,9 @@ def lazy_create_base64_image_data(file_path: Union[Path, str]) -> str:
         file_path.exists()
         and file_path.suffix.lower() in ImageConstants.supported_extensions
     ):
-        factor = get_resizing_factor_to_downsized(file_path)
+        factor = (
+            1 if is_svg_path(file_path) else get_resizing_factor_to_downsized(file_path)
+        )
         ecoding_type = get_encoding_type(file_path)
         if factor > 1:
             b64_string = get_resized_base64(file_path, factor, ecoding_type)

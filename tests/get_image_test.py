@@ -7,7 +7,7 @@ from django.forms.utils import ErrorDict
 from django.http import JsonResponse
 
 from main.content_generation.get_full_image import get_full_image_reponse
-from tests.mocks import create_mock_client, create_mock_image_file
+from tests.mocks import create_mock_client, create_mock_image_file, create_mock_svg_file
 
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
@@ -82,6 +82,16 @@ def test_get_full_image_reponse_success(tmp_path):
     data = json.loads(response.content)
     assert "base64" in data
     assert data["base64"].startswith("data:image/jpeg;base64,")
+
+
+def test_get_full_image_reponse_for_svg(tmp_path):
+    """A saved SVG returns a data URL rather than an unknown-encoding error."""
+    create_mock_svg_file(tmp_path)
+    response = get_full_image_reponse({"name": "2025-02-12", "file": "logo.svg"})
+    assert isinstance(response, JsonResponse)
+    data = json.loads(response.content)
+    assert "base64" in data
+    assert data["base64"].startswith("data:image/svg+xml;base64,")
 
 
 def test_get_full_image_reponse_file_not_found(tmp_path):

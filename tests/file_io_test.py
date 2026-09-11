@@ -4,6 +4,7 @@ from pathlib import Path
 
 from main.utils.file_io import (
     extract_date_from_folder,
+    get_icon_file_path,
     get_stored_media_folder,
     get_stored_media_path,
     is_media_content_file,
@@ -17,6 +18,7 @@ def test_is_media_content_file_accepts_image_video_and_mesh():
     """Image, video, and mesh extensions are media content."""
     assert is_media_content_file(Path("photo.jpg"))
     assert is_media_content_file(Path("photo.PNG"))
+    assert is_media_content_file(Path("logo.svg"))
     assert is_media_content_file(Path("clip.mp4"))
     assert is_media_content_file(Path("scan.glb"))
 
@@ -34,6 +36,23 @@ def test_path_has_image_reserved_tag_requires_image_extension():
     assert not path_has_image_reserved_tag(Path("scan_icon.glb"))
     assert not path_has_image_reserved_tag(Path("clip_resized.mp4"))
     assert not path_has_image_reserved_tag(Path("photo.jpg"))
+    assert not path_has_image_reserved_tag(Path("logo.svg"))
+
+
+def test_get_icon_file_path_maps_svg_to_png(settings):
+    """An SVG's calendar icon is a rasterised PNG, not another SVG."""
+    icon = get_icon_file_path(Path("2025/02/12/logo.svg"))
+    assert (
+        icon == Path(settings.ENTRY_FOLDER) / "icons" / "2025" / "02" / "logo_icon.png"
+    )
+
+
+def test_get_icon_file_path_keeps_existing_extensions(settings):
+    """Video, mesh, and raster image icon suffixes stay as they were."""
+    icons = Path(settings.ENTRY_FOLDER) / "icons" / "2025" / "02"
+    assert get_icon_file_path(Path("2025/02/12/clip.mp4")) == icons / "clip_icon.jpg"
+    assert get_icon_file_path(Path("2025/02/12/scan.glb")) == icons / "scan_icon.jpg"
+    assert get_icon_file_path(Path("2025/02/12/photo.jpg")) == icons / "photo_icon.jpg"
 
 
 def test_extract_date_from_folder():
@@ -73,9 +92,7 @@ def test_remove_empty_parent_folders_stops_at_entry_folder(tmp_path, settings):
     assert tmp_path.exists()
 
 
-def test_remove_empty_parent_folders_does_not_remove_entry_folder(
-    tmp_path, settings
-):
+def test_remove_empty_parent_folders_does_not_remove_entry_folder(tmp_path, settings):
     """Calling the pruner on the entry root must leave it in place."""
     entries = tmp_path / "entries"
     entries.mkdir()
@@ -120,7 +137,9 @@ def test_move_dated_folder_moves_every_file(tmp_path):
     assert (dest / "scan.glb").read_bytes() == b"glb"
     assert (dest / "scan_resized.jpeg").read_bytes() == b"jpg"
     assert (dest / "notes.txt").read_text() == "keep"
-    assert (tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg").read_bytes() == b"icon"
+    assert (
+        tmp_path / "icons" / "2025" / "03" / "scan_icon.jpg"
+    ).read_bytes() == b"icon"
     assert not (tmp_path / "icons" / "2025" / "02" / "scan_icon.jpg").exists()
     assert not list(tmp_path.rglob("*_resized_icon*"))
     assert not source.exists()

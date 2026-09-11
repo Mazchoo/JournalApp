@@ -76,14 +76,19 @@ def extract_date_from_folder(folder: Path) -> Tuple[str, str, str]:
     return day, month, year
 
 
+_ICON_EXTENSIONS = {
+    ".mp4": ".jpg",
+    ".glb": ".jpg",
+    ".svg": ".png",
+}
+
+
 def get_icon_file_path(image_file_path: Path) -> Path:
     """Get icon file path from image file path"""
     if image_file_path == settings.MISSING_ICON_IMAGE:
         return image_file_path  # Already suitable to be an icon
 
-    extention = (
-        ".jpg" if image_file_path.suffix in (".mp4", ".glb") else image_file_path.suffix
-    )
+    extention = _ICON_EXTENSIONS.get(image_file_path.suffix, image_file_path.suffix)
     icon_file_name = f"{image_file_path.stem}_icon{extention}"
     _, month, year = extract_date_from_folder(image_file_path.parent)
     return Path(f"{settings.ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
