@@ -15,12 +15,13 @@ from reportlab.graphics.renderPM import RenderPMError  # type: ignore
 from svglib.svglib import svg2rlg  # type: ignore
 
 from main.config import ImageConstants
+from main.file_types import ImageFileType
 from main.utils.pil_image_wrapper import get_square_resized_image
 
 
 def is_svg_path(file_path: Path) -> bool:
     """True if the path points at a vector image."""
-    return file_path.suffix.lower() == ".svg"
+    return file_path.suffix.lower() == ImageFileType.SVG
 
 
 def rasterize_svg(svg_path: Path, longest_side: int) -> Image.Image:

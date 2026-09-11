@@ -2,6 +2,8 @@
 
 from typing import Literal, Tuple, get_args
 
+from main.file_types import ImageFileType, MeshFileType, VideoFileType
+
 IContentTypes = Literal["image", "paragraph", "video", "mesh"]
 ALLOWED_CONTENT_TYPES = set(get_args(IContentTypes))
 
@@ -44,7 +46,7 @@ class DateConstants:
 class ImageConstants:
     """Static image configuration"""
 
-    supported_extensions: tuple = (".png", ".jpg", ".jpeg", ".jfif", ".svg")
+    supported_extensions: tuple[ImageFileType, ...] = tuple(ImageFileType)
     reserved_image_tags: tuple = ("_icon", "_resized")
     unknown_enoding_type: str = "unknown"
     default_display_longest_side: int = 1024
@@ -54,8 +56,8 @@ class ImageConstants:
 class VideoConstants:
     """Static information for displaying videos"""
 
-    supported_extensions: Tuple[str] = (".mp4",)
-    save_image_extention: str = "jpeg"
+    supported_extensions: tuple[VideoFileType, ...] = tuple(VideoFileType)
+    save_image_extention: str = ImageFileType.JPEG.encoding
     reserved_video_tags: tuple = ("_icon", "_resized")
     collage_image_longest_side: int = 768
     collage_nr_rows: int = 1
@@ -69,7 +71,7 @@ class VideoConstants:
 class MeshConstants:
     """Static information for displaying meshes"""
 
-    supported_extensions: Tuple[str] = (".glb",)
-    save_image_extention: str = "jpeg"
+    supported_extensions: tuple[MeshFileType, ...] = tuple(MeshFileType)
+    save_image_extention: str = ImageFileType.JPEG.encoding
     reserved_mesh_tags: tuple = ("_icon",)
     icon_size: int = 96

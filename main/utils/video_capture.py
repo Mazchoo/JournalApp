@@ -8,7 +8,7 @@ import numpy as np
 import imageio.v3 as iio
 from imageio_ffmpeg import read_frames, count_frames_and_secs
 
-from main.config import VideoConstants
+from main.file_types import VideoFileType
 
 
 class VideoCapture:
@@ -25,7 +25,7 @@ class VideoCapture:
 
         if not video_path.exists():
             return
-        if video_path.suffix.lower() not in VideoConstants.supported_extensions:
+        if video_path.suffix.lower() not in VideoFileType:
             return
 
         self._initialize()

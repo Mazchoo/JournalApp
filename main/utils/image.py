@@ -7,6 +7,7 @@ from typing import Union
 from PIL import Image
 
 from main.config import ImageConstants
+from main.file_types import ImageFileType, MeshFileType, VideoFileType
 from main.utils.svg import is_svg_path, write_svg_icon
 from main.utils.pil_image_wrapper import (
     get_square_resized_image,
@@ -32,9 +33,11 @@ def _icon_source_paths(target_path_obj: Path) -> tuple[Path, Path] | None:
         return None
 
     icon_name_path = target_path_obj
-    if target_path_obj.suffix == ".mp4":
-        target_path_obj = target_path_obj.parent / f"{target_path_obj.stem}.jpg"
-    elif target_path_obj.suffix == ".glb":
+    if target_path_obj.suffix == VideoFileType.MP4:
+        target_path_obj = (
+            target_path_obj.parent / f"{target_path_obj.stem}{ImageFileType.JPG}"
+        )
+    elif target_path_obj.suffix == MeshFileType.GLB:
         target_path_obj = get_resized_filename(target_path_obj)
 
     if not target_path_obj.exists():
@@ -78,17 +81,10 @@ def move_image_to_save_path(target_file_path: str, file_name: str):
 
 def get_encoding_type(file_path: Union[Path, str]) -> str:
     """Get compression type form file path"""
-    path = Path(file_path)
-    if path.suffix.lower() in [".jpg", ".jpeg", ".jfif"]:
-        ecoding_type = "jpeg"
-    elif path.suffix.lower() == ".png":
-        ecoding_type = "png"
-    elif path.suffix.lower() == ".svg":
-        ecoding_type = "svg+xml"
-    else:
-        ecoding_type = ImageConstants.unknown_enoding_type
-
-    return ecoding_type
+    try:
+        return ImageFileType(Path(file_path).suffix.lower()).encoding
+    except ValueError:
+        return ImageConstants.unknown_enoding_type
 
 
 def get_resized_base64(file_path: Path, factor: float, ecoding_type: str) -> str:
@@ -136,7 +132,7 @@ def lazy_create_base64_image_data(file_path: Union[Path, str]) -> str:
 
     if (
         file_path.exists()
-        and file_path.suffix.lower() in ImageConstants.supported_extensions
+        and file_path.suffix.lower() in ImageFileType
     ):
         factor = (
             1 if is_svg_path(file_path) else get_resizing_factor_to_downsized(file_path)

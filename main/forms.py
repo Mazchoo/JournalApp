@@ -36,12 +36,8 @@ from main.utils.mesh import save_mesh_frame_image
 from main.utils.parsing import coerce_string_int_to_bool
 from main.utils.errors import form_errors_message
 from main.utils.html_sanitize import sanitize_paragraph_html
-from main.config import (
-    ALLOWED_CONTENT_TYPES,
-    ImageConstants,
-    MeshConstants,
-    VideoConstants,
-)
+from main.config import ALLOWED_CONTENT_TYPES, ImageConstants
+from main.file_types import ImageFileType, MeshFileType, VideoFileType
 from main.database_layer.date_slugs import get_valid_date_from_slug
 
 
@@ -121,7 +117,7 @@ class ImageForm(ModelForm):
         if not target_file_obj.exists() and not source_file_obj.exists():
             raise forms.ValidationError(f"Cannot find '{file_name}' in Entries folder.")
 
-        if target_file_obj.suffix.lower() not in ImageConstants.supported_extensions:
+        if target_file_obj.suffix.lower() not in ImageFileType:
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
@@ -193,7 +189,7 @@ class VideoForm(ModelForm):
         if not target_file_obj.exists() and not source_file_obj.exists():
             raise forms.ValidationError(f"Cannot find folder '{source_path}'")
 
-        if target_file_obj.suffix.lower() not in VideoConstants.supported_extensions:
+        if target_file_obj.suffix.lower() not in VideoFileType:
             message = f"Extension '{target_file_obj.suffix}' is not a recognised image extension"
             raise forms.ValidationError(message)
 
@@ -331,7 +327,7 @@ class MeshForm(ModelForm):
 
         target_file_obj = Path(target_path)
 
-        if target_file_obj.suffix.lower() not in MeshConstants.supported_extensions:
+        if target_file_obj.suffix.lower() not in MeshFileType:
             message = f"Extension '{target_file_obj.suffix}' is not a recognised mesh extension"
             raise forms.ValidationError(message)
 
