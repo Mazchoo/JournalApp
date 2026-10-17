@@ -62,6 +62,7 @@ def generate_new_content_from_source(
 
     new_instance_id = None
     if new_obj_form.is_valid():
+        new_obj_form.instance.entry_id = new_slug
         new_obj_form.save(commit=True)
         new_instance_id = new_obj_form.instance.pk
         obj.delete()

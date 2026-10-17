@@ -6,6 +6,7 @@ import pytest
 from django.apps import apps
 
 from main.content_generation.save_entry import update_or_generate_from_request
+from main.forms import ContentForm
 from tests.mocks import (
     MINIMAL_SVG,
     create_ajax_headers,
@@ -126,6 +127,49 @@ def test_save_entry_replaces_existing_content():
     assert content is not None
     paragraph = EntryParagraph.objects.get(pk=content.content_id)
     assert paragraph.text == "<p>Updated</p>"
+
+
+@pytest.mark.django_db
+def test_failed_content_form_rolls_back_saved_siblings(monkeypatch):
+    """One invalid content link must not leave the other saved rows behind."""
+    EntryParagraph = apps.get_model("main", "EntryParagraph")
+    Content = apps.get_model("main", "Content")
+    real_is_valid = ContentForm.is_valid
+    calls = {"count": 0}
+
+    def fail_second(self):
+        calls["count"] += 1
+        if calls["count"] == 2:
+            self.add_error(None, "content link rejected")
+            return False
+        return real_is_valid(self)
+
+    monkeypatch.setattr(ContentForm, "is_valid", fail_second)
+
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "paragraph1": {
+                    "entry": "2025-03-01",
+                    "text": "<p>First</p>",
+                    "height": 200,
+                    "allow_ai_synthesis": 1,
+                },
+                "paragraph2": {
+                    "entry": "2025-03-01",
+                    "text": "<p>Second</p>",
+                    "height": 200,
+                    "allow_ai_synthesis": 1,
+                },
+            },
+        }
+    )
+
+    data = json.loads(response.content)
+    assert "error" in data
+    assert EntryParagraph.objects.count() == 0
+    assert Content.objects.count() == 0
 
 
 @pytest.mark.django_db

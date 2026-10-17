@@ -89,7 +89,7 @@ class ImageForm(ModelForm):
 
     class Meta:
         model = EntryImage
-        fields = "__all__"
+        fields = ["file_path", "allow_ai_synthesis"]
 
     def clean_file_path(self):
         """Ensure file path refers to usuable file"""
@@ -98,7 +98,7 @@ class ImageForm(ModelForm):
             raise forms.ValidationError("No data provided for image form")
 
         file_name = clean_data["file_path"]
-        entry = clean_data["entry"]
+        entry_slug = str(self.data.get("entry") or "")
 
         if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
@@ -106,8 +106,8 @@ class ImageForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
-            raise forms.ValidationError(f"Date {entry.name} is malformed")
+        if (target_path := get_stored_media_path(file_name, entry_slug)) is None:
+            raise forms.ValidationError(f"Date {entry_slug} is malformed")
 
         target_file_obj = Path(target_path)
 
@@ -161,7 +161,7 @@ class VideoForm(ModelForm):
 
     class Meta:
         model = EntryVideo
-        fields = "__all__"
+        fields = ["file_path", "allow_ai_synthesis"]
 
     def clean_file_path(self):
         """Ensure file path refers to usuable file"""
@@ -170,7 +170,7 @@ class VideoForm(ModelForm):
             raise forms.ValidationError("File path is not defined")
 
         file_name = clean_data["file_path"]
-        entry = clean_data["entry"]
+        entry_slug = str(self.data.get("entry") or "")
 
         if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
@@ -178,8 +178,8 @@ class VideoForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
-            raise forms.ValidationError(f"Date {entry.name} is malformed")
+        if (target_path := get_stored_media_path(file_name, entry_slug)) is None:
+            raise forms.ValidationError(f"Date {entry_slug} is malformed")
 
         target_file_obj = Path(target_path)
 
@@ -305,7 +305,7 @@ class MeshForm(ModelForm):
 
     class Meta:
         model = EntryMesh
-        fields = "__all__"
+        fields = ["file_path", "image_path", "camera"]
 
     def clean_file_path(self):
         """Ensure file path refers to a usable glb and move it into the date folder."""
@@ -314,7 +314,7 @@ class MeshForm(ModelForm):
             raise forms.ValidationError("File path is not defined")
 
         file_name = clean_data["file_path"]
-        entry = clean_data["entry"]
+        entry_slug = str(self.data.get("entry") or "")
 
         if len(file_name) == 0:
             raise forms.ValidationError("Path is empty")
@@ -322,8 +322,8 @@ class MeshForm(ModelForm):
         if "." not in file_name:
             raise forms.ValidationError(f"Path '{file_name}' has no extension")
 
-        if (target_path := get_stored_media_path(file_name, entry.name)) is None:
-            raise forms.ValidationError(f"Date {entry.name} is malformed")
+        if (target_path := get_stored_media_path(file_name, entry_slug)) is None:
+            raise forms.ValidationError(f"Date {entry_slug} is malformed")
 
         target_file_obj = Path(target_path)
 
@@ -403,7 +403,7 @@ class ParagraphForm(ModelForm):
 
     class Meta:
         model = EntryParagraph
-        fields = "__all__"
+        fields = ["text", "height", "allow_ai_synthesis", "raw_html"]
 
     def clean_text(self):
         """Remove script tags and their contents from paragraph HTML."""
