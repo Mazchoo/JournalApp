@@ -1,7 +1,10 @@
 """Tests for the latest_page view (URL: /latest) and get_latest_entry_tuple."""
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
+from main.database_layer.get_latest_entry import get_latest_entry_tuple
 from tests.mocks import (
     create_mock_client,
     create_mock_entry,
@@ -43,16 +46,12 @@ def test_latest_picks_most_recently_edited():
 @pytest.mark.django_db
 def test_get_latest_entry_tuple_returns_none_when_no_entries():
     """When the database is empty, get_latest_entry_tuple should return None."""
-    from main.database_layer.get_latest_entry import get_latest_entry_tuple
-
     assert get_latest_entry_tuple() is None
 
 
 @pytest.mark.django_db
 def test_get_latest_entry_tuple_returns_tuple_for_latest_entry():
     """When entries exist, it should return a (year, month, day) tuple."""
-    from main.database_layer.get_latest_entry import get_latest_entry_tuple
-
     create_mock_entry()
     result = get_latest_entry_tuple()
     assert result == ("2025", "February", "12")
@@ -61,11 +60,21 @@ def test_get_latest_entry_tuple_returns_tuple_for_latest_entry():
 @pytest.mark.django_db
 def test_get_latest_entry_tuple_returns_most_recent_among_multiple():
     """Among multiple entries, the one with the latest last_edited should be returned."""
-    from main.database_layer.get_latest_entry import get_latest_entry_tuple
-
     create_multiple_mock_entries()
     result = get_latest_entry_tuple()
     assert result == ("2025", "February", "12")
+
+
+@pytest.mark.django_db
+def test_get_latest_entry_tuple_reads_one_row():
+    """Finding the latest entry is one indexed lookup, not a full table read."""
+    create_multiple_mock_entries()
+    with CaptureQueriesContext(connection) as queries:
+        result = get_latest_entry_tuple()
+
+    assert result == ("2025", "February", "12")
+    assert len(queries) == 1
+    assert "LIMIT 1" in queries[0]["sql"]
 
 
 if __name__ == "__main__":
