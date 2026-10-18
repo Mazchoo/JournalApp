@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Self
 
 from django import forms
-from django.forms import ModelForm
 from django.db import models as django_models
+from django.db import transaction
+from django.forms import ModelForm
 from tinymce.widgets import TinyMCE  # type: ignore
 
 from main.models import (
@@ -39,13 +40,15 @@ from main.utils.html_sanitize import sanitize_paragraph_html
 from main.config import ALLOWED_CONTENT_TYPES
 from main.file_types import ImageFileType, MeshFileType, ReservedSuffix, VideoFileType
 from main.database_layer.date_slugs import get_valid_date_from_slug
+from main.database_layer.get_all_years_summary import get_all_year_summary_information
 
 
 class EntryForm(ModelForm):
     """A dated journal entry - at most one entry per date.
 
-    Creating or validating this form writes no files. ``save()`` only persists
-    the Entry row.
+    Creating or validating this form writes no files. ``save()`` persists the
+    Entry row and clears the home-page year cache when this is the first entry
+    in its year.
     """
 
     class Meta:
@@ -68,6 +71,20 @@ class EntryForm(ModelForm):
         self.instance.month = entry_date.month
         self.instance.day = entry_date.day
         return cleaned_data
+
+    def save(self, commit=True):
+        """Persist the entry. Drop the home-page icon cache when its year is new."""
+        year = self.instance.year
+        year_is_new = (
+            commit
+            and bool(year)
+            and not Entry.objects.filter(pk=self.instance.pk).exists()
+            and not Entry.objects.filter(year=year).exists()
+        )
+        entry = super().save(commit=commit)
+        if year_is_new:
+            transaction.on_commit(get_all_year_summary_information.cache_clear)
+        return entry
 
 
 class ImageForm(ModelForm):
