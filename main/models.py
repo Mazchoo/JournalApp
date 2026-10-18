@@ -30,7 +30,9 @@ class Entry(Model):
     day = models.PositiveSmallIntegerField()
     first_created = models.DateTimeField()
     last_edited = models.DateTimeField()
-    content = models.ManyToManyField(Content)  # type: models.ManyToManyField
+    content = models.ManyToManyField(
+        Content, through="EntryContent"
+    )  # type: models.ManyToManyField
     objects = EntryQuerySet.as_manager()
 
     class Meta:
@@ -42,6 +44,41 @@ class Entry(Model):
 
     def __str__(self):
         return f"Entry {self.name} - last modified - {self.last_edited}"
+
+    def ordered_content(self) -> models.QuerySet[Content]:
+        """Content rows in display order."""
+        return self.content.order_by("entrycontent__position", "entrycontent__id")
+
+    def set_content_order(self, content_ids: list[int]):
+        """Replace content links, storing display order in position."""
+        self.content.clear()
+        EntryContent.objects.bulk_create(
+            [
+                EntryContent(entry=self, content_id=content_id, position=position)
+                for position, content_id in enumerate(content_ids)
+            ]
+        )
+
+
+class EntryContent(Model):
+    """Ordered link between an entry and one content row.
+
+    The table name is the original automatic many-to-many table, so existing
+    links stay in place when ``position`` is added.
+    """
+
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = "main_entry_content"
+        ordering = ["position", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["entry", "content"], name="unique_entry_content"
+            )
+        ]
 
 
 class EntryImage(Model):

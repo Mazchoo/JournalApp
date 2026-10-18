@@ -162,7 +162,7 @@ def update_or_generate_from_request(post_data: dict):
     remove_files_from_entry(entry, ignore_file_names=form.media_file_names)
 
     entry.last_edited = datetime.now()
-    entry.content.set(content_ids)
+    entry.set_content_order(content_ids)
     entry.save()
 
     return JsonResponse({"success": "Entry Saved Successfully"})

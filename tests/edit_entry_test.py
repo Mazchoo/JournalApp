@@ -3,11 +3,14 @@
 from unittest.mock import patch
 
 import pytest
+from django.apps import apps
 
+from main.content_generation.load_entry import load_all_content_from_entry
 from tests.mocks import (
     create_mock_client,
     create_mock_entry,
     create_mock_entry_with_paragraph,
+    create_mock_paragraph,
 )
 
 
@@ -107,8 +110,6 @@ def test_edit_page_for_date_without_entry():
 @pytest.mark.django_db
 def test_load_nonexistent_entry():
     """Loading content for a slug with no Entry should return entry_exists=False."""
-    from main.content_generation.load_entry import load_all_content_from_entry
-
     result = load_all_content_from_entry("1999-01-01")
 
     assert result["entry_exists"] is False
@@ -118,8 +119,6 @@ def test_load_nonexistent_entry():
 @pytest.mark.django_db
 def test_load_entry_with_paragraph():
     """Loading content for an entry with a paragraph should return entry_exists=True."""
-    from main.content_generation.load_entry import load_all_content_from_entry
-
     create_mock_entry_with_paragraph()
 
     result = load_all_content_from_entry("2025-02-12")
@@ -171,6 +170,50 @@ def test_clone_item_defaults_allow_ai_synthesis_on():
     clone_item = response.context["clone_item"]
     assert clone_item["data"]["allow_ai_synthesis"] is True
     assert 'class="btn btn-sm btn-primary allow-syn"' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_load_entry_follows_content_position():
+    """Display order is the link position, including when it differs from insert order."""
+    entry = create_mock_entry()
+    create_mock_paragraph(entry, "<p>A</p>", position=1)
+    create_mock_paragraph(entry, "<p>B</p>", position=0)
+
+    result = load_all_content_from_entry("2025-02-12")
+
+    assert [item["data"]["text"] for item in result["content_list"]] == [
+        "<p>B</p>",
+        "<p>A</p>",
+    ]
+    assert [item["index"] for item in result["content_list"]] == [1, 2]
+
+
+@pytest.mark.django_db
+def test_load_entry_fetches_each_content_type_once(django_assert_num_queries):
+    """Paragraphs are one IN query, and a mesh camera is joined rather than fetched per mesh."""
+    entry = create_mock_entry()
+    for index in range(5):
+        create_mock_paragraph(entry, f"<p>{index}</p>", position=index)
+
+    EntryMesh = apps.get_model("main", "EntryMesh")
+    Camera = apps.get_model("main", "Camera")
+    Content = apps.get_model("main", "Content")
+    EntryContent = apps.get_model("main", "EntryContent")
+    mesh = EntryMesh.objects.create(
+        entry=entry,
+        file_path="2025-02-12/scan.glb",
+        image_path="2025-02-12/scan.jpg",
+    )
+    Camera.objects.create(mesh=mesh)
+    content = Content.objects.create(content_type="mesh", content_id=mesh.pk)
+    EntryContent.objects.create(entry=entry, content=content, position=5)
+
+    with django_assert_num_queries(4):
+        result = load_all_content_from_entry("2025-02-12")
+
+    assert len(result["content_list"]) == 6
+    assert result["content_list"][-1]["type"] == "mesh"
+    assert result["content_list"][-1]["data"]["camera"]["radius"] == 3.0
 
 
 if __name__ == "__main__":

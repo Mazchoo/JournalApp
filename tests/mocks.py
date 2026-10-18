@@ -13,7 +13,7 @@ from django.apps import apps
 from django.test import Client
 
 if TYPE_CHECKING:
-    from main.models import Entry
+    from main.models import Entry, EntryParagraph
 
 
 def create_mock_client():
@@ -47,6 +47,29 @@ def create_mock_entry() -> Entry:
     return entry
 
 
+def create_mock_paragraph(
+    entry: Entry,
+    text: str,
+    position: int,
+    height: int = 100,
+    allow_ai_synthesis: bool = False,
+) -> EntryParagraph:
+    """Attach a paragraph to entry at an explicit display position."""
+    EntryParagraph = apps.get_model("main", "EntryParagraph")
+    Content = apps.get_model("main", "Content")
+    EntryContent = apps.get_model("main", "EntryContent")
+
+    paragraph = EntryParagraph.objects.create(
+        entry=entry,
+        text=text,
+        height=height,
+        allow_ai_synthesis=allow_ai_synthesis,
+    )
+    content = Content.objects.create(content_type="paragraph", content_id=paragraph.pk)
+    EntryContent.objects.create(entry=entry, content=content, position=position)
+    return paragraph
+
+
 def create_mock_entry_with_paragraph() -> Entry:
     """
     Extend sample_entry with a paragraph Content record.
@@ -54,24 +77,13 @@ def create_mock_entry_with_paragraph() -> Entry:
     This lets us test views that render entry content (the edit/show page).
     """
     entry = create_mock_entry()
-
-    EntryParagraph = apps.get_model("main", "EntryParagraph")
-    Content = apps.get_model("main", "Content")
-
-    # Create the paragraph model instance
-    paragraph = EntryParagraph.objects.create(
-        entry=entry, text="<p>Hello World</p>", height=200, allow_ai_synthesis=True
+    create_mock_paragraph(
+        entry,
+        "<p>Hello World</p>",
+        position=0,
+        height=200,
+        allow_ai_synthesis=True,
     )
-
-    # Create the generic Content record that links to the paragraph
-    content = Content.objects.create(
-        content_type="paragraph",
-        content_id=paragraph.pk,
-    )
-
-    # Attach the content to the entry via the ManyToMany relationship
-    entry.content.add(content)
-
     return entry
 
 

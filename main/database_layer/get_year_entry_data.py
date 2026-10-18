@@ -1,9 +1,12 @@
 """Queries to get an entry from a date or date range"""
 
 import random
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Union
+
+from django.db.models import Count, Max
 
 from main.config import NR_ATTEMPTS_TO_SELECT_IMAGE
 from main.database_layer.fe_interfaces import YearEntryInformationContext
@@ -12,59 +15,49 @@ from main.utils.date import get_month_name
 from main.utils.image import get_base64_from_image, lazy_create_image_icon
 from main.utils.file_io import get_base_entry_path, get_icon_file_path
 
-
-def get_all_entries_in_month(year: int, month: int) -> list[Entry]:
-    """Return all entries from a specified month."""
-    return list(Entry.objects.in_year_month(year, month))
+MonthStats = dict[int, tuple[int, datetime]]
 
 
-def get_all_images_in_month(year: int, month: int) -> list[EntryImage]:
-    """Return all image entries from a specified month."""
-    return list(
-        EntryImage.objects.filter(entry__in=Entry.objects.in_year_month(year, month))
+def get_month_entry_stats(year: int) -> MonthStats:
+    """Return {month_index: (entry_count, last_edited)} in one query."""
+    rows = (
+        Entry.objects.in_year(year)
+        .order_by()
+        .values("month")
+        .annotate(count=Count("name"), last_edited=Max("last_edited"))
     )
+    return {row["month"]: (row["count"], row["last_edited"]) for row in rows}
 
 
-def get_all_videos_in_month(year: int, month: int) -> list[EntryVideo]:
-    """Return all video entries from a specified month."""
-    return list(
-        EntryVideo.objects.filter(entry__in=Entry.objects.in_year_month(year, month))
-    )
+def media_file_paths_by_month(year: int) -> dict[int, list[Path]]:
+    """Image, video, and mesh paths for a year, grouped by month.
 
-
-def get_all_meshes_in_month(year: int, month: int) -> list[EntryMesh]:
-    """Return all mesh entries from a specified month."""
-    return list(
-        EntryMesh.objects.filter(entry__in=Entry.objects.in_year_month(year, month))
-    )
+    Three queries, one per content type. Each returns file paths only.
+    """
+    paths: dict[int, list[Path]] = defaultdict(list)
+    for model in (EntryImage, EntryVideo, EntryMesh):
+        rows = model.objects.filter(entry__year=year).values_list(
+            "entry__month", "file_path"
+        )
+        for month, file_path in rows:
+            paths[month].append(Path(get_base_entry_path(Path(file_path))))
+    return paths
 
 
 def get_icon_for_each_month(year: int) -> dict[str, str]:
     """Get a base64 dictionary of icon files for each month in a year."""
     output_dict: dict[str, str] = {}
+    paths_by_month = media_file_paths_by_month(year)
 
     for month in range(1, 13):
         month_name = get_month_name(month)
-
-        month_images = get_all_images_in_month(year, month)
-        month_videos = get_all_videos_in_month(year, month)
-        month_meshes = get_all_meshes_in_month(year, month)
-
-        image_files = [
-            Path(get_base_entry_path(Path(img.file_path))) for img in month_images
-        ]
-        image_files.extend(
-            [Path(get_base_entry_path(Path(vid.file_path))) for vid in month_videos]
-        )
-        image_files.extend(
-            [Path(get_base_entry_path(Path(mesh.file_path))) for mesh in month_meshes]
-        )
+        image_files = paths_by_month.get(month, [])
         last_ind = len(image_files) - 1
 
         if not image_files:
             continue
 
-        for i in range(NR_ATTEMPTS_TO_SELECT_IMAGE):
+        for _ in range(NR_ATTEMPTS_TO_SELECT_IMAGE):
             selected_image = image_files[random.randint(0, last_ind)]
             selected_icon_path = get_icon_file_path(selected_image)
 
@@ -75,39 +68,35 @@ def get_icon_for_each_month(year: int) -> dict[str, str]:
     return output_dict
 
 
-def get_nr_entries_for_each_month(year: int) -> dict[str, int]:
+def get_nr_entries_for_each_month(stats: MonthStats) -> dict[str, int]:
     """Get a dict for each month and a count for each month."""
     output_dict: dict[str, int] = {}
 
     for month in range(1, 13):
         month_name = get_month_name(month)
-        entries = get_all_entries_in_month(year, month)
-
-        output_dict[month_name] = len(entries)
+        output_dict[month_name] = stats[month][0] if month in stats else 0
 
     return output_dict
 
 
-def get_last_time_entries_were_updated(year: int) -> dict[str, Union[datetime, str]]:
+def get_last_time_entries_were_updated(
+    stats: MonthStats,
+) -> dict[str, Union[datetime, str]]:
     """Return the month mapped to latest time it was edited."""
     output_dict: dict[str, Union[datetime, str]] = {}
 
     for month in range(1, 13):
         month_name = get_month_name(month)
-        entries = get_all_entries_in_month(year, month)
-
-        last_update: Union[datetime, str] = (
-            max(entry.last_edited for entry in entries) if entries else "never"
-        )
-        output_dict[month_name] = last_update
+        output_dict[month_name] = stats[month][1] if month in stats else "never"
 
     return output_dict
 
 
 def get_year_entry_information(year: int) -> YearEntryInformationContext:
     """Return year entry information."""
+    stats = get_month_entry_stats(year)
     return {
         "icon_paths": get_icon_for_each_month(year),
-        "nr_entries_per_month": get_nr_entries_for_each_month(year),
-        "month_last_edited": get_last_time_entries_were_updated(year),
+        "nr_entries_per_month": get_nr_entries_for_each_month(stats),
+        "month_last_edited": get_last_time_entries_were_updated(stats),
     }

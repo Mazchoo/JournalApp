@@ -6,6 +6,7 @@ import pytest
 from django.apps import apps
 from django.forms.utils import ErrorList
 
+from main.content_generation.load_entry import load_all_content_from_entry
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.forms import ContentForm
 from tests.mocks import (
@@ -95,6 +96,45 @@ def test_save_entry_creates_paragraph_content():
     paragraph = EntryParagraph.objects.get(pk=content.content_id)
     assert paragraph.text == "<p>Test paragraph</p>"
     assert paragraph.height == 300
+
+
+@pytest.mark.django_db
+def test_save_entry_stores_content_order():
+    """Submitted content order is stored on the link and used when the entry is loaded."""
+    response = update_or_generate_from_request(
+        {
+            "name": "2025-03-01",
+            "content": {
+                "paragraph1": {
+                    "entry": "2025-03-01",
+                    "text": "<p>First</p>",
+                    "height": 100,
+                    "allow_ai_synthesis": 1,
+                },
+                "paragraph2": {
+                    "entry": "2025-03-01",
+                    "text": "<p>Second</p>",
+                    "height": 100,
+                    "allow_ai_synthesis": 1,
+                },
+            },
+        }
+    )
+    assert "success" in json.loads(response.content)
+
+    EntryContent = apps.get_model("main", "EntryContent")
+    positions = list(
+        EntryContent.objects.filter(entry_id="2025-03-01")
+        .order_by("position")
+        .values_list("position", flat=True)
+    )
+    assert positions == [0, 1]
+
+    loaded = load_all_content_from_entry("2025-03-01")
+    assert [item["data"]["text"] for item in loaded["content_list"]] == [
+        "<p>First</p>",
+        "<p>Second</p>",
+    ]
 
 
 @pytest.mark.django_db

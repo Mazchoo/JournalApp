@@ -120,7 +120,7 @@ def update_entry_date(
                 raise RuntimeError
 
             content_ids = []
-            for content in list(entry.content.all()):
+            for content in list(entry.ordered_content()):
                 update_all_content_with_new_entry(
                     content, destination_slug, content_ids, errors
                 )
@@ -128,7 +128,7 @@ def update_entry_date(
             if errors:
                 raise RuntimeError
 
-            new_entry.content.set(content_ids)
+            new_entry.set_content_order(content_ids)
             new_entry.save()
             entry.delete()
     except Exception:

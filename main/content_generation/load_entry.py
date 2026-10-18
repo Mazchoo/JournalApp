@@ -1,32 +1,52 @@
 """Request information from single entries"""
 
-from main.database_layer.fe_interfaces import EntryContentContext
-from main.models import Entry
+from collections import defaultdict
+from typing import Iterable
+
+from django.db.models import Model
 
 from main.content_generation.content_factory_models import ContentFactory
-
-from main.database_layer.get_context import (
-    get_year_information,
-    get_month_information,
-    get_all_entry_years,
-)
-from main.database_layer.fe_interfaces import DayAndMonthNamesContext, DayPageContext
 from main.database_layer.date_information import get_day_information
+from main.database_layer.fe_interfaces import (
+    DayAndMonthNamesContext,
+    DayPageContext,
+    EntryContentContext,
+)
+from main.database_layer.get_context import (
+    get_all_entry_years,
+    get_month_information,
+    get_year_information,
+)
+from main.models import Content, Entry
+
+
+def load_content_objects(contents: Iterable[Content]) -> dict[str, dict[int, Model]]:
+    """Fetch every referenced content row in one query per content type."""
+    ids_by_type: dict[str, list[int]] = defaultdict(list)
+    for content in contents:
+        ids_by_type[content.content_type].append(content.content_id)
+
+    objects: dict[str, dict[int, Model]] = {}
+    for content_type, ids in ids_by_type.items():
+        query = ContentFactory.get(content_type).objects  # type: ignore[attr-defined]
+        if content_type == "mesh":
+            query = query.select_related("camera")
+        objects[content_type] = query.in_bulk(ids)
+    return objects
 
 
 def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
     """For content with a given date slug return content information about the entry."""
-    output: dict[str, dict] = {}
     content_list: list[dict] = []
 
-    if entry := Entry.objects.filter(name=date_slug).first():
-        content_ids = entry.content.get_queryset()
+    entry = Entry.objects.filter(name=date_slug).first()
+    if entry is not None:
+        contents = list(entry.ordered_content())
+        objects_by_type = load_content_objects(contents)
 
-        for i, content in enumerate(content_ids, start=1):
-            model = ContentFactory.get(content.content_type)
-            content_obj = model.objects.get(pk=content.content_id)
-            view_data = content_obj.view()  # type: ignore
-            output[str(content)] = view_data
+        for i, content in enumerate(contents, start=1):
+            content_obj = objects_by_type[content.content_type][content.content_id]
+            view_data = content_obj.view()  # type: ignore[attr-defined]
             content_list.append(
                 {
                     "index": i,
