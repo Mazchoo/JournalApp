@@ -4,6 +4,7 @@ import json
 
 import pytest
 from django.apps import apps
+from django.forms.utils import ErrorList
 
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.forms import ContentForm
@@ -170,6 +171,89 @@ def test_failed_content_form_rolls_back_saved_siblings(monkeypatch):
     assert "error" in data
     assert EntryParagraph.objects.count() == 0
     assert Content.objects.count() == 0
+
+
+def _paragraph_save(text="<p>Original</p>", height=200):
+    """One paragraph save. Omit height by passing None."""
+    paragraph = {"entry": "2025-03-01", "text": text, "allow_ai_synthesis": 1}
+    if height is not None:
+        paragraph["height"] = height
+    return {"name": "2025-03-01", "content": {"paragraph1": paragraph}}
+
+
+def _assert_stored_paragraph(text="<p>Original</p>"):
+    """The entry still has exactly the paragraph from the first save."""
+    Entry = apps.get_model("main", "Entry")
+    EntryParagraph = apps.get_model("main", "EntryParagraph")
+    entry = Entry.objects.get(name="2025-03-01")
+    assert entry.content.count() == 1
+    assert EntryParagraph.objects.count() == 1
+    stored = EntryParagraph.objects.get(pk=entry.content.get().content_id)
+    assert stored.text == text
+
+
+def _reject_entry(name, errors):
+    errors["entry"] = ErrorList(["rejected"])
+    return None
+
+
+def _reject_content_link(self):
+    self.add_error(None, "rejected")
+    return False
+
+
+def _raise_parse(content_type):
+    raise RuntimeError("parse failed")
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "second_save",
+    [_paragraph_save(height=None), {"name": "2025-03-01"}],
+    ids=["invalid_content", "invalid_form"],
+)
+def test_rejected_save_keeps_previous_content(second_save):
+    """A save rejected before any write leaves the stored paragraph in place."""
+    update_or_generate_from_request(_paragraph_save())
+    response = update_or_generate_from_request(second_save)
+    assert "error" in json.loads(response.content)
+    _assert_stored_paragraph()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "target, replacement",
+    [
+        ("main.content_generation.save_entry.create_or_get_entry", _reject_entry),
+        ("main.forms.ContentForm.is_valid", _reject_content_link),
+        (
+            "main.content_generation.content_factory_forms.ContentFormFactory.get",
+            _raise_parse,
+        ),
+    ],
+    ids=["entry_create", "content_link", "content_parse"],
+)
+def test_failed_save_step_keeps_previous_content(monkeypatch, target, replacement):
+    """A failure while resolving the entry or writing new rows keeps the stored paragraph."""
+    update_or_generate_from_request(_paragraph_save())
+    monkeypatch.setattr(target, replacement)
+    response = update_or_generate_from_request(_paragraph_save("<p>Updated</p>"))
+    assert "error" in json.loads(response.content)
+    _assert_stored_paragraph()
+
+
+@pytest.mark.django_db
+def test_content_save_error_keeps_previous_content(monkeypatch):
+    """A database error while writing new content leaves the stored paragraph in place."""
+    update_or_generate_from_request(_paragraph_save())
+
+    def fail_save(self, commit=True):
+        raise RuntimeError("write failed")
+
+    monkeypatch.setattr("main.forms.ParagraphForm.save", fail_save)
+    with pytest.raises(RuntimeError):
+        update_or_generate_from_request(_paragraph_save("<p>Updated</p>"))
+    _assert_stored_paragraph()
 
 
 @pytest.mark.django_db
