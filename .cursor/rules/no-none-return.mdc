@@ -1,0 +1,20 @@
+---
+description: Never annotate a function return as -> None
+alwaysApply: true
+---
+
+# No `-> None` return annotations
+
+Omit the return annotation when a function returns nothing. `-> None` is redundant.
+
+```python
+# ❌ BAD
+def delete_previous_content(content_ids: List[int]) -> None:
+    previous_content.delete()
+
+# ✅ GOOD
+def delete_previous_content(content_ids: List[int]):
+    previous_content.delete()
+```
+
+Annotate a return only when the function returns a value.
