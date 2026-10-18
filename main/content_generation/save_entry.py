@@ -9,15 +9,13 @@ from django.http import JsonResponse
 from django.forms import ModelForm
 from django.forms.utils import ErrorDict, ErrorList
 
-from main.models import Entry
+from main.models import Content, Entry
 from main.forms import EntryForm, ContentForm
 from main.utils.errors import form_errors_message
-from main.content_generation.delete_entry import (
-    delete_entry_content,
-    remove_files_from_entry,
-)
+from main.content_generation.delete_entry import remove_files_from_entry
 from main.config import ALLOWED_CONTENT_TYPES
 from main.content_generation.content_factory_forms import ContentFormFactory
+from main.content_generation.content_factory_models import ContentFactory
 from main.content_generation.request_forms import SaveEntryForm
 
 
@@ -124,6 +122,16 @@ def save_new_content(
     return content_ids
 
 
+def delete_previous_content(content_ids: List[int]):
+    """Delete content captured before the new save, and the objects they point at."""
+    previous_content = Content.objects.filter(pk__in=content_ids)
+    for content in previous_content:
+        ContentFactory.get(content.content_type).objects.filter(
+            pk=content.content_id
+        ).delete()
+    previous_content.delete()
+
+
 def update_or_generate_from_request(post_data: dict):
     """
     Delete all previous objects associated with entry and save the object again.
@@ -144,12 +152,14 @@ def update_or_generate_from_request(post_data: dict):
     if entry is None:
         return JsonResponse({"error": form_errors_message(errors)})
 
-    delete_entry_content(entry)
-    remove_files_from_entry(entry, ignore_file_names=form.media_file_names)
+    previous_content_ids = list(entry.content.values_list("pk", flat=True))
 
     content_ids = save_new_content(pending_content, entry, errors)
     if errors:
         return JsonResponse({"error": f"Invalid content {form_errors_message(errors)}"})
+
+    delete_previous_content(previous_content_ids)
+    remove_files_from_entry(entry, ignore_file_names=form.media_file_names)
 
     entry.last_edited = datetime.now()
     entry.content.set(content_ids)
