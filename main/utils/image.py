@@ -130,10 +130,7 @@ def lazy_create_base64_image_data(file_path: Union[Path, str]) -> str:
     """Load image or create base64 image from downsized original (if original size above threshold)"""
     file_path = Path(file_path)
 
-    if (
-        file_path.exists()
-        and file_path.suffix.lower() in ImageFileType
-    ):
+    if file_path.exists() and file_path.suffix.lower() in ImageFileType:
         factor = (
             1 if is_svg_path(file_path) else get_resizing_factor_to_downsized(file_path)
         )

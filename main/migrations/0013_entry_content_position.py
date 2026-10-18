@@ -30,7 +30,7 @@ def add_content_position(apps, schema_editor):
     schema_editor.execute(
         f"""
         UPDATE {quote(_LINK_TABLE)}
-        SET {quote('position')} = (
+        SET {quote("position")} = (
             SELECT COUNT(*)
             FROM {quote(_LINK_TABLE)} AS earlier
             WHERE earlier.entry_id = {quote(_LINK_TABLE)}.entry_id
@@ -61,7 +61,6 @@ def remove_content_position(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("main", "0012_camera_mesh_onetoone"),
     ]

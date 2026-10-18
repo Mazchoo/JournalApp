@@ -30,9 +30,7 @@ class Entry(Model):
     day = models.PositiveSmallIntegerField()
     first_created = models.DateTimeField()
     last_edited = models.DateTimeField()
-    content = models.ManyToManyField(
-        Content, through="EntryContent"
-    )  # type: models.ManyToManyField
+    content = models.ManyToManyField(Content, through="EntryContent")  # type: models.ManyToManyField
     objects = EntryQuerySet.as_manager()
 
     class Meta:
