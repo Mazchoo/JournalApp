@@ -5,8 +5,7 @@ from pathlib import Path
 from contextlib import closing
 
 import numpy as np
-import imageio.v3 as iio
-from imageio_ffmpeg import read_frames, count_frames_and_secs
+from imageio_ffmpeg import read_frames
 
 from main.file_types import VideoFileType
 
@@ -31,21 +30,14 @@ class VideoCapture:
         self._initialize()
 
     def _initialize(self):
-        """Initialize video metadata via imageio-ffmpeg."""
-        # Get frame count and duration
-        self._frame_count, self._duration = count_frames_and_secs(str(self._video_path))
-        self._frame_count = self._frame_count or 0
-        self._duration = self._duration or 0.0
+        """Read duration, frame rate, and size from the container header."""
+        with closing(read_frames(str(self._video_path))) as frames:
+            meta = next(frames)
 
-        if self._duration > 0 and self._frame_count > 0:
-            self._fps = self._frame_count / self._duration
-        else:
-            self._fps = 0.0
-
-        # Get dimensions by reading first frame
-        frame = iio.imread(str(self._video_path), index=0)
-        self._height, self._width = frame.shape[:2]
-
+        self._width, self._height = meta["size"]
+        self._fps = meta["fps"] or 0.0
+        self._duration = meta["duration"] or 0.0
+        self._frame_count = round(self._fps * self._duration)
         self._is_valid = self._width > 0 and self._height > 0
 
     def get_width_height(self) -> Tuple[int, int]:
