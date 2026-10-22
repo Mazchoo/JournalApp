@@ -41,14 +41,27 @@ from main.config import ALLOWED_CONTENT_TYPES
 from main.file_types import ImageFileType, MeshFileType, ReservedSuffix, VideoFileType
 from main.database_layer.date_slugs import get_valid_date_from_slug
 from main.database_layer.get_all_years_summary import get_all_year_summary_information
+from main.database_layer.new_month import is_new_month_icon
+
+
+def _saving_first_icon_in_month(form: ModelForm, commit: bool) -> bool:
+    """True when this save adds the month's first image, video, or mesh."""
+    if not commit:
+        return False
+
+    return is_new_month_icon(form.instance)
+
+
+def _clear_home_page_icon_cache():
+    """Drop cached home-page icons after the current transaction commits."""
+    transaction.on_commit(get_all_year_summary_information.cache_clear)
 
 
 class EntryForm(ModelForm):
     """A dated journal entry - at most one entry per date.
 
-    Creating or validating this form writes no files. ``save()`` persists the
-    Entry row and clears the home-page year cache when this is the first entry
-    in its year.
+    Creating, validating, or saving this form writes no files. ``save()`` only
+    persists the Entry row.
     """
 
     class Meta:
@@ -72,20 +85,6 @@ class EntryForm(ModelForm):
         self.instance.day = entry_date.day
         return cleaned_data
 
-    def save(self, commit=True):
-        """Persist the entry. Drop the home-page icon cache when its year is new."""
-        year = self.instance.year
-        year_is_new = (
-            commit
-            and bool(year)
-            and not Entry.objects.filter(pk=self.instance.pk).exists()
-            and not Entry.objects.filter(year=year).exists()
-        )
-        entry = super().save(commit=commit)
-        if year_is_new:
-            transaction.on_commit(get_all_year_summary_information.cache_clear)
-        return entry
-
 
 class ImageForm(ModelForm):
     """Image content that belongs to an entry form.
@@ -101,7 +100,8 @@ class ImageForm(ModelForm):
     - ``icons/{year}/{month}/{stem}_icon{ext}`` — square calendar icon, if missing.
       A vector image's icon is a rasterised ``{stem}_icon.png``
 
-    ``save()`` only persists the EntryImage row.
+    ``save()`` persists the EntryImage row and clears the home-page icon cache
+    when this is the first image, video, or mesh in its month.
     """
 
     class Meta:
@@ -161,6 +161,14 @@ class ImageForm(ModelForm):
             "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
         )
 
+    def save(self, commit=True):
+        """Persist the image. Drop the home-page icon cache when its month had none."""
+        clear_cache = _saving_first_icon_in_month(self, commit)
+        image = super().save(commit=commit)
+        if clear_cache:
+            _clear_home_page_icon_cache()
+        return image
+
 
 class VideoForm(ModelForm):
     """Form to create a video content for entry.
@@ -173,7 +181,8 @@ class VideoForm(ModelForm):
     - ``{year}/{month}/{day}/{stem}_resized.jpeg`` — frame collage preview, if missing
     - ``icons/{year}/{month}/{stem}_icon.jpg`` — square calendar icon, if missing
 
-    ``save()`` only persists the EntryVideo row.
+    ``save()`` persists the EntryVideo row and clears the home-page icon cache
+    when this is the first image, video, or mesh in its month.
     """
 
     class Meta:
@@ -230,6 +239,14 @@ class VideoForm(ModelForm):
         raise forms.ValidationError(
             "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
         )
+
+    def save(self, commit=True):
+        """Persist the video. Drop the home-page icon cache when its month had none."""
+        clear_cache = _saving_first_icon_in_month(self, commit)
+        video = super().save(commit=commit)
+        if clear_cache:
+            _clear_home_page_icon_cache()
+        return video
 
 
 class CameraForm(ModelForm):
@@ -314,7 +331,8 @@ class MeshForm(ModelForm):
 
     If ``frame_image`` is omitted, an existing ``_resized`` preview is required
     and is left unchanged. ``save()`` persists the EntryMesh row then the Camera
-    row that points at it; it writes no files.
+    row that points at it; it writes no files. It clears the home-page icon cache
+    when this is the first image, video, or mesh in its month.
     """
 
     camera = forms.Field()  # needs to be initialized as camera object
@@ -398,11 +416,14 @@ class MeshForm(ModelForm):
 
     def save(self, commit=True):
         """Persist the mesh first, then the camera that points at it."""
+        clear_cache = _saving_first_icon_in_month(self, commit)
         mesh = super().save(commit=True)
         camera = self.cleaned_data["camera"]
         camera.mesh = mesh
         if commit:
             camera.save()
+        if clear_cache:
+            _clear_home_page_icon_cache()
         return mesh
 
 
