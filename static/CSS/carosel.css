@@ -28,3 +28,27 @@ body {
   height: 70%;
   width: 8%;
 }
+
+/* The placeholder is in normal flow and holds each slot at icon size.
+   The year icon is painted on top once it arrives. */
+.carousel-icon-frame {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.carousel-icon-placeholder,
+.carousel-icon {
+  display: block;
+  object-fit: cover;
+}
+
+.carousel-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

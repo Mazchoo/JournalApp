@@ -28,8 +28,11 @@
                             <div class="d-none d-lg-block">
                                 <div class="slide-box row">
                                     {% for icon in icons %}
-                                        <div class="col-md-2">
-                                            <img src="{{icon}}" class="img-fluid rounded-start py-1">
+                                        <div class="col-md-2 py-1">
+                                            <div class="carousel-icon-frame">
+                                                <img src="{% static 'Image/backgrounds/icon_placeholder.svg' %}" class="carousel-icon-placeholder rounded-start" width="{{ icon_size }}" height="{{ icon_size }}" alt="">
+                                                <img src="{{ icon }}" class="carousel-icon rounded-start" width="{{ icon_size }}" height="{{ icon_size }}" alt="">
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 </div>

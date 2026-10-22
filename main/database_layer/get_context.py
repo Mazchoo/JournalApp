@@ -19,6 +19,7 @@ from main.database_layer.get_all_years_summary import (
     get_all_year_summary_information,
     get_all_entry_years,
 )
+from main.config import ImageConstants
 from main.content_generation.request_forms import MonthNameForm
 
 
@@ -46,6 +47,7 @@ def get_home_page_context(
         **context,
         **all_years_info,
         "icon_paths": icon_paths,
+        "icon_size": ImageConstants.icon_size,
     }
 
 

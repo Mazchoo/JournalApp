@@ -100,6 +100,7 @@ class HomePageContext(DayAndMonthNamesContext, AllEntryYearsContext):
     """Full context for home page."""
 
     icon_paths: dict[int, list[str]]
+    icon_size: int
 
 
 class YearPageContext(YearInformationContext, YearEntryInformationContext):
