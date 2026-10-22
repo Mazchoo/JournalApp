@@ -120,7 +120,9 @@ class FullContentPath(Form):
             raise ValidationError("File is outside the entry folder")
 
         if not target.exists():
-            raise ValidationError(f"File {target} does not exist")
+            raise ValidationError(
+                f"File {Path(clean_data['file']).name} does not exist"
+            )
 
         return str(target)
 

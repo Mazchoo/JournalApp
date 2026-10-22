@@ -12,8 +12,9 @@ from main.config import NR_ATTEMPTS_TO_SELECT_IMAGE
 from main.database_layer.fe_interfaces import YearEntryInformationContext
 from main.models import Entry, EntryImage, EntryMesh, EntryVideo
 from main.utils.date import get_month_name
-from main.utils.image import get_base64_from_image, lazy_create_image_icon
+from main.utils.image import lazy_create_image_icon
 from main.utils.file_io import get_base_entry_path, get_icon_file_path
+from main.content_generation.get_icon import calendar_icon_url
 
 MonthStats = dict[int, tuple[int, datetime]]
 
@@ -45,7 +46,7 @@ def media_file_paths_by_month(year: int) -> dict[int, list[Path]]:
 
 
 def get_icon_for_each_month(year: int) -> dict[str, str]:
-    """Get a base64 dictionary of icon files for each month in a year."""
+    """URL of one calendar icon for each month in a year."""
     output_dict: dict[str, str] = {}
     paths_by_month = media_file_paths_by_month(year)
 
@@ -62,7 +63,7 @@ def get_icon_for_each_month(year: int) -> dict[str, str]:
             selected_icon_path = get_icon_file_path(selected_image)
 
             if lazy_create_image_icon(selected_image):
-                output_dict[month_name] = get_base64_from_image(selected_icon_path)
+                output_dict[month_name] = calendar_icon_url(selected_icon_path)
                 break
 
     return output_dict

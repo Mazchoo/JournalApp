@@ -564,9 +564,11 @@ describe("zoomToMedia", () => {
       name: "2024-03-15",
     });
 
-    await ajax.succeed({ base64: "data:image/png;base64,FULL" });
+    const createObjectURL = stubCreateObjectURL("blob:journal/image");
+    await ajax.succeed(new Blob(["image-bytes"], { type: "image/png" }));
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(document.getElementById("image-preview")!.getAttribute("src")).toBe(
-      "data:image/png;base64,FULL",
+      "blob:journal/image",
     );
     expect(
       document.getElementById("image-modal")!.classList.contains("show"),
@@ -578,7 +580,9 @@ describe("zoomToMedia", () => {
     document.getElementById("image0")!.setAttribute("src", "thumbnail");
 
     clickImageArea();
-    await ajax.succeed({ error: "File missing" });
+    await ajax.fail("Bad Request", {
+      responseJSON: { error: "File missing" },
+    });
 
     expect(log).toHaveBeenCalledWith("Image error : File missing");
     expect(document.getElementById("image-preview")!.getAttribute("src")).toBe(

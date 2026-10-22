@@ -3,8 +3,6 @@
  * Request bodies and transport callbacks live in `request-interface.ts`.
  */
 
-import type { CameraSavePayload } from "./request-interface";
-
 /** JSON error body some endpoints return instead of a 2xx payload. */
 export interface JsonErrorResponse {
   error?: string;
@@ -26,13 +24,6 @@ export interface DeleteEntryResponse {
 export interface MoveEntryResponse {
   new_date?: string;
   error?: string;
-}
-
-/** JSON body from the downsized-image, downsized-mesh, and full-image endpoints. */
-export interface Base64MediaResponse {
-  base64?: string;
-  error?: string;
-  camera?: CameraSavePayload;
 }
 
 /** Shape of the image/video payloads returned by main.content_generation.load_entry. */

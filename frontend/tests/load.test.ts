@@ -34,20 +34,28 @@ describe("loadServerRenderedImage", () => {
     });
   });
 
-  it("sets the returned base64 on the matching image", async () => {
-    loadServerRenderedImage("1", "i1");
-    await ajax.succeed({ base64: "data:image/png;base64,THUMB" });
+  it("sets the streamed thumbnail on the matching image", async () => {
+    const createObjectURL = vi.fn(() => "blob:journal/thumb");
+    (URL as unknown as { createObjectURL: unknown }).createObjectURL =
+      createObjectURL;
 
+    loadServerRenderedImage("1", "i1");
+    await ajax.succeed(new Blob(["thumb-bytes"], { type: "image/png" }));
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(document.getElementById("image1")!.getAttribute("src")).toBe(
-      "data:image/png;base64,THUMB",
+      "blob:journal/thumb",
     );
+    delete (URL as unknown as { createObjectURL?: unknown }).createObjectURL;
   });
 
   it("logs a server-reported error", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
     loadServerRenderedImage("1", "i1");
-    await ajax.succeed({ error: "Cache miss" });
+    await ajax.fail("Bad Request", {
+      responseJSON: { error: "Cache miss" },
+    });
 
     expect(log).toHaveBeenCalledWith("Image load error:", "Cache miss");
     log.mockRestore();
@@ -76,20 +84,28 @@ describe("loadServerRenderedVideo", () => {
     });
   });
 
-  it("sets the returned poster frame on the matching image", async () => {
-    loadServerRenderedVideo("2", "v2");
-    await ajax.succeed({ base64: "data:image/png;base64,POSTER" });
+  it("sets the streamed poster on the matching image", async () => {
+    const createObjectURL = vi.fn(() => "blob:journal/poster");
+    (URL as unknown as { createObjectURL: unknown }).createObjectURL =
+      createObjectURL;
 
+    loadServerRenderedVideo("2", "v2");
+    await ajax.succeed(new Blob(["poster-bytes"], { type: "image/jpeg" }));
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(document.getElementById("image2")!.getAttribute("src")).toBe(
-      "data:image/png;base64,POSTER",
+      "blob:journal/poster",
     );
+    delete (URL as unknown as { createObjectURL?: unknown }).createObjectURL;
   });
 
   it("logs a server-reported error", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
     loadServerRenderedVideo("2", "v2");
-    await ajax.succeed({ error: "No frames" });
+    await ajax.fail("Bad Request", {
+      responseJSON: { error: "No frames" },
+    });
 
     expect(log).toHaveBeenCalledWith("Video image load error:", "No frames");
     log.mockRestore();
@@ -122,20 +138,25 @@ describe("loadServerRenderedMesh", () => {
     });
   });
 
-  it("sets the returned preview on the matching image", async () => {
+  it("sets the streamed preview on the matching image", async () => {
     renderDayPage({ rows: ["mesh"] });
     tinymce = installFakeTinyMCE();
     ajax = stubAjax();
+    const createObjectURL = vi.fn(() => "blob:journal/mesh");
+    (URL as unknown as { createObjectURL: unknown }).createObjectURL =
+      createObjectURL;
 
     loadServerRenderedMesh("0", "m0");
-    await ajax.succeed({ base64: "data:image/jpeg;base64,MESH" });
+    await ajax.succeed(new Blob(["mesh-bytes"], { type: "image/jpeg" }));
 
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(document.getElementById("image0")!.getAttribute("src")).toBe(
-      "data:image/jpeg;base64,MESH",
+      "blob:journal/mesh",
     );
+    delete (URL as unknown as { createObjectURL?: unknown }).createObjectURL;
   });
 
-  it("stores the returned camera on the mesh row", async () => {
+  it("reads the camera rendered on the mesh row", () => {
     renderDayPage({ rows: ["mesh"] });
     tinymce = installFakeTinyMCE();
     ajax = stubAjax();
@@ -147,12 +168,11 @@ describe("loadServerRenderedMesh", () => {
       panX: 0.5,
       panY: -0.25,
     };
+    document
+      .getElementById("image0")!
+      .setAttribute("data-camera", JSON.stringify(camera));
 
     loadServerRenderedMesh("0", "m0");
-    await ajax.succeed({
-      base64: "data:image/jpeg;base64,MESH",
-      camera,
-    });
 
     expect(getMeshCamera("0")).toEqual(camera);
   });
@@ -164,7 +184,9 @@ describe("loadServerRenderedMesh", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
     loadServerRenderedMesh("0", "m0");
-    await ajax.succeed({ error: "No preview" });
+    await ajax.fail("Bad Request", {
+      responseJSON: { error: "No preview" },
+    });
 
     expect(log).toHaveBeenCalledWith("Mesh image load error:", "No preview");
     log.mockRestore();

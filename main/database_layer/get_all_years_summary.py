@@ -9,8 +9,9 @@ from functools import lru_cache
 from Journal.settings import MISSING_ICON_IMAGE
 from main.database_layer.fe_interfaces import AllEntryYearsContext
 from main.models import Entry, EntryImage
-from main.utils.image import get_base64_from_image, lazy_create_image_icon
+from main.utils.image import lazy_create_image_icon
 from main.utils.file_io import get_icon_file_path, get_base_entry_path
+from main.content_generation.get_icon import calendar_icon_url
 
 from main.config import NR_IMAGES_TO_DISPLAY
 
@@ -69,7 +70,7 @@ def get_random_images_from_year(year: int) -> List[str]:
 
     selected_img_paths = get_selection_of_icons(valid_images)
     valid_icon_paths = get_valid_icon_paths(selected_img_paths)
-    return [get_base64_from_image(p) for p in valid_icon_paths]
+    return [calendar_icon_url(p) for p in valid_icon_paths]
 
 
 @lru_cache(maxsize=1)

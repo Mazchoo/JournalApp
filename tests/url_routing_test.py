@@ -100,6 +100,12 @@ def test_get_mesh_url_resolves():
     assert match.url_name == "get-mesh"
 
 
+def test_calendar_icon_url_resolves():
+    """URL /icons/<year>/<month>/<name> should resolve via its URL name."""
+    match = resolve("/icons/2025/02/photo_icon.jpg")
+    assert match.url_name == "icon"
+
+
 def test_move_date_url_resolves():
     """URL /ajax/move-date/ should resolve via its URL name."""
     match = resolve("/ajax/move-date/")

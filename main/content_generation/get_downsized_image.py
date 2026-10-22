@@ -1,29 +1,39 @@
-"""Helpers to return a downsized image payload by image_id"""
+"""Helpers to return a downsized image by image_id."""
 
-from django.http import JsonResponse
 from django.forms.utils import ErrorDict, ErrorList
+from django.http import FileResponse, JsonResponse
 
+from main.content_generation.get_full_image import (
+    create_image_stream_response,
+    image_error_response,
+)
 from main.models import EntryImage
-from main.utils.image import lazy_create_base64_image_data
 from main.utils.file_io import get_base_entry_path
+from main.utils.image import downsized_image_file
 
 
-def get_downsized_image_response(post_data: dict) -> JsonResponse:
-    """Get a json response with a downsized image for a given image_id"""
+def get_downsized_image_response(post_data: dict) -> JsonResponse | FileResponse:
+    """Stream the preview image for an image_id, or a JSON error."""
     errors = ErrorDict()
 
     image_id = post_data.get("image_id")
     if image_id is None:
         errors["image_id"] = ErrorList(["No image_id provided"])
-        return JsonResponse({"error": errors})
+        return image_error_response(errors)
 
     try:
         entry_image = EntryImage.objects.get(pk=int(image_id))
     except (EntryImage.DoesNotExist, ValueError):
         errors["image_id"] = ErrorList(["Image not found"])
-        return JsonResponse({"error": errors})
+        return image_error_response(errors)
 
-    full_path = get_base_entry_path(entry_image.file_path)
-    b64_string = lazy_create_base64_image_data(full_path)
+    preview = downsized_image_file(get_base_entry_path(entry_image.file_path))
+    if preview is None:
+        errors["file"] = ErrorList(["Image file does not exist"])
+        return image_error_response(errors)
 
-    return JsonResponse({"base64": b64_string})
+    image_response = create_image_stream_response(str(preview), errors)
+    if image_response is None:
+        return image_error_response(errors)
+
+    return image_response

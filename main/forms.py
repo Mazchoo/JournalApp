@@ -21,8 +21,8 @@ from main.models import (
 )
 from main.utils.image import (
     move_image_to_save_path,
+    downsized_image_file,
     lazy_create_image_icon,
-    lazy_create_base64_image_data,
 )
 from main.utils.video import lazy_create_video_icon, lazy_create_resized_collage
 from main.utils.file_io import (
@@ -143,7 +143,7 @@ class ImageForm(ModelForm):
             raise forms.ValidationError(message)
 
         move_image_to_save_path(target_path, file_name)
-        lazy_create_base64_image_data(Path(target_path))
+        downsized_image_file(Path(target_path))
         lazy_create_image_icon(Path(target_path))
         return make_media_path_relative(target_path)
 

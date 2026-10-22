@@ -1,10 +1,11 @@
-"""Tests for get_downsized_mesh_image endpoint."""
+"""Tests for the downsized mesh preview endpoint."""
 
 import json
-from unittest.mock import patch
+from pathlib import Path
 
 import pytest
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
+from PIL import Image
 
 from main.content_generation.get_downsized_mesh_image import (
     get_downsized_mesh_image_response,
@@ -15,28 +16,34 @@ from tests.mocks import create_mock_client, create_mock_entry
 FORM_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 
+def write_jpeg(path: Path):
+    """Write a real JPEG the preview helper can open."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (16, 16), color=(4, 5, 6)).save(path, format="JPEG")
+
+
 @pytest.mark.django_db
-def test_get_downsized_mesh_image_success():
-    """A valid mesh_id should return a base64 JSON response."""
+def test_get_downsized_mesh_image_streams_preview(tmp_path):
+    """A saved mesh streams its preview file."""
     entry = create_mock_entry()
     mesh = EntryMesh.objects.create(
         entry=entry,
         file_path="2025/02/12/scan.glb",
-        image_path="2025/02/12/scan.jpeg",
+        image_path="2025/02/12/scan_resized.jpeg",
     )
     Camera.objects.create(mesh=mesh)
+    preview_path = tmp_path / "2025" / "02" / "12" / "scan_resized.jpeg"
+    write_jpeg(preview_path)
+    (tmp_path / "2025" / "02" / "12" / "scan.glb").write_bytes(b"glTF")
 
-    with patch(
-        "main.content_generation.get_downsized_mesh_image.get_mesh_image_base64",
-        return_value="data:image/jpeg;base64,mockdata",
-    ):
-        response = get_downsized_mesh_image_response({"mesh_id": str(mesh.pk)})
+    response = get_downsized_mesh_image_response({"mesh_id": str(mesh.pk)})
 
-    assert isinstance(response, JsonResponse)
-    data = json.loads(response.content)
-    assert "base64" in data
-    assert data["base64"] == "data:image/jpeg;base64,mockdata"
-    assert data["camera"] == mesh.camera.view()
+    assert isinstance(response, FileResponse)
+    assert response["Content-Type"] == "image/jpeg"
+    assert b"".join(response.streaming_content) == preview_path.read_bytes()
+    assert str(tmp_path) not in " ".join(
+        str(value) for value in response.headers.values()
+    )
 
 
 @pytest.mark.django_db
@@ -44,8 +51,8 @@ def test_get_downsized_mesh_image_missing_id():
     """A request without mesh_id should return an error."""
     response = get_downsized_mesh_image_response({})
     assert isinstance(response, JsonResponse)
-    data = json.loads(response.content)
-    assert "error" in data
+    assert response.status_code == 400
+    assert "error" in json.loads(response.content)
 
 
 @pytest.mark.django_db
@@ -53,8 +60,8 @@ def test_get_downsized_mesh_image_not_found():
     """A request with a nonexistent mesh_id should return an error."""
     response = get_downsized_mesh_image_response({"mesh_id": "99999"})
     assert isinstance(response, JsonResponse)
-    data = json.loads(response.content)
-    assert "error" in data
+    assert response.status_code == 400
+    assert "error" in json.loads(response.content)
 
 
 @pytest.mark.django_db
@@ -67,7 +74,3 @@ def test_get_downsized_mesh_image_non_ajax_returns_404():
         content_type=FORM_CONTENT_TYPE,
     )
     assert response.status_code == 404
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-x", "--verbose"])

@@ -10,6 +10,8 @@ import {
 import { initializeNewMedia } from "./media/media";
 import { setMeshCamera } from "./media/mesh";
 import { initializeParagraphRow } from "./paragraph/paragraph";
+import type { JsonErrorResponse } from "../response-interface";
+import type { OrbitCamera } from "../rendering-3d/create-camera-matrix";
 
 /** Port of static/JS/entry.load.js. */
 
@@ -19,15 +21,17 @@ export function loadServerRenderedImage(index: string, imageId: string): void {
     { image_id: imageId },
     {
       success: (response) => {
-        if (response.base64 !== undefined) {
-          const media = MediaEntry.fromIndex(index);
-          if (media !== null) MediaEntry.setSrc(media, response.base64);
-        }
-        if (response.error !== undefined) {
-          console.log("Image load error:", response.error);
-        }
+        const media = MediaEntry.fromIndex(index);
+        if (media === null) return;
+        const blob = response instanceof Blob ? response : new Blob([response]);
+        MediaEntry.setSrc(media, URL.createObjectURL(blob));
       },
-      error: (_jqXhr, _textStatus, errorThrown) => {
+      error: (jqXhr, _textStatus, errorThrown) => {
+        const responseJSON = jqXhr.responseJSON as JsonErrorResponse | undefined;
+        if (responseJSON?.error !== undefined) {
+          console.log("Image load error:", responseJSON.error);
+          return;
+        }
         console.log("Failed to load image:", errorThrown);
       },
     },
@@ -40,15 +44,17 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
     { video_id: videoId },
     {
       success: (response) => {
-        if (response.base64 !== undefined) {
-          const media = MediaEntry.fromIndex(index);
-          if (media !== null) MediaEntry.setSrc(media, response.base64);
-        }
-        if (response.error !== undefined) {
-          console.log("Video image load error:", response.error);
-        }
+        const media = MediaEntry.fromIndex(index);
+        if (media === null) return;
+        const blob = response instanceof Blob ? response : new Blob([response]);
+        MediaEntry.setSrc(media, URL.createObjectURL(blob));
       },
-      error: (_jqXhr, _textStatus, errorThrown) => {
+      error: (jqXhr, _textStatus, errorThrown) => {
+        const responseJSON = jqXhr.responseJSON as JsonErrorResponse | undefined;
+        if (responseJSON?.error !== undefined) {
+          console.log("Video image load error:", responseJSON.error);
+          return;
+        }
         console.log("Failed to load video image:", errorThrown);
       },
     },
@@ -57,22 +63,26 @@ export function loadServerRenderedVideo(index: string, videoId: string): void {
 
 /** Fetch the downsized preview for a server-rendered mesh row. */
 export function loadServerRenderedMesh(index: string, meshId: string): void {
+  const media = MediaEntry.fromIndex(index);
+  const rawCamera = media?.image?.getAttribute("data-camera") ?? "";
+  if (rawCamera.startsWith("{")) {
+    setMeshCamera(index, JSON.parse(rawCamera) as OrbitCamera);
+  }
+
   requestMeshThumbnail(
     { mesh_id: meshId },
     {
       success: (response) => {
-        if (response.base64 !== undefined) {
-          const media = MediaEntry.fromIndex(index);
-          if (media !== null) MediaEntry.setSrc(media, response.base64);
-        }
-        if (response.camera !== undefined) {
-          setMeshCamera(index, response.camera);
-        }
-        if (response.error !== undefined) {
-          console.log("Mesh image load error:", response.error);
-        }
+        if (media === null) return;
+        const blob = response instanceof Blob ? response : new Blob([response]);
+        MediaEntry.setSrc(media, URL.createObjectURL(blob));
       },
-      error: (_jqXhr, _textStatus, errorThrown) => {
+      error: (jqXhr, _textStatus, errorThrown) => {
+        const responseJSON = jqXhr.responseJSON as JsonErrorResponse | undefined;
+        if (responseJSON?.error !== undefined) {
+          console.log("Mesh image load error:", responseJSON.error);
+          return;
+        }
         console.log("Failed to load mesh image:", errorThrown);
       },
     },

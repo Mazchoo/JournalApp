@@ -30,6 +30,7 @@ from main.content_generation.get_downsized_mesh_image import (
     get_downsized_mesh_image_response,
 )
 from main.content_generation.get_full_mesh import get_full_mesh_response
+from main.content_generation.get_icon import calendar_icon_response
 from main.content_generation.move_date import move_source_date_to_desination_request
 
 
@@ -124,6 +125,11 @@ def date_not_found_page(request):
 def help_page(request):
     """Return the help page"""
     return render(request=request, template_name="help.html")
+
+
+def calendar_icon(_request, year: str, month: str, name: str):
+    """Stream one calendar icon."""
+    return calendar_icon_response(year, month, name)
 
 
 @ajax_request

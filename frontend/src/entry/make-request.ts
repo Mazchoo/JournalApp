@@ -13,7 +13,6 @@ import type {
   TransportSettings,
 } from "../request-interface";
 import type {
-  Base64MediaResponse,
   DeleteEntryResponse,
   JsonErrorResponse,
   MoveEntryResponse,
@@ -165,36 +164,52 @@ export function requestMoveEntry(
   postJson(moveUrl(), fields, callbacks);
 }
 
-/** POST an image id to `main:get-downsized-image`. */
+/** POST an image id to `main:get-downsized-image`, expecting an image blob. */
 export function requestImageThumbnail(
   fields: RequestFields<ImageThumbnailRequest>,
-  callbacks: RequestCallbacks<Base64MediaResponse>,
+  callbacks: RequestCallbacks<BlobPart>,
 ): void {
-  postJson(downsizedImageUrl(), fields, callbacks);
+  postJson(downsizedImageUrl(), fields, callbacks, {
+    xhrFields: {
+      responseType: "blob",
+    },
+  });
 }
 
-/** POST a video id to `main:get-downsized-video-image`. */
+/** POST a video id to `main:get-downsized-video-image`, expecting an image blob. */
 export function requestVideoThumbnail(
   fields: RequestFields<VideoThumbnailRequest>,
-  callbacks: RequestCallbacks<Base64MediaResponse>,
+  callbacks: RequestCallbacks<BlobPart>,
 ): void {
-  postJson(downsizedVideoImageUrl(), fields, callbacks);
+  postJson(downsizedVideoImageUrl(), fields, callbacks, {
+    xhrFields: {
+      responseType: "blob",
+    },
+  });
 }
 
-/** POST a mesh id to `main:get-downsized-mesh-image`. */
+/** POST a mesh id to `main:get-downsized-mesh-image`, expecting an image blob. */
 export function requestMeshThumbnail(
   fields: RequestFields<MeshThumbnailRequest>,
-  callbacks: RequestCallbacks<Base64MediaResponse>,
+  callbacks: RequestCallbacks<BlobPart>,
 ): void {
-  postJson(downsizedMeshImageUrl(), fields, callbacks);
+  postJson(downsizedMeshImageUrl(), fields, callbacks, {
+    xhrFields: {
+      responseType: "blob",
+    },
+  });
 }
 
-/** POST a file name and date slug to `main:get-image`. */
+/** POST a file name and date slug to `main:get-image`, expecting an image blob. */
 export function requestFullImage(
   fields: RequestFields<FullContentRequest>,
-  callbacks: RequestCallbacks<Base64MediaResponse>,
+  callbacks: RequestCallbacks<BlobPart>,
 ): void {
-  postJson(imageUrl(), fields, callbacks);
+  postJson(imageUrl(), fields, callbacks, {
+    xhrFields: {
+      responseType: "blob",
+    },
+  });
 }
 
 /** POST a file name and date slug to `main:get-video`, expecting a video blob. */

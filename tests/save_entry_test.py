@@ -5,7 +5,11 @@ import json
 import pytest
 from django.apps import apps
 from django.forms.utils import ErrorList
+from django.http import FileResponse
 
+from main.content_generation.get_downsized_mesh_image import (
+    get_downsized_mesh_image_response,
+)
 from main.content_generation.load_entry import load_all_content_from_entry
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.forms import ContentForm
@@ -348,13 +352,10 @@ def test_save_entry_creates_mesh_content(tmp_path):
     assert Camera.objects.filter(pk=mesh.camera.pk).exists()
     assert mesh.camera.radius == 3.0
 
-    from main.content_generation.get_downsized_mesh_image import (
-        get_downsized_mesh_image_response,
-    )
-
     preview = get_downsized_mesh_image_response({"mesh_id": str(mesh.pk)})
-    preview_data = json.loads(preview.content)
-    assert preview_data["base64"].startswith("data:image/jpeg;base64,")
+    assert isinstance(preview, FileResponse)
+    preview_file = tmp_path / "2025" / "03" / "01" / "scan_resized.jpeg"
+    assert b"".join(preview.streaming_content) == preview_file.read_bytes()
 
 
 def _mesh_camera_payload(radius: str = "3") -> dict:

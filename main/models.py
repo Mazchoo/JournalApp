@@ -1,5 +1,6 @@
 """Defintition of information need to use dated entries and contents of entries"""
 
+import json
 from pathlib import Path
 
 from django.db.models import Model
@@ -206,4 +207,5 @@ class EntryMesh(Model):
             "file_name": file_name,
             "image_path": self.image_path,
             "camera": self.camera.view(),
+            "camera_json": json.dumps(self.camera.view()),
         }

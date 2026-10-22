@@ -1,6 +1,7 @@
 import { imageModal, imagePreview } from "../../components/globals";
 import { MediaEntry } from "../../components/media-entry";
 import { requestFullImage } from "../make-request";
+import type { JsonErrorResponse } from "../../response-interface";
 import { dateSlug } from "../../runtime/backend-variables";
 import { enableSaveButton } from "../save";
 
@@ -26,6 +27,11 @@ function showImageInModal(src: string): void {
   imageModal.show();
 }
 
+/** Use the response blob, or wrap raw bytes in one. */
+function imageResponseBlob(response: BlobPart): Blob {
+  return response instanceof Blob ? response : new Blob([response]);
+}
+
 /**
  * Show the full-size image in the image modal.
  * Locally uploaded originals are already complete; saved images are fetched.
@@ -41,8 +47,6 @@ export function openFullImage(media: MediaEntry): void {
     return;
   }
 
-  let imageSource = source;
-
   requestFullImage(
     {
       file: media.fileNameHtml(),
@@ -50,15 +54,17 @@ export function openFullImage(media: MediaEntry): void {
     },
     {
       success: (response) => {
-        if (response.base64 !== undefined) imageSource = response.base64;
-        if ("error" in response)
-          console.log(`Image error : ${response["error"]}`);
+        showImageInModal(URL.createObjectURL(imageResponseBlob(response)));
       },
-      error: (_jqXhr, _textStatus, errorThrown) => {
-        console.log(`Unknown error : ${errorThrown}`);
-      },
-      complete: () => {
-        showImageInModal(imageSource!);
+      error: (jqXhr, _textStatus, errorThrown) => {
+        const responseJSON = jqXhr.responseJSON as
+          JsonErrorResponse | undefined;
+        if (responseJSON && "error" in responseJSON) {
+          console.log(`Image error : ${responseJSON["error"]}`);
+        } else {
+          console.log(`Unknown error : ${errorThrown}`);
+        }
+        showImageInModal(source ?? "");
       },
     },
   );
