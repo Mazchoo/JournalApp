@@ -3,7 +3,7 @@
 from collections import defaultdict
 from typing import Iterable
 
-from django.db.models import Model
+from django.db.models import Model, QuerySet
 
 from main.content_generation.content_factory_models import ContentFactory
 from main.database_layer.date_information import get_day_information
@@ -17,18 +17,19 @@ from main.database_layer.get_context import (
     get_month_information,
     get_year_information,
 )
+from main.config import IContentTypes
 from main.models import Content, Entry
 
 
 def load_content_objects(contents: Iterable[Content]) -> dict[str, dict[int, Model]]:
     """Fetch every referenced content row in one query per content type."""
-    ids_by_type: dict[str, list[int]] = defaultdict(list)
+    ids_by_type: dict[IContentTypes, list[int]] = defaultdict(list)
     for content in contents:
         ids_by_type[content.content_type].append(content.content_id)
 
     objects: dict[str, dict[int, Model]] = {}
     for content_type, ids in ids_by_type.items():
-        query = ContentFactory.get(content_type).objects  # type: ignore[attr-defined]
+        query: QuerySet[Model] = ContentFactory.get(content_type).objects.all()
         if content_type == "mesh":
             query = query.select_related("camera")
         objects[content_type] = query.in_bulk(ids)
@@ -39,8 +40,7 @@ def load_all_content_from_entry(date_slug: str) -> EntryContentContext:
     """For content with a given date slug return content information about the entry."""
     content_list: list[dict] = []
 
-    entry = Entry.objects.filter(name=date_slug).first()
-    if entry is not None:
+    if entry := Entry.objects.filter(name=date_slug).first():
         contents = list(entry.ordered_content())
         objects_by_type = load_content_objects(contents)
 

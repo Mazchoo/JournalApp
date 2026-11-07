@@ -1,13 +1,13 @@
 """Handle moving an entry from one date to another"""
 
-from typing import Optional, Dict, List, Any
+from typing import Optional, Dict, List, Any, cast
 
 from django.http import JsonResponse
 from django.forms.utils import ErrorDict
 from django.forms import model_to_dict
 from django.db import transaction
 
-from main.models import Entry, Content
+from main.models import Entry, Content, EntryImage, EntryMesh, EntryParagraph, EntryVideo
 from main.forms import EntryForm, ContentForm
 
 from main.content_generation.request_forms import DateMoveForm
@@ -57,7 +57,11 @@ def generate_new_content_from_source(
     content_type = content.content_type
 
     model = ContentFactory.get(content_type)
-    obj = model.objects.get(id=content.content_id)
+    # The factory returns the model class for this content type, so the row is one of these.
+    obj = cast(
+        EntryImage | EntryParagraph | EntryVideo | EntryMesh,
+        model.objects.get(id=content.content_id),
+    )
     new_obj_form = ContentUpdateFactory.get(content_type)(obj, new_slug)
 
     new_instance_id = None
