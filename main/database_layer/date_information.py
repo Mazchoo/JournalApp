@@ -1,6 +1,6 @@
 """Helpers to add date information for navigation"""
 
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from main.models import Entry
 from main.config import DateConstants
@@ -98,30 +98,21 @@ def get_day_information(
     else:
         suffix = "th"
 
-    days_in_month = month_info["days_in_month"]
-    nr_days_in_prev_month = month_info["nr_days_in_prev_month"]
-
-    next_day = day + 1 if day < len(days_in_month) else 1
-    next_day_month = month_ind if next_day != 1 else month_ind + 1
-    next_day_month = next_day_month if next_day_month < 13 else 1
-    next_day_year = year if next_day != 1 or next_day_month != 1 else year + 1
-
-    prev_day = day - 1 if day > 1 else nr_days_in_prev_month
-    prev_day_month = month_ind if day > 1 else month_ind - 1
-    prev_day_month = prev_day_month if prev_day_month > 0 else 12
-    prev_day_year = year if not (prev_day == 31 and prev_day_month == 12) else year - 1
+    current_date = date(year, month_ind, day)
+    next_date = current_date + timedelta(days=1)
+    prev_date = current_date - timedelta(days=1)
 
     return {
         "day": day,
         "date_slug": date_slug,
         "day_suffix": suffix,
-        "next_day": next_day,
-        "next_day_month": month_names[next_day_month - 1],
-        "next_day_year": next_day_year,
-        "prev_day": prev_day,
-        "prev_day_month": month_names[prev_day_month - 1],
-        "prev_day_year": prev_day_year,
-        "day_name": datetime(year, month_ind, day).strftime("%A"),
+        "next_day": next_date.day,
+        "next_day_month": month_names[next_date.month - 1],
+        "next_day_year": next_date.year,
+        "prev_day": prev_date.day,
+        "prev_day_month": month_names[prev_date.month - 1],
+        "prev_day_year": prev_date.year,
+        "day_name": current_date.strftime("%A"),
     }
 
 
