@@ -399,7 +399,7 @@ describe("serialize raw-html-editor", () => {
       text: RAW_HTML,
       height: 320,
       allow_ai_synthesis: 0,
-      raw_html: 1,
+      is_raw_html: 1,
       entry: "2024-03-15",
     });
   });

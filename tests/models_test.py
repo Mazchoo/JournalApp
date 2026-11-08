@@ -111,7 +111,7 @@ def test_paragraph_view_method():
         "text": "<h1>Title</h1>",
         "height": 300,
         "allow_ai_synthesis": 1,
-        "raw_html": 0,
+        "is_raw_html": 0,
     }
 
 

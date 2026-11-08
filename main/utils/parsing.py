@@ -18,3 +18,18 @@ def coerce_string_int_to_bool(content) -> Optional[bool]:
         return bool(int(content))
 
     return None
+
+
+def parse_optional_flag(content) -> bool | ValueError:
+    """Parse a 0/1 flag where a missing value means False.
+
+    Returns the error instead of raising it so each caller decides how to report it.
+    """
+    if content is None:
+        return False
+
+    cleaned_bool = coerce_string_int_to_bool(content)
+    if cleaned_bool is None:
+        return ValueError(f"'{content}' is not coercible to a boolean in 0, 1 format")
+
+    return cleaned_bool

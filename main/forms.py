@@ -34,7 +34,7 @@ from main.utils.file_io import (
     get_resized_filename,
 )
 from main.utils.mesh import save_mesh_frame_image
-from main.utils.parsing import coerce_string_int_to_bool
+from main.utils.parsing import parse_optional_flag
 from main.utils.errors import form_errors_message
 from main.utils.html_sanitize import sanitize_paragraph_html
 from main.config import ALLOWED_CONTENT_TYPES
@@ -42,6 +42,14 @@ from main.file_types import ImageFileType, MeshFileType, ReservedSuffix, VideoFi
 from main.database_layer.date_slugs import get_valid_date_from_slug
 from main.database_layer.get_all_years_summary import get_all_year_summary_information
 from main.database_layer.new_month import is_new_month_icon
+
+
+def clean_flag_field(form: forms.BaseForm, field_name: str) -> bool:
+    """Parse a submitted 0/1 flag, raising a ValidationError naming the field."""
+    parsed = parse_optional_flag(form.data.get(field_name))
+    if isinstance(parsed, ValueError):
+        raise forms.ValidationError(f"{field_name}: {parsed}")
+    return parsed
 
 
 def _saving_first_icon_in_month(form: ModelForm, commit: bool) -> bool:
@@ -148,18 +156,8 @@ class ImageForm(ModelForm):
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
-        """Ensure file path refers to usuable file"""
-        allow_syn = self.data.get("allow_ai_synthesis")
-        if allow_syn is None:
-            raise forms.ValidationError("Generate information not provided")
-
-        cleaned_bool = coerce_string_int_to_bool(allow_syn)
-        if cleaned_bool is not None:
-            return cleaned_bool
-
-        raise forms.ValidationError(
-            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
-        )
+        """Read the 0/1 flag; a missing flag means False."""
+        return clean_flag_field(self, "allow_ai_synthesis")
 
     def save(self, commit=True):
         """Persist the image. Drop the home-page icon cache when its month had none."""
@@ -227,18 +225,8 @@ class VideoForm(ModelForm):
         return make_media_path_relative(target_path)
 
     def clean_allow_ai_synthesis(self):
-        """Ensure file path refers to usuable file"""
-        allow_syn = self.data.get("allow_ai_synthesis")
-        if allow_syn is None:
-            raise forms.ValidationError("Generate information not provided")
-
-        cleaned_bool = coerce_string_int_to_bool(allow_syn)
-        if cleaned_bool is not None:
-            return cleaned_bool
-
-        raise forms.ValidationError(
-            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
-        )
+        """Read the 0/1 flag; a missing flag means False."""
+        return clean_flag_field(self, "allow_ai_synthesis")
 
     def save(self, commit=True):
         """Persist the video. Drop the home-page icon cache when its month had none."""
@@ -441,39 +429,19 @@ class ParagraphForm(ModelForm):
 
     class Meta:
         model = EntryParagraph
-        fields = ["text", "height", "allow_ai_synthesis", "raw_html"]
+        fields = ["text", "height", "allow_ai_synthesis", "is_raw_html"]
 
     def clean_text(self):
         """Remove script tags and their contents from paragraph HTML."""
         return sanitize_paragraph_html(self.cleaned_data["text"])
 
     def clean_allow_ai_synthesis(self):
-        """Ensure file path refers to usuable file"""
-        allow_syn = self.data.get("allow_ai_synthesis")
-        if allow_syn is None:
-            raise forms.ValidationError("Generate information not provided")
+        """Read the 0/1 flag; a missing flag means False."""
+        return clean_flag_field(self, "allow_ai_synthesis")
 
-        cleaned_bool = coerce_string_int_to_bool(allow_syn)
-        if cleaned_bool is not None:
-            return cleaned_bool
-
-        raise forms.ValidationError(
-            "Allow AI Synthesis is not coercible to a boolean in 0, 1 format"
-        )
-
-    def clean_raw_html(self):
+    def clean_is_raw_html(self):
         """Treat a missing flag as a TinyMCE paragraph."""
-        raw_html = self.data.get("raw_html")
-        if raw_html is None:
-            return False
-
-        cleaned_bool = coerce_string_int_to_bool(raw_html)
-        if cleaned_bool is not None:
-            return cleaned_bool
-
-        raise forms.ValidationError(
-            "Raw HTML is not coercible to a boolean in 0, 1 format"
-        )
+        return clean_flag_field(self, "is_raw_html")
 
 
 class DeleteEntryForm(forms.Form):

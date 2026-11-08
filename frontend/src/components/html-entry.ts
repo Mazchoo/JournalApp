@@ -138,7 +138,7 @@ export class HtmlEntry {
       text: this.textarea.value,
       height: (host?.clientHeight ?? PARAGRAPH_EDITOR_HEIGHT_PX) + 2,
       allow_ai_synthesis: allowSynthesis ? 1 : 0,
-      raw_html: 1,
+      is_raw_html: 1,
       entry: dateSlug(),
     };
   }

@@ -133,7 +133,7 @@ class EntryParagraph(Model):
     text = models.TextField()
     height = models.IntegerField()
     allow_ai_synthesis = models.BooleanField()
-    raw_html = models.BooleanField(default=False)
+    is_raw_html = models.BooleanField(default=False)
 
     def __repr__(self):
         return f"paragraph{self.pk} - Entry {self.entry.name}"
@@ -147,7 +147,7 @@ class EntryParagraph(Model):
             "text": self.text,
             "height": self.height,
             "allow_ai_synthesis": int(self.allow_ai_synthesis),
-            "raw_html": int(self.raw_html),
+            "is_raw_html": int(self.is_raw_html),
         }
 
 
