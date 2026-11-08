@@ -25,7 +25,7 @@ def check_target_path_in_post(post_data: dict, errors: ErrorDict) -> Optional[st
 def get_image_mime_type(target_path: str) -> Optional[str]:
     """Return an image MIME type, or None when the extension is unsupported."""
     encoding_type = get_encoding_type(target_path)
-    if encoding_type == ImageConstants.unknown_enoding_type:
+    if encoding_type == ImageConstants.unknown_encoding_type:
         return None
     return f"image/{encoding_type}"
 
@@ -63,7 +63,7 @@ def image_error_response(errors: ErrorDict) -> JsonResponse:
     return JsonResponse({"error": errors}, status=400)
 
 
-def get_full_image_reponse(post_data: dict) -> JsonResponse | FileResponse:
+def get_full_image_response(post_data: dict) -> JsonResponse | FileResponse:
     """Stream an image file, or a JSON error that does not include its path."""
     errors = ErrorDict()
 

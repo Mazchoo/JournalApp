@@ -10,7 +10,7 @@ from django.http import FileResponse, JsonResponse
 from main.content_generation.get_full_image import (
     check_target_path_in_post,
     create_image_stream_response,
-    get_full_image_reponse,
+    get_full_image_response,
     get_image_mime_type,
 )
 from tests.mocks import create_mock_client, create_mock_image_file, create_mock_svg_file
@@ -102,29 +102,29 @@ def test_create_image_stream_response_file_not_found():
     assert "nonexistent" not in str(errors)
 
 
-def test_get_full_image_reponse_success(tmp_path):
+def test_get_full_image_response_success(tmp_path):
     """A valid request with an existing image should stream the file."""
     image_path = create_mock_image_file(tmp_path)
-    response = get_full_image_reponse({"name": "2025-02-12", "file": "photo.jpg"})
+    response = get_full_image_response({"name": "2025-02-12", "file": "photo.jpg"})
     assert isinstance(response, FileResponse)
     assert response["Content-Type"] == "image/jpeg"
     assert b"".join(response.streaming_content) == image_path.read_bytes()
     assert str(image_path.parent) not in header_text(response)
 
 
-def test_get_full_image_reponse_for_svg(tmp_path):
+def test_get_full_image_response_for_svg(tmp_path):
     """A saved SVG streams as image/svg+xml."""
     svg_path = create_mock_svg_file(tmp_path)
-    response = get_full_image_reponse({"name": "2025-02-12", "file": "logo.svg"})
+    response = get_full_image_response({"name": "2025-02-12", "file": "logo.svg"})
     assert isinstance(response, FileResponse)
     assert response["Content-Type"] == "image/svg+xml"
     assert b"".join(response.streaming_content) == svg_path.read_bytes()
     assert str(svg_path.parent) not in header_text(response)
 
 
-def test_get_full_image_reponse_file_not_found(tmp_path):
+def test_get_full_image_response_file_not_found(tmp_path):
     """A request for a nonexistent image should return a JSON error."""
-    response = get_full_image_reponse({"name": "2025-02-12", "file": "missing.jpg"})
+    response = get_full_image_response({"name": "2025-02-12", "file": "missing.jpg"})
     assert isinstance(response, JsonResponse)
     assert response.status_code == 400
     body = response.content.decode()
@@ -132,9 +132,9 @@ def test_get_full_image_reponse_file_not_found(tmp_path):
     assert str(tmp_path) not in body
 
 
-def test_get_full_image_reponse_invalid_form():
+def test_get_full_image_response_invalid_form():
     """An empty request should return a JSON error from form validation."""
-    response = get_full_image_reponse({})
+    response = get_full_image_response({})
     assert isinstance(response, JsonResponse)
     assert response.status_code == 400
     data = json.loads(response.content)
@@ -143,7 +143,7 @@ def test_get_full_image_reponse_invalid_form():
 
 def test_get_full_image_with_non_date_name_returns_json_error():
     """`name` that is not YYYY-MM-DD must be rejected by the form."""
-    response = get_full_image_reponse({"name": "abc", "file": "photo.jpg"})
+    response = get_full_image_response({"name": "abc", "file": "photo.jpg"})
 
     assert response.status_code == 400
     assert "error" in json.loads(response.content)

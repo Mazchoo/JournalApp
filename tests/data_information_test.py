@@ -6,7 +6,6 @@ import pytest
 
 from main.content_generation.request_forms import (
     DayPageForm,
-    MonthNameForm,
     SaveEntryForm,
     YearPageForm,
 )
@@ -23,6 +22,7 @@ from main.database_layer.date_slugs import (
 )
 from main.database_layer.get_context import put_day_and_month_names_into_context
 from main.forms import DeleteEntryForm
+from main.url_forms import MonthNameForm
 from main.utils.date import date_exists
 from tests.mocks import create_mock_entry
 

@@ -270,12 +270,8 @@ def test_rejected_save_keeps_previous_content(second_save):
     [
         ("main.content_generation.save_entry.create_or_get_entry", _reject_entry),
         ("main.forms.ContentForm.is_valid", _reject_content_link),
-        (
-            "main.content_generation.content_factory_forms.ContentFormFactory.get",
-            _raise_parse,
-        ),
     ],
-    ids=["entry_create", "content_link", "content_parse"],
+    ids=["entry_create", "content_link"],
 )
 def test_failed_save_step_keeps_previous_content(monkeypatch, target, replacement):
     """A failure while resolving the entry or writing new rows keeps the stored paragraph."""
@@ -283,6 +279,19 @@ def test_failed_save_step_keeps_previous_content(monkeypatch, target, replacemen
     monkeypatch.setattr(target, replacement)
     response = update_or_generate_from_request(_paragraph_save("<p>Updated</p>"))
     assert "error" in json.loads(response.content)
+    _assert_stored_paragraph()
+
+
+@pytest.mark.django_db
+def test_content_parse_error_keeps_previous_content(monkeypatch):
+    """An unexpected error while parsing content propagates and nothing is written."""
+    update_or_generate_from_request(_paragraph_save())
+    monkeypatch.setattr(
+        "main.content_generation.content_factory_forms.ContentFormFactory.get",
+        _raise_parse,
+    )
+    with pytest.raises(RuntimeError):
+        update_or_generate_from_request(_paragraph_save("<p>Updated</p>"))
     _assert_stored_paragraph()
 
 

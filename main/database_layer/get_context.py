@@ -20,7 +20,7 @@ from main.database_layer.get_all_years_summary import (
     get_all_entry_years,
 )
 from main.config import ImageConstants
-from main.content_generation.request_forms import MonthNameForm
+from main.url_forms import MonthNameForm
 
 
 def put_day_and_month_names_into_context(

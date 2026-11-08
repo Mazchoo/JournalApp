@@ -84,8 +84,8 @@ def get_icon_file_path(image_file_path: Path) -> Path:
     if image_file_path == settings.MISSING_ICON_IMAGE:
         return image_file_path  # Already suitable to be an icon
 
-    extention = _ICON_EXTENSIONS.get(image_file_path.suffix, image_file_path.suffix)
-    icon_file_name = f"{image_file_path.stem}{ReservedSuffix.ICON}{extention}"
+    extension = _ICON_EXTENSIONS.get(image_file_path.suffix, image_file_path.suffix)
+    icon_file_name = f"{image_file_path.stem}{ReservedSuffix.ICON}{extension}"
     _, month, year = extract_date_from_folder(image_file_path.parent)
     return Path(f"{settings.ENTRY_FOLDER}/icons/{year}/{month}/{icon_file_name}")
 
@@ -177,12 +177,12 @@ def make_media_path_relative(file_name: str) -> str:
 def get_resized_filename(file_path: Path) -> Path:
     """Get resized image path from original file path"""
     if file_path.suffix == VideoFileType.MP4:
-        extention = ImageFileType.JPEG
+        extension = ImageFileType.JPEG
     elif file_path.suffix == MeshFileType.GLB:
-        extention = ImageFileType.JPEG
+        extension = ImageFileType.JPEG
     else:
-        extention = file_path.suffix
-    return file_path.parent / f"{file_path.stem}{ReservedSuffix.RESIZED}{extention}"
+        extension = file_path.suffix
+    return file_path.parent / f"{file_path.stem}{ReservedSuffix.RESIZED}{extension}"
 
 
 def move_media_to_save_path(target_file_path: str, file_name: str):

@@ -82,7 +82,7 @@ def get_encoding_type(file_path: Union[Path, str]) -> str:
     try:
         return ImageFileType(Path(file_path).suffix.lower()).encoding
     except ValueError:
-        return ImageConstants.unknown_enoding_type
+        return ImageConstants.unknown_encoding_type
 
 
 def ensure_resized_image(file_path: Path, factor: float, encoding_type: str) -> Path:

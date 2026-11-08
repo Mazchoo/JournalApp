@@ -9,7 +9,7 @@ from django.apps import apps
 from django.http import JsonResponse
 
 from main.content_generation.move_date import (
-    move_source_date_to_desination_request,
+    move_source_date_to_destination_request,
     update_entry_date,
 )
 from main.content_generation.save_entry import update_or_generate_from_request
@@ -31,7 +31,7 @@ def test_move_entry_success():
     create_mock_entry()
 
     with patch(
-        "main.views.move_source_date_to_desination_request",
+        "main.views.move_source_date_to_destination_request",
         return_value=JsonResponse({"new_date": "/edit/2025/March/1"}),
     ):
         response = client.post(
@@ -52,7 +52,7 @@ def test_move_entry_to_existing_date_returns_error():
     client = create_mock_client()
 
     with patch(
-        "main.views.move_source_date_to_desination_request",
+        "main.views.move_source_date_to_destination_request",
         return_value=JsonResponse({"error": "Destination date already exists"}),
     ):
         response = client.post(
@@ -72,7 +72,7 @@ def test_move_entry_from_nonexistent_source_returns_error():
     client = create_mock_client()
 
     with patch(
-        "main.views.move_source_date_to_desination_request",
+        "main.views.move_source_date_to_destination_request",
         return_value=JsonResponse({"error": "Source date not found"}),
     ):
         response = client.post(
@@ -119,7 +119,7 @@ def test_move_entry_keeps_mesh_content(tmp_path):
         }
     )
 
-    response = move_source_date_to_desination_request(
+    response = move_source_date_to_destination_request(
         {"move_from": "2025-02-12", "move_to": "2025-03-01"}
     )
     data = json.loads(response.content)
@@ -188,7 +188,7 @@ def test_move_entry_reports_error_when_destination_url_cannot_be_built(monkeypat
         "main.content_generation.move_date.convert_date_to_url_tuple",
         return_value=None,
     ):
-        response = move_source_date_to_desination_request(
+        response = move_source_date_to_destination_request(
             {"move_from": "2025-02-12", "move_to": "2025-03-01"}
         )
 

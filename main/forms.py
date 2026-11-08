@@ -117,7 +117,7 @@ class ImageForm(ModelForm):
         fields = ["file_path", "allow_ai_synthesis"]
 
     def clean_file_path(self):
-        """Ensure file path refers to usuable file"""
+        """Ensure file path refers to usable file"""
         clean_data = super().clean()
         if clean_data is None:
             raise forms.ValidationError("No data provided for image form")
@@ -188,7 +188,7 @@ class VideoForm(ModelForm):
         fields = ["file_path", "allow_ai_synthesis"]
 
     def clean_file_path(self):
-        """Ensure file path refers to usuable file"""
+        """Ensure file path refers to usable file"""
         clean_data = super().clean()
         if clean_data is None:
             raise forms.ValidationError("File path is not defined")
@@ -464,7 +464,7 @@ class DeleteEntryForm(forms.Form):
 
 
 class ContentForm(ModelForm):
-    """Generic content that applies to all content types e.g. image, text, ect.
+    """Generic content that applies to all content types e.g. image, text, etc.
 
     Creating, validating, or saving this form writes no files. ``save()`` only
     persists the Content row that points at an image, paragraph, video, or mesh.

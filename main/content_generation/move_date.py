@@ -7,7 +7,14 @@ from django.forms.utils import ErrorDict
 from django.forms import model_to_dict
 from django.db import transaction
 
-from main.models import Entry, Content, EntryImage, EntryMesh, EntryParagraph, EntryVideo
+from main.models import (
+    Entry,
+    Content,
+    EntryImage,
+    EntryMesh,
+    EntryParagraph,
+    EntryVideo,
+)
 from main.forms import EntryForm, ContentForm
 
 from main.content_generation.request_forms import DateMoveForm
@@ -142,7 +149,7 @@ def update_entry_date(
     return new_entry
 
 
-def move_source_date_to_desination_request(post_data: dict) -> JsonResponse:
+def move_source_date_to_destination_request(post_data: dict) -> JsonResponse:
     """Handle request to change the date of an entry"""
     errors: Dict[str, ErrorDict] = {}
 

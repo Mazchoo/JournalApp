@@ -12,26 +12,13 @@ from main.utils import file_io
 from main.utils.date import date_exists
 
 
-class MonthNameForm(Form):
-    """Validates that a month parameter is a valid month name."""
-
-    month = CharField()
-
-    def clean_month(self) -> str:
-        """Ensure month is a valid month name."""
-        month = self.cleaned_data["month"]
-        if month not in DateConstants.month_names:
-            raise ValidationError(f"month must be one of {DateConstants.month_names}")
-        return month
-
-
 class YearPageForm(Form):
     """Validated year parameter from URL."""
 
     year = IntegerField(min_value=1)
 
     def clean_year(self) -> int:
-        """Ensure year exists in the database."""
+        """Ensure year forms a valid calendar date."""
         year = self.cleaned_data["year"]
 
         if not date_exists(year):

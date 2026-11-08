@@ -20,7 +20,7 @@ from main.database_layer.get_latest_entry import get_latest_entry_tuple
 from main.content_generation.save_entry import update_or_generate_from_request
 from main.content_generation.load_entry import get_day_page_context
 from main.content_generation.delete_entry import delete_entry_and_content
-from main.content_generation.get_full_image import get_full_image_reponse
+from main.content_generation.get_full_image import get_full_image_response
 from main.content_generation.get_downsized_image import get_downsized_image_response
 from main.content_generation.get_full_video import get_full_video_response
 from main.content_generation.get_downsized_video_image import (
@@ -31,7 +31,7 @@ from main.content_generation.get_downsized_mesh_image import (
 )
 from main.content_generation.get_full_mesh import get_full_mesh_response
 from main.content_generation.get_icon import calendar_icon_response
-from main.content_generation.move_date import move_source_date_to_desination_request
+from main.content_generation.move_date import move_source_date_to_destination_request
 
 
 def home_page(request, **kwargs):
@@ -112,11 +112,6 @@ def edit_entry_page(request, **kwargs):
     return render(request=request, template_name="day.html", context=page_context)
 
 
-def show_entry_page(request, _day: int, _month: str, _year: int):
-    """Placeholder for extra content generated from a single entry"""
-    return render(request=request, template_name="day.html")
-
-
 def date_not_found_page(request):
     """Return page for date that does not exist"""
     return render(request=request, template_name="DateNotFound.html")
@@ -147,7 +142,7 @@ def save_entry(post_data):
 @ajax_request
 def get_image(post_data):
     """Async get a full image (not downsized one)"""
-    return get_full_image_reponse(post_data)
+    return get_full_image_response(post_data)
 
 
 @ajax_request
@@ -183,4 +178,4 @@ def get_downsized_mesh_image(post_data):
 @ajax_request
 def move_entry_date(post_data):
     """Async move entry to a different date"""
-    return move_source_date_to_desination_request(post_data)
+    return move_source_date_to_destination_request(post_data)

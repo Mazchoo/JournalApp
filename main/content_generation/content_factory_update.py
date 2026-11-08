@@ -28,7 +28,7 @@ def get_updated_date_video(video: EntryVideo, destination_slug: str) -> VideoFor
     return VideoForm(new_video_dict)
 
 
-def getUpdatedDateParagraph(
+def get_updated_date_paragraph(
     paragraph: EntryParagraph, destination_slug: str
 ) -> ParagraphForm:
     """Update paragraph content date with a new form"""
@@ -53,7 +53,7 @@ class ContentUpdateFactory:
 
     _CONTENT_UPDATE_DATE = {
         "image": get_updated_date_image,
-        "paragraph": getUpdatedDateParagraph,
+        "paragraph": get_updated_date_paragraph,
         "video": get_updated_date_video,
         "mesh": get_updated_date_mesh,
     }

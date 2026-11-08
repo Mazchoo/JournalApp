@@ -70,6 +70,10 @@ def parse_submitted_new_content(
         errors[f"{key}"] = ErrorList([" => Invalid content type"])
         return None
 
+    if not isinstance(value, dict):
+        errors[f"{key}"] = ErrorList([" => Content must be a set of fields"])
+        return None
+
     content_fields = dict(value)
     model_form = ContentFormFactory.get(content_type)(content_fields)  # type: ignore
 
@@ -88,12 +92,7 @@ def process_content_submitted(
     pending: List[PendingContent] = []
 
     for key, value in content_dict.items():
-        try:
-            parsed = parse_submitted_new_content(key, value, errors)
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            errors[f"{key}"] = ErrorList([f" => Internal server error: {e}"])
-            continue
-
+        parsed = parse_submitted_new_content(key, value, errors)
         if parsed is not None:
             pending.append(parsed)
 

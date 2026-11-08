@@ -1,6 +1,7 @@
 """Extract ajax request fields into a dict when making an async request from js side"""
 
 from collections import OrderedDict
+from functools import wraps
 from typing import Any, List
 
 from django.core.exceptions import ValidationError
@@ -54,6 +55,7 @@ def convert_query_into_nested_dict(query_dict: QueryDict) -> OrderedDict:
 def ajax_request(func):
     """Check that input request is an ajax request."""
 
+    @wraps(func)
     def wrap_func(request):
         if not is_ajax(request) or not request.POST:
             raise Http404

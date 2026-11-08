@@ -1,5 +1,6 @@
 """Helper functions to extract information and get a summary image of a video"""
 
+import logging
 from typing import Union
 from pathlib import Path
 from collections import namedtuple
@@ -7,6 +8,7 @@ from collections import namedtuple
 import numpy as np
 from PIL import Image, ImageFilter
 
+from Journal.settings import ENTRY_FOLDER
 from main.config import VideoConstants
 from main.utils.file_io import get_icon_file_path, get_resized_filename
 from main.utils.pil_image_wrapper import get_square_resized_image
@@ -25,6 +27,8 @@ CollageDrawDimensions = namedtuple(
     ],
 )
 
+logger = logging.getLogger(__name__)
+
 
 def lazy_create_video_icon(video_path: Path) -> bool:
     """
@@ -41,15 +45,17 @@ def lazy_create_video_icon(video_path: Path) -> bool:
     with VideoCapture(video_path) as capture:
         nr_frames = capture.get_total_frames()
         if nr_frames == 0:
-            print(f"Error! Video {video_path} has no frames to create icon.")
+            logger.warning("Video %s has no frames to create an icon from", video_path)
             return False
 
-        frame_ind = capture.get_frame_at_idx(nr_frames // 2)
-        if frame_ind is None:
-            print(f"Error! Can get frame index {frame_ind} from {video_path}.")
+        middle_frame = capture.get_frame_at_idx(nr_frames // 2)
+        if middle_frame is None:
+            logger.warning(
+                "Cannot read frame %d from video %s", nr_frames // 2, video_path
+            )
             return False
 
-        image = Image.fromarray(frame_ind)
+        image = Image.fromarray(middle_frame)
 
     image_resized = get_square_resized_image(image, VideoConstants.icon_size)
     image_resized.save(target_icon_file_path)
@@ -107,7 +113,7 @@ def draw_frame_to_collage(
     end_x = start_x + collage_dims.width
 
     frame_index = collage_dims.frame_increment // 2
-    frame_index += i * collage_dims.rows * collage_dims.frame_increment
+    frame_index += i * collage_dims.cols * collage_dims.frame_increment
     frame_index += j * collage_dims.frame_increment
 
     frame = capture.get_frame_at_idx(frame_index)
@@ -122,7 +128,7 @@ def draw_frame_to_collage(
     )
 
     # Apply smoothing filter if bilateral filter flag is enabled
-    if VideoConstants.billateral_filter:
+    if VideoConstants.bilateral_filter:
         pil_frame = pil_frame.filter(ImageFilter.SMOOTH)
 
     # Convert back to numpy array (already RGB - no conversion needed)
@@ -146,7 +152,7 @@ def create_collage_image(
 
     image_resized = Image.fromarray(collage_image)
     resized_path = target_path.parent / target_path.name
-    image_resized.save(resized_path, format=VideoConstants.save_image_extention)
+    image_resized.save(resized_path, format=VideoConstants.save_image_extension)
     return True
 
 
@@ -161,10 +167,10 @@ def lazy_create_resized_collage(file_path: Path) -> Path | None:
             factor = get_resizing_factor_to_collage_size(capture)
             if create_collage_image(capture, factor, resize_file_name):
                 return resize_file_name
-            print(f"Error! Video {file_path} could not create collage!")
+            logger.warning("Could not create collage for video %s", file_path)
             return None
 
-        print(f"Error! Video {file_path} cannot stream!")
+        logger.warning("Video %s cannot be opened for reading", file_path)
         return None
 
 
@@ -178,8 +184,6 @@ def collage_image_file(file_path: Union[Path, str]) -> Path | None:
 
 
 if __name__ == "__main__":
-    from Journal.settings import ENTRY_FOLDER
-
     with VideoCapture(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4")) as cap:
         create_collage_image(cap, 2, Path(f"{ENTRY_FOLDER}/20260129_222725.jpg"))
     lazy_create_video_icon(Path(f"{ENTRY_FOLDER}/20260129_222725.mp4"))

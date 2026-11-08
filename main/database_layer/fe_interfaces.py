@@ -8,13 +8,11 @@ from main.config import IDayNamesOfWeek, IMonthNamesOfYear
 
 
 class DayAndMonthNamesContext(TypedDict):
-    """Output from get_day_and_month_names."""
+    """Static day and month names used by every template."""
 
     full_day_names: IDayNamesOfWeek
     short_day_names: IDayNamesOfWeek
     months_in_year: IMonthNamesOfYear
-    year: Optional[int]
-    month: Optional[int]
 
 
 class YearNavigationContext(TypedDict):

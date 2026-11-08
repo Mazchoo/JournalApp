@@ -28,7 +28,7 @@ def delete_entry_content(entry: Entry):
     Content.objects.filter(id__in=delete_content_ids).delete()
 
     for model in ContentFactory.all_content_models():
-        model.objects.filter(entry=entry.name).delete()
+        model.objects.filter(entry=entry).delete()
 
 
 def _is_ignored_media_file(file: Path, ignore_file_names: List[str]) -> bool:

@@ -6,6 +6,7 @@ only ever delivered inside an ``<img>`` data URL, never inlined as markup, so
 scripts and external references in the file cannot run.
 """
 
+import logging
 from pathlib import Path
 
 from lxml.etree import XMLSyntaxError  # type: ignore
@@ -17,6 +18,8 @@ from svglib.svglib import svg2rlg  # type: ignore
 from main.config import ImageConstants
 from main.file_types import ImageFileType
 from main.utils.pil_image_wrapper import get_square_resized_image
+
+logger = logging.getLogger(__name__)
 
 
 def is_svg_path(file_path: Path) -> bool:
@@ -46,7 +49,7 @@ def write_svg_icon(svg_path: Path, icon_path: Path) -> bool:
     try:
         image = rasterize_svg(svg_path, 256)
     except (ValueError, OSError, XMLSyntaxError, RenderPMError) as exc:
-        print(f"Error! Cannot rasterise SVG {svg_path}: {exc}")
+        logger.warning("Cannot rasterise SVG %s: %s", svg_path, exc)
         return False
 
     icon = get_square_resized_image(image, ImageConstants.icon_size)

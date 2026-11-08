@@ -1,4 +1,4 @@
-"""Defintition of information need to use dated entries and contents of entries"""
+"""Definition of information need to use dated entries and contents of entries"""
 
 import json
 from pathlib import Path
@@ -11,7 +11,7 @@ from main.queries import EntryQuerySet
 
 
 class Content(Model):
-    """Stored data added to an entry (e.g. text, image, ect.)"""
+    """Stored data added to an entry (e.g. text, image, etc.)"""
 
     CONTENT_TYPES = [(t, t.capitalize()) for t in sorted(ALLOWED_CONTENT_TYPES)]
 
